@@ -1,0 +1,60 @@
+name: Backend CI
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint:
+    strategy:
+      matrix:
+        cmd: [black, ruff, mypy]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install poetry
+        run: pipx install poetry
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'poetry'
+      - name: Restore cached dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pypoetry
+          key: poetry-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: poetry-${{ runner.os }}-
+      - name: Install dependencies
+        run: poetry install
+      - name: Run lint check
+        run: poetry run pre-commit run -a ${{ matrix.cmd }}
+
+  pytest:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install poetry
+        run: pipx install poetry
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'poetry'
+      - name: Restore cached dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pypoetry
+          key: poetry-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: poetry-${{ runner.os }}-
+      - name: Install dependencies
+        run: poetry install
+      - name: Run tests
+        run: poetry run pytest -vv
