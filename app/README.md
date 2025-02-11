@@ -1,98 +1,149 @@
-# Welcome to your Expo app 👋
+# Memento App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+This mobile application is an [Expo](https://expo.dev) project that was created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app). Expo is a React Native framework that enables developing universal apps for both Android and iOS.
 
-## Get started
+## Get Started
 
 1. Install dependencies
 
    ```bash
-   npm install
+   pnpm i
    ```
 
 2. Start the app
 
    ```bash
-    npx expo start
+    pnpm start
    ```
 
 In the output, you'll find options to open the app in a
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
+- [Development build](https://docs.expo.dev/develop/development-builds/introduction/)
 - [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
 - [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
 - [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+The easiest, quickstart option is to download the Expo Go app on your physical device and to scan the QR code presented in the terminal output to launch the app.
 
-## Get a fresh project
+## Unit Testing
 
-When you're ready, run:
+Powered by [Jest](https://jestjs.io/).
 
 ```bash
-npm run reset-project
+ # pnpm i
+ pnpm test
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## E2E Testing
 
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
-
-## Android Emulator Setup (Windows/WSL)
+Powered by [Maestro](https://maestro.mobile.dev/), the simplest and most effective UI testing framework for mobile apps. Test flows are defined under the `e2e` folder.
 
 ### Prerequisites
 
-There are numerous ways to install and run an Android Emulator, depending on your host machine and preferred environment (Android Studio or CLI).
+- Android Emulator or iOS Simulator (MacOS)
+- Download and install [Maestro CLI](https://maestro.mobile.dev/getting-started/installing-maestro)
+  - for MacOS, Linux, or WSL:
+  ```bash
+  export MAESTRO_VERSION=1.39.0; curl -Ls "https://get.maestro.mobile.dev" | bash
+  ```
+  - for Windows, follow the instructions in link above
 
-One approach is to follow the instructions described in the [Android Developer documentation](https://developer.android.com/tools) for installing the Android SDK command-line tools.
+### Run Locally
 
-### Installation
+Follow the instructions provided in the Maestro documentation for [running flows](https://maestro.mobile.dev/getting-started/writing-your-first-flow). You must have an emulator/simulator running with the app installed before running the commands below.
 
-Maestro
+- All test flows for project
+  ```bash
+  pnpm test:e2e # or: maestro test
+  ```
+- Specific/individual flows
+  ```bash
+  maestro test <path-to-flow.yml>
+  ```
 
+### Run on EAS
+
+To build the app and run Maestro tests in the cloud, an EAS configuration is defined in `.eas/build/e2e-test.yml`.
+
+You can manually trigger the [EAS Build and E2E Test](https://github.com/owencooke/memento/actions/workflows/app-build.yml) GitHub Action to easily run the E2E tests on EAS.
+
+Alternatively, the tests can be ran using the EAS CLI.
+
+1. Ensure the EAS CLI is installed
+   ```bash
+   eas -v # otherwise, run: npm install --global eas-cli
+   ```
+2. To kickoff the E2E testing in EAS
+   ```bash
+   eas build --platform <android | ios | all> --profile e2e-test
+   ```
+
+Refer to the Expo Docs for more information about [custom EAS builds](https://docs.expo.dev/custom-builds/schema/#easmaestro_test).
+
+## Emulated Devices
+
+By far the most configuration-heavy and tricky part of mobile development, many of the prerequisites required to run an Android Emulator or iOS Simulator will depend on your local machine.
+
+It is recommended to follow official documentation for installing/running emulators.
+
+### Android Emulator
+
+Follow the [Android Developer documentation](https://developer.android.com/tools) for installing the Android SDK command-line tools (for `avdmanager`, `adb` and `emulator`). Alternatively, it is possible to use [Android Studio ](https://developer.android.com/tools/sdkmanager) to create devices and manage the Android SDK.
+
+Some helpful commands are provided below for reference
+
+#### Running a specific AVD
+
+This will launch a window running the virtual device.
+
+```bash
+emulator -avd Pixel_6_API_34
 ```
-export MAESTRO_VERSION=1.36.0; curl -Ls "https://get.maestro.mobile.dev" | bash
-sudo apt update && sudo apt install android-sdk
-mkdir /usr/lib/android-sdk/platform-tools
-sudo ln -s /mnt/c/Users/{UserName}/AppData/Local/Android/Sdk/platform-tools/adb.exe /usr/lib/android-sdk/platform-tools/adb
-sudo ln -s /mnt/c/Users/owenc/AppData/Local/Android/Sdk/emulator/emulator.exe /usr/bin/emulator
-sudo chown -R $USER:$USER /usr/lib/android-sdk
-sudo chmod -R 777 /usr/lib/android-sdk
-yes | sdkmanager --licenses
-adb shell pm list packages
-adb install android/app/build/outputs/apk/release/app-release.apk
-```
 
-### Running
+Tip: you can change the size of the emulated device using CTRL+UP or CTRL+DOWN.
 
-```
-emulator -avd Pixel_6_API_34 -scale 0.5
+#### Check emulator connected
+
+```bash
 adb devices
 ```
 
-## Build
+#### Building APK on emulator
 
-### Android
-
-Ensure emulator running first (see above). Then run
-
-```
-npx expo run:android
+```bash
+pnpm android # debug mode
+# or for production build: pnpm android:prod
 ```
 
-## EAS
+**Note:** build may fail at first, requiring you to accept necessary SDK licences. Some of these commands may be helpful, depending on your environment.
 
 ```
-eas build --profile e2e-test
+sudo apt update && sudo apt install android-sdk
+sudo chown -R $USER:$USER /usr/lib/android-sdk
+sudo chmod -R 777 /usr/lib/android-sdk
+yes | sdkmanager --licenses
 ```
+
+#### Verifying installed package IDs
+
+Can be helpful if Maestro flows can't launch the app on your emulator. Use this to verify the name of the package installed and the `appID` in the Maestro flow matches.
+
+```bash
+adb shell pm list packages
+```
+
+#### Manually installing build to emulator
+
+Building native code takes a long time; ~20 minutes for a sample app in EAS Build, potentially much longer locally depending on your host machine.
+
+An alternative option to building locally is to trigger an EAS build, then download the build artifact and manually install on your emulator using the command below.
+
+```bash
+adb install <path-to-apk>
+# ex: android/app/build/outputs/apk/release/app-release.apk
+```
+
+## Additional Resources
+
+- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
+- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.

@@ -5,12 +5,13 @@
   "scripts": {
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
-    "debug:android": "expo run:android",
+    "android": "expo run:android",
+    "android:prod": "expo run:android --variant release",
     "ios": "expo run:ios",
     "web": "expo start --web",
     "test": "jest",
-    "lint": "expo lint",
-    "build:android": "expo run:android --variant release"
+    "test:e2e": "maestro test",
+    "lint": "expo lint"
   },
   "jest": {
     "preset": "jest-expo"
