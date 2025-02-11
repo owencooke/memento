@@ -1,25 +1,21 @@
-name: EAS Build and E2E Test
+name: EAS Build / E2E Test
 
 on:
-  push:
-    branches:
-      - '**'
-# on:
-#   workflow_dispatch:
-#     inputs:
-#       branch:
-#         description: "Branch to build from"
-#         required: true
-#         default: "main"
-#       platform:
-#         type: choice
-#         description: "Platform to deploy/test on"
-#         required: true
-#         default: android
-#         options:
-#           - android
-#           - ios
-#           - all
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to build from"
+        required: true
+        default: "main"
+      platform:
+        type: choice
+        description: "Platform to deploy/test on"
+        required: true
+        default: android
+        options:
+          - android
+          - ios
+          - all
 
 jobs:
   build:
