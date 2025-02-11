@@ -48,3 +48,42 @@ Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+
+## Android Emulator Setup (Windows/WSL)
+
+### Prerequisites
+
+There are numerous ways to install and run an Android Emulator, depending on your host machine and preferred environment (Android Studio or CLI).
+
+One approach is to follow the instructions described in the [Android Developer documentation](https://developer.android.com/tools) for installing the Android SDK command-line tools.
+
+### Installation
+
+Maestro
+
+```
+export MAESTRO_VERSION=1.36.0; curl -Ls "https://get.maestro.mobile.dev" | bash
+```
+
+### Running
+
+```
+emulator -avd Pixel_6_API_34 -scale 0.5
+adb devices
+```
+
+## Build
+
+### Android
+
+Ensure emulator running first (see above). Then run
+
+```
+npx expo run:android
+```
+
+## EAS
+
+```
+eas build --profile e2e-test
+```

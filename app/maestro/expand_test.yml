@@ -1,0 +1,5 @@
+appId: com.memento.app
+---
+- tapOn: 'Explore.*'
+- tapOn: '.*File-based routing'
+- assertVisible: 'This app has two screens.*'

@@ -1,0 +1,19 @@
+{
+  "cli": {
+    "version": ">= 15.0.5",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "e2e-test": {
+      "withoutCredentials": true,
+      "config": "e2e-test.yml",
+      "android": {
+        "buildType": "apk",
+        "image": "latest"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
