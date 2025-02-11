@@ -1,15 +1,16 @@
 {
-  "name": "app",
+  "name": "memento",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
-    "android": "expo run:android",
+    "debug:android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
     "test": "jest",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "build:android": "expo run:android --variant release"
   },
   "jest": {
     "preset": "jest-expo"

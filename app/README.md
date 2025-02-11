@@ -63,6 +63,15 @@ Maestro
 
 ```
 export MAESTRO_VERSION=1.36.0; curl -Ls "https://get.maestro.mobile.dev" | bash
+sudo apt update && sudo apt install android-sdk
+mkdir /usr/lib/android-sdk/platform-tools
+sudo ln -s /mnt/c/Users/{UserName}/AppData/Local/Android/Sdk/platform-tools/adb.exe /usr/lib/android-sdk/platform-tools/adb
+sudo ln -s /mnt/c/Users/owenc/AppData/Local/Android/Sdk/emulator/emulator.exe /usr/bin/emulator
+sudo chown -R $USER:$USER /usr/lib/android-sdk
+sudo chmod -R 777 /usr/lib/android-sdk
+yes | sdkmanager --licenses
+adb shell pm list packages
+adb install android/app/build/outputs/apk/release/app-release.apk
 ```
 
 ### Running

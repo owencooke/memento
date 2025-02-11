@@ -1,9 +1,7 @@
 build:
-  name: Create a build and run Maestro tests on it
+  name: E2E Tests
   steps:
     - eas/build
     - eas/maestro_test:
         inputs:
-          flow_path: |
-            maestro/home.yml
-            maestro/expand_test.yml
+          flow_path: "maestro/*.yml"
