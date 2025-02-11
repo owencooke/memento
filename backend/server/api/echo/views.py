@@ -1,6 +1,5 @@
+from echo.schema import Message
 from fastapi import APIRouter
-
-from server.api.echo.schema import Message
 
 router = APIRouter()
 
