@@ -4,4 +4,4 @@ build:
     - eas/build
     - eas/maestro_test:
         inputs:
-          flow_path: "maestro/*.yml"
+          flow_path: ./e2e

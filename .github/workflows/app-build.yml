@@ -1,0 +1,66 @@
+name: EAS Build and E2E Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to build from"
+        required: true
+        default: "main"
+      platform:
+        type: choice
+        description: "Platform to deploy on"
+        required: true
+        default: android
+        options:
+          - android
+          - ios
+          - all
+
+jobs:
+  detect-and-deploy:
+    name: Auto Detect Build or Update
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./app
+
+    steps:
+      - name: 🏗 Checkout repository
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.inputs.branch }}
+          fetch-depth: 0
+
+      - name: 🏗 Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: ./app/pnpm-lock.yaml
+
+      - name: 🏗 Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: 🔍 Check for dependency or EAS changes
+        id: check_native
+        run: |
+          if git diff --name-only origin/main...HEAD | grep -E '^(package.json|pnpm-lock.yaml|eas.json)'; then
+            echo "NATIVE_CHANGED=true" >> $GITHUB_ENV
+          else
+            echo "NATIVE_CHANGED=false" >> $GITHUB_ENV
+          fi
+
+      - name: 🚀 Run EAS build or update
+        run: |
+          if [ "${{ env.NATIVE_CHANGED }}" == "true" ] || ! eas branch list | grep -q "${{ github.event.inputs.branch }}"; then
+            # If dependencies changed OR branch doesn't exist, run EAS build
+            eas build --platform ${{ github.event.inputs.platform }} --non-interactive --no-wait --profile e2e-test
+          else
+            # Only JS/UI changes, can update instead of full native build
+            eas update --auto --non-interactive --platform ${{ github.event.inputs.platform }} --profile e2e-test
+          fi
+        shell: bash
