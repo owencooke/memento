@@ -1,5 +1,7 @@
 @startwbs
 * Context-Aware Keepsake Digitizer
+
+' Owen
 ** User Authentication
 *** FR-1: Registration with SSO
 **** Create user table in database
@@ -15,7 +17,6 @@
 **** Redirect user to home page on success
 *** FR-3: Multi-device sign-in and access
 ' Q: what to put here... this might be more of a non=functional
-
 ** Images
 *** Image Capture
 **** FR-4: Take new photo with camera
@@ -53,24 +54,73 @@
 **** FR-11: Extract text from images
 ***** Call OCR library to extract text from input image
 ***** Add OCR result as field to keepsake metadata
-
 ** Keepsakes
 *** Filtering
 **** FR-12: Filter by date
+***** Create database query for filtering keepsakes by date range
+***** Create API endpoint for returning filtered keepsakes
+***** Create card component for a keepsake
+***** Create grid view for displaying all keepsake cards
+***** Create component for filter actionsheet trigger
+***** Add start and end date picker options to action sheet
+***** Update keepsake grid view by calling API endpoint when filters applied
 **** FR-13: Filter by location
+***** Modify database filter query to consider lat/long bounding box conditions
+***** Calculate lat/long bounding box for a location using geolocation library
+***** Add location text input option to filter actionsheet
+***** Add user's location input to client's filter API call
 **** FR-14: Filter by OCR keywords
+***** Modify database filter query to consider keywords in OCR results
+***** Add text search option to keepsake grid view page
+***** Add user's text search input to client's filter API call
 **** FR-15: Filter by user annotations
+***** Modify database filter query to consider keepsake keywords (from caption)
 **** FR-16: Filter by image classification
+***** Modify database filter query to consider image classification labels
+***** Add text input option for image class to filter actionsheet
+***** Add user's image category input to client's filter API call
 *** Creation
 **** FR-17: Add textual caption
+***** Create database table for a Keepsake
+***** Write query for inserting a new keepsake to database
+***** Create API endpoint for creating a new keepsake
+***** Create view for displaying "Create Keepsake" form
+***** Add text input option for caption to keepsake create form
+***** Add call to "Create Keepsake" API with form values when user submits
 **** FR-18: Process caption into keywords
+***** Use library to remove stopwords from keepsake caption
+***** Add remaining words from result to keepsake metadata
 **** FR-19: Edit metadata properties
+***** Add input fields to "Create Keepsake" form for user-modifiable metadata fields
 **** FR-20: Add images
+***** Create interactive image grid component for displaying added images
+***** Add photo component/trigger for uploading photos from device
+***** Add delete icon onto the corner of each image in the grid
+***** Remove image from the grid state when delete selected
+***** Modify "Create Keepsake" API endpoint payload to receive images 
+***** Upload image(s) to blob storage via cloud provider
+***** Add blob storage references to Keepsake database fields 
 **** FR-21: Specify thumbnail
+***** Add UI indicator for thumbnail to the leftmost topmost image in grid
+***** Add drag-and-drop support to image grid for changing thumbnail selection
 *** Bulk Creation
 **** FR-22: Group images into keepsakes
+***** Use image picker call to direct user to select multiple photos from device library
+***** Create form for displaying groups of images (1 per group initially)
+***** Add drag-and-drop support allowing user to move images to different groups
+***** Add button for confirming bulk creation of multiple keepsakes
+***** Modify "Create Keepsake" API endpoint to support multiple keepsakes in one payload
 **** FR-23: Set captions and metadata
+***** Add button/trigger for modifying a single keepsake/group 
+***** Display "Create Keepsake" form inputs for that particular group
+***** Save per-group modifications to a local state during bulk creation
 **** FR-24: Add to collection
+***** Add text input to form for new collection title.
+***** Add text input to form for new collection caption (optional).
+***** Add checkbox to form to allow user to optionally create a new collection for bulk keepsakes
+***** Modify "Create Keepsake" API endpoint to optionally create a new collection with keepsakes
+
+' Levi
 *** Viewing
 **** FR-25: View title
 **** FR-26: View description
@@ -84,7 +134,6 @@
 **** FR-33: Modify/remove metadata
 *** Deletion
 **** FR-34: Delete keepsake permanently
-
 ** Collections
 *** Manual Creation
 **** FR-35: Create new collection
@@ -100,6 +149,8 @@
 **** FR-43: Modify title
 **** FR-44: Modify/remove caption
 **** FR-45: Modify/remove metadata
+
+' Mahmud
 *** Deletion
 **** FR-46: Delete collection
 *** Metadata Management
