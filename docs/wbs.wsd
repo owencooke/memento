@@ -1,0 +1,89 @@
+@startwbs
+* Context-Aware Keepsake Digitizer
+** User Authentication
+*** FR-1: Allow users to register with SSO
+*** FR-2: Allow users to login with SSO
+*** FR-3: Allow multi-device sign-in and access
+
+** Images
+*** Image Capture
+**** FR-4: Take new photo with camera
+**** FR-5: Display reference square overlay
+**** FR-6: Select existing photos from library
+*** Image Processing
+**** FR-7: Extract EXIF metadata
+**** FR-8: Perform image classification
+**** FR-9: Populate fields from metadata
+**** FR-10: Remove image background
+**** FR-11: Extract text from images
+
+** Keepsakes
+*** Filtering
+**** FR-12: Filter by date
+**** FR-13: Filter by location
+**** FR-14: Filter by OCR keywords
+**** FR-15: Filter by user annotations
+**** FR-16: Filter by image classification
+*** Creation
+**** FR-17: Add textual caption
+**** FR-18: Process caption into keywords
+**** FR-19: Edit metadata properties
+**** FR-20: Add images
+**** FR-21: Specify thumbnail
+*** Bulk Creation
+**** FR-22: Group images into keepsakes
+**** FR-23: Set captions and metadata
+**** FR-24: Add to collection
+*** Viewing
+**** FR-25: View title
+**** FR-26: View description
+**** FR-27: View metadata
+**** FR-28: View photos in carousel
+*** Editing
+**** FR-29: Modify/remove title
+**** FR-30: Modify/remove description
+**** FR-31: Modify/remove images
+**** FR-32: Change thumbnail
+**** FR-33: Modify/remove metadata
+*** Deletion
+**** FR-34: Delete keepsake permanently
+
+** Collections
+*** Manual Creation
+**** FR-35: Create new collection
+**** FR-36: Require collection title
+**** FR-37: Add optional caption
+*** Automated Creation
+**** FR-38: Recommend collections
+**** FR-39: Notify of recommendations
+**** FR-40: Accept/reject recommendations
+*** Editing
+**** FR-41: Add keepsakes
+**** FR-42: Remove keepsakes
+**** FR-43: Modify title
+**** FR-44: Modify/remove caption
+**** FR-45: Modify/remove metadata
+*** Deletion
+**** FR-46: Delete collection
+*** Metadata Management
+**** FR-47: Auto-derive collection date
+**** FR-48: Auto-derive collection location
+**** FR-49: Modify location
+**** FR-50: Modify time/date
+' FIXME: DUPLICATE of FR-45
+**** FR-51: Modify/remove metadata
+
+** Visualization
+*** Map Features
+**** FR-52: Show collections on map
+**** FR-53: Click markers to view collection
+*** Content Generation
+**** FR-54: Generate collection collages
+
+** Integrations
+*** Sharing
+**** FR-55: Share keepsakes
+**** FR-56: Share collages
+*** Notifications
+**** FR-57: Special day reminders
+@endwbs
