@@ -15,8 +15,8 @@
 **** Manage user login session on mobile device
 **** Display login form with SSO button
 **** Redirect user to home page on success
+' Question: what to put for FR-3..? this might be more of a non=functional
 *** FR-3: Multi-device sign-in and access
-' Q: what to put here... this might be more of a non=functional
 ** Images
 *** Image Capture
 **** FR-4: Take new photo with camera
