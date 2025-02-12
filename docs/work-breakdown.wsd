@@ -1,4 +1,4 @@
-@startwbs
+@startwbs Work Breakdown Structure
 * Context-Aware Keepsake Digitizer
 
 ' Owen
@@ -8,7 +8,7 @@
 **** Insert SSO provided identifier / user details into database
 **** Create API endpoint for registering new user 
 **** Display registration form with SSO button and input fields
-**** Redirect user to login page on success
+**** Redirect user to home page on success
 *** FR-2: User login with SSO
 **** Validate user using SSO provider and database
 **** Create API endpoint for existing user login
