@@ -1,21 +1,58 @@
 @startwbs
 * Context-Aware Keepsake Digitizer
 ** User Authentication
-*** FR-1: Allow users to register with SSO
-*** FR-2: Allow users to login with SSO
-*** FR-3: Allow multi-device sign-in and access
+*** FR-1: Registration with SSO
+**** Create user table in database
+**** Insert SSO provided identifier / user details into database
+**** Create API endpoint for registering new user 
+**** Display registration form with SSO button and input fields
+**** Redirect user to login page on success
+*** FR-2: User login with SSO
+**** Validate user using SSO provider and database
+**** Create API endpoint for existing user login
+**** Manage user login session on mobile device
+**** Display login form with SSO button
+**** Redirect user to home page on success
+*** FR-3: Multi-device sign-in and access
+' Q: what to put here... this might be more of a non=functional
 
 ** Images
 *** Image Capture
 **** FR-4: Take new photo with camera
+***** Create component for image capture triggers and results
+***** Add "Take Photo" option to photo upload options actionsheet
+***** Open the device camera when button clicked
+***** Return the captured image as output from the module
 **** FR-5: Display reference square overlay
+***** Draw a square overlay on active camera display
+***** Remove overlay when looking at image result
 **** FR-6: Select existing photos from library
+***** Add "Select Photo" option to photo upload options actionsheet
+***** Open the mobile device's photo libary when button clicked
+***** Return the selected image(s) as output from the module
 *** Image Processing
 **** FR-7: Extract EXIF metadata
+***** Modify image capture APIs to obtain EXIF metadata
+***** Return the image(s) metadata as output from module
 **** FR-8: Perform image classification
+***** Select pre-trained ML model for image classification
+***** Select weights from image training datasets to use
+***** Transform input image to match expected ML model dimensions
+***** Process results of ML model into image label/category
+***** Add classification result as field to keepsake metadata
 **** FR-9: Populate fields from metadata
+***** Obtain aggregrated result from uploaded image(s) metadata
+***** Populate create keepsake form fields with aggregrated result
 **** FR-10: Remove image background
+***** Use library to remove background from image
+***** Crop resulting image to remove transparent pixels
+***** Create API Endpoint for image background removal
+***** Call endpoint for each uploaded image after user creates keepsake
+***** Display background-free result to user 
+***** Present dialog for user to accept the result or keep their original image
 **** FR-11: Extract text from images
+***** Call OCR library to extract text from input image
+***** Add OCR result as field to keepsake metadata
 
 ** Keepsakes
 *** Filtering
