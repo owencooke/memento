@@ -74,55 +74,55 @@ rectangle "Context-Aware Keepsake Digitizer" {
     ' }
   }
 
-'   package "Collections" {
-'     package "Manual Creation" {
-'       usecase "FR-35: Create new collection" as FR35
-'       usecase "FR-36: Require title" as FR36
-'       usecase "FR-37: Add caption" as FR37
-'     }
-'     package "Automated Creation" {
-'       usecase "FR-38: Recommend collections" as FR38
-'       usecase "FR-39: Notify recommendations" as FR39
-'       usecase "FR-40: Accept/reject recommendations" as FR40
-'     }
-'     package "Editing" {
-'       usecase "FR-41: Add keepsakes" as FR41
-'       usecase "FR-42: Remove keepsakes" as FR42
-'       usecase "FR-43: Modify title" as FR43
-'       usecase "FR-44: Modify caption" as FR44
-'       usecase "FR-45: Modify metadata" as FR45
-'     }
-'     package "Deletion" {
-'       usecase "FR-46: Delete collection" as FR46
-'     }
-'     package "Metadata Management" {
-'       usecase "FR-47: Auto-derive date" as FR47
-'       usecase "FR-48: Auto-derive location" as FR48
-'       usecase "FR-49: Modify location" as FR49
-'       usecase "FR-50: Modify time/date" as FR50
-'       usecase "FR-51: Modify metadata" as FR51
-'     }
-'   }
+  '   package "Collections" {
+  '     package "Manual Creation" {
+  '       usecase "FR-35: Create new collection" as FR35
+  '       usecase "FR-36: Require title" as FR36
+  '       usecase "FR-37: Add caption" as FR37
+  '     }
+  '     package "Automated Creation" {
+  '       usecase "FR-38: Recommend collections" as FR38
+  '       usecase "FR-39: Notify recommendations" as FR39
+  '       usecase "FR-40: Accept/reject recommendations" as FR40
+  '     }
+  '     package "Editing" {
+  '       usecase "FR-41: Add keepsakes" as FR41
+  '       usecase "FR-42: Remove keepsakes" as FR42
+  '       usecase "FR-43: Modify title" as FR43
+  '       usecase "FR-44: Modify caption" as FR44
+  '       usecase "FR-45: Modify metadata" as FR45
+  '     }
+  '     package "Deletion" {
+  '       usecase "FR-46: Delete collection" as FR46
+  '     }
+  '     package "Metadata Management" {
+  '       usecase "FR-47: Auto-derive date" as FR47
+  '       usecase "FR-48: Auto-derive location" as FR48
+  '       usecase "FR-49: Modify location" as FR49
+  '       usecase "FR-50: Modify time/date" as FR50
+  '       usecase "FR-51: Modify metadata" as FR51
+  '     }
+  '   }
 
-'   package "Visualization" {
-'     package "Map Features" {
-'       usecase "FR-52: Show collections on map" as FR52
-'       usecase "FR-53: Click markers to view" as FR53
-'     }
-'     package "Content Generation" {
-'       usecase "FR-54: Generate collages" as FR54
-'     }
-'   }
+  '   package "Visualization" {
+  '     package "Map Features" {
+  '       usecase "FR-52: Show collections on map" as FR52
+  '       usecase "FR-53: Click markers to view" as FR53
+  '     }
+  '     package "Content Generation" {
+  '       usecase "FR-54: Generate collages" as FR54
+  '     }
+  '   }
 
-'   package "Integrations" {
-'     package "Sharing" {
-'       usecase "FR-55: Share keepsakes" as FR55
-'       usecase "FR-56: Share collages" as FR56
-'     }
-'     package "Notifications" {
-'       usecase "FR-57: Special day reminders" as FR57
-'     }
-'   }
+  '   package "Integrations" {
+  '     package "Sharing" {
+  '       usecase "FR-55: Share keepsakes" as FR55
+  '       usecase "FR-56: Share collages" as FR56
+  '     }
+  '     package "Notifications" {
+  '       usecase "FR-57: Special day reminders" as FR57
+  '     }
+  '   }
 }
 
 ' User interactions
