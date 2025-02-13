@@ -153,31 +153,77 @@
 
 ' Levi
 *** Viewing
-' NOTE should the view requirements have an API for each FR? Should they just query the same endpoint?
+' FIXME: should the view requirements have an API for each FR? Should they just query the same endpoint? Should we have API for bulk retrieval and single retrieval?
+**** Create API endpoint for retrieving all keepsakes associated with a user
+**** Write query for retrieving all keepsakes for user from database
+**** Create view for displaying individual keepsake
+**** Create grid view for displaying keepsakes
+
 **** FR-25: View title
-***** Retrieve keepsake title from database
-***** Display keepsake title in keepsake view
+***** Create title field in individual keepsake view
+***** Create title field in keepsake grid view
+***** Populate title field 
 
 **** FR-26: View description
-***** Retrieve keepsake description from database
-***** Display keepsake description in keepsake view
+***** Create description field in individual keepsake view
+***** Populate description field 
 
 **** FR-27: View metadata
-***** Retrieve keepsake metadata from database
-***** Display keepsake description in keepsake view
+***** Create location field in individual keepsake view
+***** Create location field in keepsake grid view
+***** Populate location field 
+' NOTE Should we include the geocoding thing here?
+***** Make location field readable with geocode API
+***** Create date field in individual keepsake view
+***** Create date field in keepsake grid view
+***** Convert date field to readable format
+***** Populate date field 
+' NOTE Displaying any other metadata?
 
 **** FR-28: View photos in carousel
-***** Retrieve keepsake images from database
-***** Display images in horizontal scrolling carousel
-***** Enable touch/swipe gestures for navigating carousel
+' FIXME: No FR for thumbnail display. Should it go here or should we drop it for the diagram?
+***** Create UI component for displaying images in carousel
+***** Create API endpoint for retrieving keepsake images
+***** Enable swipe gesture for navigating carousel
+***** Populate image carousel
+***** Create UI component for displaying images in full screen
+***** Enable touch gesture for transitioning to full screen image view
 
 *** Editing
-' NOTE same here should each of these have an API endpoint?
+' FIXME: Should each field have an endpoint? If not should we put the nodes that apply to all the functional requirements under the Feature Node?
+**** Create API endpoint for updating keepsake in database
+**** Write query for updating keepsake in database
+**** Create view for displaying "Edit Keepsake" form
+**** Add call to "Edit Keepsake" API with form values when user submits
+
 **** FR-29: Modify/remove title
+***** Create text input field for title
+***** Populate title field with existing title
+***** Implement field validation confirming that title exists
+
 **** FR-30: Modify/remove description
+***** Create text input field for description
+***** Populate description field with existing description
+' NOTE Do we want to add field validation as leaf nodes? Works for both creation and editing
+
 **** FR-31: Modify/remove images
+***** Create interactive image grid component for displaying associated images
+***** Add photo component/trigger for taking photo using device camera
+***** Add photo component/trigger for uploading photos from device
+***** Add delete icon onto the corner of each image in the grid
+***** Remove image from the grid state when delete selected
+***** Modify "Edit Keepsake" API endpoint payload to receive images
+***** Modify "Edit Keepsake" API endpoint payload to communicate deleted images
+***** Upload image(s) to blob storage via cloud provider
+
 **** FR-32: Change thumbnail
+***** Add drag-and-drop support to image grid for changing thumbnail selection
+' NOTE Is there more to changing the thumbnail? Should specify API for thumbnail selection?
+
 **** FR-33: Modify/remove metadata
+' NOTE Again do we want to specify the fields?
+***** Add input fields to "Edit Keepsake" form for location field
+***** Add input fields to "Edit Keepsake" form for date field
 
 *** Deletion
 
@@ -186,6 +232,7 @@
 ***** Remove associated images from storage
 ***** Display confirmation prompt before deletion
 ***** Remove keepsake from user's view after deletion
+***** Delete keepsake from database
 
 ** Collections
 
