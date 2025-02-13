@@ -3,12 +3,14 @@
 
 ' Owen
 ** User Authentication
+
 *** FR-1: Registration with SSO
 **** Create user table in database
 **** Insert SSO provided identifier / user details into database
 **** Create API endpoint for registering new user 
 **** Display registration form with SSO button and input fields
 **** Redirect user to home page on success
+
 *** FR-2: User login with SSO
 **** Validate user using SSO provider and database
 **** Create API endpoint for existing user login
@@ -16,34 +18,45 @@
 **** Display login form with SSO button
 **** Redirect user to home page on success
 ' Question: what to put for FR-3..? this might be more of a non=functional
+' Answer: yeah seems more like non-functional. It's implied with how the SSO works imo
 *** FR-3: Multi-device sign-in and access
+
 ** Images
+
 *** Image Capture
+
 **** FR-4: Take new photo with camera
 ***** Create component for image capture triggers and results
 ***** Add "Take Photo" option to photo upload options actionsheet
 ***** Open the device camera when button clicked
 ***** Return the captured image as output from the module
+
 **** FR-5: Display reference square overlay
 ***** Draw a square overlay on active camera display
 ***** Remove overlay when looking at image result
+
 **** FR-6: Select existing photos from library
 ***** Add "Select Photo" option to photo upload options actionsheet
 ***** Open the mobile device's photo libary when button clicked
 ***** Return the selected image(s) as output from the module
+
 *** Image Processing
+
 **** FR-7: Extract EXIF metadata
 ***** Modify image capture APIs to obtain EXIF metadata
 ***** Return the image(s) metadata as output from module
+
 **** FR-8: Perform image classification
 ***** Select pre-trained ML model for image classification
 ***** Select weights from image training datasets to use
 ***** Transform input image to match expected ML model dimensions
 ***** Process results of ML model into image label/category
 ***** Add classification result as field to keepsake metadata
+
 **** FR-9: Populate fields from metadata
 ***** Obtain aggregrated result from uploaded image(s) metadata
 ***** Populate create keepsake form fields with aggregrated result
+
 **** FR-10: Remove image background
 ***** Use library to remove background from image
 ***** Crop resulting image to remove transparent pixels
@@ -51,11 +64,15 @@
 ***** Call endpoint for each uploaded image after user creates keepsake
 ***** Display background-free result to user 
 ***** Present dialog for user to accept the result or keep their original image
+
 **** FR-11: Extract text from images
 ***** Call OCR library to extract text from input image
 ***** Add OCR result as field to keepsake metadata
+
 ** Keepsakes
+
 *** Filtering
+
 **** FR-12: Filter by date
 ***** Create database query for filtering keepsakes by date range
 ***** Create API endpoint for returning filtered keepsakes
@@ -64,22 +81,28 @@
 ***** Create component for filter actionsheet trigger
 ***** Add start and end date picker options to action sheet
 ***** Update keepsake grid view by calling API endpoint when filters applied
+
 **** FR-13: Filter by location
 ***** Modify database filter query to consider lat/long bounding box conditions
 ***** Calculate lat/long bounding box for a location using geolocation library
 ***** Add location text input option to filter actionsheet
 ***** Add user's location input to client's filter API call
+
 **** FR-14: Filter by OCR keywords
 ***** Modify database filter query to consider keywords in OCR results
 ***** Add text search option to keepsake grid view page
 ***** Add user's text search input to client's filter API call
+
 **** FR-15: Filter by user annotations
 ***** Modify database filter query to consider keepsake keywords (from caption)
+
 **** FR-16: Filter by image classification
 ***** Modify database filter query to consider image classification labels
 ***** Add text input option for image class to filter actionsheet
 ***** Add user's image category input to client's filter API call
+
 *** Creation
+
 **** FR-17: Add textual caption
 ***** Create database table for a Keepsake
 ***** Write query for inserting a new keepsake to database
@@ -87,11 +110,14 @@
 ***** Create view for displaying "Create Keepsake" form
 ***** Add text input option for caption to keepsake create form
 ***** Add call to "Create Keepsake" API with form values when user submits
+
 **** FR-18: Process caption into keywords
 ***** Use library to remove stopwords from keepsake caption
 ***** Add remaining words from result to keepsake metadata
+
 **** FR-19: Edit metadata properties
 ***** Add input fields to "Create Keepsake" form for user-modifiable metadata fields
+
 **** FR-20: Add images
 ***** Create interactive image grid component for displaying added images
 ***** Add photo component/trigger for uploading photos from device
@@ -100,20 +126,25 @@
 ***** Modify "Create Keepsake" API endpoint payload to receive images 
 ***** Upload image(s) to blob storage via cloud provider
 ***** Add blob storage references to Keepsake database fields 
+
 **** FR-21: Specify thumbnail
 ***** Add UI indicator for thumbnail to the leftmost topmost image in grid
 ***** Add drag-and-drop support to image grid for changing thumbnail selection
+
 *** Bulk Creation
+
 **** FR-22: Group images into keepsakes
 ***** Use image picker call to direct user to select multiple photos from device library
 ***** Create form for displaying groups of images (1 per group initially)
 ***** Add drag-and-drop support allowing user to move images to different groups
 ***** Add button for confirming bulk creation of multiple keepsakes
 ***** Modify "Create Keepsake" API endpoint to support multiple keepsakes in one payload
+
 **** FR-23: Set captions and metadata
 ***** Add button/trigger for modifying a single keepsake/group 
 ***** Display "Create Keepsake" form inputs for that particular group
 ***** Save per-group modifications to a local state during bulk creation
+
 **** FR-24: Add to collection
 ***** Add text input to form for new collection title.
 ***** Add text input to form for new collection caption (optional).
@@ -122,56 +153,111 @@
 
 ' Levi
 *** Viewing
+' NOTE should the view requirements have an API for each FR? Should they just query the same endpoint?
 **** FR-25: View title
+***** Retrieve keepsake title from database
+***** Display keepsake title in keepsake view
+
 **** FR-26: View description
+***** Retrieve keepsake description from database
+***** Display keepsake description in keepsake view
+
 **** FR-27: View metadata
+***** Retrieve keepsake metadata from database
+***** Display keepsake description in keepsake view
+
 **** FR-28: View photos in carousel
+***** Retrieve keepsake images from database
+***** Display images in horizontal scrolling carousel
+***** Enable touch/swipe gestures for navigating carousel
+
 *** Editing
+' NOTE same here should each of these have an API endpoint?
 **** FR-29: Modify/remove title
 **** FR-30: Modify/remove description
 **** FR-31: Modify/remove images
 **** FR-32: Change thumbnail
 **** FR-33: Modify/remove metadata
+
 *** Deletion
+
 **** FR-34: Delete keepsake permanently
+***** Create API endpoint for deleting keepsake entry
+***** Remove associated images from storage
+***** Display confirmation prompt before deletion
+***** Remove keepsake from user's view after deletion
+
 ** Collections
+
 *** Manual Creation
+
 **** FR-35: Create new collection
+***** Create API endpoint for collection creation
+***** Add UI form for entering collection details
+
 **** FR-36: Require collection title
+
 **** FR-37: Add optional caption
+
 *** Automated Creation
+
 **** FR-38: Recommend collections
+
 **** FR-39: Notify of recommendations
+
 **** FR-40: Accept/reject recommendations
+
 *** Editing
+
 **** FR-41: Add keepsakes
+
 **** FR-42: Remove keepsakes
+
 **** FR-43: Modify title
+
 **** FR-44: Modify/remove caption
+
 **** FR-45: Modify/remove metadata
 
 ' Mahmud
 *** Deletion
+
 **** FR-46: Delete collection
+
 *** Metadata Management
+
 **** FR-47: Auto-derive collection date
+
 **** FR-48: Auto-derive collection location
+
 **** FR-49: Modify location
+
 **** FR-50: Modify time/date
 ' FIXME: DUPLICATE of FR-45
+
 **** FR-51: Modify/remove metadata
 
 ** Visualization
+
 *** Map Features
+
 **** FR-52: Show collections on map
+
 **** FR-53: Click markers to view collection
+
 *** Content Generation
+
 **** FR-54: Generate collection collages
 
 ** Integrations
+
 *** Sharing
+
 **** FR-55: Share keepsakes
+
 **** FR-56: Share collages
+
 *** Notifications
+
 **** FR-57: Special day reminders
 @endwbs
