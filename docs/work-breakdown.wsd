@@ -240,21 +240,41 @@
 
 **** FR-35: Create new collection
 ***** Create API endpoint for collection creation
-***** Add UI form for entering collection details
+***** Write query for adding a collection to the database
+***** Create view for displaying "Create Collection" form
+***** Add call to "Create Collection" API with form values when user submits
 
 **** FR-36: Require collection title
+***** Validate title field confirming it is not empty
 
 **** FR-37: Add optional caption
+***** Create text input field for caption
 
-*** Automated Creation
+' TODO Missing anything big here?
+*** System-Recommended Collection Creation
 
 **** FR-38: Recommend collections
+***** Implement clustering algorithm for keepsake locations
+***** Define confidence threshold for accepting recommended collections
 
 **** FR-39: Notify of recommendations
+***** Send from backend to client a notification of recommended collection
+***** Create UI component for previewing recommended collection
+***** Create button/trigger for accepting or rejecting collection
+***** Add input fields to "Recommended Collection" form for collection title
+***** Validate title field
 
 **** FR-40: Accept/reject recommendations
+***** Create API endpoint for accepting/rejecting recommended collections
+***** Create process for building default recommendation from clustered keepsakes
+***** Insert recommended collection into database
+***** Update client view with new collection
 
 *** Editing
+**** Create API endpoint for updating collection in database
+**** Write query for updating collection in database
+**** Create view for displaying "Edit Collection" form
+**** Add call to "Edit Collection" API with form values when user submits
 
 **** FR-41: Add keepsakes
 
