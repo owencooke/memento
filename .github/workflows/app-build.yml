@@ -3,10 +3,6 @@ name: EAS Build / E2E Test
 on:
   workflow_dispatch:
     inputs:
-      branch:
-        description: "Branch to build from"
-        required: true
-        default: "main"
       platform:
         type: choice
         description: "Platform to deploy/test on"
@@ -28,15 +24,11 @@ jobs:
     steps:
       - name: 🏗 Checkout repository
         uses: actions/checkout@v3
-        with:
-          ref: ${{ github.event.inputs.branch }}
 
       - name: 🏗 Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: 20
-          cache: pnpm
-          cache-dependency-path: ./app/pnpm-lock.yaml
 
       - name: 🏗 Setup EAS
         uses: expo/expo-github-action@v8
