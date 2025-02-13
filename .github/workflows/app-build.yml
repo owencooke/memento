@@ -22,21 +22,45 @@ jobs:
         working-directory: ./app
 
     steps:
-      - name: 🏗 Checkout repository
+      - name: Checkout repository
         uses: actions/checkout@v3
+      
+      - name: Cache pnpm
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
 
-      - name: 🏗 Setup Node
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 20
+          cache: pnpm
+          cache-dependency-path: ./app/pnpm-lock.yaml
 
-      - name: 🏗 Setup EAS
+      - name: Cache pnpm store
+        uses: actions/cache@v3
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Setup EAS
         uses: expo/expo-github-action@v8
         with:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: 🚀 Run EAS build
+      - name: Run EAS build
         run: |
           eas build --platform ${{ github.event.inputs.platform }} --non-interactive --no-wait --profile e2e-test
         shell: bash
