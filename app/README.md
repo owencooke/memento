@@ -25,6 +25,20 @@ In the output, you'll find options to open the app in a
 
 The easiest, quickstart option is to download the Expo Go app on your physical device and to scan the QR code presented in the terminal output to launch the app.
 
+## Sync Backend API
+
+This project uses [hey-api](https://heyapi.dev/) to automatically generate TypeScript types and API clients from the backend's OpenAPI definition.
+
+To sync new backend changes to the mobile client:
+
+1. Ensure the local backend server is running at http://localhost:8000/ with your new API changes
+2. In the `/app` directory, run the command
+   ```bash
+   pnpm sync-api
+   ```
+
+This should generate new TypeScript clients/types inside the `/app/api-client/` folder that reflect your new or modified APIs that are ready for use!
+
 ## Unit Testing
 
 Powered by [Jest](https://jestjs.io/).

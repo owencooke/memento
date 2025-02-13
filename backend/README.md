@@ -25,7 +25,7 @@ To run the project use this set of commands:
 poetry run python -m server
 ```
 
-This will start the server on the configured host.
+This will start the server at http://localhost:8000/api.
 
 You can find Swagger documentation at `/docs`.
 
