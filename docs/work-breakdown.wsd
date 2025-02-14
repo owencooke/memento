@@ -169,11 +169,13 @@
 ***** Populate description field 
 
 **** FR-27: View metadata
+' Location Metadata
 ***** Create location field in individual keepsake view
 ***** Create location field in keepsake grid view
 ***** Populate location field 
 ' NOTE Should we include the geocoding thing here?
 ***** Make location field readable with geocode API
+' Date Metadata
 ***** Create date field in individual keepsake view
 ***** Create date field in keepsake grid view
 ***** Convert date field to readable format
@@ -275,16 +277,36 @@
 **** Write query for updating collection in database
 **** Create view for displaying "Edit Collection" form
 **** Add call to "Edit Collection" API with form values when user submits
+**** Create button/trigger for accepting or rejecting collection changes
 
 **** FR-41: Add keepsakes
+***** Create UI component for selecting keepsakes to add to collection
+***** Update collection contents in database
 
 **** FR-42: Remove keepsakes
+***** Create UI component for selecting keepsakes to remove from collection
+***** Update collection contents in database
 
 **** FR-43: Modify title
+***** Create UI input for editing title
+***** Populate title field with existing title
+***** Update collection title in database
 
 **** FR-44: Modify/remove caption
+***** Create UI input for editing caption
+***** Populate caption field with existing caption
+***** Update collection caption in database
 
 **** FR-45: Modify/remove metadata
+' Date Metadata
+***** Create UI input for editing date
+***** Populate date field with existing date
+***** Convert date field to readable format
+***** Update collection date in database
+' Location Metadata
+***** Create UI input for editing location
+***** Populate location field with existing location
+***** Update collection location in database
 
 ' Mahmud
 *** Deletion
