@@ -16,7 +16,7 @@ lint = "scripts.commands:lint"
 test = "scripts.commands:test"
 
 [tool.poetry.dependencies]
-python = ">3.9.1,<4"
+python = ">=3.10,<3.14"
 fastapi = "^0.115.6"
 uvicorn = { version = "^0.34.0", extras = ["standard"] }
 pydantic = "^2.10.4"
@@ -24,7 +24,6 @@ pydantic-settings = "^2.7.0"
 yarl = "^1.18.3"
 ujson = "^5.10.0"
 httptools = "^0.6.4"
-pymongo = "^4.10.1"
 loguru = "^0.7.3"
 
 

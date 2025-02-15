@@ -7,13 +7,29 @@ tool.
 
 To install Poetry
 
-```
+```bash
 curl -sSL https://install.python-poetry.org | python3 -
 ```
 
-Be sure to add the prompted PATH variable to your `.bashrc` after running. Then, install the project dependencies:
+Be sure to add the prompted PATH variable to your `.bashrc` after running:
 
+```bash
+# Open editor, add poetry to PATH, save
+nano ~/.bashrc
+# Refresh terminal
+source ~/.bashrc
 ```
+
+Other system dependencies that must be installed:
+
+```bash
+sudo apt update
+sudo apt install llvm-dev
+```
+
+Lastly, install the project's Python dependencies via Poetry:
+
+```bash
 poetry install
 ```
 
