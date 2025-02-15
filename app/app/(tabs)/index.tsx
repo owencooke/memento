@@ -2,6 +2,7 @@ import React from "react";
 import MapView, { Marker } from "react-native-maps";
 import { StyleSheet, View } from "react-native";
 import { Button, ButtonText } from "@/components/ui/button";
+import SingleSignOn from "@/components/SingleSignOn";
 
 export default function App() {
   const markers = [
@@ -39,8 +40,9 @@ export default function App() {
       <Button className="mt-32">
         <ButtonText>Testing</ButtonText>
       </Button>
+      <SingleSignOn />
       <View className="flex w-full h-full">
-        <MapView
+        {/* <MapView
           style={{
             width: "100%",
             height: "100%",
@@ -60,7 +62,7 @@ export default function App() {
               description={marker.description}
             />
           ))}
-        </MapView>
+        </MapView> */}
       </View>
     </View>
   );
