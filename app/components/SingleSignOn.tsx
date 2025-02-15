@@ -1,52 +1,16 @@
 import * as React from "react";
 import { Button } from "react-native";
-import * as AuthSession from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
-import * as Linking from "expo-linking";
 import { supabase } from "@/libs/supabase/config";
-import { useRouter } from "expo-router";
 
-// Define your redirect URI
-// const redirectUri = Linking.createURL("/auth/redirect"); // Matches Supabase config
+const redirectUri = "memento://auth/redirect";
 
 export default function GoogleSignIn() {
-  const router = useRouter();
   const [isAuthenticating, setIsAuthenticating] = React.useState(false);
-
-  //   const redirectUri = AuthSession.makeRedirectUri({
-  //     scheme: "memento",
-  //     path: "auth/redirect",
-  //     preferLocalhost: false, // Avoids localhost URLs
-  //     isTripleSlashed: false, // Ensures correct format
-  //   });
-  const redirectUri = "memento://auth/redirect";
-
-  // Handle incoming OAuth response
-  React.useEffect(() => {
-    const handleDeepLink = async ({ url }: { url: string }) => {
-      if (url) {
-        await handleOAuthCallback(url);
-      }
-    };
-
-    // Listen for deep link events
-    const subscription = Linking.addEventListener("url", handleDeepLink);
-
-    return () => {
-      subscription.remove();
-    };
-  }, []);
 
   // Open Google OAuth flow
   const signInWithGoogle = async () => {
     setIsAuthenticating(true);
-
-    // let redirect = AuthSession.makeRedirectUri({
-    //   scheme: "memento",
-    //   path: redirectUri,
-    // });
-
-    console.log({ redirectUri });
 
     try {
       let result = await WebBrowser.openAuthSessionAsync(
