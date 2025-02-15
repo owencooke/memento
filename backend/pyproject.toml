@@ -10,6 +10,11 @@ maintainers = [
 ]
 readme = "README.md"
 
+[tool.poetry.scripts]
+start = "scripts.commands:start"
+lint = "scripts.commands:lint"
+test = "scripts.commands:test"
+
 [tool.poetry.dependencies]
 python = ">3.9.1,<4"
 fastapi = "^0.115.6"
@@ -51,6 +56,7 @@ allow_untyped_decorators = true
 warn_unused_ignores = false
 warn_return_any = false
 namespace_packages = true
+explicit_package_bases = true
 
 [tool.pytest.ini_options]
 filterwarnings = [

@@ -19,17 +19,17 @@ poetry install
 
 ## Running
 
-To run the project use this set of commands:
+To run the backend server:
 
 ```bash
-poetry run python -m server
+poetry run start
 ```
 
 This will start the server at http://localhost:8000/api.
 
-You can find Swagger documentation at `/docs`.
+You can find Swagger API documentation at `/docs`.
 
-## Pre-commit
+## Linting / Pre-commit
 
 To install [pre-commit](https://pre-commit.com/) simply run inside the shell:
 
@@ -37,18 +37,24 @@ To install [pre-commit](https://pre-commit.com/) simply run inside the shell:
 pre-commit install
 ```
 
-Configured using the `.pre-commit-config.yaml` file, it runs:
+Configured using the `.pre-commit-config.yaml` file, it runs the following before proceeding with a commit:
 
 - black (formats the code);
 - mypy (validates types);
 - ruff (spots possible bugs);
+
+You can also manually run the lint commands using:
+
+```bash
+poetry run lint
+```
 
 ## Tests
 
 For running tests on your local machine:
 
 ```bash
-poetry run pytest -vv
+poetry run test
 ```
 
 ## References
