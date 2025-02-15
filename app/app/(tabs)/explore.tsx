@@ -7,6 +7,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import CameraPicker from "@/components/CameraPicker";
+import UserProfile from "@/components/UserInfo";
 
 export default function TabTwoScreen() {
   return (
@@ -21,6 +22,7 @@ export default function TabTwoScreen() {
         />
       }
     >
+      <UserProfile />
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">Explore</ThemedText>
       </ThemedView>

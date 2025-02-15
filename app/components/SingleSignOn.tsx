@@ -64,21 +64,39 @@ export default function GoogleSignIn() {
     }
   };
 
-  // Extract token and sign in user
   const handleOAuthCallback = async (url: string) => {
-    console.log({ url });
-    // try {
-    //   const { data, error } = await supabase.auth.getSessionFromUrl({ url });
+    try {
+      // Parse the URL
+      const parsedUrl = new URL(url);
 
-    //   if (error) {
-    //     console.error("Error processing OAuth callback:", error.message);
-    //   } else {
-    //     console.log("✅ Signed in!", data);
-    //     router.push("/home"); // Navigate to home or dashboard
-    //   }
-    // } catch (err) {
-    //   console.error("OAuth callback handling error:", err);
-    // }
+      // Extract the fragment part (after #)
+      const fragment = parsedUrl.hash.substr(1); // Remove the '#' from the beginning
+      const params = new URLSearchParams(fragment); // Create a URLSearchParams object to parse the fragment
+
+      // Extract the access_token and refresh_token
+      const access_token = params.get("access_token");
+      const refresh_token = params.get("refresh_token"); // Extract if available
+
+      if (!access_token) {
+        console.error("No access token found!");
+        return;
+      }
+
+      // Use the token to get the authenticated user from Supabase
+      const { data: user, error } = await supabase.auth.setSession({
+        access_token,
+        refresh_token: refresh_token || "", // Fallback to an empty string if no refresh token is provided
+      });
+
+      if (error) {
+        console.error("Error setting session:", error.message);
+        return;
+      }
+
+      console.log("✅ Supabase user:", user);
+    } catch (error: any) {
+      console.error("Error processing OAuth callback:", error.message);
+    }
   };
 
   return (
