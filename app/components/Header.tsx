@@ -9,6 +9,8 @@ import {
   AvatarFallbackText,
   AvatarImage,
 } from "@/components/ui/avatar";
+import { Menu, MenuItem, MenuItemLabel } from "./ui/menu";
+import { Button } from "@/components/ui/button";
 
 interface HeaderProps {
   title: string;
@@ -16,7 +18,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ title, navigate }) => {
-  const { session } = useSession();
+  const { session, signOut } = useSession();
 
   return (
     <SafeAreaView className="bg-background-0" edges={["top"]}>
@@ -34,16 +36,28 @@ const Header: React.FC<HeaderProps> = ({ title, navigate }) => {
           className="mr-2"
         />
         <Text className="text-xl font-semibold">{title}</Text>
-        <Avatar size={"md"} className="ml-2">
-          <AvatarFallbackText>
-            {session?.user.user_metadata.full_name}
-          </AvatarFallbackText>
-          <AvatarImage
-            source={{
-              uri: session?.user.user_metadata.avatar_url,
-            }}
-          />
-        </Avatar>
+        <Menu
+          placement="bottom left"
+          offset={4}
+          trigger={({ ...triggerProps }) => (
+            <Button {...triggerProps} variant="link">
+              <Avatar size={"md"} className="ml-2">
+                <AvatarFallbackText>
+                  {session?.user.user_metadata.full_name}
+                </AvatarFallbackText>
+                <AvatarImage
+                  source={{
+                    uri: session?.user.user_metadata.avatar_url,
+                  }}
+                />
+              </Avatar>
+            </Button>
+          )}
+        >
+          <MenuItem onPress={signOut}>
+            <MenuItemLabel size="md">Sign out</MenuItemLabel>
+          </MenuItem>
+        </Menu>
       </View>
     </SafeAreaView>
   );
