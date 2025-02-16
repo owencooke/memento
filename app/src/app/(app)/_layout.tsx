@@ -2,13 +2,19 @@ import { Text, View } from "react-native";
 import { Redirect, Stack } from "expo-router";
 
 import { useSession } from "@/src/context/AuthContext";
+import { Center } from "@/src/components/ui/center";
+import { Spinner } from "@/src/components/ui/spinner";
 
 export default function AppLayout() {
   const { session, isLoading } = useSession();
 
   // You can keep the splash screen open, or render a loading screen like we do here.
   if (isLoading) {
-    return <Text>Loading...</Text>;
+    return (
+      <Center className="w-full h-full">
+        <Spinner></Spinner>
+      </Center>
+    );
   }
 
   // Only require authentication within the (app) group's layout as users

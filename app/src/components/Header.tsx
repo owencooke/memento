@@ -37,6 +37,7 @@ const Header: React.FC<HeaderProps> = ({ title, navigate }) => {
         />
         <Text className="text-xl font-semibold">{title}</Text>
         <Menu
+          className="bg-background-0"
           placement="bottom left"
           offset={4}
           trigger={({ ...triggerProps }) => (
@@ -54,7 +55,7 @@ const Header: React.FC<HeaderProps> = ({ title, navigate }) => {
             </Button>
           )}
         >
-          <MenuItem onPress={signOut}>
+          <MenuItem onPress={signOut} textValue="Sign out">
             <MenuItemLabel size="md">Sign out</MenuItemLabel>
           </MenuItem>
         </Menu>

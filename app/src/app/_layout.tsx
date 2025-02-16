@@ -36,7 +36,7 @@ export default function RootLayout() {
 
   return (
     <AuthProvider>
-      <GluestackUIProvider mode="light">
+      <GluestackUIProvider mode={colorScheme ?? "light"}>
         <ThemeProvider
           value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
         >
