@@ -94,8 +94,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     router.replace("/");
   };
 
-  //   NOTE: might not need if managed properly via signIn/signOut
   useEffect(() => {
+    const checkSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      setSession(session);
+      setIsLoading(false);
+    };
+
+    checkSession();
+
+    //   NOTE: might not need if managed properly via signIn/signOut
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (_, session) => {
         setSession(session);
