@@ -1,7 +1,7 @@
 import {
   DarkTheme,
   DefaultTheme,
-  ThemeProvider,
+  ThemeProvider as NavigationThemeProvider,
 } from "@react-navigation/native";
 import "@/global.css";
 import { GluestackUIProvider } from "@/src/components/ui/gluestack-ui-provider";
@@ -12,14 +12,14 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import "react-native-reanimated";
 
-import { useColorScheme } from "react-native";
+import { ThemeProvider, useTheme } from "@/src/context/ThemeContext";
 import { AuthProvider } from "@/src/context/AuthContext";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
+function RootContent() {
+  const { theme } = useTheme();
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
@@ -35,19 +35,27 @@ export default function RootLayout() {
   }
 
   return (
+    <GluestackUIProvider mode={theme}>
+      <NavigationThemeProvider
+        value={theme === "dark" ? DarkTheme : DefaultTheme}
+      >
+        <Stack>
+          <Stack.Screen name="(app)" options={{ headerShown: false }} />
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+        <StatusBar style="auto" />
+      </NavigationThemeProvider>
+    </GluestackUIProvider>
+  );
+}
+
+export default function RootLayout() {
+  return (
     <AuthProvider>
-      <GluestackUIProvider mode={colorScheme ?? "light"}>
-        <ThemeProvider
-          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-        >
-          <Stack>
-            <Stack.Screen name="(app)" options={{ headerShown: false }} />
-            <Stack.Screen name="index" options={{ headerShown: false }} />
-            <Stack.Screen name="+not-found" />
-          </Stack>
-          <StatusBar style="auto" />
-        </ThemeProvider>
-      </GluestackUIProvider>
+      <ThemeProvider>
+        <RootContent />
+      </ThemeProvider>
     </AuthProvider>
   );
 }

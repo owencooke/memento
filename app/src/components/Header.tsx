@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StatusBar, Platform } from "react-native";
+import { View, Text, StatusBar, Platform, useColorScheme } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Image } from "@/src/components/ui/image";
@@ -11,6 +11,8 @@ import {
 } from "@/src/components/ui/avatar";
 import { Menu, MenuItem, MenuItemLabel } from "./ui/menu";
 import { Button } from "@/src/components/ui/button";
+import { Icon, SunIcon, MoonIcon, ArrowLeftIcon } from "./ui/icon";
+import { useTheme } from "../context/ThemeContext";
 
 interface HeaderProps {
   title: string;
@@ -19,6 +21,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ title, navigate }) => {
   const { session, signOut } = useSession();
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <SafeAreaView className="bg-background-0" edges={["top"]}>
@@ -55,7 +58,23 @@ const Header: React.FC<HeaderProps> = ({ title, navigate }) => {
             </Button>
           )}
         >
+          <MenuItem
+            key="Theme"
+            textValue="Theme"
+            closeOnSelect={false}
+            onPress={toggleTheme}
+          >
+            <Icon
+              as={theme === "dark" ? SunIcon : MoonIcon}
+              size="md"
+              className="mr-2"
+            />
+            <MenuItemLabel size="md">
+              {theme === "dark" ? "Light" : "Dark"} Mode
+            </MenuItemLabel>
+          </MenuItem>
           <MenuItem onPress={signOut} textValue="Sign out">
+            <Icon as={ArrowLeftIcon} size="md" className="mr-2" />
             <MenuItemLabel size="md">Sign out</MenuItemLabel>
           </MenuItem>
         </Menu>
