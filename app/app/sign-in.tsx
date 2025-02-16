@@ -8,11 +8,11 @@ export default function SignIn() {
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <Text
-        onPress={() => {
-          signIn();
+        onPress={async () => {
+          await signIn();
           // Navigate after signing in. You may want to tweak this to ensure sign-in is
           // successful before navigating.
-          router.replace("/");
+          router.replace("/(app)/(tabs)/mementos");
         }}
       >
         Sign In

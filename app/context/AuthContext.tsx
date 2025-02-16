@@ -16,7 +16,7 @@ const AUTH_REDIRECT_URI = "memento://auth/redirect";
 interface UserSession {
   session: Session | null;
   isLoading: boolean;
-  signIn: () => void;
+  signIn: () => Promise<void>;
   signOut: () => void;
 }
 
