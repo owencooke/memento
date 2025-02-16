@@ -1,30 +1,30 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { View, Text } from "react-native";
 import { router } from "expo-router";
-import { Text, View, ActivityIndicator } from "react-native";
+import * as SplashScreen from "expo-splash-screen";
 
 import { useSession } from "@/context/AuthContext";
 
 export default function SignIn() {
   const { session, isLoading, signIn } = useSession();
+  const [appReady, setAppReady] = useState(false);
 
   useEffect(() => {
-    if (!isLoading && session) {
-      router.replace("/(app)/(tabs)/mementos");
-    }
+    const checkSession = async () => {
+      if (!isLoading) {
+        if (session) {
+          router.replace("/(app)/(tabs)/mementos");
+        }
+        await SplashScreen.hideAsync();
+        setAppReady(true);
+      }
+    };
+
+    checkSession();
   }, [isLoading, session]);
 
-  if (isLoading) {
-    // Display a loading state while checking session
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  }
-
-  if (session) {
-    // If session exists, redirect to the main screen
-    return null;
+  if (!appReady) {
+    return null; // Keeps the splash screen visible until app is ready
   }
 
   return (
