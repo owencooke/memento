@@ -14,10 +14,37 @@ import {
   AvatarImage,
 } from "@/components/ui/avatar";
 import { useSession } from "@/context/AuthContext";
+import { Image } from "@/components/ui/image";
+
+const headerLeft = () => {
+  return (
+    <Image
+      size="sm"
+      source={require("@/assets/images/react-logo.png")}
+      alt="Memento Logo"
+    />
+  );
+};
+
+const headerRight = () => {
+  const { session } = useSession();
+
+  return (
+    <Avatar size={"md"}>
+      <AvatarFallbackText>
+        {session?.user.user_metadata.full_name}
+      </AvatarFallbackText>
+      <AvatarImage
+        source={{
+          uri: session?.user.user_metadata.avatar_url,
+        }}
+      />
+    </Avatar>
+  );
+};
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const { session } = useSession();
 
   return (
     <Tabs
@@ -38,18 +65,8 @@ export default function TabLayout() {
         name="mementos"
         options={{
           title: "Mementos",
-          headerRight: () => (
-            <Avatar size={"md"}>
-              <AvatarFallbackText>
-                {session?.user.user_metadata.full_name}
-              </AvatarFallbackText>
-              <AvatarImage
-                source={{
-                  uri: session?.user.user_metadata.avatar_url,
-                }}
-              />
-            </Avatar>
-          ),
+          headerLeft,
+          headerRight,
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name="house.fill" color={color} />
           ),
@@ -59,6 +76,8 @@ export default function TabLayout() {
         name="collections"
         options={{
           title: "Collections",
+          headerLeft,
+          headerRight,
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name="paperplane.fill" color={color} />
           ),
