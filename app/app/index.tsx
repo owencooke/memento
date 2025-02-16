@@ -4,6 +4,8 @@ import { router } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 
 import { useSession } from "@/context/AuthContext";
+import { Button, ButtonText } from "@/components/ui/button";
+import { Center } from "@/components/ui/center";
 
 export default function SignIn() {
   const { session, isLoading, signIn } = useSession();
@@ -28,8 +30,10 @@ export default function SignIn() {
   }
 
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text onPress={signIn}>Sign In</Text>
-    </View>
+    <Center className="w-full h-full">
+      <Button onPress={signIn}>
+        <ButtonText>Sign In</ButtonText>
+      </Button>
+    </Center>
   );
 }

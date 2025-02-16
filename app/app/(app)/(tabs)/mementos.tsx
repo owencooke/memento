@@ -1,6 +1,6 @@
 import React from "react";
 import MapView, { Marker } from "react-native-maps";
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native";
 import { Button, ButtonText } from "@/components/ui/button";
 
 const markers = [
@@ -35,11 +35,11 @@ const markers = [
 
 export default function Mementos() {
   return (
-    <View className="flex gap-8">
-      <Button className="mt-32">
+    <>
+      <Button className="mt-4">
         <ButtonText>Testing</ButtonText>
       </Button>
-      <View className="flex w-full h-full">
+      <View>
         <MapView
           style={{
             width: "100%",
@@ -62,6 +62,6 @@ export default function Mementos() {
           ))}
         </MapView>
       </View>
-    </View>
+    </>
   );
 }
