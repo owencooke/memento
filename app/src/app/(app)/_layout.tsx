@@ -1,7 +1,7 @@
 import { Text, View } from "react-native";
 import { Redirect, Stack } from "expo-router";
 
-import { useSession } from "@/context/AuthContext";
+import { useSession } from "@/src/context/AuthContext";
 
 export default function AppLayout() {
   const { session, isLoading } = useSession();

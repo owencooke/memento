@@ -3,9 +3,9 @@ import { View, Text } from "react-native";
 import { router } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 
-import { useSession } from "@/context/AuthContext";
-import { Button, ButtonText } from "@/components/ui/button";
-import { Center } from "@/components/ui/center";
+import { useSession } from "@/src/context/AuthContext";
+import { Button, ButtonText } from "@/src/components/ui/button";
+import { Center } from "@/src/components/ui/center";
 
 export default function SignIn() {
   const { session, isLoading, signIn } = useSession();

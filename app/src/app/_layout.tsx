@@ -4,7 +4,7 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import "@/global.css";
-import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
+import { GluestackUIProvider } from "@/src/components/ui/gluestack-ui-provider";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -12,8 +12,8 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import "react-native-reanimated";
 
-import { useColorScheme } from "@/hooks/useColorScheme";
-import { AuthProvider } from "@/context/AuthContext";
+import { useColorScheme } from "@/src/hooks/useColorScheme";
+import { AuthProvider } from "@/src/context/AuthContext";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();

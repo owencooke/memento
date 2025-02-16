@@ -1,7 +1,7 @@
 import React from "react";
 import MapView, { Marker } from "react-native-maps";
 import { View } from "react-native";
-import { Button, ButtonText } from "@/components/ui/button";
+import { Button, ButtonText } from "@/src/components/ui/button";
 
 const markers = [
   {

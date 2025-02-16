@@ -1,6 +1,6 @@
-import { Center } from "@/components/ui/center";
+import { Center } from "@/src/components/ui/center";
 import { Stack } from "expo-router";
-import { Text } from "@/components/ui/text";
+import { Text } from "@/src/components/ui/text";
 import { Link } from "expo-router";
 
 export default function NotFoundScreen() {

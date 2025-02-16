@@ -6,7 +6,7 @@ import React, {
   ReactNode,
 } from "react";
 import { Session } from "@supabase/supabase-js";
-import { supabase } from "@/libs/supabase/config";
+import { supabase } from "@/src/libs/supabase/config";
 import * as WebBrowser from "expo-web-browser";
 import { useRouter } from "expo-router";
 

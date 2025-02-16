@@ -2,15 +2,15 @@ import React from "react";
 import { View, Text, StatusBar, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { Image } from "@/components/ui/image";
-import { useSession } from "@/context/AuthContext";
+import { Image } from "@/src/components/ui/image";
+import { useSession } from "@/src/context/AuthContext";
 import {
   Avatar,
   AvatarFallbackText,
   AvatarImage,
-} from "@/components/ui/avatar";
+} from "@/src/components/ui/avatar";
 import { Menu, MenuItem, MenuItemLabel } from "./ui/menu";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/src/components/ui/button";
 
 interface HeaderProps {
   title: string;
@@ -31,7 +31,7 @@ const Header: React.FC<HeaderProps> = ({ title, navigate }) => {
         <Image
           size="sm"
           // TODO: replace with our logo!
-          source={require("@/assets/images/react-logo.png")}
+          source={require("@/src/assets/images/react-logo.png")}
           alt="Memento Logo"
           className="mr-2"
         />
