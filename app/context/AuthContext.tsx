@@ -8,6 +8,7 @@ import React, {
 import { Session } from "@supabase/supabase-js";
 import { supabase } from "@/libs/supabase/config";
 import * as WebBrowser from "expo-web-browser";
+import { useRouter } from "expo-router";
 
 const AUTH_URI =
   "https://epqxqhjetxflplibxhwp.supabase.co/auth/v1/authorize?provider=google";
@@ -17,7 +18,7 @@ interface UserSession {
   session: Session | null;
   isLoading: boolean;
   signIn: () => Promise<void>;
-  signOut: () => void;
+  signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<UserSession | undefined>(undefined);
@@ -33,6 +34,7 @@ export const useSession = (): UserSession => {
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
+  const router = useRouter();
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -48,6 +50,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
       if (result.type === "success" && result.url) {
         await handleOAuthCallback(result.url);
+        router.replace("/(app)/(tabs)/mementos");
       }
     } catch (error) {
       console.error("Google Sign-In Error:", error);
@@ -85,7 +88,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  const signOut = () => {};
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    setSession(null);
+    router.replace("/");
+  };
 
   //   NOTE: might not need if managed properly via signIn/signOut
   useEffect(() => {
