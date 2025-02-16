@@ -1,11 +1,9 @@
 import CameraPicker from "@/components/CameraPicker";
-import UserProfile from "@/components/UserInfo";
 import { View } from "react-native";
 
-export default function TabTwoScreen() {
+export default function Collections() {
   return (
     <View>
-      <UserProfile />
       <CameraPicker />
     </View>
   );

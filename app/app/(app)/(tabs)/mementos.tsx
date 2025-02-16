@@ -33,7 +33,7 @@ const markers = [
   },
 ];
 
-export default function App() {
+export default function Mementos() {
   return (
     <View className="flex gap-8">
       <Button className="mt-32">
