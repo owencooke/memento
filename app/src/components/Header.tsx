@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StatusBar, Platform, useColorScheme } from "react-native";
+import { View, StatusBar, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Image } from "@/src/components/ui/image";
@@ -13,6 +13,7 @@ import { Menu, MenuItem, MenuItemLabel } from "./ui/menu";
 import { Button } from "@/src/components/ui/button";
 import { Icon, SunIcon, MoonIcon, ArrowLeftIcon } from "./ui/icon";
 import { useTheme } from "../context/ThemeContext";
+import { Text } from "./ui/text";
 
 interface HeaderProps {
   title: string;
@@ -38,7 +39,9 @@ const Header: React.FC<HeaderProps> = ({ title, navigate }) => {
           alt="Memento Logo"
           className="mr-2"
         />
-        <Text className="text-xl font-semibold">{title}</Text>
+        <Text size="xl" className="font-semibold">
+          {title}
+        </Text>
         <Menu
           className="bg-background-0"
           placement="bottom left"
