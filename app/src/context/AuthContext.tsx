@@ -14,14 +14,14 @@ const AUTH_URI =
   "https://epqxqhjetxflplibxhwp.supabase.co/auth/v1/authorize?provider=google";
 const AUTH_REDIRECT_URI = "memento://auth/redirect";
 
-interface UserSession {
+export interface UserSession {
   session: Session | null;
   isLoading: boolean;
   signIn: () => Promise<void>;
   signOut: () => Promise<void>;
 }
 
-const AuthContext = createContext<UserSession | undefined>(undefined);
+export const AuthContext = createContext<UserSession | undefined>(undefined);
 
 export const useSession = (): UserSession => {
   const context = useContext(AuthContext);

@@ -19,7 +19,7 @@
       "node_modules/(?!@gluestack-ui)/"
     ],
     "setupFiles": [
-      "./tests/unit/setup.ts"
+      "./tests/unit/mocks/libs.ts"
     ]
   },
   "dependencies": {
