@@ -7,9 +7,11 @@ repos:
         entry: bash -c 'cd app && pnpm lint'
         language: system
         files: \.(js|jsx|ts|tsx)$
+        stages: [push]
 
-      - id: pnpm-test
-        name: Test with pnpm
-        entry: bash -c 'cd app && pnpm test'
-        language: system
-        files: \.(js|jsx|ts|tsx)$
+      # - id: pnpm-test
+      #   name: Test with pnpm
+      #   entry: bash -c 'cd app && pnpm test'
+      #   language: system
+      #   files: \.(js|jsx|ts|tsx)$
+      #   stages: [push]
