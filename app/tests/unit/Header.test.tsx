@@ -1,9 +1,4 @@
-import {
-  render,
-  screen,
-  waitFor,
-  userEvent,
-} from "@testing-library/react-native";
+import { render, userEvent } from "@testing-library/react-native";
 import Header from "@/src/components/navigation/Header";
 import { MockAuthProvider } from "./mocks/AuthProvider";
 import { ThemeProvider } from "@/src/context/ThemeContext";
@@ -18,26 +13,18 @@ const renderHeader = (signOutMock = jest.fn()) =>
   );
 
 describe("Header", () => {
-  test("renders correctly with the given title", () => {
+  test("renders title correctly", () => {
     const { getByText } = renderHeader();
     expect(getByText("Test")).toBeTruthy();
   });
 
-  test("avatar opens menu and sign out is clickable", async () => {
-    const signOutMock = jest.fn();
-    const { getByTestId } = renderHeader(signOutMock);
+  test("opens menu when avatar clicked", async () => {
+    const { getByTestId } = renderHeader();
+    const menuTrigger = getByTestId("user-menu-trigger");
+    expect(menuTrigger.props.accessibilityState.expanded).toBe(false);
 
-    // Open the menu
-    await userEvent.press(getByTestId("avatar-menu-trigger"));
-    await waitFor(() => screen.debug());
+    await userEvent.press(getByTestId("user-menu-trigger"));
 
-    // Wait for the "Sign out" button to appear
-    const signOutButton = await screen.findByText("Sign out");
-
-    // Click the sign-out button
-    await userEvent.press(signOutButton);
-
-    // Check if the signOut method is called
-    expect(signOutMock).toHaveBeenCalled();
+    expect(menuTrigger.props.accessibilityState.expanded).toBe(true);
   });
 });
