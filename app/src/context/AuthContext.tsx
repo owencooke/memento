@@ -61,23 +61,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     try {
       // Parse the URL
       const parsedUrl = new URL(url);
-
-      // Extract the fragment part (after #)
-      const fragment = parsedUrl.hash.substr(1);
-      const params = new URLSearchParams(fragment);
-
-      // Extract the access_token and refresh_token
+      const params = new URLSearchParams(parsedUrl.hash.substr(1));
       const access_token = params.get("access_token");
-      const refresh_token = params.get("refresh_token");
+      const refresh_token = params.get("refresh_token") ?? "";
 
       if (!access_token) {
-        throw new Error("No access token found!");
+        throw new Error("Failed to parse access_token from OAuth URL");
       }
 
       // Use the token to get the authenticated user from Supabase
       const { error } = await supabase.auth.setSession({
         access_token,
-        refresh_token: refresh_token || "",
+        refresh_token,
       });
 
       if (error) {
