@@ -17,16 +17,17 @@ const mockSession: Partial<MockUserSession> = {
   },
 };
 
-export const MockAuthProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const MockAuthProvider: React.FC<{
+  children: React.ReactNode;
+  signOut?: () => Promise<void>;
+}> = ({ children, signOut = jest.fn() }) => {
   return (
     <AuthContext.Provider
       value={{
         session: mockSession as UserSession["session"],
         isLoading: false,
         signIn: async () => {},
-        signOut: async () => {},
+        signOut,
       }}
     >
       {children}

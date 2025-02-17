@@ -46,7 +46,11 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
           placement="bottom left"
           offset={4}
           trigger={({ ...triggerProps }) => (
-            <Button {...triggerProps} variant="link">
+            <Button
+              {...triggerProps}
+              variant="link"
+              testID="avatar-menu-trigger"
+            >
               <Avatar size={"md"} className="ml-2">
                 <AvatarFallbackText>
                   {session?.user.user_metadata.full_name}
