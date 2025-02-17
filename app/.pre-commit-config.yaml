@@ -6,10 +6,10 @@ repos:
         name: Lint with pnpm
         entry: bash -c 'cd app && pnpm lint'
         language: system
-        types: [javascript]
+        files: \.(js|jsx|ts|tsx)$
 
       - id: pnpm-test
         name: Test with pnpm
         entry: bash -c 'cd app && pnpm test'
         language: system
-        types: [javascript]
+        files: \.(js|jsx|ts|tsx)$
