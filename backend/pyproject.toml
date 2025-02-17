@@ -14,6 +14,7 @@ readme = "README.md"
 start = "scripts.commands:start"
 lint = "scripts.commands:lint"
 test = "scripts.commands:test"
+sync-db = "scripts.commands:sync_db_pydantic"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.14"
@@ -25,6 +26,8 @@ yarl = "^1.18.3"
 ujson = "^5.10.0"
 httptools = "^0.6.4"
 loguru = "^0.7.3"
+supabase-pydantic = "^0.17.0"
+python-dotenv = "^1.0.1"
 
 
 [tool.poetry.group.dev.dependencies]

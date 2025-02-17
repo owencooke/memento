@@ -65,6 +65,16 @@ You can also manually run the lint commands using:
 poetry run lint
 ```
 
+## Syncing DB to Pydantic Models
+
+This project leverages [supabase-pydantic](https://github.com/kmbhm1/supabase-pydantic) to automatically generate Pydantic models from the Supabase database schema.
+
+```bash
+poetry run sync-db
+```
+
+The generated models are stored under [`server/services/db/models`](https://github.com/owencooke/memento/tree/main/backend/server/services/db/models)
+
 ## Tests
 
 For running tests on your local machine:
