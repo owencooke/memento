@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-type Theme = "light" | "dark";
+export type Theme = "light" | "dark";
 
 interface ThemeContextType {
   theme: Theme;
@@ -40,6 +40,10 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+/**
+ * Hook that allows other components to access the current {@link Theme}.
+ * Also provides a method to toggle the theme between light and dark mode.
+ */
 export const useTheme = () => {
   const context = useContext(ThemeContext);
   if (context === undefined) {
