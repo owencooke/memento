@@ -9,18 +9,17 @@ import {
   AvatarFallbackText,
   AvatarImage,
 } from "@/src/components/ui/avatar";
-import { Menu, MenuItem, MenuItemLabel } from "./ui/menu";
+import { Menu, MenuItem, MenuItemLabel } from "../ui/menu";
 import { Button } from "@/src/components/ui/button";
-import { Icon, SunIcon, MoonIcon, ArrowLeftIcon } from "./ui/icon";
-import { useTheme } from "../context/ThemeContext";
-import { Text } from "./ui/text";
+import { Icon, SunIcon, MoonIcon, ArrowLeftIcon } from "../ui/icon";
+import { useTheme } from "../../context/ThemeContext";
+import { Text } from "../ui/text";
 
 interface HeaderProps {
   title: string;
-  navigate: (route: string) => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ title, navigate }) => {
+const Header: React.FC<HeaderProps> = ({ title }) => {
   const { session, signOut } = useSession();
   const { theme, toggleTheme } = useTheme();
 

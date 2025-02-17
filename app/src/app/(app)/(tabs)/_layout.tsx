@@ -2,10 +2,10 @@ import { Tabs } from "expo-router";
 import React from "react";
 import { Platform } from "react-native";
 
-import { HapticTab } from "@/src/components/HapticTab";
+import { HapticTab } from "@/src/components/navigation/HapticTab";
 import { IconSymbol } from "@/src/components/ui/IconSymbol";
 import TabBarBackground from "@/src/components/ui/TabBarBackground";
-import Header from "@/src/components/Header";
+import Header from "@/src/components/navigation/Header";
 import { useColors } from "@/src/hooks/useColors";
 
 export default function TabLayout() {
@@ -25,7 +25,7 @@ export default function TabLayout() {
           default: {},
         }),
         header: ({ navigation, options }) => (
-          <Header title={options.title ?? ""} navigate={navigation.navigate} />
+          <Header title={options.title ?? ""} />
         ),
       }}
     >
