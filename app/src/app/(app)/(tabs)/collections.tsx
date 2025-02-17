@@ -1,20 +1,13 @@
-import { Button, ButtonText } from "@/src/components/ui/button";
-import { Center } from "@/src/components/ui/center";
+import { Button, ButtonIcon, ButtonText } from "@/src/components/ui/button";
 import { Text } from "@/src/components/ui/text";
-import usePhotos, { Photo, DeviceSource } from "@/src/hooks/usePhotos";
-import { useState } from "react";
+import usePhotos from "@/src/hooks/usePhotos";
 import { Image } from "@/src/components/ui/image";
 import { View } from "react-native";
 import { ScrollView } from "react-native";
+import { TrashIcon } from "@/src/components/ui/icon";
 
 export default function Collections() {
-  const { hasPermission, getPhotos } = usePhotos();
-  const [photos, setPhotos] = useState<Photo[]>([]);
-
-  const handleGetPhotos = async (source: DeviceSource) => {
-    const newPhotos = await getPhotos(source);
-    setPhotos((prevPhotos) => [...prevPhotos, ...newPhotos]);
-  };
+  const { hasPermission, addPhotos, photos, removePhoto } = usePhotos();
 
   if (!hasPermission) {
     return <Text>No access to camera</Text>;
@@ -25,18 +18,19 @@ export default function Collections() {
         flexGrow: 1,
         justifyContent: "center",
         alignItems: "center",
+        paddingBlock: 8,
       }}
     >
-      <Button onPress={() => handleGetPhotos("picker")}>
-        <ButtonText>Select from camera roll</ButtonText>
-      </Button>
-      <Button onPress={() => handleGetPhotos("camera")}>
+      <Button onPress={() => addPhotos("camera")}>
         <ButtonText>Take a photo</ButtonText>
       </Button>
-      <Center className="flex flex-col gap-2">
+      <Button className="my-4" onPress={() => addPhotos("picker")}>
+        <ButtonText>Select from camera roll</ButtonText>
+      </Button>
+      <>
         {photos.map((photo, index) => (
           <View key={index}>
-            <Image source={photo.uri} size="md" />
+            <Image source={photo.uri} size="xl" alt="" />
             {photo.exif && (
               <Text style={{ marginTop: 5 }}>
                 {Object.entries(photo.exif).map(([key, value]) => (
@@ -44,9 +38,16 @@ export default function Collections() {
                 ))}
               </Text>
             )}
+            <Button
+              size="lg"
+              className="rounded-full p-3.5"
+              onPress={() => removePhoto(photo)}
+            >
+              <ButtonIcon as={TrashIcon} />
+            </Button>
           </View>
         ))}
-      </Center>
+      </>
     </ScrollView>
   );
 }

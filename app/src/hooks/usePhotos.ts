@@ -11,6 +11,7 @@ export type Photo = ImagePicker.ImagePickerAsset;
  */
 export default function usePhotos() {
   const [hasPermission, setHasPermission] = useState(false);
+  const [photos, setPhotos] = useState<Photo[]>([]);
 
   useEffect(() => {
     (async () => {
@@ -19,7 +20,7 @@ export default function usePhotos() {
     })();
   }, []);
 
-  const getPhotos = async (source: DeviceSource): Promise<Photo[]> => {
+  const addPhotos = async (source: DeviceSource) => {
     let operation =
       source === "camera"
         ? ImagePicker.launchCameraAsync
@@ -33,13 +34,20 @@ export default function usePhotos() {
     });
 
     if (!result.canceled) {
-      return result.assets;
+      setPhotos((prevPhotos) => [...prevPhotos, ...result.assets]);
     }
-    return [];
+  };
+
+  const removePhoto = (photoToRemove: Photo) => {
+    setPhotos((prevPhotos) =>
+      prevPhotos.filter((photo) => photo.assetId !== photoToRemove.assetId),
+    );
   };
 
   return {
     hasPermission,
-    getPhotos,
+    photos,
+    addPhotos,
+    removePhoto,
   };
 }
