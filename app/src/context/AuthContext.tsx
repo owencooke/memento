@@ -45,7 +45,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     try {
       let result = await WebBrowser.openAuthSessionAsync(
         AUTH_URI,
-        AUTH_REDIRECT_URI
+        AUTH_REDIRECT_URI,
       );
 
       if (result.type === "success" && result.url) {
@@ -63,21 +63,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       const parsedUrl = new URL(url);
 
       // Extract the fragment part (after #)
-      const fragment = parsedUrl.hash.substr(1); // Remove the '#' from the beginning
-      const params = new URLSearchParams(fragment); // Create a URLSearchParams object to parse the fragment
+      const fragment = parsedUrl.hash.substr(1);
+      const params = new URLSearchParams(fragment);
 
       // Extract the access_token and refresh_token
       const access_token = params.get("access_token");
-      const refresh_token = params.get("refresh_token"); // Extract if available
+      const refresh_token = params.get("refresh_token");
 
       if (!access_token) {
         throw new Error("No access token found!");
       }
 
       // Use the token to get the authenticated user from Supabase
-      const { data: user, error } = await supabase.auth.setSession({
+      const { error } = await supabase.auth.setSession({
         access_token,
-        refresh_token: refresh_token || "", // Fallback to an empty string if no refresh token is provided
+        refresh_token: refresh_token || "",
       });
 
       if (error) {
@@ -105,16 +105,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
     checkSession();
 
-    //   NOTE: might not need if managed properly via signIn/signOut
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (_, session) => {
         setSession(session);
         setIsLoading(false);
-      }
+      },
     );
-    return () => {
-      authListener.subscription?.unsubscribe();
-    };
+    return () => authListener.subscription?.unsubscribe();
   }, []);
 
   return (

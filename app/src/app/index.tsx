@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { View, Text } from "react-native";
 import { router } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 

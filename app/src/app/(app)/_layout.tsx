@@ -1,4 +1,3 @@
-import { Text, View } from "react-native";
 import { Redirect, Stack } from "expo-router";
 
 import { useSession } from "@/src/context/AuthContext";

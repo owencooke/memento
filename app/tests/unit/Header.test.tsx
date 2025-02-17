@@ -9,7 +9,7 @@ const renderHeader = (signOutMock = jest.fn()) =>
       <ThemeProvider>
         <Header title="Test" />
       </ThemeProvider>
-    </MockAuthProvider>
+    </MockAuthProvider>,
   );
 
 describe("Header", () => {
