@@ -3,7 +3,8 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "start": "expo start --tunnel",
+    "start": "expo start",
+    "start:wsl": "REACT_NATIVE_PACKAGER_HOSTNAME=$(netsh.exe interface ip show address 'Wi-Fi' | grep 'IP Address' | awk '{print $3}') expo start",
     "android": "DARK_MODE=media expo run:android",
     "android:prod": "DARK_MODE=media expo run:android --variant release",
     "ios": "DARK_MODE=media expo run:ios",
