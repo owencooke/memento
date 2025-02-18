@@ -38,9 +38,13 @@ class Settings(BaseSettings):
 
     log_level: LogLevel = LogLevel.INFO
 
+    # Database
+    supabase_url: str
+    supabase_key: str
+    db_url: str
+
     model_config = SettingsConfigDict(
         env_file=".env",
-        env_prefix="SERVER_",
         env_file_encoding="utf-8",
     )
 
