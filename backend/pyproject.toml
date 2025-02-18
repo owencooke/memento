@@ -35,7 +35,7 @@ pytesseract = "^0.3.13"
 keras = "^3.8.0"
 onnxruntime = "^1.20.1"
 numba = "0.61.0"
-rembg = {version = "2.0.61", extras = ["gpu"]}
+rembg = {version = "2.0.61", extras = ["cpu"]}
 
 
 [tool.poetry.group.dev.dependencies]
