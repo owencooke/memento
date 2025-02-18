@@ -62,5 +62,5 @@ export type UserInfoApiUserIdGetResponses = {
 export type UserInfoApiUserIdGetResponse = UserInfoApiUserIdGetResponses[keyof UserInfoApiUserIdGetResponses];
 
 export type ClientOptions = {
-    baseUrl: 'https://ece-493-memento-backend.loca.lt/' | (string & {});
+    baseUrl: `${string}://${string}` | (string & {});
 };

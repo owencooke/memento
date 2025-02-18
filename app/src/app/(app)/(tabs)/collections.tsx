@@ -7,18 +7,24 @@ import { ScrollView } from "react-native";
 import { TrashIcon } from "@/src/components/ui/icon";
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "@/src/context/AuthContext";
-import { userInfoApiUserIdGetOptions } from "@/src/api-client/@tanstack/react-query.gen";
+import { userInfoApiUserIdGetOptions } from "@/src/api-client/generated/@tanstack/react-query.gen";
 
 export default function Collections() {
   const { session } = useSession();
   const { hasPermission, addPhotos, photos, removePhoto } = usePhotos();
-  const { data: userInfo } = useQuery({
+  const {
+    data: userInfo,
+    error,
+    isLoading,
+  } = useQuery({
     ...userInfoApiUserIdGetOptions({
       path: {
         id: session?.user.id ?? "",
       },
     }),
   });
+
+  console.log({ userInfo, error, isLoading });
 
   if (!hasPermission) {
     return <Text>No access to camera</Text>;

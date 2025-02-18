@@ -8,7 +8,7 @@ module.exports = {
   ignorePatterns: [
     "/dist/*",
     "src/components/ui/*",
-    "src/api-client",
+    "src/api-client/generated/**",
     "*.d.ts",
   ],
 };

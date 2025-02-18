@@ -16,12 +16,6 @@ def get_app() -> FastAPI:
     configure_logging()
     app = FastAPI(
         title="Memento Backend",
-        servers=[
-            {
-                "url": "https://ece-493-memento-backend.loca.lt/",
-                "description": "Local Tunnel",
-            }
-        ],
     )
 
     app.add_middleware(
