@@ -17,7 +17,7 @@ test = "scripts.commands:test"
 sync-db = "scripts.commands:sync_db_pydantic"
 
 [tool.poetry.dependencies]
-python = ">=3.10,<3.14"
+python = ">=3.10,<3.13"
 fastapi = "^0.115.6"
 uvicorn = { version = "^0.34.0", extras = ["standard"] }
 pydantic = "^2.10.4"
@@ -28,6 +28,14 @@ httptools = "^0.6.4"
 loguru = "^0.7.3"
 supabase-pydantic = "^0.17.0"
 python-dotenv = "^1.0.1"
+supabase = "^2.13.0"
+pillow = "^11.1.0"
+scikit-learn = "^1.6.1"
+pytesseract = "^0.3.13"
+keras = "^3.8.0"
+onnxruntime = "^1.20.1"
+numba = "0.61.0"
+rembg = {version = "2.0.61", extras = ["gpu"]}
 
 
 [tool.poetry.group.dev.dependencies]
