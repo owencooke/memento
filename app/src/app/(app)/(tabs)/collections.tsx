@@ -12,19 +12,13 @@ import { userInfoApiUserIdGetOptions } from "@/src/api-client/@tanstack/react-qu
 export default function Collections() {
   const { session } = useSession();
   const { hasPermission, addPhotos, photos, removePhoto } = usePhotos();
-  const {
-    data: userInfo,
-    isLoading,
-    error,
-  } = useQuery({
+  const { data: userInfo } = useQuery({
     ...userInfoApiUserIdGetOptions({
       path: {
         id: session?.user.id ?? "",
       },
     }),
   });
-
-  console.log({ userInfo, isLoading, error });
 
   if (!hasPermission) {
     return <Text>No access to camera</Text>;

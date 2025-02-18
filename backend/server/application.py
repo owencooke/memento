@@ -2,6 +2,7 @@ from fastapi import FastAPI
 
 from server.api.router import api_router
 from server.config.log import configure_logging
+from fastapi.middleware.cors import CORSMiddleware
 
 
 def get_app() -> FastAPI:
@@ -13,7 +14,23 @@ def get_app() -> FastAPI:
     :return: application.
     """
     configure_logging()
-    app = FastAPI()
+    app = FastAPI(
+        title="Memento Backend",
+        servers=[
+            {
+                "url": "https://ece-493-memento-backend.loca.lt/",
+                "description": "Local Tunnel",
+            }
+        ],
+    )
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],  # Accept requests from any origin
+        allow_credentials=True,
+        allow_methods=["*"],  # Allow all HTTP methods
+        allow_headers=["*"],  # Allow all headers
+    )
 
     # Main router for the API.
     app.include_router(router=api_router, prefix="/api")
