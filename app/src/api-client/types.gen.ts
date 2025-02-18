@@ -5,10 +5,13 @@ export type HttpValidationError = {
 };
 
 /**
- * Simple message model.
+ * UserInfo Schema for Pydantic.
+ *
+ * Inherits from UserInfoBaseSchema. Add any customization here.
  */
-export type Message = {
-    message: string;
+export type UserInfo = {
+    id: string;
+    birthday?: string | null;
 };
 
 export type ValidationError = {
@@ -31,30 +34,32 @@ export type HealthCheckApiHealthGetResponses = {
     200: unknown;
 };
 
-export type SendEchoMessageApiEchoPostData = {
-    body: Message;
-    path?: never;
+export type UserInfoApiUserIdGetData = {
+    body?: never;
+    path: {
+        id: string;
+    };
     query?: never;
-    url: '/api/echo/';
+    url: '/api/user/{id}';
 };
 
-export type SendEchoMessageApiEchoPostErrors = {
+export type UserInfoApiUserIdGetErrors = {
     /**
      * Validation Error
      */
     422: HttpValidationError;
 };
 
-export type SendEchoMessageApiEchoPostError = SendEchoMessageApiEchoPostErrors[keyof SendEchoMessageApiEchoPostErrors];
+export type UserInfoApiUserIdGetError = UserInfoApiUserIdGetErrors[keyof UserInfoApiUserIdGetErrors];
 
-export type SendEchoMessageApiEchoPostResponses = {
+export type UserInfoApiUserIdGetResponses = {
     /**
      * Successful Response
      */
-    200: Message;
+    200: UserInfo;
 };
 
-export type SendEchoMessageApiEchoPostResponse = SendEchoMessageApiEchoPostResponses[keyof SendEchoMessageApiEchoPostResponses];
+export type UserInfoApiUserIdGetResponse = UserInfoApiUserIdGetResponses[keyof UserInfoApiUserIdGetResponses];
 
 export type ClientOptions = {
     baseUrl: `${string}://${string}` | (string & {});
