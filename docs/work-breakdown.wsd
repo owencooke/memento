@@ -312,41 +312,65 @@
 *** Deletion
 
 **** FR-46: Delete collection
+***** Create API endpoint for collection deletion
+***** Write query for deleting the collection from the database
+***** Create UI component for deleting a collection
+***** Add call to "Delete Collection" API when the user deletes a collection
 
 *** Metadata Management
 
 **** FR-47: Auto-derive collection date
+***** Retrieve the date for the collection from the keepsakes stored in it
+***** Populate the collection's date field with the date of the keepsakes stored in the collection
 
-**** FR-48: Auto-derive collection location
+**** FR-48: Auto-derive collection location  
+***** Retrieve the location for the collection from the keepsakes stored in it
+***** Populate the collection's location field with the location of the keepsakes stored in the collection
 
 **** FR-49: Modify location
+***** Create UI input for editing location
+***** Populate location field with existing location
+***** Update collection location in database
 
 **** FR-50: Modify time/date
-' FIXME: DUPLICATE of FR-45
-
-**** FR-51: Modify/remove metadata
+***** Create UI input for editing time/date
+***** Populate time/date field with existing time/date
+***** Update collection time/date in database
 
 ** Visualization
 
 *** Map Features
 
-**** FR-52: Show collections on map
+**** FR-51: Show collections on map
+***** Create UI component for a map display
+***** Create API endpoint for retrieving the locations of collections associated with the user
+***** Write query for retrieving the locations of collections associated with the user from the database
+***** Plot collections on the map
 
-**** FR-53: Click markers to view collection
+**** FR-52: Click markers to view collection
+***** Enable touch gesture for opening a collection
 
 *** Content Generation
 
-**** FR-54: Generate collection collages
+**** FR-53: Generate collection collages
+***** Create UI component for selecting a collection to make a collage
+***** Create a view with some or all keepsakes in a collection as a collage
 
 ** Integrations
 
 *** Sharing
 
-**** FR-55: Share keepsakes
+**** FR-54: Share keepsakes
+***** Create UI component for sharing a keepsake 
+***** Use sharing library to share keepsake
 
-**** FR-56: Share collages
+**** FR-55: Share collages
+***** Create UI component for sharing a collage 
+***** Use sharing library to share collage
 
 *** Notifications
 
-**** FR-57: Special day reminders
+**** FR-56: Special day reminders
+***** Determine if the current day is special
+***** Use notification library to send a push notification to the device
 @endwbs
