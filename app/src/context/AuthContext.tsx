@@ -9,10 +9,13 @@ import { Session } from "@supabase/supabase-js";
 import { supabase } from "@/src/libs/supabase/config";
 import * as WebBrowser from "expo-web-browser";
 import { useRouter } from "expo-router";
+import * as AuthSession from "expo-auth-session";
 
-const AUTH_URI =
-  "https://epqxqhjetxflplibxhwp.supabase.co/auth/v1/authorize?provider=google";
-const AUTH_REDIRECT_URI = "memento://auth/redirect";
+const AUTH_REDIRECT_URI = AuthSession.makeRedirectUri({
+  scheme: "memento",
+  path: "auth/redirect",
+});
+const AUTH_URI = `https://epqxqhjetxflplibxhwp.supabase.co/auth/v1/authorize?provider=google&redirect_to=${encodeURIComponent(AUTH_REDIRECT_URI)}`;
 
 export interface UserSession {
   session: Session | null;
