@@ -1,8 +1,8 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from server.api.router import api_router
 from server.config.log import configure_logging
-from fastapi.middleware.cors import CORSMiddleware
 
 
 def get_app() -> FastAPI:

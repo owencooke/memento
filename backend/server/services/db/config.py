@@ -1,6 +1,7 @@
-import os
-from supabase import create_client, Client
+from supabase import Client, create_client
 
-url: str = os.environ.get("SUPABASE_URL")
-key: str = os.environ.get("SUPABASE_KEY")
+from server.config.settings import settings
+
+url: str = settings.supabase_url
+key: str = settings.supabase_key
 supabase: Client = create_client(url, key)

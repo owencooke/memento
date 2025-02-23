@@ -67,6 +67,9 @@ warn_unused_ignores = false
 warn_return_any = false
 namespace_packages = true
 explicit_package_bases = true
+exclude = [
+    "server/services/db/models/*"
+]
 
 [tool.pytest.ini_options]
 filterwarnings = [
@@ -124,9 +127,11 @@ lint.ignore = [
     "ANN401",  # typing.Any are disallowed in `**kwargs
     "PLR0913", # Too many arguments for function call
     "D106",    # Missing docstring in public nested class
+    "S104",    # Possible binding to all interfaces
 ]
 exclude = [
-    ".venv/"
+    ".venv/",
+    "server/services/db/models/*"
 ]
 lint.mccabe = { max-complexity = 10 }
 line-length = 88
@@ -143,6 +148,13 @@ ignore-decorators = ["typing.overload"]
 [tool.ruff.lint.pylint]
 allow-magic-value-types = ["int", "str", "float", "bytes"]
 
+[tool.black]
+exclude = '''
+/(
+    \.venv
+  | server/services/db/models
+)/
+'''
 
 [fastapi-template.options]
 project_name = "server"

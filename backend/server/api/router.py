@@ -1,6 +1,6 @@
 from fastapi.routing import APIRouter
 
-from server.api import user, monitoring
+from server.api import monitoring, user
 
 api_router = APIRouter()
 api_router.include_router(monitoring.router)

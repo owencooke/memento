@@ -1,4 +1,5 @@
 import enum
+import os
 from pathlib import Path
 from tempfile import gettempdir
 
@@ -39,9 +40,9 @@ class Settings(BaseSettings):
     log_level: LogLevel = LogLevel.INFO
 
     # Database
-    supabase_url: str
-    supabase_key: str
-    db_url: str
+    supabase_url: str = os.getenv("SUPABASE_URL", "")
+    supabase_key: str = os.getenv("SUPABASE_KEY", "")
+    db_url: str = os.getenv("DB_URL", "")
 
     model_config = SettingsConfigDict(
         env_file=".env",
