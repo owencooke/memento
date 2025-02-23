@@ -1,0 +1,4 @@
+appId: com.memento.app
+---
+- launchApp
+- assertVisible: 'Welcome!'
