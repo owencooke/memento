@@ -13,44 +13,43 @@ actor "SSO Provider" as SSO << External System >>
 ' Packages/Use Cases
 rectangle "Context-Aware Keepsake Digitizer" {
 
-  package "User Authentication" {
-    usecase "FR-1: Register" as FR1
-    usecase "FR-2: Login" as FR2
-    usecase "FR-3: Multi-device Access" as FR3
-  }
+    package "User Authentication" {
+        usecase "FR-1: Register" as FR1
+        usecase "FR-2: Login" as FR2
+    }
 
-  package "Images" {
     package "Image Capture" {
-      usecase "FR-4: Take new photo" as FR4
-      usecase "FR-5: Show reference overlay" as FR5
-      usecase "FR-6: Select existing photos" as FR6
-      usecase "FR-7: Extract metadata" as FR7
+        usecase "FR-4: Take new photo" as FR4
+        usecase "FR-5: Show reference overlay" as FR5
+        usecase "FR-6: Select existing photos" as FR6
+        usecase "FR-7: Extract metadata" as FR7
     }
-    package "Image Processing" {
-      usecase "FR-8: Classify image" as FR8
-      usecase "FR-9: Populate fields from metadata" as FR9
-      usecase "FR-10: Remove background" as FR10
-      usecase "FR-11: Extract text" as FR11
-    }
-  }
 
-  package "Keepsakes" {
-    package "Filtering" {
-      usecase "Apply Filters" as Filter  
-      usecase "FR-12: Filter by date" as FR12
-      usecase "FR-13: Filter by location" as FR13
-      usecase "FR-14: Filter by OCR keywords" as FR14
-      usecase "FR-15: Filter by annotations" as FR15
-      usecase "FR-16: Filter by classification" as FR16
+    package "Image Processing" {
+        usecase "Process Images"
+        usecase "FR-8: Classify image" as FR8
+        usecase "FR-10: Remove background" as FR10
+        usecase "FR-11: Extract text" as FR11
     }
-    package "Creation" {
-      usecase "Create Keepsake" 
-      usecase "FR-17: Add caption" as FR17
-      usecase "FR-18: Process caption keywords" as FR18
-      usecase "FR-19: Edit metadata" as FR19
-      usecase "FR-20: Add images" as FR20
-      usecase "FR-21: Set thumbnail" as FR21
-    }
+ 
+    package "Keepsakes" {
+        package "Filtering" {
+            usecase "Apply Filters" as Filter  
+            usecase "FR-12: Filter by date" as FR12
+            usecase "FR-13: Filter by location" as FR13
+            usecase "FR-14: Filter by OCR keywords" as FR14
+            usecase "FR-15: Filter by annotations" as FR15
+            usecase "FR-16: Filter by classification" as FR16
+        }
+        package "Keepsake Creation" {
+            usecase "Create Keepsake" 
+            usecase "FR-9: Populate fields from metadata" as FR9
+            usecase "FR-17: Add caption" as FR17
+            usecase "FR-18: Process caption keywords" as FR18
+            usecase "FR-19: Edit metadata" as FR19
+            usecase "FR-20: Add images" as FR20
+            usecase "FR-21: Set thumbnail" as FR21
+        }
     ' package "Bulk Creation" {
     '   usecase "FR-22: Group images into keepsakes" as FR22
     '   usecase "FR-23: Set captions and metadata" as FR23
@@ -128,12 +127,10 @@ rectangle "Context-Aware Keepsake Digitizer" {
 ' User interactions
 User -- (FR1) : grants permission
 User -- (FR2) : grants permission 
-User -- (FR3)
 User -- (FR4)
 User -- (FR6)
 User -- (Filter)
-User -- (FR12)
-User -- (FR19)
+User -- (Create Keepsake) : uploads photos/info
 
 ' SSO interactions
 SSO -- (FR1) : issues token
@@ -141,13 +138,19 @@ SSO -- (FR2) : issues token
 (FR1) .> (FR2) : <<include>>
 
 ' Cloud interactions
+Cloud -- (Create Keepsake) : stores photos/info
 
 ' Image Capture
 (FR5) .> (FR4) : <<include>>
 (FR4) .> (FR7) : <<include>>
 (FR6) .> (FR7) : <<include>>
 
-' Filters
+' Image Processing
+(Process Images) .> (FR8) : <<include>>
+(Process Images) .> (FR10) : <<include>>
+(Process Images) .> (FR11) : <<include>>
+
+' Keepsake Filters
 (Filter) <. (FR12) : <<extend>>
 (Filter) <. (FR13) : <<extend>>
 (Filter) <. (FR14) : <<extend>>
@@ -156,9 +159,12 @@ SSO -- (FR2) : issues token
 
 ' Create Keepsake
 (Create Keepsake) <. (FR17) : <<extend>>
-' (Create Keepsake) <. (FR18) : <<extend>>
 (Create Keepsake) <. (FR19) : <<extend>>
 (Create Keepsake) .> (FR20) : <<include>>
 (Create Keepsake) <. (FR21) : <<extend>>
+(Create Keepsake) .> (Process Images) : <<include>>
+(FR9) .> (FR7) : <<include>>
+(Create Keepsake) <. (FR9) : <<extend>>
+(Create Keepsake) .> (FR18) : <<include>>
 
 @enduml
