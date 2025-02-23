@@ -19,6 +19,7 @@ rectangle "Context-Aware Keepsake Digitizer" {
     }
 
     package "Image Capture" {
+        usecase "Upload Images"
         usecase "FR-4: Take new photo" as FR4
         usecase "FR-5: Show reference overlay" as FR5
         usecase "FR-6: Select existing photos" as FR6
@@ -125,46 +126,53 @@ rectangle "Context-Aware Keepsake Digitizer" {
 }
 
 ' User interactions
-User -- (FR1) : grants permission
-User -- (FR2) : grants permission 
-User -- (FR4)
-User -- (FR6)
-User -- (Filter)
-User -- (Create Keepsake) : uploads photos/info
+User --- (FR1) : grants permission
+User --- (FR2) : grants permission 
+User --- (FR4)
+User --- (FR6)
+User --- (Filter)
+User --- (Create Keepsake) : uploads photos/info
 
 ' SSO interactions
-SSO -- (FR1) : issues token
-SSO -- (FR2) : issues token
+SSO --- (FR1) : issues token
+SSO --- (FR2) : issues token
 (FR1) .> (FR2) : <<include>>
 
 ' Cloud interactions
-Cloud -- (Create Keepsake) : stores photos/info
+Cloud --- (Create Keepsake) : stores photos/info
 
 ' Image Capture
-(FR5) .> (FR4) : <<include>>
-(FR4) .> (FR7) : <<include>>
-(FR6) .> (FR7) : <<include>>
+(FR5) .-> (FR4) : <<include>>
+(FR4) .-> (FR7) : <<include>>
+(FR6) .-> (FR7) : <<include>>
+(FR4) .-> (Upload Images) : <<include>>
+(FR6) .-> (Upload Images) : <<include>>
 
 ' Image Processing
-(Process Images) .> (FR8) : <<include>>
-(Process Images) .> (FR10) : <<include>>
-(Process Images) .> (FR11) : <<include>>
+(Process Images) .-> (FR8) : <<include>>
+(Process Images) .-> (FR10) : <<include>>
+(Process Images) .-> (FR11) : <<include>>
 
 ' Keepsake Filters
-(Filter) <. (FR12) : <<extend>>
-(Filter) <. (FR13) : <<extend>>
-(Filter) <. (FR14) : <<extend>>
-(Filter) <. (FR15) : <<extend>>
-(Filter) <. (FR16) : <<extend>>
+(Filter) <-. (FR12) : <<extend>>
+(Filter) <-. (FR13) : <<extend>>
+(Filter) <-. (FR14) : <<extend>>
+(Filter) <-. (FR15) : <<extend>>
+(Filter) <-. (FR16) : <<extend>>
 
 ' Create Keepsake
-(Create Keepsake) <. (FR17) : <<extend>>
-(Create Keepsake) <. (FR19) : <<extend>>
-(Create Keepsake) .> (FR20) : <<include>>
-(Create Keepsake) <. (FR21) : <<extend>>
-(Create Keepsake) .> (Process Images) : <<include>>
-(FR9) .> (FR7) : <<include>>
-(Create Keepsake) <. (FR9) : <<extend>>
-(Create Keepsake) .> (FR18) : <<include>>
+(Create Keepsake) <-. (FR17) : <<extend>>
+(Create Keepsake) <-. (FR19) : <<extend>>
+(Create Keepsake) .-> (FR20) : <<include>>
+(Create Keepsake) <-. (FR21) : <<extend>>
+(Create Keepsake) <-. (FR9) : <<extend>>
+(Create Keepsake) .-> (FR18) : <<include>>
+
+' Inter-package interactions 
+' NOTE: the more dashes, the longer the arrow 
+' (gives some visual separation)
+(Create Keepsake) .--> (Process Images) : <<include>>
+(FR20) .--> (Upload Images) : <<include>>
+(FR9) .--> (FR7) : <<include>>
 
 @enduml
