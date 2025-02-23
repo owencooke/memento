@@ -38,7 +38,9 @@ export default function Collections() {
         paddingBlock: 8,
       }}
     >
-      <Text>Your Birthday: {userInfo?.birthday}</Text>
+      <Text className="text-center w-full">
+        Your Birthday: {userInfo?.birthday}
+      </Text>
       <Button onPress={() => addPhotos("camera")}>
         <ButtonText>Take a photo</ButtonText>
       </Button>
