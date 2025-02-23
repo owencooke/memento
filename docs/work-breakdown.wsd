@@ -151,7 +151,7 @@
 ***** Modify "Create Keepsake" API endpoint to optionally create a new collection with keepsakes
 
 ' Levi
-*** Viewing
+*** Viewing Keepsakes
 ' FIXME: should the view requirements have an API for each FR? Should they just query the same endpoint? Should we have API for bulk retrieval and single retrieval?
 **** Create API endpoint for retrieving all keepsakes associated with a user
 **** Write query for retrieving all keepsakes for user from database
@@ -190,7 +190,7 @@
 ***** Create UI component for displaying images in full screen
 ***** Enable touch gesture for transitioning to full screen image view
 
-*** Editing
+*** Editing Keepsakes
 ' FIXME: Should each field have an endpoint? If not should we put the nodes that apply to all the functional requirements under the Feature Node?
 **** Create API endpoint for updating keepsake in database
 **** Write query for updating keepsake in database
@@ -226,7 +226,7 @@
 ***** Add input fields to "Edit Keepsake" form for location field
 ***** Add input fields to "Edit Keepsake" form for date field
 
-*** Deletion
+*** Keepsake Deletion
 
 **** FR-34: Delete keepsake permanently
 ***** Create API endpoint for deleting keepsake entry
@@ -271,7 +271,7 @@
 ***** Insert recommended collection into database
 ***** Update client view with new collection
 
-*** Editing
+*** Editing Collections
 **** Create API endpoint for updating collection in database
 **** Write query for updating collection in database
 **** Create view for displaying "Edit Collection" form
