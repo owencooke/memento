@@ -1,3 +1,5 @@
+' TODO: fix FR numberings after SRS revision
+
 @startwbs Work Breakdown Structure
 * Context-Aware Keepsake Digitizer
 
@@ -17,9 +19,6 @@
 **** Manage user login session on mobile device
 **** Display login form with SSO button
 **** Redirect user to home page on success
-' Question: what to put for FR-3..? this might be more of a non=functional
-' Answer: yeah seems more like non-functional. It's implied with how the SSO works imo
-*** FR-3: Multi-device sign-in and access
 
 ** Images
 
