@@ -42,7 +42,7 @@ rectangle "Context-Aware Keepsake Digitizer" {
             usecase "FR-15: Filter by annotations" as FR15
             usecase "FR-16: Filter by classification" as FR16
         }
-        package "Keepsake Creation" {
+        package "Creating" {
             usecase "Create Keepsake" 
             usecase "FR-9: Populate fields from metadata" as FR9
             usecase "FR-17: Add caption" as FR17
@@ -51,7 +51,7 @@ rectangle "Context-Aware Keepsake Digitizer" {
             usecase "FR-20: Add images" as FR20
             usecase "FR-21: Set thumbnail" as FR21
         }
-     package "Bulk Creation" {
+     package "Bulk Creating" {
        usecase "FR-22: Group images into keepsakes" as FR22
        usecase "FR-23: Set captions and metadata" as FR23
        usecase "FR-24: Add to collection" as FR24
@@ -71,14 +71,14 @@ rectangle "Context-Aware Keepsake Digitizer" {
        usecase "FR-32: Change thumbnail" as FR32
        usecase "FR-33: Modify metadata" as FR33
      }
-     package "Deletion" {
+     package "Deleting" {
       usecase "Delete Keepsake"
        usecase "FR-34: Delete keepsake" as FR34
      }
   }
 
      package "Collections" {
-       package "View Collections" {
+       package "Viewing" {
          usecase "FR-3: View Collections" as FR3
        }
        package "Manual Creation" {
@@ -101,7 +101,7 @@ rectangle "Context-Aware Keepsake Digitizer" {
          usecase "FR-44: Modify caption" as FR44
          usecase "FR-45: Modify metadata" as FR45
        }
-       package "Deletion" {
+       package "Deleting" {
          usecase "Delete Collection"
          usecase "FR-46: Delete collection" as FR46
        }
@@ -110,27 +110,26 @@ rectangle "Context-Aware Keepsake Digitizer" {
   '       usecase "FR-48: Auto-derive location" as FR48
   '       usecase "FR-49: Modify location" as FR49
   '       usecase "FR-50: Modify time/date" as FR50
-  '       usecase "FR-51: Modify metadata" as FR51
   '     }
-  '   }
+    }
 
   '   package "Visualization" {
   '     package "Map Features" {
-  '       usecase "FR-52: Show collections on map" as FR52
-  '       usecase "FR-53: Click markers to view" as FR53
+  '       usecase "FR-51: Show collections on map" as FR51
+  '       usecase "FR-52: Click markers to view" as FR52
   '     }
   '     package "Content Generation" {
-  '       usecase "FR-54: Generate collages" as FR54
+  '       usecase "FR-53: Generate collages" as FR53
   '     }
   '   }
 
   '   package "Integrations" {
   '     package "Sharing" {
-  '       usecase "FR-55: Share keepsakes" as FR55
-  '       usecase "FR-56: Share collages" as FR56
+  '       usecase "FR-54: Share keepsakes" as FR54
+  '       usecase "FR-55: Share collages" as FR55
   '     }
   '     package "Notifications" {
-  '       usecase "FR-57: Special day reminders" as FR57
+  '       usecase "FR-56: Special day reminders" as FR56
   '     }
   '   }
 }
