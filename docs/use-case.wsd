@@ -136,8 +136,6 @@ rectangle "Context-Aware Keepsake Digitizer" {
 ' User interactions
 User --- (FR1) : grants permission
 User --- (FR2) : grants permission 
-User --- (FR4)
-User --- (FR6)
 User --- (Filter)
 User --- (Create Keepsake) : uploads photos/info
 User --- (Edit Keepsake) : edits info/uploads photos
