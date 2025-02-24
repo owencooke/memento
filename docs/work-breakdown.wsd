@@ -236,6 +236,11 @@
 ***** Delete keepsake from database
 
 ** Collections
+*** FR-3: View collections
+**** Create API endpoint for retrieving all collections associated with a user
+**** Write query for retrieving all collections for user from database
+**** Create view for displaying individual collection
+**** Create grid view for displaying collections
 
 *** Manual Creation
 
