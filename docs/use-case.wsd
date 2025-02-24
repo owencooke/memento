@@ -78,6 +78,9 @@ rectangle "Context-Aware Keepsake Digitizer" {
   }
 
      package "Collections" {
+       package "View Collections" {
+         usecase "FR-3: View Collections" as FR3
+       }
        package "Manual Creation" {
          usecase "Manually Create Collection"
          usecase "FR-35: Create new collection" as FR35
@@ -142,6 +145,7 @@ User --- (Create Keepsake) : uploads photos/info
 User --- (Edit Keepsake) : edits info/uploads photos
 User --- (View Keepsake) : selects keepsake from grid view
 User --- (Delete Keepsake) : selects keepsake for deletion
+User --- (View Collections) : selects collection from grid view
 User --- (Manually Create Collection) : selects keepsakes / sets info
 User --- (FR40) : accepts/rejects collection
 User --- (Edit Collection) : edits info / keepsake inclusion
@@ -196,7 +200,10 @@ Cloud --- (Create Keepsake) : stores photos/info
 (Edit Keepsake) <-. (FR33) : <<extend>>
 
 ' Delete Keepsake
-(Delete Keepsake) <-. (FR34) : <<extend>>
+(Delete Keepsake) <-. (FR34) : <<include>>
+
+' View Collections
+(View Collections) <-. (FR3) : <<include>>
 
 ' Manually Create Collection
 (Manually Create Collection) <-. (FR35) : <<extend>>
