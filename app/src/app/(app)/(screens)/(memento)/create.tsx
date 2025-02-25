@@ -30,6 +30,14 @@ export default function CreateMemento() {
         </FormControlLabel>
         <DateTimePicker mode="date" value={new Date()} />
       </FormControl>
+      <FormControl size={"lg"}>
+        <FormControlLabel>
+          <FormControlLabelText>Location</FormControlLabelText>
+        </FormControlLabel>
+        <Input>
+          <InputField placeholder="N/A" />
+        </Input>
+      </FormControl>
     </View>
   );
 }
