@@ -1,0 +1,242 @@
+' NOTE: we may need to split this into separate diagrams where possible...
+' it's going to be huge
+
+@startuml Use Case
+left to right direction
+skinparam packageStyle rectangle
+
+' Actors
+actor User
+actor "SSO Provider" as SSO << External System >>
+
+' Packages/Use Cases
+rectangle "Context-Aware Keepsake Digitizer" {
+    package "User Authentication" {
+        usecase "FR-1: Register" as FR1
+        usecase "FR-2: Login" as FR2
+    }
+
+    package "Image Capture" {
+        usecase "Upload Images"
+        usecase "FR-4: Take new photo" as FR4
+        usecase "FR-5: Show reference overlay" as FR5
+        usecase "FR-6: Select existing photos" as FR6
+        usecase "FR-7: Extract metadata" as FR7
+    }
+
+    package "Image Processing" {
+        usecase "Process Images"
+        usecase "FR-8: Classify image" as FR8
+        usecase "FR-10: Remove background" as FR10
+        usecase "FR-11: Extract text" as FR11
+    }
+ 
+    package "Keepsakes" {
+        package "Filtering" {
+            usecase "Apply Filters" as Filter  
+            usecase "FR-12: Filter by date" as FR12
+            usecase "FR-13: Filter by location" as FR13
+            usecase "FR-14: Filter by OCR keywords" as FR14
+            usecase "FR-15: Filter by annotations" as FR15
+            usecase "FR-16: Filter by classification" as FR16
+        }
+        package "Creating" {
+            usecase "Create Keepsake" 
+            usecase "FR-9: Populate fields from metadata" as FR9
+            usecase "FR-17: Add caption" as FR17
+            usecase "FR-18: Process caption keywords" as FR18
+            usecase "FR-19: Edit metadata" as FR19
+            usecase "FR-20: Add images" as FR20
+            usecase "FR-21: Set thumbnail" as FR21
+        }
+        package "Bulk Creating" {
+            usecase "Bulk Create Keepsakes" 
+            usecase "FR-22: Group images into keepsakes" as FR22
+            usecase "FR-23: Set captions and metadata" as FR23
+            usecase "FR-24: Add to collection" as FR24
+        }
+        package "Viewing" {
+            usecase "View Keepsake"
+            usecase "FR-25: View title" as FR25
+            usecase "FR-26: View description" as FR26
+            usecase "FR-27: View metadata" as FR27
+            usecase "FR-28: View photos in carousel" as FR28
+        }
+        package "Editing" {
+            usecase "Edit Keepsake"
+            usecase "FR-29: Modify title" as FR29
+            usecase "FR-30: Modify description" as FR30
+            usecase "FR-31: Modify images" as FR31
+            usecase "FR-32: Change thumbnail" as FR32
+            usecase "FR-33: Modify metadata" as FR33
+        }
+        package "Deleting" {
+            usecase "FR-34: Delete keepsake" as FR34
+        }
+    }
+
+    package "Collections" {
+        package "Viewing" {
+            usecase "FR-3: View Collections" as FR3
+        }
+        package "Manual Creation" {
+            usecase "Manually Create Collection"
+            usecase "FR-35: Create new collection" as FR35
+            usecase "FR-36: Require title" as FR36
+            usecase "FR-37: Add caption" as FR37
+        }
+        package "Automated Creation" {
+            usecase "FR-38: Recommend collections" as FR38
+            usecase "FR-39: Notify recommendations" as FR39
+            usecase "FR-40: Accept/reject recommendations" as FR40
+        }
+        package "Editing" {
+            usecase "Edit Collection"
+            usecase "FR-41: Add keepsakes" as FR41
+            usecase "FR-42: Remove keepsakes" as FR42
+            usecase "FR-43: Modify title" as FR43
+            usecase "FR-44: Modify caption" as FR44
+            usecase "FR-45: Modify metadata" as FR45
+        }
+        package "Deleting" {
+            usecase "FR-46: Delete collection" as FR46
+        }
+        package "Metadata Management" {
+            usecase "Modify Metadata"
+            usecase "FR-47: Auto-derive date" as FR47
+            usecase "FR-48: Auto-derive location" as FR48
+            usecase "FR-49: Modify location" as FR49
+            usecase "FR-50: Modify time/date" as FR50
+        }
+    }
+
+    package "Visualization" {
+        package "Map Features" {
+            usecase "View Map"
+            usecase "FR-51: Show collections on map" as FR51
+            usecase "FR-52: Click markers to view" as FR52
+        }
+        package "Content Generation" {
+            usecase "FR-53: Generate collages" as FR53
+        }
+    }
+
+    package "Integrations" {
+        package "Sharing" {
+            usecase "FR-54: Share keepsakes" as FR54
+            usecase "FR-55: Share collages" as FR55
+        }
+        package "Notifications" {
+            usecase "FR-56: Special day reminders" as FR56
+        }
+    }
+}
+
+' User interactions
+User --- (FR1) : grants permission
+User --- (FR2) : grants permission 
+User --- (Filter)
+User --- (Create Keepsake) : uploads photos/info
+User --- (Edit Keepsake) : edits info/uploads photos
+User --- (View Keepsake) : selects keepsake from grid view
+User --- (FR34) : selects keepsake for deletion
+User --- (FR3) : selects collection from grid view
+User --- (Manually Create Collection) : selects keepsakes / sets info
+User --- (FR40) : accepts/rejects collection
+User --- (Edit Collection) : edits info / keepsake inclusion
+User --- (FR46) : selects collection for deletion
+User --- (FR55) : shares a collage to social media
+User --- (FR54) : shares a keepsake to social media
+User --- (View Map) : views the map
+User --- (FR53) : generate a collage for a collection
+User --- (Modify Metadata) : modifies a collection's metadata
+User --- (FR56) : views reminders from push notifications
+User --- (Bulk Create Keepsakes) : creates multiple keepsakes at once
+
+' SSO interactions
+SSO --- (FR1) : issues token
+SSO --- (FR2) : issues token
+(FR1) .> (FR2) : <<include>>
+
+' Image Capture
+(FR5) .-> (FR4) : <<include>>
+(FR4) .-> (FR7) : <<include>>
+(FR6) .-> (FR7) : <<include>>
+(FR4) .-> (Upload Images) : <<include>>
+(FR6) .-> (Upload Images) : <<include>>
+
+' Image Processing
+(Process Images) .-> (FR8) : <<include>>
+(Process Images) .-> (FR10) : <<include>>
+(Process Images) .-> (FR11) : <<include>>
+
+' Keepsake Filters
+(Filter) <-. (FR12) : <<extend>>
+(Filter) <-. (FR13) : <<extend>>
+(Filter) <-. (FR14) : <<extend>>
+(Filter) <-. (FR15) : <<extend>>
+(Filter) <-. (FR16) : <<extend>>
+
+' Create Keepsake
+(Create Keepsake) <-. (FR17) : <<extend>>
+(Create Keepsake) <-. (FR19) : <<extend>>
+(Create Keepsake) .-> (FR20) : <<include>>
+(Create Keepsake) <-. (FR21) : <<extend>>
+(Create Keepsake) <-. (FR9) : <<extend>>
+(Create Keepsake) .-> (FR18) : <<include>>
+
+' Bulk Create
+(Bulk Create Keepsakes) .-> (FR22) : <<include>>
+(Bulk Create Keepsakes) <-. (FR23) : <<extend>>
+(Bulk Create Keepsakes) <-. (FR24) : <<extend>>
+
+' View Keepsake
+(View Keepsake) <-. (FR25) : <<extend>>
+(View Keepsake) <-. (FR26) : <<extend>>
+(View Keepsake) <-. (FR27) : <<extend>>
+(View Keepsake) <-. (FR28) : <<extend>>
+
+' Edit Keepsake
+(Edit Keepsake) <-. (FR29) : <<extend>>
+(Edit Keepsake) <-. (FR30) : <<extend>>
+(Edit Keepsake) .-> (FR31) : <<include>>
+(Edit Keepsake) <-. (FR32) : <<extend>>
+(Edit Keepsake) <-. (FR33) : <<extend>>
+
+' Manually Create Collection
+(Manually Create Collection) <-. (FR35) : <<extend>>
+(Manually Create Collection) <-. (FR36) : <<extend>>
+(Manually Create Collection) <-. (FR37) : <<extend>>
+
+' System Recommended Collection
+(FR40) .-> (FR39) : <<include>>
+(FR39) .-> (FR38) : <<include>>
+
+' Editing Collections
+(Edit Collection) <-. (FR41) : <<extend>>
+(Edit Collection) <-. (FR42) : <<extend>>
+(Edit Collection) <-. (FR43) : <<extend>>
+(Edit Collection) <-. (FR44) : <<extend>>
+(Edit Collection) <-. (FR45) : <<extend>>
+
+' Modify Metadata
+(Modify Metadata) <-. (FR47) : <<extend>>
+(Modify Metadata) <-. (FR48) : <<extend>>
+(Modify Metadata) <-. (FR49) : <<extend>>
+(Modify Metadata) <-. (FR50) : <<extend>>
+
+' View Map
+(View Map) .-> (FR51) : <<include>>
+(View Map) <-. (FR52) : <<extend>>
+
+' Inter-package interactions 
+' NOTE: the more dashes, the longer the arrow 
+' (gives some visual separation)
+(Create Keepsake) .--> (Process Images) : <<include>>
+(FR20) .--> (Upload Images) : <<include>>
+(FR9) .--> (FR7) : <<include>>
+(Edit Keepsake) .--> (Process Images) : <<include>>
+(FR31) .--> (Upload Images) : <<include>>
+' (FR53) <-. (FR55) : <<extend>>
+
+@enduml
