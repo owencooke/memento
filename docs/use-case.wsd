@@ -104,33 +104,39 @@ rectangle "Context-Aware Keepsake Digitizer" {
             usecase "Delete Collection"
             usecase "FR-46: Delete collection" as FR46
         }
-  '     package "Metadata Management" {
-            ' usecase "FR-47: Auto-derive date" as FR47
-            ' usecase "FR-48: Auto-derive location" as FR48
-            ' usecase "FR-49: Modify location" as FR49
-            ' usecase "FR-50: Modify time/date" as FR50
-  '     }
+        package "Metadata Management" {
+            usecase "Modify Metadata"
+            usecase "FR-47: Auto-derive date" as FR47
+            usecase "FR-48: Auto-derive location" as FR48
+            usecase "FR-49: Modify location" as FR49
+            usecase "FR-50: Modify time/date" as FR50
+        }
     }
 
-    ' package "Visualization" {
-    '     package "Map Features" {
-    '         usecase "FR-51: Show collections on map" as FR51
-    '         usecase "FR-52: Click markers to view" as FR52
-    '     }
-    '     package "Content Generation" {
-    '         usecase "FR-53: Generate collages" as FR53
-    '     }
-    ' }
+    package "Visualization" {
+        package "Map Features" {
+            usecase "View Map"
+            usecase "FR-51: Show collections on map" as FR51
+            usecase "FR-52: Click markers to view" as FR52
+        }
+        package "Content Generation" {
+            usecase "Generate Collage"
+            usecase "FR-53: Generate collages" as FR53
+        }
+    }
 
-    ' package "Integrations" {
-    '     package "Sharing" {
-    '         usecase "FR-54: Share keepsakes" as FR54
-    '         usecase "FR-55: Share collages" as FR55
-    '     }
-    '     package "Notifications" {
-    '         usecase "FR-56: Special day reminders" as FR56
-    '     }
-    ' }
+    package "Integrations" {
+        package "Sharing" {
+            usecase "Share Keepsake"
+            usecase "Share Collage"
+            usecase "FR-54: Share keepsakes" as FR54
+            usecase "FR-55: Share collages" as FR55
+        }
+        package "Notifications" {
+            usecase "View Reminder"
+            usecase "FR-56: Special day reminders" as FR56
+        }
+    }
 }
 
 ' User interactions
@@ -146,6 +152,12 @@ User --- (Manually Create Collection) : selects keepsakes / sets info
 User --- (FR40) : accepts/rejects collection
 User --- (Edit Collection) : edits info / keepsake inclusion
 User --- (Delete Collection) : selects collection for deletion
+User --- (Share Collage) : shares a collage to social media
+User --- (Share Keepsake) : shares a keepsake to social media
+User --- (View Map) : views the map
+User --- (Generate Collage) : generate a collage for a collection
+User --- (Modify Metadata) : modifies a collection's metadata
+User --- (View Reminder) : views reminders from push notifications
 
 ' SSO interactions
 SSO --- (FR1) : issues token
@@ -220,6 +232,26 @@ Cloud --- (Create Keepsake) : stores photos/info
 
 ' Delete Collection
 (Delete Collection) <-. (FR46) : <<extend>>
+
+' Modify Metadata
+(Modify Metadata) <-. (FR47) : <<extend>>
+(Modify Metadata) <-. (FR48) : <<extend>>
+(Modify Metadata) <-. (FR49) : <<extend>>
+(Modify Metadata) <-. (FR50) : <<extend>>
+
+' View Map
+(View Map) .-> (FR51) : <<include>>
+(View Map) <-. (FR52) : <<extend>>
+
+' Generate Collage
+(Generate Collage) .-> (FR53) : <<include>>
+
+' Sharing
+(Share Keepsake) .-> (FR54) : <<include>>
+(Share Collage) .-> (FR55) : <<include>>
+
+' View Reminder
+(View Reminder) .-> (FR56) : <<include>>
 
 ' Inter-package interactions 
 ' NOTE: the more dashes, the longer the arrow 
