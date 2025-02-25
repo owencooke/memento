@@ -7,6 +7,7 @@ import { Input, InputField } from "@/src/components/ui/input";
 import { Heading } from "@/src/components/ui/heading";
 import { View } from "react-native";
 import { Textarea, TextareaInput } from "@/src/components/ui/textarea";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 export default function CreateMemento() {
   const handleAddMemento = () => {
@@ -27,13 +28,7 @@ export default function CreateMemento() {
         <FormControlLabel>
           <FormControlLabelText>Password</FormControlLabelText>
         </FormControlLabel>
-        <Input>
-          <InputField
-            type="password"
-            defaultValue="12345"
-            placeholder="password"
-          />
-        </Input>
+        <DateTimePicker mode="date" value={new Date()} />
       </FormControl>
     </View>
   );
