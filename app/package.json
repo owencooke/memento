@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
+    "start:tunnel": "expo start --tunnel",
     "android": "DARK_MODE=media expo run:android",
     "android:prod": "DARK_MODE=media expo run:android --variant release",
     "ios": "DARK_MODE=media expo run:ios",
