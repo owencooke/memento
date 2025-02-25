@@ -1,0 +1,380 @@
+' TODO: fix FR numberings after SRS revision
+
+@startwbs Work Breakdown Structure
+* Context-Aware Keepsake Digitizer
+
+' Owen
+** User Authentication
+
+*** FR-1: Registration with SSO
+**** Create user table in database
+**** Insert SSO provided identifier / user details into database
+**** Create API endpoint for registering new user 
+**** Display registration form with SSO button and input fields
+**** Redirect user to home page on success
+
+*** FR-2: User login with SSO
+**** Validate user using SSO provider and database
+**** Create API endpoint for existing user login
+**** Manage user login session on mobile device
+**** Display login form with SSO button
+**** Redirect user to home page on success
+
+** Images
+
+*** Image Capture
+
+**** FR-4: Take new photo with camera
+***** Create component for image capture triggers and results
+***** Add "Take Photo" option to photo upload options actionsheet
+***** Open the device camera when button clicked
+***** Return the captured image as output from the module
+
+**** FR-5: Display reference square overlay
+***** Draw a square overlay on active camera display
+***** Remove overlay when looking at image result
+
+**** FR-6: Select existing photos from library
+***** Add "Select Photo" option to photo upload options actionsheet
+***** Open the mobile device's photo libary when button clicked
+***** Return the selected image(s) as output from the module
+
+*** Image Processing
+
+**** FR-7: Extract EXIF metadata
+***** Modify image capture APIs to obtain EXIF metadata
+***** Return the image(s) metadata as output from module
+
+**** FR-8: Perform image classification
+***** Select pre-trained ML model for image classification
+***** Select weights from image training datasets to use
+***** Transform input image to match expected ML model dimensions
+***** Process results of ML model into image label/category
+***** Add classification result as field to keepsake metadata
+
+**** FR-9: Populate fields from metadata
+***** Obtain aggregrated result from uploaded image(s) metadata
+***** Populate create keepsake form fields with aggregrated result
+
+**** FR-10: Remove image background
+***** Use library to remove background from image
+***** Crop resulting image to remove transparent pixels
+***** Create API Endpoint for image background removal
+***** Call endpoint for each uploaded image after user creates keepsake
+***** Display background-free result to user 
+***** Present dialog for user to accept the result or keep their original image
+
+**** FR-11: Extract text from images
+***** Call OCR library to extract text from input image
+***** Add OCR result as field to keepsake metadata
+
+** Keepsakes
+
+*** Filtering
+
+**** FR-12: Filter by date
+***** Create database query for filtering keepsakes by date range
+***** Create API endpoint for returning filtered keepsakes
+***** Create card component for a keepsake
+***** Create grid view for displaying all keepsake cards
+***** Create component for filter actionsheet trigger
+***** Add start and end date picker options to action sheet
+***** Update keepsake grid view by calling API endpoint when filters applied
+
+**** FR-13: Filter by location
+***** Modify database filter query to consider lat/long bounding box conditions
+***** Calculate lat/long bounding box for a location using geolocation library
+***** Add location text input option to filter actionsheet
+***** Add user's location input to client's filter API call
+
+**** FR-14: Filter by OCR keywords
+***** Modify database filter query to consider keywords in OCR results
+***** Add text search option to keepsake grid view page
+***** Add user's text search input to client's filter API call
+
+**** FR-15: Filter by user annotations
+***** Modify database filter query to consider keepsake keywords (from caption)
+
+**** FR-16: Filter by image classification
+***** Modify database filter query to consider image classification labels
+***** Add text input option for image class to filter actionsheet
+***** Add user's image category input to client's filter API call
+
+*** Creation
+
+**** FR-17: Add textual caption
+***** Create database table for a Keepsake
+***** Write query for inserting a new keepsake to database
+***** Create API endpoint for creating a new keepsake
+***** Create view for displaying "Create Keepsake" form
+***** Add text input option for caption to keepsake create form
+***** Add call to "Create Keepsake" API with form values when user submits
+
+**** FR-18: Process caption into keywords
+***** Use library to remove stopwords from keepsake caption
+***** Add remaining words from result to keepsake metadata
+
+**** FR-19: Edit metadata properties
+***** Add input fields to "Create Keepsake" form for user-modifiable metadata fields
+
+**** FR-20: Add images
+***** Create interactive image grid component for displaying added images
+***** Add photo component/trigger for uploading photos from device
+***** Add delete icon onto the corner of each image in the grid
+***** Remove image from the grid state when delete selected
+***** Modify "Create Keepsake" API endpoint payload to receive images 
+***** Upload image(s) to blob storage via cloud provider
+***** Add blob storage references to Keepsake database fields 
+
+**** FR-21: Specify thumbnail
+***** Add UI indicator for thumbnail to the leftmost topmost image in grid
+***** Add drag-and-drop support to image grid for changing thumbnail selection
+
+*** Bulk Creation
+
+**** FR-22: Group images into keepsakes
+***** Use image picker call to direct user to select multiple photos from device library
+***** Create form for displaying groups of images (1 per group initially)
+***** Add drag-and-drop support allowing user to move images to different groups
+***** Add button for confirming bulk creation of multiple keepsakes
+***** Modify "Create Keepsake" API endpoint to support multiple keepsakes in one payload
+
+**** FR-23: Set captions and metadata
+***** Add button/trigger for modifying a single keepsake/group 
+***** Display "Create Keepsake" form inputs for that particular group
+***** Save per-group modifications to a local state during bulk creation
+
+**** FR-24: Add to collection
+***** Add text input to form for new collection title.
+***** Add text input to form for new collection caption (optional).
+***** Add checkbox to form to allow user to optionally create a new collection for bulk keepsakes
+***** Modify "Create Keepsake" API endpoint to optionally create a new collection with keepsakes
+
+' Levi
+*** Viewing Keepsakes
+' FIXME: should the view requirements have an API for each FR? Should they just query the same endpoint? Should we have API for bulk retrieval and single retrieval?
+**** Create API endpoint for retrieving all keepsakes associated with a user
+**** Write query for retrieving all keepsakes for user from database
+**** Create view for displaying individual keepsake
+**** Create grid view for displaying keepsakes
+
+**** FR-25: View title
+***** Create title field in individual keepsake view
+***** Create title field in keepsake grid view
+***** Populate title field 
+
+**** FR-26: View description
+***** Create description field in individual keepsake view
+***** Populate description field 
+
+**** FR-27: View metadata
+' Location Metadata
+***** Create location field in individual keepsake view
+***** Create location field in keepsake grid view
+***** Populate location field 
+' NOTE Should we include the geocoding thing here?
+***** Make location field readable with geocode API
+' Date Metadata
+***** Create date field in individual keepsake view
+***** Create date field in keepsake grid view
+***** Convert date field to readable format
+***** Populate date field 
+' NOTE Displaying any other metadata?
+
+**** FR-28: View photos in carousel
+' FIXME: No FR for thumbnail display. Should it go here or should we drop it for the diagram?
+***** Create UI component for displaying images in carousel
+***** Create API endpoint for retrieving keepsake images
+***** Enable swipe gesture for navigating carousel
+***** Populate image carousel
+***** Create UI component for displaying images in full screen
+***** Enable touch gesture for transitioning to full screen image view
+
+*** Editing Keepsakes
+' FIXME: Should each field have an endpoint? If not should we put the nodes that apply to all the functional requirements under the Feature Node?
+**** Create API endpoint for updating keepsake in database
+**** Write query for updating keepsake in database
+**** Create view for displaying "Edit Keepsake" form
+**** Add call to "Edit Keepsake" API with form values when user submits
+
+**** FR-29: Modify/remove title
+***** Create text input field for title
+***** Populate title field with existing title
+***** Implement field validation confirming that title exists
+
+**** FR-30: Modify/remove description
+***** Create text input field for description
+***** Populate description field with existing description
+' NOTE Do we want to add field validation as leaf nodes? Works for both creation and editing
+
+**** FR-31: Modify/remove images
+***** Create interactive image grid component for displaying associated images
+***** Add photo component/trigger for taking photo using device camera
+***** Add photo component/trigger for uploading photos from device
+***** Add delete icon onto the corner of each image in the grid
+***** Remove image from the grid state when delete selected
+***** Modify "Edit Keepsake" API endpoint payload to receive images
+***** Modify "Edit Keepsake" API endpoint payload to communicate deleted images
+***** Upload image(s) to blob storage via cloud provider
+
+**** FR-32: Change thumbnail
+***** Add drag-and-drop support to image grid for changing thumbnail selection
+' NOTE Is there more to changing the thumbnail? Should specify API for thumbnail selection?
+
+**** FR-33: Modify/remove metadata
+' NOTE Again do we want to specify the fields?
+***** Add input fields to "Edit Keepsake" form for location field
+***** Add input fields to "Edit Keepsake" form for date field
+
+*** Keepsake Deletion
+
+**** FR-34: Delete keepsake permanently
+***** Create API endpoint for deleting keepsake entry
+***** Remove associated images from storage
+***** Display confirmation prompt before deletion
+***** Remove keepsake from user's view after deletion
+***** Delete keepsake from database
+
+** Collections
+*** FR-3: View collections
+**** Create API endpoint for retrieving all collections associated with a user
+**** Write query for retrieving all collections for user from database
+**** Create view for displaying individual collection
+**** Create grid view for displaying collections
+
+*** Manual Creation
+
+**** FR-35: Create new collection
+***** Create API endpoint for collection creation
+***** Write query for adding a collection to the database
+***** Create view for displaying "Create Collection" form
+***** Add call to "Create Collection" API with form values when user submits
+
+**** FR-36: Require collection title
+***** Validate title field confirming it is not empty
+
+**** FR-37: Add optional caption
+***** Create text input field for caption
+
+' TODO Missing anything big here?
+*** System-Recommended Collection Creation
+
+**** FR-38: Recommend collections
+***** Implement clustering algorithm for keepsake locations
+***** Define confidence threshold for accepting recommended collections
+
+**** FR-39: Notify of recommendations
+***** Send from backend to client a notification of recommended collection
+***** Create UI component for previewing recommended collection
+***** Create button/trigger for accepting or rejecting collection
+***** Add input fields to "Recommended Collection" form for collection title
+***** Validate title field
+
+**** FR-40: Accept/reject recommendations
+***** Create API endpoint for accepting/rejecting recommended collections
+***** Create process for building default recommendation from clustered keepsakes
+***** Insert recommended collection into database
+***** Update client view with new collection
+
+*** Editing Collections
+**** Create API endpoint for updating collection in database
+**** Write query for updating collection in database
+**** Create view for displaying "Edit Collection" form
+**** Add call to "Edit Collection" API with form values when user submits
+**** Create button/trigger for accepting or rejecting collection changes
+
+**** FR-41: Add keepsakes
+***** Create UI component for selecting keepsakes to add to collection
+***** Update collection contents in database
+
+**** FR-42: Remove keepsakes
+***** Create UI component for selecting keepsakes to remove from collection
+***** Update collection contents in database
+
+**** FR-43: Modify title
+***** Create UI input for editing title
+***** Populate title field with existing title
+***** Update collection title in database
+
+**** FR-44: Modify/remove caption
+***** Create UI input for editing caption
+***** Populate caption field with existing caption
+***** Update collection caption in database
+
+**** FR-45: Modify/remove metadata
+' Date Metadata
+***** Create UI input for editing date
+***** Populate date field with existing date
+***** Convert date field to readable format
+***** Update collection date in database
+' Location Metadata
+***** Create UI input for editing location
+***** Populate location field with existing location
+***** Update collection location in database
+
+' Mahmud
+*** Deletion
+
+**** FR-46: Delete collection
+***** Create API endpoint for collection deletion
+***** Write query for deleting the collection from the database
+***** Create UI component for deleting a collection
+***** Add call to "Delete Collection" API when the user deletes a collection
+
+*** Metadata Management
+
+**** FR-47: Auto-derive collection date
+***** Retrieve the date for the collection from the keepsakes stored in it
+***** Populate the collection's date field with the date of the keepsakes stored in the collection
+
+**** FR-48: Auto-derive collection location  
+***** Retrieve the location for the collection from the keepsakes stored in it
+***** Populate the collection's location field with the location of the keepsakes stored in the collection
+
+**** FR-49: Modify location
+***** Create UI input for editing location
+***** Populate location field with existing location
+***** Update collection location in database
+
+**** FR-50: Modify time/date
+***** Create UI input for editing time/date
+***** Populate time/date field with existing time/date
+***** Update collection time/date in database
+
+** Visualization
+
+*** Map Features
+
+**** FR-51: Show collections on map
+***** Create UI component for a map display
+***** Create API endpoint for retrieving the locations of collections associated with the user
+***** Write query for retrieving the locations of collections associated with the user from the database
+***** Plot collections on the map
+
+**** FR-52: Click markers to view collection
+***** Enable touch gesture for opening a collection
+
+*** Content Generation
+
+**** FR-53: Generate collection collages
+***** Create UI component for selecting a collection to make a collage
+***** Create a view with some or all keepsakes in a collection as a collage
+
+** Integrations
+
+*** Sharing
+
+**** FR-54: Share keepsakes
+***** Create UI component for sharing a keepsake 
+***** Use sharing library to share keepsake
+
+**** FR-55: Share collages
+***** Create UI component for sharing a collage 
+***** Use sharing library to share collage
+
+*** Notifications
+
+**** FR-56: Special day reminders
+***** Determine if the current day is special
+***** Use notification library to send a push notification to the device
+@endwbs
