@@ -7,7 +7,6 @@ skinparam packageStyle rectangle
 
 ' Actors
 actor User
-actor "Cloud Provider" as Cloud << External System >>
 actor "SSO Provider" as SSO << External System >>
 
 ' Packages/Use Cases
@@ -51,6 +50,7 @@ rectangle "Context-Aware Keepsake Digitizer" {
             usecase "FR-21: Set thumbnail" as FR21
         }
         package "Bulk Creating" {
+            usecase "Bulk Create Keepsakes" 
             usecase "FR-22: Group images into keepsakes" as FR22
             usecase "FR-23: Set captions and metadata" as FR23
             usecase "FR-24: Add to collection" as FR24
@@ -71,7 +71,6 @@ rectangle "Context-Aware Keepsake Digitizer" {
             usecase "FR-33: Modify metadata" as FR33
         }
         package "Deleting" {
-            usecase "Delete Keepsake"
             usecase "FR-34: Delete keepsake" as FR34
         }
     }
@@ -87,7 +86,6 @@ rectangle "Context-Aware Keepsake Digitizer" {
             usecase "FR-37: Add caption" as FR37
         }
         package "Automated Creation" {
-            usecase "System Recommended Collection"
             usecase "FR-38: Recommend collections" as FR38
             usecase "FR-39: Notify recommendations" as FR39
             usecase "FR-40: Accept/reject recommendations" as FR40
@@ -101,7 +99,6 @@ rectangle "Context-Aware Keepsake Digitizer" {
             usecase "FR-45: Modify metadata" as FR45
         }
         package "Deleting" {
-            usecase "Delete Collection"
             usecase "FR-46: Delete collection" as FR46
         }
         package "Metadata Management" {
@@ -120,20 +117,16 @@ rectangle "Context-Aware Keepsake Digitizer" {
             usecase "FR-52: Click markers to view" as FR52
         }
         package "Content Generation" {
-            usecase "Generate Collage"
             usecase "FR-53: Generate collages" as FR53
         }
     }
 
     package "Integrations" {
         package "Sharing" {
-            usecase "Share Keepsake"
-            usecase "Share Collage"
             usecase "FR-54: Share keepsakes" as FR54
             usecase "FR-55: Share collages" as FR55
         }
         package "Notifications" {
-            usecase "View Reminder"
             usecase "FR-56: Special day reminders" as FR56
         }
     }
@@ -146,26 +139,24 @@ User --- (Filter)
 User --- (Create Keepsake) : uploads photos/info
 User --- (Edit Keepsake) : edits info/uploads photos
 User --- (View Keepsake) : selects keepsake from grid view
-User --- (Delete Keepsake) : selects keepsake for deletion
-User --- (View Collections) : selects collection from grid view
+User --- (FR34) : selects keepsake for deletion
+User --- (FR3) : selects collection from grid view
 User --- (Manually Create Collection) : selects keepsakes / sets info
 User --- (FR40) : accepts/rejects collection
 User --- (Edit Collection) : edits info / keepsake inclusion
-User --- (Delete Collection) : selects collection for deletion
-User --- (Share Collage) : shares a collage to social media
-User --- (Share Keepsake) : shares a keepsake to social media
+User --- (FR46) : selects collection for deletion
+User --- (FR55) : shares a collage to social media
+User --- (FR54) : shares a keepsake to social media
 User --- (View Map) : views the map
-User --- (Generate Collage) : generate a collage for a collection
+User --- (FR53) : generate a collage for a collection
 User --- (Modify Metadata) : modifies a collection's metadata
-User --- (View Reminder) : views reminders from push notifications
+User --- (FR56) : views reminders from push notifications
+User --- (Bulk Create Keepsakes) : creates multiple keepsakes at once
 
 ' SSO interactions
 SSO --- (FR1) : issues token
 SSO --- (FR2) : issues token
 (FR1) .> (FR2) : <<include>>
-
-' Cloud interactions
-Cloud --- (Create Keepsake) : stores photos/info
 
 ' Image Capture
 (FR5) .-> (FR4) : <<include>>
@@ -194,6 +185,11 @@ Cloud --- (Create Keepsake) : stores photos/info
 (Create Keepsake) <-. (FR9) : <<extend>>
 (Create Keepsake) .-> (FR18) : <<include>>
 
+' Bulk Create
+(Bulk Create Keepsakes) .-> (FR22) : <<include>>
+(Bulk Create Keepsakes) <-. (FR23) : <<extend>>
+(Bulk Create Keepsakes) <-. (FR24) : <<extend>>
+
 ' View Keepsake
 (View Keepsake) <-. (FR25) : <<extend>>
 (View Keepsake) <-. (FR26) : <<extend>>
@@ -207,21 +203,14 @@ Cloud --- (Create Keepsake) : stores photos/info
 (Edit Keepsake) <-. (FR32) : <<extend>>
 (Edit Keepsake) <-. (FR33) : <<extend>>
 
-' Delete Keepsake
-(Delete Keepsake) <-. (FR34) : <<include>>
-
-' View Collections
-(View Collections) <-. (FR3) : <<include>>
-
 ' Manually Create Collection
 (Manually Create Collection) <-. (FR35) : <<extend>>
 (Manually Create Collection) <-. (FR36) : <<extend>>
 (Manually Create Collection) <-. (FR37) : <<extend>>
 
 ' System Recommended Collection
-(System Recommended Collection) <-. (FR38) : <<extend>>
-(System Recommended Collection) <-. (FR39) : <<extend>>
-(System Recommended Collection) <-. (FR40) : <<extend>>
+(FR40) .-> (FR39) : <<include>>
+(FR39) .-> (FR38) : <<include>>
 
 ' Editing Collections
 (Edit Collection) <-. (FR41) : <<extend>>
@@ -229,9 +218,6 @@ Cloud --- (Create Keepsake) : stores photos/info
 (Edit Collection) <-. (FR43) : <<extend>>
 (Edit Collection) <-. (FR44) : <<extend>>
 (Edit Collection) <-. (FR45) : <<extend>>
-
-' Delete Collection
-(Delete Collection) <-. (FR46) : <<extend>>
 
 ' Modify Metadata
 (Modify Metadata) <-. (FR47) : <<extend>>
@@ -243,16 +229,6 @@ Cloud --- (Create Keepsake) : stores photos/info
 (View Map) .-> (FR51) : <<include>>
 (View Map) <-. (FR52) : <<extend>>
 
-' Generate Collage
-(Generate Collage) .-> (FR53) : <<include>>
-
-' Sharing
-(Share Keepsake) .-> (FR54) : <<include>>
-(Share Collage) .-> (FR55) : <<include>>
-
-' View Reminder
-(View Reminder) .-> (FR56) : <<include>>
-
 ' Inter-package interactions 
 ' NOTE: the more dashes, the longer the arrow 
 ' (gives some visual separation)
@@ -261,6 +237,6 @@ Cloud --- (Create Keepsake) : stores photos/info
 (FR9) .--> (FR7) : <<include>>
 (Edit Keepsake) .--> (Process Images) : <<include>>
 (FR31) .--> (Upload Images) : <<include>>
-
+' (FR53) <-. (FR55) : <<extend>>
 
 @enduml
