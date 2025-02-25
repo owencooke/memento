@@ -1,4 +1,5 @@
 import enum
+import os
 from pathlib import Path
 from tempfile import gettempdir
 
@@ -26,7 +27,7 @@ class Settings(BaseSettings):
     with environment variables.
     """
 
-    host: str = "127.0.0.1"
+    host: str = "0.0.0.0"
     port: int = 8000
     # quantity of workers for uvicorn
     workers_count: int = 1
@@ -38,9 +39,13 @@ class Settings(BaseSettings):
 
     log_level: LogLevel = LogLevel.INFO
 
+    # Database
+    supabase_url: str = os.getenv("SUPABASE_URL", "")
+    supabase_key: str = os.getenv("SUPABASE_KEY", "")
+    db_url: str = os.getenv("DB_URL", "")
+
     model_config = SettingsConfigDict(
         env_file=".env",
-        env_prefix="SERVER_",
         env_file_encoding="utf-8",
     )
 

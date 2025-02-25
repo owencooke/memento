@@ -10,8 +10,14 @@ maintainers = [
 ]
 readme = "README.md"
 
+[tool.poetry.scripts]
+start = "scripts.commands:start"
+lint = "scripts.commands:lint"
+test = "scripts.commands:test"
+sync-db = "scripts.commands:sync_db_pydantic"
+
 [tool.poetry.dependencies]
-python = ">3.9.1,<4"
+python = ">=3.10,<3.13"
 fastapi = "^0.115.6"
 uvicorn = { version = "^0.34.0", extras = ["standard"] }
 pydantic = "^2.10.4"
@@ -19,8 +25,17 @@ pydantic-settings = "^2.7.0"
 yarl = "^1.18.3"
 ujson = "^5.10.0"
 httptools = "^0.6.4"
-pymongo = "^4.10.1"
 loguru = "^0.7.3"
+supabase-pydantic = "^0.17.0"
+python-dotenv = "^1.0.1"
+supabase = "^2.13.0"
+pillow = "^11.1.0"
+scikit-learn = "^1.6.1"
+pytesseract = "^0.3.13"
+keras = "^3.8.0"
+onnxruntime = "^1.20.1"
+numba = "0.61.0"
+rembg = {version = "2.0.61", extras = ["cpu"]}
 
 
 [tool.poetry.group.dev.dependencies]
@@ -51,6 +66,10 @@ allow_untyped_decorators = true
 warn_unused_ignores = false
 warn_return_any = false
 namespace_packages = true
+explicit_package_bases = true
+exclude = [
+    "server/services/db/models/*"
+]
 
 [tool.pytest.ini_options]
 filterwarnings = [
@@ -108,9 +127,11 @@ lint.ignore = [
     "ANN401",  # typing.Any are disallowed in `**kwargs
     "PLR0913", # Too many arguments for function call
     "D106",    # Missing docstring in public nested class
+    "S104",    # Possible binding to all interfaces
 ]
 exclude = [
-    ".venv/"
+    ".venv/",
+    "server/services/db/models/*"
 ]
 lint.mccabe = { max-complexity = 10 }
 line-length = 88
@@ -127,6 +148,13 @@ ignore-decorators = ["typing.overload"]
 [tool.ruff.lint.pylint]
 allow-magic-value-types = ["int", "str", "float", "bytes"]
 
+[tool.black]
+exclude = '''
+/(
+    \.venv
+  | server/services/db/models
+)/
+'''
 
 [fastapi-template.options]
 project_name = "server"

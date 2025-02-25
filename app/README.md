@@ -4,6 +4,8 @@ This mobile application is an [Expo](https://expo.dev) project that was created 
 
 ## Get Started
 
+### Running the app
+
 1. Install dependencies
 
    ```bash
@@ -24,6 +26,30 @@ In the output, you'll find options to open the app in a
 - [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
 The easiest, quickstart option is to download the Expo Go app on your physical device and to scan the QR code presented in the terminal output to launch the app.
+
+### Connecting to Backend
+
+To call the Backend APIs, the Expo app needs to know the IP address of the host the backend is running on. The app host and backend host should be on the same LAN. To specify the host IP, set the following environment variable in a `.env` file:
+
+```
+EXPO_PUBLIC_API_HOST = <host_machine_ip>
+```
+
+You can find the local IP using the command `ipconfig` in Windows or `ip addr show eth0` in Linux.
+
+## Sync Backend API
+
+This project uses [hey-api](https://heyapi.dev/) to automatically generate TypeScript types and API clients from the backend's OpenAPI definition.
+
+To sync new backend changes to the mobile client:
+
+1. Ensure the local backend server is running at http://localhost:8000/ with your new API changes
+2. In the `/app` directory, run the command
+   ```bash
+   pnpm sync-api
+   ```
+
+This should generate new TypeScript clients/types inside the `/src/app/api-client/generated` folder that reflect the new or modified APIs.
 
 ## Unit Testing
 
