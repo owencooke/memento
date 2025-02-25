@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 
 from pydantic import UUID4, BaseModel, Field
@@ -26,6 +28,20 @@ class CustomModelUpdate(CustomModel):
 # Note: These are the base Row models that include all fields.
 
 
+class CollectionsBaseSchema(CustomModel):
+	"""Collections Base Schema."""
+
+	# Primary Keys
+	id: int
+
+	# Columns
+	caption: str | None = Field(default=None)
+	created_at: datetime.datetime
+	title: str
+	updated_at: datetime.datetime
+	user_id: UUID4
+
+
 class UserInfoBaseSchema(CustomModel):
 	"""UserInfo Base Schema."""
 
@@ -37,6 +53,28 @@ class UserInfoBaseSchema(CustomModel):
 # INSERT CLASSES
 # Note: These models are used for insert operations. Auto-generated fields
 # (like IDs and timestamps) are optional.
+
+
+class CollectionsInsert(CustomModelInsert):
+	"""Collections Insert Schema."""
+
+	# Primary Keys
+
+
+	# Field properties:
+	# caption: nullable
+	# created_at: has default value
+	# updated_at: has default value
+	# user_id: has default value
+
+	# Required fields
+	title: str
+
+		# Optional fields
+	caption: str | None = Field(default=None)
+	created_at: datetime.datetime | None = Field(default=None)
+	updated_at: datetime.datetime | None = Field(default=None)
+	user_id: UUID4 | None = Field(default=None)
 
 
 class UserInfoInsert(CustomModelInsert):
@@ -52,6 +90,26 @@ class UserInfoInsert(CustomModelInsert):
 	birthday: datetime.date | None = Field(default=None)
 # UPDATE CLASSES
 # Note: These models are used for update operations. All fields are optional.
+
+
+class CollectionsUpdate(CustomModelUpdate):
+	"""Collections Update Schema."""
+
+	# Primary Keys
+
+
+	# Field properties:
+	# caption: nullable
+	# created_at: has default value
+	# updated_at: has default value
+	# user_id: has default value
+
+		# Optional fields
+	caption: str | None = Field(default=None)
+	created_at: datetime.datetime | None = Field(default=None)
+	title: str | None = Field(default=None)
+	updated_at: datetime.datetime | None = Field(default=None)
+	user_id: UUID4 | None = Field(default=None)
 
 
 class UserInfoUpdate(CustomModelUpdate):
@@ -70,9 +128,21 @@ class UserInfoUpdate(CustomModelUpdate):
 # OPERATIONAL CLASSES
 
 
+class Collections(CollectionsBaseSchema):
+	"""Collections Schema for Pydantic.
+
+	Inherits from CollectionsBaseSchema. Add any customization here.
+	"""
+
+	# Foreign Keys
+	user_ids: list[UserInfo] | None = Field(default=None)
+
+
 class UserInfo(UserInfoBaseSchema):
 	"""UserInfo Schema for Pydantic.
 
 	Inherits from UserInfoBaseSchema. Add any customization here.
 	"""
 
+	# Foreign Keys
+	ids: list[Collections] | None = Field(default=None)
