@@ -13,6 +13,7 @@ import { Textarea, TextareaInput } from "@/src/components/ui/textarea";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PlayIcon } from "@/src/components/ui/icon";
+import PhotoSelectGrid from "@/src/components/PhotoSelectGrid";
 
 export default function CreateMemento() {
   const handleAddMemento = () => {
@@ -33,6 +34,12 @@ export default function CreateMemento() {
           <ButtonIcon as={PlayIcon} />
         </Button>
       </View>
+      <FormControl size={"lg"}>
+        <FormControlLabel>
+          <FormControlLabelText>Add Photos</FormControlLabelText>
+        </FormControlLabel>
+        <PhotoSelectGrid />
+      </FormControl>
       <FormControl size={"lg"}>
         <FormControlLabel>
           <FormControlLabelText>Caption</FormControlLabelText>
