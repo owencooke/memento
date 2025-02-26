@@ -61,33 +61,39 @@ export default function Collections() {
 
       <FlatList
         numColumns={2}
+        columnWrapperStyle={{ gap: 12 }}
+        contentContainerStyle={{ gap: 12 }}
         data={collections}
         keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => (
-          <Pressable onPress={() => handleSelect(String(item.id))}>
-            <Box
-              className={`p-4 mb-3 size-fit rounded-md shadow ${
-                selectedId === String(item.id) ? "bg-gray-300" : "bg-white"
-              }`}
-            >
-              <VStack space="md">
-                <Image
-                  size="md"
-                  source={{ uri: "https://placehold.co/40" }}
-                  alt="Collection Image"
-                />
-                <VStack className="justify-center">
-                  <Text className="text-lg font-bold w-full text-wrap">
-                    {item.title}
-                  </Text>
-                  <HStack className="justify-between">
-                    <Text className="text-gray-700 w-fit">{"Location"}</Text>
-                    <Text className="text-gray-700 w-fit">{"Date"}</Text>
-                  </HStack>
+          <Box className="flex-1">
+            <Pressable onPress={() => handleSelect(String(item.id))}>
+              <Box
+                className={`p-4 rounded-md shadow ${
+                  selectedId === String(item.id) ? "bg-gray-300" : "bg-white"
+                }`}
+              >
+                <VStack space="md">
+                  <Image
+                    source={{ uri: "https://placehold.co/400.png" }}
+                    alt="Collection Image"
+                    className="w-full rounded-md"
+                  />
+                  <VStack className="justify-center">
+                    <Text className="text-lg font-bold flex-1 text-wrap">
+                      {item.title}
+                    </Text>
+                    <HStack className="justify-between">
+                      <Text className="text-gray-700 flex-1">{"Location"}</Text>
+                      <Text className="text-gray-700 flex-1 text-right">
+                        {"Date"}
+                      </Text>
+                    </HStack>
+                  </VStack>
                 </VStack>
-              </VStack>
-            </Box>
-          </Pressable>
+              </Box>
+            </Pressable>
+          </Box>
         )}
       />
 
