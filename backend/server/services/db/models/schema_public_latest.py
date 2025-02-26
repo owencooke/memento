@@ -52,8 +52,8 @@ class ImageBaseSchema(CustomModel):
 	# Columns
 	date: datetime.date | None = Field(default=None)
 	detected_text: str | None = Field(default=None)
+	filename: str
 	image_label: str | None = Field(default=None)
-	source_url: str | None = Field(default=None)
 
 
 class MementoBaseSchema(CustomModel):
@@ -114,13 +114,14 @@ class ImageInsert(CustomModelInsert):
 	# date: nullable
 	# detected_text: nullable
 	# image_label: nullable
-	# source_url: nullable
+
+	# Required fields
+	filename: str
 
 		# Optional fields
 	date: datetime.date | None = Field(default=None)
 	detected_text: str | None = Field(default=None)
 	image_label: str | None = Field(default=None)
-	source_url: str | None = Field(default=None)
 
 
 class MementoInsert(CustomModelInsert):
@@ -186,13 +187,12 @@ class ImageUpdate(CustomModelUpdate):
 	# date: nullable
 	# detected_text: nullable
 	# image_label: nullable
-	# source_url: nullable
 
 		# Optional fields
 	date: datetime.date | None = Field(default=None)
 	detected_text: str | None = Field(default=None)
+	filename: str | None = Field(default=None)
 	image_label: str | None = Field(default=None)
-	source_url: str | None = Field(default=None)
 
 
 class MementoUpdate(CustomModelUpdate):
