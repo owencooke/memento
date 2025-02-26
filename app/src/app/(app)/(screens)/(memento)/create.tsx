@@ -1,4 +1,3 @@
-import React from "react";
 import { useForm, Controller } from "react-hook-form";
 import { Button, ButtonText, ButtonIcon } from "@/src/components/ui/button";
 import {
@@ -18,33 +17,70 @@ import { PlayIcon } from "@/src/components/ui/icon";
 import PhotoSelectGrid from "@/src/components/PhotoSelectGrid";
 import { useMutation } from "@tanstack/react-query";
 import { createMementoRouteApiMementoPostMutation } from "@/src/api-client/generated/@tanstack/react-query.gen";
-import { BodyCreateMementoRouteApiMementoPost } from "@/src/api-client/generated/types.gen";
+import {
+  BodyCreateMementoRouteApiMementoPost,
+  MementoInsert,
+} from "@/src/api-client/generated/types.gen";
 import { useSession } from "@/src/context/AuthContext";
 import { router } from "expo-router";
+import { toISODate } from "@/src/libs/utils/date";
+import { Photo } from "@/src/hooks/usePhotos";
+import { uriToBlob } from "@/src/libs/utils/file";
+
+interface CreateMementoForm {
+  memento: MementoInsert;
+  photos: Photo[];
+}
 
 export default function CreateMemento() {
   const insets = useSafeAreaInsets();
   const { session } = useSession();
-  const { control, handleSubmit } =
-    useForm<BodyCreateMementoRouteApiMementoPost>({
-      defaultValues: {
-        memento: {
-          caption: "",
-          date: "",
-          user_id: session?.user.id,
-        },
-        imageMetadata: [],
-        images: [],
+  const { control, handleSubmit, setValue } = useForm<CreateMementoForm>({
+    defaultValues: {
+      memento: {
+        caption: "",
+        date: "",
+        user_id: session?.user.id,
       },
-    });
+      photos: [],
+    },
+  });
 
   const createMutation = useMutation(
     createMementoRouteApiMementoPostMutation(),
   );
 
-  const onSubmit = (body: BodyCreateMementoRouteApiMementoPost) => {
+  const onSubmit = (form: CreateMementoForm) => {
+    const body = new FormData();
+
+    // Add memento data
+    body.append(
+      "memento",
+      JSON.stringify({
+        ...form.memento,
+        date: form.memento.date ? toISODate(form.memento.date) : null,
+      }),
+    );
+
+    // Add metadata for each image
+    form.photos.forEach((photo) => {
+      const { exif, fileName } = photo;
+      body.append(
+        "imageMetadata",
+        JSON.stringify({ date: exif?.DateTimeOriginal, filename: fileName }),
+      );
+    });
+
+    // Add binary blob of each image
+    form.photos.forEach(async (photo, idx) => {
+      const { uri, fileName } = photo;
+      const imageBlob = await uriToBlob(uri);
+      body.append("images", imageBlob, fileName || undefined);
+    });
+
     createMutation.mutate(
-      { body },
+      { body: body as any },
+
       {
         onSuccess: () => router.replace("/(app)/(tabs)/mementos"),
         onError: (error: any) =>
@@ -81,7 +117,9 @@ export default function CreateMemento() {
             <FormControlLabel>
               <FormControlLabelText>Add Photos</FormControlLabelText>
             </FormControlLabel>
-            <PhotoSelectGrid />
+            <PhotoSelectGrid
+              onChange={(photos) => setValue("photos", photos)}
+            />
           </FormControl>
           <FormControl size={"lg"}>
             <FormControlLabel>
