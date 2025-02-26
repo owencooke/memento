@@ -26,6 +26,8 @@ import { router } from "expo-router";
 import { toISODate } from "@/src/libs/utils/date";
 import { Photo } from "@/src/hooks/usePhotos";
 import { uriToBlob } from "@/src/libs/utils/file";
+import { createMementoRouteApiMementoPost } from "@/src/api-client/generated";
+import { formDataBodySerializer } from "@/src/api-client/files";
 
 interface CreateMementoForm {
   memento: MementoInsert;
@@ -51,36 +53,6 @@ export default function CreateMemento() {
   );
 
   const onSubmit = async (form: CreateMementoForm) => {
-    let images = [];
-
-    for (const photo of form.photos) {
-      const imageBlob = await uriToBlob(photo.uri);
-      images.push(imageBlob);
-    }
-
-    const body = {
-      // Add memento data
-      memento: {
-        ...form.memento,
-        date: form.memento.date ? toISODate(form.memento.date) : null,
-      },
-      // Add metadata for each image
-      imageMetadata: form.photos.map((photo) => {
-        const { exif, fileName } = photo;
-        return {
-          date: toISODate(
-            exif?.DateTimeOriginal || exif?.DateTimeDigitized || exif?.DateTime,
-          ),
-          filename: fileName ?? "",
-        };
-      }),
-      // Add each image's binary blob
-      images,
-      //   images: await Promise.all(
-      //     form.photos.map(async (photo) => await uriToBlob(photo.uri)),
-      //   ),
-    };
-
     // const body = new FormData();
 
     // // Add memento data
@@ -111,23 +83,65 @@ export default function CreateMemento() {
     // );
 
     // // Add binary blob of each image
-    // form.photos.forEach(async (photo) => {
-    //   const { uri, fileName } = photo;
-    //   const imageBlob = await uriToBlob(uri);
-    //   body.append("images", imageBlob, fileName || undefined);
-    // });
+    // await Promise.all(
+    //   form.photos.map(async (photo) => {
+    //     const { uri, fileName } = photo;
+    //     const imageBlob = await uriToBlob(uri);
+    //     body.append("images", imageBlob, fileName || undefined);
+    //   }),
+    // );
+
+    const body = {
+      // Add memento data
+      memento: {
+        ...form.memento,
+        date: form.memento.date ? toISODate(form.memento.date) : null,
+      },
+      // Add metadata for each image
+      imageMetadata: form.photos.map((photo) => {
+        const { exif, fileName } = photo;
+        return {
+          date: toISODate(
+            exif?.DateTimeOriginal || exif?.DateTimeDigitized || exif?.DateTime,
+          ),
+          filename: fileName ?? "",
+        };
+      }),
+      // Add each image's binary blob
+      images: await Promise.all(
+        form.photos.map(async (photo) => await uriToBlob(photo.uri)),
+      ),
+    };
 
     console.log({ body });
 
-    await createMutation.mutateAsync(
-      { body },
-      //   { body: body as any },
-      {
-        onSuccess: () => router.replace("/(app)/(tabs)/mementos"),
-        onError: (error: any) =>
-          console.error("Failed to create new memento", error),
+    // await createMutation.mutateAsync(
+    //   {
+    //     body: body,
+    //     bodySerializer: formDataBodySerializer.bodySerializer,
+    //     headers: { "Content-Type": "multipart/form-data" },
+    //   },
+    //   //   body as any,
+    //   //   { body: body as any },
+    //   {
+    //     onSuccess: () => router.replace("/(app)/(tabs)/mementos"),
+    //     onError: (error: any) =>
+    //       console.error("Failed to create new memento", error),
+    //   },
+    // );
+    const { data } = await createMementoRouteApiMementoPost({
+      // Pass formData directly as the body
+      body,
+      bodySerializer: formDataBodySerializer.bodySerializer,
+      headers: {
+        "Content-Type": "multipart/form-data",
       },
-    );
+    });
+
+    // Handle success manually
+    if (data) {
+      router.replace("/(app)/(tabs)/mementos");
+    }
   };
 
   return (
