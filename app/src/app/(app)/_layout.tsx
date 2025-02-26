@@ -3,6 +3,7 @@ import { Redirect, Stack } from "expo-router";
 import { useSession } from "@/src/context/AuthContext";
 import { Center } from "@/src/components/ui/center";
 import { Spinner } from "@/src/components/ui/spinner";
+import Header from "@/src/components/navigation/Header";
 
 export default function AppLayout() {
   const { session, isLoading } = useSession();
@@ -26,7 +27,11 @@ export default function AppLayout() {
 
   // This layout can be deferred because it's not the root layout.
   return (
-    <Stack>
+    <Stack
+      screenOptions={{
+        header: ({ options }) => <Header title={options.title} mode="goBack" />,
+      }}
+    >
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
     </Stack>
   );

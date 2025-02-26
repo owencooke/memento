@@ -24,9 +24,7 @@ export default function TabLayout() {
           },
           default: {},
         }),
-        header: ({ navigation, options }) => (
-          <Header title={options.title ?? ""} />
-        ),
+        header: ({ options }) => <Header title={options.title} />,
       }}
     >
       <Tabs.Screen
