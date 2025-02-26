@@ -17,13 +17,17 @@ import {
 } from "react-native-safe-area-context";
 import { PlayIcon } from "@/src/components/ui/icon";
 import PhotoSelectGrid from "@/src/components/PhotoSelectGrid";
+import { useMutation } from "@tanstack/react-query";
+import { createMementoRouteApiMementoPostMutation } from "@/src/api-client/generated/@tanstack/react-query.gen";
 
 export default function CreateMemento() {
   const insets = useSafeAreaInsets();
 
-  const handleAddMemento = () => {
-    // router.push("/")
-  };
+  const createMutation = useMutation(
+    createMementoRouteApiMementoPostMutation(),
+  );
+
+  const handleAddMemento = () => {};
 
   return (
     <SafeAreaView
