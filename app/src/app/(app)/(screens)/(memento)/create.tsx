@@ -1,5 +1,10 @@
 import { useForm, Controller } from "react-hook-form";
-import { Button, ButtonText, ButtonIcon } from "@/src/components/ui/button";
+import {
+  Button,
+  ButtonText,
+  ButtonIcon,
+  ButtonSpinner,
+} from "@/src/components/ui/button";
 import {
   FormControl,
   FormControlLabel,
@@ -27,7 +32,7 @@ import { toISODate } from "@/src/libs/utils/date";
 import { Photo } from "@/src/hooks/usePhotos";
 import { uriToBlob } from "@/src/libs/utils/file";
 import { createMementoRouteApiMementoPost } from "@/src/api-client/generated";
-import { formDataBodySerializer } from "@/src/api-client/files";
+import { formDataBodySerializer } from "@/src/api-client/formData";
 
 interface CreateMementoForm {
   memento: MementoInsert;
@@ -174,7 +179,11 @@ export default function CreateMemento() {
             onPress={handleSubmit(onSubmit)}
             disabled={createMutation.isPending}
           >
-            <ButtonText>Create Memento</ButtonText>
+            {createMutation.isPending ? (
+              <ButtonSpinner />
+            ) : (
+              <ButtonText>Create Memento</ButtonText>
+            )}
           </Button>
         </View>
       </ScrollView>
