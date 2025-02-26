@@ -74,11 +74,13 @@ export default function Collections() {
                 }`}
               >
                 <VStack space="md">
-                  <Image
-                    source={{ uri: "https://placehold.co/400.png" }}
-                    alt="Collection Image"
-                    className="w-full rounded-md"
-                  />
+                  <Box className="aspect-square">
+                    <Image
+                      source={{ uri: "https://placehold.co/400.png" }}
+                      alt="Collection Image"
+                      className="w-auto h-full"
+                    />
+                  </Box>
                   <VStack className="justify-center">
                     <Text className="text-lg font-bold flex-1 text-wrap">
                       {item.title}
