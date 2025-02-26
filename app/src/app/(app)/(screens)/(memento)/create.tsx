@@ -67,12 +67,17 @@ export default function CreateMemento() {
       const { exif, fileName } = photo;
       body.append(
         "imageMetadata",
-        JSON.stringify({ date: exif?.DateTimeOriginal, filename: fileName }),
+        JSON.stringify({
+          date: toISODate(
+            exif?.DateTimeOriginal || exif?.DateTimeDigitized || exif?.DateTime,
+          ),
+          filename: fileName,
+        }),
       );
     });
 
     // Add binary blob of each image
-    form.photos.forEach(async (photo, idx) => {
+    form.photos.forEach(async (photo) => {
       const { uri, fileName } = photo;
       const imageBlob = await uriToBlob(uri);
       body.append("images", imageBlob, fileName || undefined);
@@ -87,6 +92,8 @@ export default function CreateMemento() {
           console.error("Failed to create new memento", error),
       },
     );
+
+    console.log({ body });
   };
 
   return (

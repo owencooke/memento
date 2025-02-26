@@ -31,8 +31,6 @@ export default function PhotoSelectGrid({ onChange }: PhotoSelectGridProps) {
     return <Text>No access to camera</Text>;
   }
 
-  console.log(photos);
-
   return (
     <View className="flex flex-wrap flex-row gap-[2%]">
       {photos.map((photo, index) => (
