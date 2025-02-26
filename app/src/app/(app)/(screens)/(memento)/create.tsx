@@ -22,17 +22,13 @@ import { PlayIcon } from "@/src/components/ui/icon";
 import PhotoSelectGrid from "@/src/components/PhotoSelectGrid";
 import { useMutation } from "@tanstack/react-query";
 import { createMementoRouteApiMementoPostMutation } from "@/src/api-client/generated/@tanstack/react-query.gen";
-import {
-  BodyCreateMementoRouteApiMementoPost,
-  MementoInsert,
-} from "@/src/api-client/generated/types.gen";
+import { MementoInsert } from "@/src/api-client/generated/types.gen";
 import { useSession } from "@/src/context/AuthContext";
 import { router } from "expo-router";
 import { toISODate } from "@/src/libs/utils/date";
 import { Photo } from "@/src/hooks/usePhotos";
-import { uriToBlob } from "@/src/libs/utils/file";
-import { createMementoRouteApiMementoPost } from "@/src/api-client/generated";
 import { formDataBodySerializer } from "@/src/api-client/formData";
+import { getRelevantExifMetadata } from "@/src/libs/exif";
 
 interface CreateMementoForm {
   memento: MementoInsert;
@@ -58,31 +54,26 @@ export default function CreateMemento() {
   );
 
   const onSubmit = async (form: CreateMementoForm) => {
-    const body = {
-      // Add memento data
-      memento: {
-        ...form.memento,
-        date: form.memento.date ? toISODate(form.memento.date) : null,
-      },
-      // Add metadata for each image
-      imageMetadata: form.photos.map((photo) => {
-        const { exif, fileName } = photo;
-        return {
-          date: toISODate(
-            exif?.DateTimeOriginal || exif?.DateTimeDigitized || exif?.DateTime,
-          ),
-          filename: fileName ?? "",
-        };
-      }),
-      // Map each image to necessary upload info
-      images: form.photos.map((photo) => ({
-        uri: photo.uri,
-        type: photo.type,
-        name: photo.fileName,
-      })),
-    } as any;
+    // Overall memento data
+    const memento = {
+      ...form.memento,
+      date: form.memento.date ? toISODate(form.memento.date) : null,
+    };
 
-    // Call Create API endpoint
+    // Metadata for each image
+    const imageMetadata = form.photos.map((photo) =>
+      getRelevantExifMetadata(photo),
+    );
+
+    // Map each image to its necessary upload info
+    const images = form.photos.map((photo) => ({
+      uri: photo.uri,
+      type: photo.mimeType,
+      name: photo.fileName,
+    }));
+
+    // Call Create API endpoint, with custom serializer for multi-part form data
+    const body = { memento, imageMetadata, images } as any;
     await createMutation.mutateAsync(
       {
         body,
@@ -125,7 +116,10 @@ export default function CreateMemento() {
               <FormControlLabelText>Add Photos</FormControlLabelText>
             </FormControlLabel>
             <PhotoSelectGrid
-              onChange={(photos) => setValue("photos", photos)}
+              onChange={(photos) => {
+                setValue("photos", photos);
+                console.log(photos);
+              }}
             />
           </FormControl>
           <FormControl size={"lg"}>
