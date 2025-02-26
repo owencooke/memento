@@ -53,44 +53,6 @@ export default function CreateMemento() {
   );
 
   const onSubmit = async (form: CreateMementoForm) => {
-    // const body = new FormData();
-
-    // // Add memento data
-    // body.append(
-    //   "memento",
-    //   JSON.stringify({
-    //     ...form.memento,
-    //     date: form.memento.date ? toISODate(form.memento.date) : null,
-    //   }),
-    // );
-
-    // // Add metadata for each image
-    // body.append(
-    //   "imageMetadata",
-    //   JSON.stringify(
-    //     form.photos.map((photo) => {
-    //       const { exif, fileName } = photo;
-    //       return {
-    //         date: toISODate(
-    //           exif?.DateTimeOriginal ||
-    //             exif?.DateTimeDigitized ||
-    //             exif?.DateTime,
-    //         ),
-    //         filename: fileName,
-    //       };
-    //     }),
-    //   ),
-    // );
-
-    // // Add binary blob of each image
-    // await Promise.all(
-    //   form.photos.map(async (photo) => {
-    //     const { uri, fileName } = photo;
-    //     const imageBlob = await uriToBlob(uri);
-    //     body.append("images", imageBlob, fileName || undefined);
-    //   }),
-    // );
-
     const body = {
       // Add memento data
       memento: {
@@ -115,33 +77,18 @@ export default function CreateMemento() {
 
     console.log({ body });
 
-    // await createMutation.mutateAsync(
-    //   {
-    //     body: body,
-    //     bodySerializer: formDataBodySerializer.bodySerializer,
-    //     headers: { "Content-Type": "multipart/form-data" },
-    //   },
-    //   //   body as any,
-    //   //   { body: body as any },
-    //   {
-    //     onSuccess: () => router.replace("/(app)/(tabs)/mementos"),
-    //     onError: (error: any) =>
-    //       console.error("Failed to create new memento", error),
-    //   },
-    // );
-    const { data } = await createMementoRouteApiMementoPost({
-      // Pass formData directly as the body
-      body,
-      bodySerializer: formDataBodySerializer.bodySerializer,
-      headers: {
-        "Content-Type": "multipart/form-data",
+    // Call Create API endpoint
+    await createMutation.mutateAsync(
+      {
+        body: body,
+        bodySerializer: formDataBodySerializer.bodySerializer,
       },
-    });
-
-    // Handle success manually
-    if (data) {
-      router.replace("/(app)/(tabs)/mementos");
-    }
+      {
+        onSuccess: () => router.replace("/(app)/(tabs)/mementos"),
+        onError: (error: any) =>
+          console.error("Failed to create new memento", error),
+      },
+    );
   };
 
   return (
