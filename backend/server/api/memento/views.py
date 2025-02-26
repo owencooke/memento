@@ -33,10 +33,10 @@ async def create_memento_route(
 
     for i in range(len(images)):
         # Upload image to object storage
-        path = upload_image(images[i])
+        path = await upload_image(images[i])
 
         # Create new image metadata records
         image_metadata_list[i].filename = path
-        create_image_metadata(image_metadata_list[i])
+        create_image_metadata(image_metadata_list[i], new_memento)
 
     return new_memento
