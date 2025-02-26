@@ -2,15 +2,7 @@ import { View, Text } from "react-native";
 import usePhotos, { Photo } from "../hooks/usePhotos";
 import { Image } from "./ui/image";
 import { Button, ButtonIcon } from "./ui/button";
-import {
-  AddIcon,
-  ClockIcon,
-  CloseIcon,
-  DownloadIcon,
-  EditIcon,
-  EyeOffIcon,
-  TrashIcon,
-} from "./ui/icon";
+import { AddIcon, CloseIcon, EditIcon, EyeOffIcon } from "./ui/icon";
 import {
   Actionsheet,
   ActionsheetBackdrop,
@@ -34,7 +26,7 @@ export default function PhotoSelectGrid() {
   }
 
   return (
-    <View className="flex flex-wrap">
+    <View className="flex flex-wrap flex-row gap-[2%]">
       {photos.map((photo, index) => (
         <InteractivePhotoCard
           key={index}
@@ -44,7 +36,7 @@ export default function PhotoSelectGrid() {
       ))}
       <Button
         size="lg"
-        className="w-24 h-24 m-1"
+        className="basis-[32%] aspect-square"
         action="secondary"
         onPress={() => setShowActionsheet(true)}
       >
@@ -62,8 +54,12 @@ export default function PhotoSelectGrid() {
               handleClose();
             }}
           >
-            <ActionsheetIcon className="stroke-background-700" as={EditIcon} />
-            <ActionsheetItemText>Take a Photo</ActionsheetItemText>
+            <ActionsheetIcon
+              size="lg"
+              className="stroke-background-700"
+              as={EditIcon}
+            />
+            <ActionsheetItemText size="lg">Take a Photo</ActionsheetItemText>
           </ActionsheetItem>
           <ActionsheetItem
             onPress={() => {
@@ -72,10 +68,13 @@ export default function PhotoSelectGrid() {
             }}
           >
             <ActionsheetIcon
+              size="lg"
               className="stroke-background-700"
               as={EyeOffIcon}
             />
-            <ActionsheetItemText>Select from Library</ActionsheetItemText>
+            <ActionsheetItemText size="lg">
+              Select from Library
+            </ActionsheetItemText>
           </ActionsheetItem>
         </ActionsheetContent>
       </Actionsheet>
@@ -90,8 +89,8 @@ interface InteractivePhotoCardProps {
 
 function InteractivePhotoCard({ photo, onDelete }: InteractivePhotoCardProps) {
   return (
-    <View className="relative w-24 h-24 m-1">
-      <Image source={{ uri: photo.uri }} className="w-full h-full" />
+    <View className="relative basis-[32%] aspect-square">
+      <Image source={{ uri: photo.uri }} className="w-full h-full" alt="" />
       <Button onPress={onDelete} className="absolute top-1 right-1">
         <ButtonIcon as={CloseIcon} />
       </Button>
