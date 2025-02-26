@@ -69,23 +69,18 @@ export default function CreateMemento() {
           filename: fileName ?? "",
         };
       }),
-      // Add each image's binary blob
-      images: form.photos.map((photo) => {
-        // Return a file-like object that React Native's FormData can handle
-        return {
-          uri: photo.uri,
-          type: photo.type || "image/jpeg",
-          name: photo.fileName || "image.jpg",
-        };
-      }),
-    };
-
-    console.log({ body });
+      // Map each image to necessary upload info
+      images: form.photos.map((photo) => ({
+        uri: photo.uri,
+        type: photo.type,
+        name: photo.fileName,
+      })),
+    } as any;
 
     // Call Create API endpoint
     await createMutation.mutateAsync(
       {
-        body: body as any,
+        body,
         bodySerializer: formDataBodySerializer.bodySerializer,
       },
       {
