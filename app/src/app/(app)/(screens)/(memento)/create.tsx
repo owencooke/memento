@@ -25,7 +25,7 @@ import { createMementoRouteApiMementoPostMutation } from "@/src/api-client/gener
 import { MementoInsert } from "@/src/api-client/generated/types.gen";
 import { useSession } from "@/src/context/AuthContext";
 import { router } from "expo-router";
-import { toISODate } from "@/src/libs/utils/date";
+import { toISODate } from "@/src/libs/date";
 import { Photo } from "@/src/hooks/usePhotos";
 import { formDataBodySerializer } from "@/src/api-client/formData";
 import { getRelevantExifMetadata } from "@/src/libs/exif";
