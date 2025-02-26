@@ -6,7 +6,8 @@ from server.services.db.models.schema_public_latest import (
     Memento,
     MementoInsert,
 )
-from server.services.db.queries.image import upload_image
+from server.services.db.queries.image import create_image_metadata
+from server.services.storage.image import upload_image
 from server.services.db.queries.memento import create_memento
 
 router = APIRouter()
@@ -32,5 +33,8 @@ async def create_memento_route(
         path = upload_image(files[i])
 
         # Create new image metadata records
+        metadata = body.imageMetadata[i]
+        metadata.filename = path
+        create_image_metadata(metadata)
 
     return new_memento

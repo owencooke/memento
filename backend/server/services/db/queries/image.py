@@ -1,14 +1,11 @@
-from fastapi import UploadFile
 from server.services.db.config import supabase
+from server.services.db.models.schema_public_latest import Image, ImageInsert
+from server.services.db.utils import convert_to_supabase_types
 
 
-async def upload_image(file: UploadFile) -> str:
-    "Uses Supabase Storage API to upload an image; returns relative path in /images bucket"
-    image_content = await file.read()
-    response = supabase.storage.from_("avatars").upload(
-        file=image_content,
-        path=file.filename,
-        file_options={"content-type": file.content_type},
+async def create_image_metadata(metadata: ImageInsert) -> Image:
+    """Creates a new image metadata record for an image asssociated with a memento."""
+    response = (
+        supabase.table("image").insert(convert_to_supabase_types(metadata)).execute()
     )
-    print(response)
-    return response.path
+    return Image(**response.data[0])
