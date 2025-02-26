@@ -34,14 +34,16 @@ export default function PhotoSelectGrid() {
           onDelete={() => removePhoto(photo)}
         />
       ))}
-      <Button
-        size="lg"
-        className="basis-[32%] aspect-square"
-        action="secondary"
-        onPress={() => setShowActionsheet(true)}
-      >
-        <ButtonIcon as={AddIcon} />
-      </Button>
+      <View className="relative basis-[32%] aspect-square">
+        <Button
+          size="lg"
+          className="mt-2 mr-2 h-full"
+          action="secondary"
+          onPress={() => setShowActionsheet(true)}
+        >
+          <ButtonIcon as={AddIcon} />
+        </Button>
+      </View>
       <Actionsheet isOpen={showActionsheet} onClose={handleClose}>
         <ActionsheetBackdrop />
         <ActionsheetContent>
@@ -90,9 +92,16 @@ interface InteractivePhotoCardProps {
 function InteractivePhotoCard({ photo, onDelete }: InteractivePhotoCardProps) {
   return (
     <View className="relative basis-[32%] aspect-square">
-      <Image source={{ uri: photo.uri }} className="w-full h-full" alt="" />
-      <Button onPress={onDelete} className="absolute top-1 right-1">
-        <ButtonIcon as={CloseIcon} />
+      <Image
+        source={{ uri: photo.uri }}
+        className="w-auto h-full mt-2 mr-2"
+        alt=""
+      />
+      <Button
+        onPress={onDelete}
+        className="absolute p-2 rounded-full top-0 right-0"
+      >
+        <ButtonIcon className="m-0 p-0" as={CloseIcon} />
       </Button>
     </View>
   );
