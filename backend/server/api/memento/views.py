@@ -1,6 +1,5 @@
 from fastapi import APIRouter, File, UploadFile
 
-from pydantic import BaseModel
 from server.services.db.models.schema_public_latest import (
     ImageInsert,
     Memento,
@@ -13,28 +12,23 @@ from server.services.db.queries.memento import create_memento
 router = APIRouter()
 
 
-class MementoAndImages(BaseModel):
-    memento: MementoInsert
-    imageMetadata: list[ImageInsert]
-
-
 @router.post("/")
 async def create_memento_route(
-    body: MementoAndImages,
-    files: list[UploadFile] = File(...),
+    memento: MementoInsert,
+    imageMetadata: list[ImageInsert],
+    images: list[UploadFile] = File(...),
 ) -> Memento:
     """Creates a new memento, uploads associated images to object storage, and stores image metadata."""
 
     # Create new memento record
-    new_memento = create_memento(body.memento)
+    new_memento = create_memento(memento)
 
-    for i in range(len(files)):
+    for i in range(len(images)):
         # Upload image to object storage
-        path = upload_image(files[i])
+        path = upload_image(images[i])
 
         # Create new image metadata records
-        metadata = body.imageMetadata[i]
-        metadata.filename = path
-        create_image_metadata(metadata)
+        imageMetadata[i].filename = path
+        create_image_metadata(imageMetadata[i])
 
     return new_memento
