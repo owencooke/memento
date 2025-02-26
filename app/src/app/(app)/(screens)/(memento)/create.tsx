@@ -13,12 +13,18 @@ import { Textarea, TextareaInput } from "@/src/components/ui/textarea";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PlayIcon } from "@/src/components/ui/icon";
+
 export default function CreateMemento() {
   const handleAddMemento = () => {
     // router.push("/")
   };
+
   return (
-    <SafeAreaView className={`w-full h-full flex justify-center gap-4 px-5`}>
+    <SafeAreaView
+      // Note: flex-1 is equivalent to h-full for the safe view area
+      className={`flex-1 flex justify-center gap-6 px-5 pt-5`}
+      edges={["bottom"]}
+    >
       <View className="flex flex-row justify-between items-center">
         <Heading className="block" size="2xl">
           Create Memento
