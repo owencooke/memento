@@ -13,17 +13,25 @@ import {
   ActionsheetIcon,
   ActionsheetItemText,
 } from "./ui/actionsheet";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-export default function PhotoSelectGrid() {
+interface PhotoSelectGridProps {
+  onChange: (photos: Photo[]) => void;
+}
+
+export default function PhotoSelectGrid({ onChange }: PhotoSelectGridProps) {
   const [showActionsheet, setShowActionsheet] = useState(false);
   const { hasPermission, addPhotos, photos, removePhoto } = usePhotos();
+
+  useEffect(() => onChange(photos), [onChange, photos]);
 
   const handleClose = () => setShowActionsheet(false);
 
   if (!hasPermission) {
     return <Text>No access to camera</Text>;
   }
+
+  console.log(photos);
 
   return (
     <View className="flex flex-wrap flex-row gap-[2%]">

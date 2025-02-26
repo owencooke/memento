@@ -1,4 +1,5 @@
-from fastapi import APIRouter, File, UploadFile
+from typing import Annotated
+from fastapi import APIRouter, File, Form, UploadFile
 
 from server.services.db.models.schema_public_latest import (
     ImageInsert,
@@ -14,9 +15,9 @@ router = APIRouter()
 
 @router.post("/")
 async def create_memento_route(
-    memento: MementoInsert,
-    imageMetadata: list[ImageInsert],
-    images: list[UploadFile] = File(...),
+    memento: Annotated[MementoInsert, Form()],
+    imageMetadata: Annotated[list[ImageInsert], Form()],
+    images: Annotated[list[UploadFile], File()],
 ) -> Memento:
     """Creates a new memento, uploads associated images to object storage, and stores image metadata."""
 
