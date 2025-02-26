@@ -1,5 +1,5 @@
 import { Photo } from "../hooks/usePhotos";
-import { toISODate } from "./utils/date";
+import { toISODate } from "./date";
 
 export const getRelevantExifMetadata = (photo: Photo) => {
   const { exif, fileName } = photo;
