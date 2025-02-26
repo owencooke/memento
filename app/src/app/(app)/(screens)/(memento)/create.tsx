@@ -50,50 +50,84 @@ export default function CreateMemento() {
     createMementoRouteApiMementoPostMutation(),
   );
 
-  const onSubmit = (form: CreateMementoForm) => {
-    const body = new FormData();
+  const onSubmit = async (form: CreateMementoForm) => {
+    let images = [];
 
-    // Add memento data
-    body.append(
-      "memento",
-      JSON.stringify({
+    for (const photo of form.photos) {
+      const imageBlob = await uriToBlob(photo.uri);
+      images.push(imageBlob);
+    }
+
+    const body = {
+      // Add memento data
+      memento: {
         ...form.memento,
         date: form.memento.date ? toISODate(form.memento.date) : null,
-      }),
-    );
-
-    // Add metadata for each image
-    form.photos.forEach((photo) => {
-      const { exif, fileName } = photo;
-      body.append(
-        "imageMetadata",
-        JSON.stringify({
+      },
+      // Add metadata for each image
+      imageMetadata: form.photos.map((photo) => {
+        const { exif, fileName } = photo;
+        return {
           date: toISODate(
             exif?.DateTimeOriginal || exif?.DateTimeDigitized || exif?.DateTime,
           ),
-          filename: fileName,
-        }),
-      );
-    });
+          filename: fileName ?? "",
+        };
+      }),
+      // Add each image's binary blob
+      images,
+      //   images: await Promise.all(
+      //     form.photos.map(async (photo) => await uriToBlob(photo.uri)),
+      //   ),
+    };
 
-    // Add binary blob of each image
-    form.photos.forEach(async (photo) => {
-      const { uri, fileName } = photo;
-      const imageBlob = await uriToBlob(uri);
-      body.append("images", imageBlob, fileName || undefined);
-    });
+    // const body = new FormData();
 
-    createMutation.mutate(
-      { body: body as any },
+    // // Add memento data
+    // body.append(
+    //   "memento",
+    //   JSON.stringify({
+    //     ...form.memento,
+    //     date: form.memento.date ? toISODate(form.memento.date) : null,
+    //   }),
+    // );
 
+    // // Add metadata for each image
+    // body.append(
+    //   "imageMetadata",
+    //   JSON.stringify(
+    //     form.photos.map((photo) => {
+    //       const { exif, fileName } = photo;
+    //       return {
+    //         date: toISODate(
+    //           exif?.DateTimeOriginal ||
+    //             exif?.DateTimeDigitized ||
+    //             exif?.DateTime,
+    //         ),
+    //         filename: fileName,
+    //       };
+    //     }),
+    //   ),
+    // );
+
+    // // Add binary blob of each image
+    // form.photos.forEach(async (photo) => {
+    //   const { uri, fileName } = photo;
+    //   const imageBlob = await uriToBlob(uri);
+    //   body.append("images", imageBlob, fileName || undefined);
+    // });
+
+    console.log({ body });
+
+    await createMutation.mutateAsync(
+      { body },
+      //   { body: body as any },
       {
         onSuccess: () => router.replace("/(app)/(tabs)/mementos"),
         onError: (error: any) =>
           console.error("Failed to create new memento", error),
       },
     );
-
-    console.log({ body });
   };
 
   return (
@@ -177,6 +211,7 @@ export default function CreateMemento() {
             className="mt-auto"
             size={"lg"}
             onPress={handleSubmit(onSubmit)}
+            disabled={createMutation.isPending}
           >
             <ButtonText>Create Memento</ButtonText>
           </Button>
