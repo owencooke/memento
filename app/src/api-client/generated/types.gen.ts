@@ -26,12 +26,32 @@ export type HttpValidationError = {
 };
 
 /**
+ * Image Base Schema.
+ */
+export type ImageBaseSchema = {
+    id: number;
+    memento_id: number;
+    date?: string | null;
+    detected_text?: string | null;
+    filename: string;
+    image_label?: string | null;
+};
+
+/**
  * Memento Insert Schema.
  */
 export type MementoInsert = {
     caption?: string | null;
     date?: string | null;
     user_id?: string | null;
+};
+
+export type MementoWithImages = {
+    id: number;
+    caption?: string | null;
+    date?: string | null;
+    user_id: string;
+    images: Array<ImageBaseSchema>;
 };
 
 /**
@@ -114,8 +134,10 @@ export type GetUsersMementosApiUserUserIdMementoGetResponses = {
     /**
      * Successful Response
      */
-    200: unknown;
+    200: Array<MementoWithImages>;
 };
+
+export type GetUsersMementosApiUserUserIdMementoGetResponse = GetUsersMementosApiUserUserIdMementoGetResponses[keyof GetUsersMementosApiUserUserIdMementoGetResponses];
 
 export type CreateNewMementoApiUserUserIdMementoPostData = {
     body: BodyCreateNewMementoApiUserUserIdMementoPost;
