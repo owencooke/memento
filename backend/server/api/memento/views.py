@@ -28,7 +28,7 @@ async def create_new_memento(
     imageMetadata: Annotated[str, Form()],
     images: Annotated[list[UploadFile], File()],
     user_id: UUID4 = Depends(get_user_id),
-) -> Memento:
+) -> MementoInsert:
     """Creates a new memento, uploads associated images to object storage, and stores image metadata."""
 
     # Parse and validate form data

@@ -21,7 +21,7 @@ import {
 import { PlayIcon } from "@/src/components/ui/icon";
 import PhotoSelectGrid from "@/src/components/PhotoSelectGrid";
 import { useMutation } from "@tanstack/react-query";
-import { createMementoRouteApiMementoPostMutation } from "@/src/api-client/generated/@tanstack/react-query.gen";
+import { createNewMementoApiUserUserIdMementoPostMutation } from "@/src/api-client/generated/@tanstack/react-query.gen";
 import { MementoInsert } from "@/src/api-client/generated/types.gen";
 import { useSession } from "@/src/context/AuthContext";
 import { router } from "expo-router";
@@ -31,7 +31,7 @@ import { formDataBodySerializer } from "@/src/api-client/formData";
 import { getRelevantExifMetadata } from "@/src/libs/exif";
 
 interface CreateMementoForm {
-  memento: MementoInsert;
+  memento: Omit<MementoInsert, "user_id">;
   photos: Photo[];
 }
 
@@ -43,14 +43,13 @@ export default function CreateMemento() {
       memento: {
         caption: "",
         date: "",
-        user_id: session?.user.id,
       },
       photos: [],
     },
   });
 
   const createMutation = useMutation(
-    createMementoRouteApiMementoPostMutation(),
+    createNewMementoApiUserUserIdMementoPostMutation(),
   );
 
   const onSubmit = async (form: CreateMementoForm) => {
@@ -78,6 +77,7 @@ export default function CreateMemento() {
       {
         body,
         bodySerializer: formDataBodySerializer.bodySerializer,
+        path: { user_id: session?.user.id ?? "" },
       },
       {
         onSuccess: () => router.replace("/(app)/(tabs)/mementos"),
