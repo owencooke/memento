@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, File, Form, UploadFile
 
 from pydantic import UUID4
 from server.api.path import get_user_id
+from server.services.db.models.joins import MementoWithImages
 from server.services.db.models.schema_public_latest import (
     ImageInsert,
     Memento,
@@ -17,7 +18,9 @@ router = APIRouter()
 
 
 @router.get("/")
-def get_users_mementos(user_id: UUID4 = Depends(get_user_id)):
+def get_users_mementos(
+    user_id: UUID4 = Depends(get_user_id),
+) -> list[MementoWithImages]:
     """Gets all the mementos belonging to a user."""
     return get_mementos(user_id)
 
