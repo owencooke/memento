@@ -25,16 +25,14 @@ export type HttpValidationError = {
     detail?: Array<ValidationError>;
 };
 
-/**
- * Image Base Schema.
- */
-export type ImageBaseSchema = {
+export type ImageWithUrl = {
     id: number;
     memento_id: number;
     date?: string | null;
     detected_text?: string | null;
     filename: string;
     image_label?: string | null;
+    url?: string;
 };
 
 /**
@@ -51,7 +49,7 @@ export type MementoWithImages = {
     caption?: string | null;
     date?: string | null;
     user_id: string;
-    images: Array<ImageBaseSchema>;
+    images: Array<ImageWithUrl>;
 };
 
 /**
