@@ -12,7 +12,7 @@ export default function MementoCard({
   const [thumbnail] = images;
 
   return (
-    <View className="flex-1 bg-background-0 overflow-hidden rounded-xl shadow-hard-1 p-3 gap-4">
+    <View className="flex-1 bg-background-0 rounded-xl shadow-hard-1 p-3 gap-4">
       <View className="aspect-square">
         <Image
           source={{ uri: thumbnail.url }}
