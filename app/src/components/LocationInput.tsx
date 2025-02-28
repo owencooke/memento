@@ -3,6 +3,7 @@ import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplet
 const LocationInput = () => {
   return (
     <GooglePlacesAutocomplete
+      enablePoweredByContainer={false}
       placeholder="Search"
       onPress={(data, details = null) => {
         // 'details' is provided when fetchDetails = true

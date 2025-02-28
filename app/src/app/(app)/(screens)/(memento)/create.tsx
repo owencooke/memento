@@ -154,13 +154,19 @@ export default function CreateMemento() {
 
   return (
     <SafeAreaView className="flex-1" edges={["bottom"]}>
-      <FlatList
-        data={[]}
-        renderItem={() => <></>}
-        contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 20 }}
-        showsVerticalScrollIndicator={false}
-        ListHeaderComponent={<FormContent />}
-      />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        className="flex-1"
+      >
+        <FlatList
+          data={[]}
+          renderItem={() => <></>}
+          contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 20 }}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps
+          ListHeaderComponent={<FormContent />}
+        />
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
