@@ -13,3 +13,9 @@ async def upload_image(file: UploadFile) -> str:
         file_options={"content-type": file.content_type},
     )
     return response.path
+
+
+def get_image_url(filename: str) -> str:
+    "Uses Supabase Storage API to create signed url for a stored image"
+    response = supabase.storage.from_("images").create_signed_url(filename, 86400)
+    return response["signedUrl"]

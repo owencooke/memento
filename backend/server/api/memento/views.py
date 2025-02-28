@@ -7,11 +7,10 @@ from server.api.path import get_user_id
 from server.services.db.models.joins import MementoWithImages
 from server.services.db.models.schema_public_latest import (
     ImageInsert,
-    Memento,
     MementoInsert,
 )
 from server.services.db.queries.image import create_image_metadata
-from server.services.storage.image import upload_image
+from server.services.storage.image import get_image_url, upload_image
 from server.services.db.queries.memento import create_memento, get_mementos
 
 router = APIRouter()
@@ -22,7 +21,13 @@ def get_users_mementos(
     user_id: UUID4 = Depends(get_user_id),
 ) -> list[MementoWithImages]:
     """Gets all the mementos belonging to a user."""
-    return get_mementos(user_id)
+    mementos = get_mementos(user_id)
+
+    # Get private URLs for each image
+    for memento in mementos:
+        for image in memento.images:
+            image.url = get_image_url(image.filename)
+    return mementos
 
 
 @router.post("/")
