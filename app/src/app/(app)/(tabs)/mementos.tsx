@@ -30,9 +30,11 @@ export default function Mementos() {
   };
 
   return (
-    <Box className="flex-1 bg-background-50">
+    <Box className="flex-1 bg-background-100 py-4 px-6">
       {mementos && mementos.length > 0 ? (
         <FlatList
+          columnWrapperStyle={{ gap: 12 }}
+          contentContainerStyle={{ gap: 12 }}
           numColumns={2}
           data={mementos}
           renderItem={({ item }) => <MementoCard {...item} />}
@@ -43,7 +45,7 @@ export default function Mementos() {
         </View>
       )}
 
-      <Fab size="lg" onPress={handleAddMemento}>
+      <Fab placement="top left" size="lg" onPress={handleAddMemento}>
         <FabIcon as={AddIcon} />
       </Fab>
     </Box>
