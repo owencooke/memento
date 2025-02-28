@@ -2,14 +2,22 @@ import { View } from "react-native";
 import { Image } from "@/src/components/ui/image";
 import { MementoWithImages } from "@/src/api-client/generated";
 import { Text } from "../ui/text";
+import { useMemo } from "react";
 
 export default function MementoCard({
   caption,
   date,
   images,
+  location,
 }: MementoWithImages) {
   // TODO: ensure thumbnail always the same via DB property
   const [thumbnail] = images;
+
+  // Extract city from whole location
+  const city = useMemo(
+    () => (location ? location.split(",")[0].trim() : location),
+    [location],
+  );
 
   return (
     <View className="flex-1 bg-background-0 rounded-xl shadow-hard-1 p-3 gap-4">
@@ -33,8 +41,7 @@ export default function MementoCard({
         )}
         <View className="flex flex-row justify-between items-center mt-auto font-medium">
           <Text size="sm">{date}</Text>
-          {/* TODO: replace with city */}
-          <Text size="sm">Edmonton</Text>
+          <Text size="sm">{city}</Text>
         </View>
       </View>
     </View>

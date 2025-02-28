@@ -5,26 +5,19 @@ interface LocationInputProps {
   onChange?: (value: string) => void;
 }
 
-const LocationInput = ({ value = "", onChange }: LocationInputProps) => {
+const LocationInput = ({
+  value = "",
+  onChange = (_) => {},
+}: LocationInputProps) => {
   return (
     <GooglePlacesAutocomplete
       keyboardShouldPersistTaps="handled"
       enablePoweredByContainer={false}
       placeholder="Search location"
-      onPress={(data, details = null) => {
-        // Send the selected place data
-        if (onChange) {
-          onChange(data.description || "");
-        }
-      }}
+      onPress={(data) => onChange(data.description || "")}
       textInputProps={{
         value,
-        onChangeText: (text) => {
-          // Also trigger onChange when typing to update the form state
-          if (onChange) {
-            onChange(text);
-          }
-        },
+        onChangeText: (text) => onChange(text),
       }}
       query={{
         key: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY,
