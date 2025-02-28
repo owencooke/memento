@@ -38,16 +38,15 @@ interface CreateMementoForm {
 export default function CreateMemento() {
   const insets = useSafeAreaInsets();
   const { session } = useSession();
-  const { control, handleSubmit, setValue, getValues } =
-    useForm<CreateMementoForm>({
-      defaultValues: {
-        memento: {
-          caption: "",
-          date: new Date(),
-        },
-        photos: [],
+  const { control, handleSubmit, setValue } = useForm<CreateMementoForm>({
+    defaultValues: {
+      memento: {
+        caption: "",
+        date: new Date(),
       },
-    });
+      photos: [],
+    },
+  });
 
   const createMutation = useMutation(
     createNewMementoApiUserUserIdMementoPostMutation(),
@@ -108,13 +107,6 @@ export default function CreateMemento() {
               className="p-3.5"
               action="secondary"
               variant="solid"
-              onPress={() => {
-                console.log(getValues());
-                let date = getValues("memento.date");
-                console.log({ date });
-                // date = toISODate(date || "");
-                // console.log({ date });
-              }}
             >
               <ButtonIcon as={PlayIcon} />
             </Button>
@@ -135,8 +127,12 @@ export default function CreateMemento() {
               name="memento.caption"
               control={control}
               render={({ field }) => (
-                <Textarea {...field} size="md">
-                  <TextareaInput placeholder="ex: an ancient seashell found in Hawaii" />
+                <Textarea size="md">
+                  <TextareaInput
+                    onChangeText={(text) => field.onChange(text)}
+                    value={field.value ?? ""}
+                    placeholder="ex: an ancient seashell found in Hawaii"
+                  />
                 </Textarea>
               )}
             />
