@@ -28,8 +28,8 @@ class CustomModelUpdate(CustomModel):
 # Note: These are the base Row models that include all fields.
 
 
-class CollectionsBaseSchema(CustomModel):
-	"""Collections Base Schema."""
+class CollectionBaseSchema(CustomModel):
+	"""Collection Base Schema."""
 
 	# Primary Keys
 	id: int
@@ -37,9 +37,19 @@ class CollectionsBaseSchema(CustomModel):
 	# Columns
 	caption: str | None = Field(default=None)
 	created_at: datetime.datetime
+	date: datetime.date | None = Field(default=None)
+	location: str | None = Field(default=None)
 	title: str
 	updated_at: datetime.datetime
 	user_id: UUID4
+
+
+class HasMementoBaseSchema(CustomModel):
+	"""HasMemento Base Schema."""
+
+	# Primary Keys
+	collection_id: int
+	memento_id: int
 
 
 class ImageBaseSchema(CustomModel):
@@ -65,6 +75,7 @@ class MementoBaseSchema(CustomModel):
 	# Columns
 	caption: str | None = Field(default=None)
 	date: datetime.date | None = Field(default=None)
+	location: str | None = Field(default=None)
 	user_id: UUID4
 
 
@@ -81,8 +92,8 @@ class UserInfoBaseSchema(CustomModel):
 # (like IDs and timestamps) are optional.
 
 
-class CollectionsInsert(CustomModelInsert):
-	"""Collections Insert Schema."""
+class CollectionInsert(CustomModelInsert):
+	"""Collection Insert Schema."""
 
 	# Primary Keys
 
@@ -90,6 +101,8 @@ class CollectionsInsert(CustomModelInsert):
 	# Field properties:
 	# caption: nullable
 	# created_at: has default value
+	# date: nullable
+	# location: nullable
 	# updated_at: has default value
 	# user_id: has default value
 
@@ -99,8 +112,18 @@ class CollectionsInsert(CustomModelInsert):
 		# Optional fields
 	caption: str | None = Field(default=None)
 	created_at: datetime.datetime | None = Field(default=None)
+	date: datetime.date | None = Field(default=None)
+	location: str | None = Field(default=None)
 	updated_at: datetime.datetime | None = Field(default=None)
 	user_id: UUID4 | None = Field(default=None)
+
+
+class HasMementoInsert(CustomModelInsert):
+	"""HasMemento Insert Schema."""
+
+	# Primary Keys
+	collection_id: int
+	memento_id: int
 
 
 class ImageInsert(CustomModelInsert):
@@ -133,11 +156,13 @@ class MementoInsert(CustomModelInsert):
 	# Field properties:
 	# caption: nullable
 	# date: nullable
+	# location: nullable
 	# user_id: has default value
 
 		# Optional fields
 	caption: str | None = Field(default=None)
 	date: datetime.date | None = Field(default=None)
+	location: str | None = Field(default=None)
 	user_id: UUID4 | None = Field(default=None)
 
 
@@ -156,8 +181,8 @@ class UserInfoInsert(CustomModelInsert):
 # Note: These models are used for update operations. All fields are optional.
 
 
-class CollectionsUpdate(CustomModelUpdate):
-	"""Collections Update Schema."""
+class CollectionUpdate(CustomModelUpdate):
+	"""Collection Update Schema."""
 
 	# Primary Keys
 
@@ -165,15 +190,27 @@ class CollectionsUpdate(CustomModelUpdate):
 	# Field properties:
 	# caption: nullable
 	# created_at: has default value
+	# date: nullable
+	# location: nullable
 	# updated_at: has default value
 	# user_id: has default value
 
 		# Optional fields
 	caption: str | None = Field(default=None)
 	created_at: datetime.datetime | None = Field(default=None)
+	date: datetime.date | None = Field(default=None)
+	location: str | None = Field(default=None)
 	title: str | None = Field(default=None)
 	updated_at: datetime.datetime | None = Field(default=None)
 	user_id: UUID4 | None = Field(default=None)
+
+
+class HasMementoUpdate(CustomModelUpdate):
+	"""HasMemento Update Schema."""
+
+	# Primary Keys
+	collection_id: int | None = Field(default=None)
+	memento_id: int | None = Field(default=None)
 
 
 class ImageUpdate(CustomModelUpdate):
@@ -204,11 +241,13 @@ class MementoUpdate(CustomModelUpdate):
 	# Field properties:
 	# caption: nullable
 	# date: nullable
+	# location: nullable
 	# user_id: has default value
 
 		# Optional fields
 	caption: str | None = Field(default=None)
 	date: datetime.date | None = Field(default=None)
+	location: str | None = Field(default=None)
 	user_id: UUID4 | None = Field(default=None)
 
 
@@ -228,14 +267,25 @@ class UserInfoUpdate(CustomModelUpdate):
 # OPERATIONAL CLASSES
 
 
-class Collections(CollectionsBaseSchema):
-	"""Collections Schema for Pydantic.
+class Collection(CollectionBaseSchema):
+	"""Collection Schema for Pydantic.
 
-	Inherits from CollectionsBaseSchema. Add any customization here.
+	Inherits from CollectionBaseSchema. Add any customization here.
 	"""
 
 	# Foreign Keys
-	user_ids: list[UserInfo] | None = Field(default=None)
+	ids: list[HasMemento] | None = Field(default=None)
+
+
+class HasMemento(HasMementoBaseSchema):
+	"""HasMemento Schema for Pydantic.
+
+	Inherits from HasMementoBaseSchema. Add any customization here.
+	"""
+
+	# Foreign Keys
+	collection_ids: list[Collection] | None = Field(default=None)
+	memento_ids: list[Memento] | None = Field(default=None)
 
 
 class Image(ImageBaseSchema):
@@ -255,6 +305,7 @@ class Memento(MementoBaseSchema):
 	"""
 
 	# Foreign Keys
+	ids: list[HasMemento] | None = Field(default=None)
 	ids: list[Image] | None = Field(default=None)
 
 
@@ -264,5 +315,3 @@ class UserInfo(UserInfoBaseSchema):
 	Inherits from UserInfoBaseSchema. Add any customization here.
 	"""
 
-	# Foreign Keys
-	ids: list[Collections] | None = Field(default=None)

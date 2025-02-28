@@ -6,21 +6,6 @@ export type BodyCreateNewMementoApiUserUserIdMementoPost = {
     images: Array<Blob | File>;
 };
 
-/**
- * Collections Schema for Pydantic.
- *
- * Inherits from CollectionsBaseSchema. Add any customization here.
- */
-export type Collections = {
-    id: number;
-    caption?: string | null;
-    created_at: string;
-    title: string;
-    updated_at: string;
-    user_id: string;
-    user_ids?: Array<UserInfo> | null;
-};
-
 export type HttpValidationError = {
     detail?: Array<ValidationError>;
 };
@@ -41,6 +26,7 @@ export type ImageWithUrl = {
 export type MementoInsert = {
     caption?: string | null;
     date?: string | null;
+    location?: string | null;
     user_id?: string | null;
 };
 
@@ -48,6 +34,7 @@ export type MementoWithImages = {
     id: number;
     caption?: string | null;
     date?: string | null;
+    location?: string | null;
     user_id: string;
     images: Array<ImageWithUrl>;
 };
@@ -60,7 +47,6 @@ export type MementoWithImages = {
 export type UserInfo = {
     id: string;
     birthday?: string | null;
-    ids?: Array<Collections> | null;
 };
 
 export type ValidationError = {
