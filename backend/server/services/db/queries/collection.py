@@ -5,6 +5,8 @@ from server.services.db.models.joins import CollectionWithMementos
 from server.services.db.models.schema_public_latest import (
     Collection,
     CollectionInsert,
+    HasMemento,
+    HasMementoInsert,
 )
 from server.services.db.utils import convert_to_supabase_types
 
@@ -33,8 +35,22 @@ def get_collections(
 def create_collection(new_collection: CollectionInsert) -> Collection:
     """Creates a new collection for a user."""
     response = (
-        supabase.table("collections")
+        supabase.table("collection")
         .insert(convert_to_supabase_types(new_collection))
         .execute()
     )
     return Collection(**response.data[0])
+
+
+def associate_memento(has_memento: HasMementoInsert) -> HasMemento:
+    """Associated a memento with a collection."""
+    response = (
+        supabase.table("has_memento")
+        .insert(convert_to_supabase_types(has_memento))
+        .execute()
+    )
+
+    if not response.data:
+        raise ValueError("Failed to associate memento with collection")
+
+    return HasMemento(**response.data[0])  # Return actual HasMemento objec
