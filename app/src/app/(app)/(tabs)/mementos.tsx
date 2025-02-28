@@ -4,13 +4,11 @@ import { Box } from "@/src/components/ui/box";
 import { Fab, FabIcon } from "@/src/components/ui/fab";
 import { AddIcon } from "@/src/components/ui/icon";
 import { useSession } from "@/src/context/AuthContext";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { View, Text, FlatList } from "react-native";
 
 export default function Mementos() {
-  const tabBarHeight = useBottomTabBarHeight();
   const { session } = useSession();
 
   const {

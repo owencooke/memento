@@ -31,22 +31,23 @@ import { formDataBodySerializer } from "@/src/api-client/formData";
 import { getRelevantExifMetadata } from "@/src/libs/exif";
 
 interface CreateMementoForm {
-  memento: Omit<MementoInsert, "user_id">;
+  memento: Omit<MementoInsert, "user_id" | "date"> & { date: Date };
   photos: Photo[];
 }
 
 export default function CreateMemento() {
   const insets = useSafeAreaInsets();
   const { session } = useSession();
-  const { control, handleSubmit, setValue } = useForm<CreateMementoForm>({
-    defaultValues: {
-      memento: {
-        caption: "",
-        date: "",
+  const { control, handleSubmit, setValue, getValues } =
+    useForm<CreateMementoForm>({
+      defaultValues: {
+        memento: {
+          caption: "",
+          date: new Date(),
+        },
+        photos: [],
       },
-      photos: [],
-    },
-  });
+    });
 
   const createMutation = useMutation(
     createNewMementoApiUserUserIdMementoPostMutation(),
@@ -107,6 +108,13 @@ export default function CreateMemento() {
               className="p-3.5"
               action="secondary"
               variant="solid"
+              onPress={() => {
+                console.log(getValues());
+                let date = getValues("memento.date");
+                console.log({ date });
+                // date = toISODate(date || "");
+                // console.log({ date });
+              }}
             >
               <ButtonIcon as={PlayIcon} />
             </Button>
@@ -116,10 +124,7 @@ export default function CreateMemento() {
               <FormControlLabelText>Add Photos</FormControlLabelText>
             </FormControlLabel>
             <PhotoSelectGrid
-              onChange={(photos) => {
-                setValue("photos", photos);
-                console.log(photos);
-              }}
+              onChange={(photos) => setValue("photos", photos)}
             />
           </FormControl>
           <FormControl size={"lg"}>
@@ -146,7 +151,7 @@ export default function CreateMemento() {
               render={({ field }) => (
                 <DateTimePicker
                   mode="date"
-                  value={field.value ? new Date(field.value) : new Date()}
+                  value={field.value}
                   onChange={(_, date) => field.onChange(date)}
                 />
               )}

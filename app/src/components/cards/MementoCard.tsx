@@ -1,4 +1,4 @@
-import { View, Dimensions } from "react-native";
+import { View } from "react-native";
 import { Image } from "@/src/components/ui/image";
 import { MementoWithImages } from "@/src/api-client/generated";
 import { Text } from "../ui/text";
