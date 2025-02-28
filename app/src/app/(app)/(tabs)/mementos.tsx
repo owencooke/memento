@@ -45,7 +45,7 @@ export default function Mementos() {
         </View>
       )}
 
-      <Fab placement="top left" size="lg" onPress={handleAddMemento}>
+      <Fab size="lg" onPress={handleAddMemento}>
         <FabIcon as={AddIcon} />
       </Fab>
     </Box>
