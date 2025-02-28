@@ -1,12 +1,13 @@
 import { getUsersMementosApiUserUserIdMementoGetOptions } from "@/src/api-client/generated/@tanstack/react-query.gen";
 import MementoCard from "@/src/components/cards/MementoCard";
+import { Box } from "@/src/components/ui/box";
 import { Fab, FabIcon } from "@/src/components/ui/fab";
 import { AddIcon } from "@/src/components/ui/icon";
 import { useSession } from "@/src/context/AuthContext";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { ScrollView, View, Text, FlatList } from "react-native";
+import { View, Text, FlatList } from "react-native";
 
 export default function Mementos() {
   const tabBarHeight = useBottomTabBarHeight();
@@ -29,22 +30,22 @@ export default function Mementos() {
   };
 
   return (
-    <View
-      // TODO: fix this offset for bottom bar
-      className={`w-full h-full bg-slate-400 pb-safe-offset-0`}
-      style={{ paddingBottom: tabBarHeight + 80 }}
-    >
-      {mementos && mementos.length > 0 && (
+    <Box className="flex-1 bg-background-50">
+      {mementos && mementos.length > 0 ? (
         <FlatList
           numColumns={2}
-          horizontal={false}
           data={mementos}
           renderItem={({ item }) => <MementoCard {...item} />}
         />
+      ) : (
+        <View className="flex-1 items-center justify-center">
+          <Text>No mementos yet</Text>
+        </View>
       )}
-      <Fab placement="bottom right" size="lg" onPress={handleAddMemento}>
+
+      <Fab size="lg" onPress={handleAddMemento}>
         <FabIcon as={AddIcon} />
       </Fab>
-    </View>
+    </Box>
   );
 }
