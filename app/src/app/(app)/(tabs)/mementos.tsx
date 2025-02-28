@@ -27,7 +27,7 @@ export default function Mementos() {
   const gridData = useMemo(
     () =>
       mementos?.length && mementos.length % 2
-        ? [...mementos, { spacer: true }]
+        ? [...mementos, ...mementos, { spacer: true }]
         : mementos,
     [mementos],
   );
@@ -43,6 +43,7 @@ export default function Mementos() {
           columnWrapperStyle={{ gap: 12 }}
           contentContainerStyle={{ gap: 12 }}
           numColumns={2}
+          showsVerticalScrollIndicator={false}
           data={gridData}
           renderItem={({ item }) => (
             <View className="flex-1">
