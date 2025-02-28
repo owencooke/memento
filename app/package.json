@@ -77,6 +77,8 @@
     "react-native": "0.76.6",
     "react-native-css-interop": "^0.1.22",
     "react-native-gesture-handler": "~2.20.2",
+    "react-native-get-random-values": "^1.11.0",
+    "react-native-google-places-autocomplete": "^2.5.7",
     "react-native-maps": "1.18.0",
     "react-native-pager-view": "6.5.1",
     "react-native-reanimated": "~3.16.7",
