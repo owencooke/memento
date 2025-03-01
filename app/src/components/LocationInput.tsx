@@ -56,16 +56,21 @@ const LocationInput = ({
       styles={{
         description: {
           width: "100%",
+          color: getColor("typography-900"),
         },
         textInput: {
           backgroundColor: getColor("background-0"),
           borderWidth: 1,
           borderColor: getColor("background-300"),
-          color: getColor("typography-0"),
+          color: getColor("typography-900"),
         },
         row: {
           backgroundColor: getColor("background-0"),
         },
+        listView: {
+          backgroundColor: getColor("background-0"),
+        },
+        separator: { backgroundColor: getColor("background-300") },
       }}
     />
   );
