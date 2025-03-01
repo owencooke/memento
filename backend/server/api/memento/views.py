@@ -58,9 +58,10 @@ async def create_new_memento(
     # Parse Image metadata fields from form data
     image_metadata_list = []
     for img_data in json.loads(image_metadata):
-        img_data["coordinates"] = (
-            Location(lat=img_data["lat"], long=img_data["long"])
-        ).to_gis_string()
+        if img_data["lat"] and img_data["long"]:
+            img_data["coordinates"] = (
+                Location(lat=img_data["lat"], long=img_data["long"])
+            ).to_gis_string()
         image_metadata_list.append(ImageInsert.model_validate(img_data))
 
     # Create new memento in DB

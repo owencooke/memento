@@ -2,7 +2,7 @@
 
 export type BodyCreateNewMementoApiUserUserIdMementoPost = {
     memento: string;
-    imageMetadata: string;
+    image_metadata: string;
     images: Array<Blob | File>;
 };
 
@@ -10,9 +10,26 @@ export type HttpValidationError = {
     detail?: Array<ValidationError>;
 };
 
+/**
+ * Image Schema for Pydantic.
+ *
+ * Inherits from ImageBaseSchema. Add any customization here.
+ */
+export type Image = {
+    id: number;
+    memento_id: number;
+    coordinates?: string | null;
+    date?: string | null;
+    detected_text?: string | null;
+    filename: string;
+    image_label?: string | null;
+    memento_ids?: Array<Memento> | null;
+};
+
 export type ImageWithUrl = {
     id: number;
     memento_id: number;
+    coordinates?: Location | null;
     date?: string | null;
     detected_text?: string | null;
     filename: string;
@@ -21,18 +38,33 @@ export type ImageWithUrl = {
 };
 
 /**
- * Memento Insert Schema.
+ * A model that provides methods for converting lat/long
+ * coordinates between a variety of formats.
  */
-export type MementoInsert = {
+export type Location = {
+    lat: number;
+    long: number;
+};
+
+/**
+ * Memento Schema for Pydantic.
+ *
+ * Inherits from MementoBaseSchema. Add any customization here.
+ */
+export type Memento = {
+    id: number;
     caption?: string | null;
+    coordinates?: string | null;
     date?: string | null;
     location?: string | null;
-    user_id?: string | null;
+    user_id: string;
+    ids?: Array<Image> | null;
 };
 
 export type MementoWithImages = {
     id: number;
     caption?: string | null;
+    coordinates?: string | null;
     date?: string | null;
     location?: string | null;
     user_id: string;
@@ -145,7 +177,7 @@ export type CreateNewMementoApiUserUserIdMementoPostResponses = {
     /**
      * Successful Response
      */
-    200: MementoInsert;
+    200: Memento;
 };
 
 export type CreateNewMementoApiUserUserIdMementoPostResponse = CreateNewMementoApiUserUserIdMementoPostResponses[keyof CreateNewMementoApiUserUserIdMementoPostResponses];

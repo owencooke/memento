@@ -55,7 +55,14 @@ export const getUsersMementosApiUserUserIdMementoGet = <ThrowOnError extends boo
 
 /**
  * Create New Memento
- * Creates a new memento, uploads associated images to object storage, and stores image metadata.
+ * Post route for creating a new memento.
+ *
+ * 3 key steps:
+ * 1. creates a memento DB record
+ * 2. uploads associated images to object storage,
+ * 3. stores a metadata DB record for each image.
+ *
+ * Uses multipart/form-data to upload JSON/binary payloads simultaneously.
  */
 export const createNewMementoApiUserUserIdMementoPost = <ThrowOnError extends boolean = false>(options: Options<CreateNewMementoApiUserUserIdMementoPostData, ThrowOnError>) => {
     return (options.client ?? _heyApiClient).post<CreateNewMementoApiUserUserIdMementoPostResponse, CreateNewMementoApiUserUserIdMementoPostError, ThrowOnError>({

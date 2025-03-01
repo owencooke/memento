@@ -18,7 +18,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { PlayIcon } from "@/src/components/ui/icon";
 import PhotoSelectGrid from "@/src/components/PhotoSelectGrid";
 import { useMutation } from "@tanstack/react-query";
-import { createNewMementoApiUserUserIdMementoPostMutation } from "@/src/api-client/generated/@tanstack/react-query.gen";
+import {
+  createNewMementoApiUserUserIdMementoPostMutation,
+  getUsersMementosApiUserUserIdMementoGetQueryKey,
+} from "@/src/api-client/generated/@tanstack/react-query.gen";
 import { useSession } from "@/src/context/AuthContext";
 import { router } from "expo-router";
 import { toISODateString } from "@/src/libs/date";
@@ -31,6 +34,7 @@ import {
 import LocationInput, { GeoLocation } from "@/src/components/LocationInput";
 import { FlatList } from "react-native";
 import { useCallback } from "react";
+import { queryClient } from "@/src/app/_layout";
 
 interface CreateMementoForm {
   memento: { date: Date; location: GeoLocation; caption: string };
@@ -60,7 +64,6 @@ export default function CreateMemento() {
   const handlePhotosChanged = async (photos: Photo[]) => {
     if (photos.length > getValues("photos").length) {
       const { date, location } = await aggregateMetadata(photos);
-      console.log({ date, location });
       date && setValue("memento.date", date);
       location && setValue("memento.location", location);
     }
@@ -75,8 +78,7 @@ export default function CreateMemento() {
     };
 
     // Metadata for each image
-    const imageMetadata = form.photos.map(getRelevantImageMetadata);
-    console.log(imageMetadata);
+    const image_metadata = form.photos.map(getRelevantImageMetadata);
 
     // Map each image to its necessary upload info
     const images = form.photos.map((photo) => ({
@@ -86,15 +88,26 @@ export default function CreateMemento() {
     }));
 
     // Call POST endpoint with custom serializer for multi-part form data
-    const body = { memento, imageMetadata, images } as any;
+    const path = { user_id: session?.user.id ?? "" };
+    const body = { memento, image_metadata, images } as any;
+
+    console.log(body);
     await createMutation.mutateAsync(
       {
         body,
+        path,
         bodySerializer: formDataBodySerializer.bodySerializer,
-        path: { user_id: session?.user.id ?? "" },
       },
       {
-        onSuccess: () => router.replace("/(app)/(tabs)/mementos"),
+        onSuccess: () => {
+          // Invalidate cached GET mementos before redirecting
+          queryClient.invalidateQueries({
+            queryKey: getUsersMementosApiUserUserIdMementoGetQueryKey({
+              path,
+            }),
+          });
+          router.replace("/(app)/(tabs)/mementos");
+        },
         onError: (error: any) =>
           console.error("Failed to create new memento", error),
       },

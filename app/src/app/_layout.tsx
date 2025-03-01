@@ -17,7 +17,7 @@ import { ThemeProvider, useTheme } from "@/src/context/ThemeContext";
 import { AuthProvider } from "@/src/context/AuthContext";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
