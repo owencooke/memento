@@ -36,7 +36,7 @@ const LocationInput = ({
       enablePoweredByContainer={false}
       debounce={300}
       fetchDetails={true}
-      placeholder="Search location"
+      placeholder="Find a place…"
       // Handle when user selects an autocomplete option
       onPress={(data, details) => {
         const lat = details?.geometry.location.lat;
@@ -44,12 +44,17 @@ const LocationInput = ({
         onChange({ text: data.description || "", lat, long });
       }}
       textInputProps={{
-        onChangeText: (text) => onChange({ text }),
+        onChangeText: (text) => onChange({ ...value, text }),
       }}
       query={{
         types: "(cities)",
         key: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY,
         language: "en",
+      }}
+      styles={{
+        description: {
+          width: "100%",
+        },
       }}
     />
   );

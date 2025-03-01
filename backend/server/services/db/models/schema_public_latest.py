@@ -74,6 +74,7 @@ class MementoBaseSchema(CustomModel):
 
 	# Columns
 	caption: str | None = Field(default=None)
+	coordinates: str | None = Field(default=None)
 	date: datetime.date | None = Field(default=None)
 	location: str | None = Field(default=None)
 	user_id: UUID4
@@ -155,12 +156,14 @@ class MementoInsert(CustomModelInsert):
 
 	# Field properties:
 	# caption: nullable
+	# coordinates: nullable
 	# date: nullable
 	# location: nullable
 	# user_id: has default value
 
 		# Optional fields
 	caption: str | None = Field(default=None)
+	coordinates: str | None = Field(default=None)
 	date: datetime.date | None = Field(default=None)
 	location: str | None = Field(default=None)
 	user_id: UUID4 | None = Field(default=None)
@@ -240,12 +243,14 @@ class MementoUpdate(CustomModelUpdate):
 
 	# Field properties:
 	# caption: nullable
+	# coordinates: nullable
 	# date: nullable
 	# location: nullable
 	# user_id: has default value
 
 		# Optional fields
 	caption: str | None = Field(default=None)
+	coordinates: str | None = Field(default=None)
 	date: datetime.date | None = Field(default=None)
 	location: str | None = Field(default=None)
 	user_id: UUID4 | None = Field(default=None)

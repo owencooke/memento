@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, File, Form, UploadFile
 
 from pydantic import UUID4
 from server.api.path import get_user_id
+from server.services.db.models.gis import Location
 from server.services.db.models.joins import MementoWithImages
 from server.services.db.models.schema_public_latest import (
     ImageInsert,
@@ -38,9 +39,15 @@ async def create_new_memento(
     user_id: UUID4 = Depends(get_user_id),
 ) -> MementoInsert:
     """Creates a new memento, uploads associated images to object storage, and stores image metadata."""
+    # Split location object
+    memento_data = json.loads(memento)
+    memento_data["coordinates"] = Location(
+        **memento_data["location"]
+    ).to_supabase_string()
+    memento_data["location"] = memento_data["location"]["text"]
 
     # Parse and validate form data
-    memento_data = MementoInsert.model_validate(json.loads(memento))
+    memento_data = MementoInsert.model_validate(memento_data)
     image_metadata_list = [
         ImageInsert.model_validate(img) for img in json.loads(imageMetadata)
     ]
