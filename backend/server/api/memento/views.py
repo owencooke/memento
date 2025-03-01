@@ -26,7 +26,7 @@ def get_users_mementos(
 
     # Get private URLs for each image
     for memento in mementos:
-        print(memento.coordinates)
+        print("DEBUG", memento.coordinates)
         for image in memento.images:
             image.url = get_image_url(image.filename)
     return mementos
