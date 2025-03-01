@@ -8,3 +8,16 @@ from server.services.db.models.schema_public_latest import (
 
 class CollectionWithMementos(CollectionBaseSchema):
     mementos: list[HasMementoBaseSchema]
+from server.services.db.models.gis import CoordinatesConverter
+from server.services.db.models.schema_public_latest import (
+    MementoBaseSchema,
+    ImageBaseSchema,
+)
+
+
+class ImageWithUrl(CoordinatesConverter, ImageBaseSchema):
+    url: str = Field(default="")
+
+
+class MementoWithImages(MementoBaseSchema):
+    images: list[ImageWithUrl]

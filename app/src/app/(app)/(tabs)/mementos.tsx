@@ -1,67 +1,61 @@
-import React from "react";
-import MapView, { Marker } from "react-native-maps";
-import { View } from "react-native";
-import { Button, ButtonText } from "@/src/components/ui/button";
-
-const markers = [
-  {
-    id: 1,
-    title: "Calgary",
-    description: "This is Calgary",
-    coordinate: {
-      latitude: 51.0447,
-      longitude: -114.0719,
-    },
-  },
-  {
-    id: 2,
-    title: "Edmonton",
-    description: "This is Edmonton",
-    coordinate: {
-      latitude: 53.5461,
-      longitude: -113.4938,
-    },
-  },
-  {
-    id: 3,
-    title: "Banff",
-    description: "This is Banff",
-    coordinate: {
-      latitude: 51.1784,
-      longitude: -115.5708,
-    },
-  },
-];
+import { getUsersMementosApiUserUserIdMementoGetOptions } from "@/src/api-client/generated/@tanstack/react-query.gen";
+import MementoCard from "@/src/components/cards/MementoCard";
+import { Fab, FabIcon } from "@/src/components/ui/fab";
+import { AddIcon } from "@/src/components/ui/icon";
+import { useSession } from "@/src/context/AuthContext";
+import { useQuery } from "@tanstack/react-query";
+import { router } from "expo-router";
+import { View, Text, FlatList } from "react-native";
+import { useMemo } from "react";
 
 export default function Mementos() {
+  const { session } = useSession();
+
+  const { data: mementos } = useQuery({
+    ...getUsersMementosApiUserUserIdMementoGetOptions({
+      path: {
+        user_id: session?.user.id ?? "",
+      },
+    }),
+  });
+
+  // For odd number of mementos, add a spacer for last grid element
+  const gridData = useMemo(
+    () =>
+      mementos?.length && mementos.length % 2
+        ? [...mementos, { spacer: true }]
+        : mementos,
+    [mementos],
+  );
+
+  const handleAddMemento = () => {
+    router.push("/(app)/(screens)/(memento)/create");
+  };
+
   return (
-    <>
-      <Button className="mt-4">
-        <ButtonText>Testing</ButtonText>
-      </Button>
-      <View>
-        <MapView
-          style={{
-            width: "100%",
-            height: "100%",
-          }}
-          initialRegion={{
-            latitude: 52.2681,
-            longitude: -113.8112,
-            latitudeDelta: 5,
-            longitudeDelta: 5,
-          }}
-        >
-          {markers.map((marker) => (
-            <Marker
-              key={marker.id}
-              coordinate={marker.coordinate}
-              title={marker.title}
-              description={marker.description}
-            />
-          ))}
-        </MapView>
-      </View>
-    </>
+    <View className="flex-1 bg-background-100 py-4 px-6">
+      {mementos && mementos.length > 0 ? (
+        <FlatList
+          columnWrapperStyle={{ gap: 12 }}
+          contentContainerStyle={{ gap: 12 }}
+          numColumns={2}
+          showsVerticalScrollIndicator={false}
+          data={gridData}
+          renderItem={({ item }) => (
+            <View className="flex-1">
+              {!("spacer" in item) && <MementoCard {...item} />}
+            </View>
+          )}
+        />
+      ) : (
+        <View className="flex-1 items-center justify-center">
+          <Text>No mementos yet!</Text>
+        </View>
+      )}
+
+      <Fab size="lg" onPress={handleAddMemento}>
+        <FabIcon as={AddIcon} />
+      </Fab>
+    </View>
   );
 }

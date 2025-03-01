@@ -11,7 +11,7 @@ from server.services.db.queries.user import (
 router = APIRouter()
 
 
-@router.get("/{id}", response_model=UserInfo)
+@router.get("/{id}")
 def user_info(id: UUID4) -> UserInfo:
     """Gets user info for a specific user."""
     user_info = get_user_info(id)
