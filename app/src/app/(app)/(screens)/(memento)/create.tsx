@@ -24,7 +24,10 @@ import { router } from "expo-router";
 import { toISODateString } from "@/src/libs/date";
 import { Photo } from "@/src/hooks/usePhotos";
 import { formDataBodySerializer } from "@/src/api-client/formData";
-import { aggregateMetadata, getRelevantImageMetadata } from "@/src/libs/exif";
+import {
+  aggregateMetadata,
+  getRelevantImageMetadata,
+} from "@/src/libs/metadata";
 import LocationInput, { GeoLocation } from "@/src/components/LocationInput";
 import { FlatList } from "react-native";
 import { useCallback } from "react";
@@ -159,7 +162,7 @@ export default function CreateMemento() {
                       <TextareaInput
                         onChangeText={(text) => field.onChange(text)}
                         value={field.value}
-                        placeholder="ex: an ancient seashell found in Hawaii"
+                        placeholder="Ex: an ancient seashell found in Hawaii"
                       />
                     </Textarea>
                   )}

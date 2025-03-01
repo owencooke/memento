@@ -81,44 +81,25 @@ const findMostCommonDate = (metadatas: ImageMetadata[]): string | null => {
 
 /**
  * Use Google Geocode API to reverse coordinates into a named place
+ * Reference: https://developers.google.com/maps/documentation/geocoding/requests-reverse-geocoding
  */
 const reverseCityGeocode = async (
   coords: Coordinates,
 ): Promise<GeoLocation> => {
   const { lat, long } = coords;
   const apiKey = process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY;
-
   try {
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&key=${apiKey}&result_type=locality|administrative_area_level_1`;
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&key=${apiKey}&result_type=locality`;
     const { results, status } = await fetch(url).then((res) => res.json());
-    if (status !== "OK" || !results || results.length === 0) {
+    if (status !== "OK" || !results || results.length < 1) {
       throw new Error(
-        `Geocoding failed with status: ${status}, results: ${JSON.stringify(results)}`,
+        `Reverse geocoding failed. Status: ${status}, results: ${JSON.stringify(results)}`,
       );
     }
-
-    // Extract components from first result
-    const components = results[0].address_components;
-    const city =
-      components.find((c: any) => c.types.includes("locality"))?.long_name ||
-      "";
-    const state =
-      components.find((c: any) =>
-        c.types.includes("administrative_area_level_1"),
-      )?.short_name || "";
-
-    // Return coordinates and readable location
-    return {
-      text:
-        city && state
-          ? `${city}, ${state}`
-          : results[0].formatted_address || "",
-      lat,
-      long,
-    };
+    return { ...coords, text: results[0].formatted_address || "" };
   } catch (error) {
     console.error(error);
-    return { text: "", lat, long };
+    return { ...coords, text: "" };
   }
 };
 
