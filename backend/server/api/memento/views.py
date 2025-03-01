@@ -26,6 +26,7 @@ def get_users_mementos(
 
     # Get private URLs for each image
     for memento in mementos:
+        print(memento.coordinates)
         for image in memento.images:
             image.url = get_image_url(image.filename)
     return mementos
@@ -41,9 +42,7 @@ async def create_new_memento(
     """Creates a new memento, uploads associated images to object storage, and stores image metadata."""
     # Parse Memento fields from form data
     memento_data = json.loads(memento)
-    memento_data["coordinates"] = Location(
-        **memento_data["location"]
-    ).to_supabase_string()
+    memento_data["coordinates"] = Location(**memento_data["location"]).to_gis_string()
     memento_data["location"] = memento_data["location"]["text"]
     memento_data = MementoInsert.model_validate(memento_data)
 
@@ -52,7 +51,7 @@ async def create_new_memento(
     for img_data in json.loads(imageMetadata):
         img_data["coordinates"] = (
             Location(lat=img_data["lat"], long=img_data["long"])
-        ).to_supabase_string()
+        ).to_gis_string()
         image_metadata_list.append(ImageInsert.model_validate(img_data))
 
     # Create new memento in DB
