@@ -149,7 +149,7 @@ export default function CreateMemento() {
                   name="memento.caption"
                   control={control}
                   render={({ field }) => (
-                    <Textarea size="md">
+                    <Textarea size="md" className="bg-background-0">
                       <TextareaInput
                         onChangeText={(text) => field.onChange(text)}
                         value={field.value ?? ""}

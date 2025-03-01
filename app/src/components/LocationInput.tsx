@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import { useColors } from "../hooks/useColors";
 
 export interface GeoLocation {
   text: string;
@@ -17,6 +18,7 @@ const LocationInput = ({
   onChange = (_) => {},
 }: LocationInputProps) => {
   const autocompleteRef = useRef<any>(null);
+  const { getColor } = useColors();
 
   // Updates the autocomplete text when controlled value changes
   useEffect(() => {
@@ -48,12 +50,21 @@ const LocationInput = ({
       }}
       query={{
         types: "(cities)",
-        key: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY,
+        key: process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY,
         language: "en",
       }}
       styles={{
         description: {
           width: "100%",
+        },
+        textInput: {
+          backgroundColor: getColor("background-0"),
+          borderWidth: 1,
+          borderColor: getColor("background-300"),
+          color: getColor("typography-0"),
+        },
+        row: {
+          backgroundColor: getColor("background-0"),
         },
       }}
     />

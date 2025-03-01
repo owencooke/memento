@@ -27,7 +27,7 @@ export default function Mementos() {
   const gridData = useMemo(
     () =>
       mementos?.length && mementos.length % 2
-        ? [...mementos, ...mementos, { spacer: true }]
+        ? [...mementos, { spacer: true }]
         : mementos,
     [mementos],
   );
