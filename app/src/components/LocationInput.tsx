@@ -17,17 +17,19 @@ const LocationInput = ({
   value = { text: "", lat: 0, long: 0 },
   onChange = (_) => {},
 }: LocationInputProps) => {
-  const autocompleteRef = useRef<any>(null);
   const { getColor } = useColors();
+  const autocompleteRef = useRef<any>(null);
+  const prevTextRef = useRef<string>("");
 
   // Updates the autocomplete text when controlled value changes
   useEffect(() => {
     if (
       autocompleteRef.current &&
       value !== null &&
-      typeof value === "string"
+      value.text !== prevTextRef.current
     ) {
-      autocompleteRef.current.setAddressText(value);
+      prevTextRef.current = value.text;
+      autocompleteRef.current.setAddressText(value.text);
     }
   }, [value]);
 
@@ -43,10 +45,17 @@ const LocationInput = ({
       onPress={(data, details) => {
         const lat = details?.geometry.location.lat;
         const long = details?.geometry.location.lng;
-        onChange({ text: data.description || "", lat, long });
+        const text = data.description || "";
+        prevTextRef.current = text;
+        onChange({ text, lat, long });
       }}
       textInputProps={{
-        onChangeText: (text) => onChange({ ...value, text }),
+        onChangeText: (text) => {
+          if (text !== prevTextRef.current) {
+            prevTextRef.current = text;
+            onChange({ ...value, text });
+          }
+        },
       }}
       query={{
         types: "(cities)",
