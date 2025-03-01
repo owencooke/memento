@@ -46,7 +46,7 @@ export const getRelevantImageMetadata = (photo: Photo): ImageMetadata => {
  *  - Date: uses the mode
  *  - Location: finds center of largest coordinate cluster and uses reverse geocoding
  */
-export const aggregateMetadata = (photos: Photo[]) => {
+export const aggregateMetadata = async (photos: Photo[]) => {
   const metadatas = photos.map(getRelevantImageMetadata);
 
   const dateString = findMostCommonDate(metadatas);
@@ -54,7 +54,7 @@ export const aggregateMetadata = (photos: Photo[]) => {
 
   return {
     date: dateString ? getDateFromISO(dateString) : null,
-    location: geocenter ? reverseCityGeocode(geocenter) : null,
+    location: geocenter ? await reverseCityGeocode(geocenter) : null,
   };
 };
 
@@ -79,9 +79,48 @@ const findMostCommonDate = (metadatas: ImageMetadata[]): string | null => {
     );
 };
 
-// TODO: implement
-const reverseCityGeocode = (coords: Coordinates) =>
-  ({ ...coords, text: "" }) as GeoLocation;
+/**
+ * Use Google Geocode API to reverse coordinates into a named place
+ */
+const reverseCityGeocode = async (
+  coords: Coordinates,
+): Promise<GeoLocation> => {
+  const { lat, long } = coords;
+  const apiKey = process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY;
+
+  try {
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&key=${apiKey}&result_type=locality|administrative_area_level_1`;
+    const { results, status } = await fetch(url).then((res) => res.json());
+    if (status !== "OK" || !results || results.length === 0) {
+      throw new Error(
+        `Geocoding failed with status: ${status}, results: ${JSON.stringify(results)}`,
+      );
+    }
+
+    // Extract components from first result
+    const components = results[0].address_components;
+    const city =
+      components.find((c: any) => c.types.includes("locality"))?.long_name ||
+      "";
+    const state =
+      components.find((c: any) =>
+        c.types.includes("administrative_area_level_1"),
+      )?.short_name || "";
+
+    // Return coordinates and readable location
+    return {
+      text:
+        city && state
+          ? `${city}, ${state}`
+          : results[0].formatted_address || "",
+      lat,
+      long,
+    };
+  } catch (error) {
+    console.error(error);
+    return { text: "", lat, long };
+  }
+};
 
 /**
  * Finds the center (lat/long) of the largest coordinate cluster

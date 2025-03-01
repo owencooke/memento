@@ -16,14 +16,16 @@ import {
 import { useEffect, useState } from "react";
 
 interface PhotoSelectGridProps {
-  onChange: (photos: Photo[]) => void;
+  onChange: (photos: Photo[]) => Promise<void>;
 }
 
 export default function PhotoSelectGrid({ onChange }: PhotoSelectGridProps) {
   const [showActionsheet, setShowActionsheet] = useState(false);
   const { hasPermission, addPhotos, photos, removePhoto } = usePhotos();
 
-  useEffect(() => onChange(photos), [onChange, photos]);
+  useEffect(() => {
+    onChange(photos).catch((e) => console.error(e));
+  }, [onChange, photos]);
 
   const handleClose = () => setShowActionsheet(false);
 

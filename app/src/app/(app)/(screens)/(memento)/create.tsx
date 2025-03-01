@@ -54,9 +54,9 @@ export default function CreateMemento() {
   );
 
   // When more photos added, populate date/location fields from image data
-  const handlePhotosChanged = (photos: Photo[]) => {
+  const handlePhotosChanged = async (photos: Photo[]) => {
     if (photos.length > getValues("photos").length) {
-      const { date, location } = aggregateMetadata(photos);
+      const { date, location } = await aggregateMetadata(photos);
       console.log({ date, location });
       date && setValue("memento.date", date);
       location && setValue("memento.location", location);
@@ -158,7 +158,7 @@ export default function CreateMemento() {
                     <Textarea size="md" className="bg-background-0">
                       <TextareaInput
                         onChangeText={(text) => field.onChange(text)}
-                        value={field.value ?? ""}
+                        value={field.value}
                         placeholder="ex: an ancient seashell found in Hawaii"
                       />
                     </Textarea>
