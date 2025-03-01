@@ -3,7 +3,7 @@ import { useState } from "react";
 import usePhotos from "@/src/hooks/usePhotos";
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "@/src/context/AuthContext";
-import { getCollectionsApiUserIdCollectionsGetOptions } from "@/src/api-client/generated/@tanstack/react-query.gen";
+import { getUsersCollectionsApiUserUserIdCollectionGetOptions } from "@/src/api-client/generated/@tanstack/react-query.gen";
 import { Box } from "@/src/components/ui/box";
 import { Fab, FabIcon } from "@/src/components/ui/fab";
 import { AddIcon } from "@/src/components/ui/icon";
@@ -13,6 +13,7 @@ import { Alert, AlertText } from "@/src/components/ui/alert";
 import { HStack } from "@/src/components/ui/hstack";
 import { VStack } from "@/src/components/ui/vstack";
 import { Image } from "@/src/components/ui/image";
+import { router } from "expo-router";
 
 const placeholderImage = "https://via.placeholder.com/100";
 
@@ -25,9 +26,9 @@ export default function Collections() {
     error,
     isLoading,
   } = useQuery({
-    ...getCollectionsApiUserIdCollectionsGetOptions({
+    ...getUsersCollectionsApiUserUserIdCollectionGetOptions({
       path: {
-        id: session?.user.id ?? "",
+        user_id: session?.user.id ?? "",
       },
     }),
     enabled: !!session?.user.id,
@@ -45,7 +46,7 @@ export default function Collections() {
   };
 
   const handleAddCollection = () => {
-    showAlert("Add new collection");
+    router.push("/(app)/(screens)/(collection)/create");
   };
 
   if (isLoading) return <Text>Loading...</Text>;
