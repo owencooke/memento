@@ -12,10 +12,17 @@ import {
   FormControlLabelText,
 } from "@/src/components/ui/form-control";
 import { Heading } from "@/src/components/ui/heading";
-import { Input, InputField } from "@/src/components/ui/input";
+import {
+  Input,
+  InputField,
+  InputSlot,
+  InputIcon,
+} from "@/src/components/ui/input";
 import { Textarea, TextareaInput } from "@/src/components/ui/textarea";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Button, ButtonSpinner, ButtonText } from "@/src/components/ui/button";
+import { useState } from "react";
+import { CalendarDaysIcon } from "@/src/components/ui/icon";
 
 interface CreateCollectionForm {
   collection: Omit<CollectionInsert, "user_id" | "date"> & { date: Date };
@@ -50,6 +57,13 @@ export default function CreateCollection() {
       onSuccess: () => router.replace("/(app)/(tabs)/collections"),
       onError: (error: any) =>
         console.error("Failed to create collection", error),
+    });
+  };
+
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const handleDatePickerState = () => {
+    setShowDatePicker((showState) => {
+      return !showState;
     });
   };
 
@@ -110,11 +124,28 @@ export default function CreateCollection() {
               name="collection.date"
               control={control}
               render={({ field }) => (
-                <DateTimePicker
-                  mode="date"
-                  value={field.value}
-                  onChange={(_, date) => field.onChange(date)}
-                />
+                <>
+                  <Input>
+                    <InputField
+                      value={field.value ? field.value.toDateString() : ""}
+                      placeholder="Select a date"
+                      editable={false}
+                    />
+                    <InputSlot onPress={handleDatePickerState}>
+                      <InputIcon as={CalendarDaysIcon} />
+                    </InputSlot>
+                  </Input>
+                  {showDatePicker && (
+                    <DateTimePicker
+                      mode="date"
+                      value={field.value ?? new Date()}
+                      onChange={(_, selectedDate) => {
+                        setShowDatePicker(false);
+                        if (selectedDate) field.onChange(selectedDate);
+                      }}
+                    />
+                  )}
+                </>
               )}
             />
           </FormControl>
