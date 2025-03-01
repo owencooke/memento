@@ -2,6 +2,7 @@ import { useForm, Controller } from "react-hook-form";
 import { useSession } from "@/src/context/AuthContext";
 import { CollectionInsert } from "@/src/api-client/generated";
 import { useMutation } from "@tanstack/react-query";
+import { createNewCollectionApiUserUserIdCollectionPostMutation } from "@/src/api-client/generated/@tanstack/react-query.gen";
 import { toISODate } from "@/src/libs/date";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -41,23 +42,43 @@ export default function CreateCollection() {
     },
   });
 
-  const createMutation = useMutation({
-    mutationFn: async (data: CreateCollectionForm) => {
-      console.log("Collection API call will be implemented later");
-    },
-  });
+  const createMutation = useMutation(
+    createNewCollectionApiUserUserIdCollectionPostMutation(),
+  );
 
   const onSubmit = async (form: CreateCollectionForm) => {
+    if (!session?.user.id) {
+      console.error("User is not auth");
+    }
+
     const collection = {
       ...form.collection,
       date: form.collection.date ? toISODate(form.collection.date) : null,
     };
 
-    await createMutation.mutateAsync(collection, {
-      onSuccess: () => router.replace("/(app)/(tabs)/collections"),
-      onError: (error: any) =>
-        console.error("Failed to create collection", error),
-    });
+    console.log("collection:", collection);
+    const body = {
+      new_collection: collection,
+      mementos: [],
+    };
+    console.log("body:", body);
+
+    console.log("Successfully Created Mutation");
+    await createMutation.mutateAsync(
+      {
+        body,
+        path: { user_id: session?.user.id ?? "" },
+      },
+      {
+        onSuccess: () => {
+          console.log("Successfully Created Mutation");
+          router.replace("/(app)/(tabs)/collections");
+        },
+
+        onError: (error: any) =>
+          console.error("Failed to create new collection", error),
+      },
+    );
   };
 
   const [showDatePicker, setShowDatePicker] = useState(false);
