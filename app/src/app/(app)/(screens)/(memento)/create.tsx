@@ -21,7 +21,7 @@ import { useMutation } from "@tanstack/react-query";
 import { createNewMementoApiUserUserIdMementoPostMutation } from "@/src/api-client/generated/@tanstack/react-query.gen";
 import { useSession } from "@/src/context/AuthContext";
 import { router } from "expo-router";
-import { toISODate } from "@/src/libs/date";
+import { toISODateString } from "@/src/libs/date";
 import { Photo } from "@/src/hooks/usePhotos";
 import { formDataBodySerializer } from "@/src/api-client/formData";
 import { aggregateMetadata, getRelevantImageMetadata } from "@/src/libs/exif";
@@ -68,7 +68,7 @@ export default function CreateMemento() {
   const onSubmit = async (form: CreateMementoForm) => {
     const memento = {
       ...form.memento,
-      date: form.memento.date ? toISODate(form.memento.date) : null,
+      date: form.memento.date ? toISODateString(form.memento.date) : null,
     };
 
     // Metadata for each image

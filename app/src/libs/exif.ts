@@ -1,6 +1,6 @@
 import { GeoLocation } from "../components/LocationInput";
 import { Photo } from "../hooks/usePhotos";
-import { toISODate } from "./date";
+import { getDateFromISO, toISODateString } from "./date";
 
 type ImageMetadata = {
   filename: string;
@@ -9,13 +9,21 @@ type ImageMetadata = {
   long: number | null;
 };
 
+type Coordinates = {
+  lat: number;
+  long: number;
+};
+
+/**
+ * Extracts "relevant" properties from EXIF metadata of an image for our application.
+ */
 export const getRelevantImageMetadata = (photo: Photo): ImageMetadata => {
   const { exif, fileName } = photo;
 
   // Date
   let date =
     exif?.DateTimeOriginal || exif?.DateTimeDigitized || exif?.DateTime;
-  date = date ? toISODate(date) : null;
+  date = date ? toISODateString(date) : null;
 
   // Coordinates
   let lat = null,
@@ -33,25 +41,26 @@ export const getRelevantImageMetadata = (photo: Photo): ImageMetadata => {
   };
 };
 
-type Coordinates = {
-  lat: number;
-  long: number;
-};
-
+/**
+ * Looks at the metadata for an array of images and tries to aggregate them into a final result.
+ *  - Date: uses the mode
+ *  - Location: finds center of largest coordinate cluster and uses reverse geocoding
+ */
 export const aggregateMetadata = (photos: Photo[]) => {
   const metadatas = photos.map(getRelevantImageMetadata);
 
   const dateString = findMostCommonDate(metadatas);
-
-  const geocenter = findLocationCenter(metadatas);
+  const geocenter = findLargestLocationCenter(metadatas);
 
   return {
-    date: dateString ? new Date(dateString) : null,
+    date: dateString ? getDateFromISO(dateString) : null,
     location: geocenter ? reverseCityGeocode(geocenter) : null,
   };
 };
 
-// Find the most common date
+/**
+ * Get the most common date from list of metadata.
+ */
 const findMostCommonDate = (metadatas: ImageMetadata[]): string | null => {
   const dateCounts: Record<string, number> = {};
 
@@ -74,48 +83,43 @@ const findMostCommonDate = (metadatas: ImageMetadata[]): string | null => {
 const reverseCityGeocode = (coords: Coordinates) =>
   ({ ...coords, text: "" }) as GeoLocation;
 
-// Find the center of the largest coordinate cluster
-const findLocationCenter = (metadatas: ImageMetadata[]): Coordinates | null => {
-  // Filter locations with coordinates
+/**
+ * Finds the center (lat/long) of the largest coordinate cluster
+ * Threshold for clustering is ~10km, in attempt to cluster by city
+ */
+const findLargestLocationCenter = (
+  metadatas: ImageMetadata[],
+  clusterThreshold = 0.1,
+): Coordinates | null => {
   const locations = metadatas.filter(
-    (m): m is ImageMetadata & { lat: number; long: number } =>
-      m.lat !== null && m.long !== null,
-  );
-
+    (m) => m.lat !== null && m.long !== null,
+  ) as Coordinates[];
   if (locations.length === 0) return null;
-
-  // City-level clustering (~10km)
-  const THRESHOLD = 0.1;
 
   // Find clusters based on proximity
   const clusters = locations.reduce((acc: Coordinates[][], loc) => {
-    // Try adding to existing cluster
     const matchingClusterIndex = acc.findIndex((cluster) =>
-      cluster.some((point) => isNearby(point, loc, THRESHOLD)),
+      cluster.some((point) => isNearby(point, loc, clusterThreshold)),
     );
-
     if (matchingClusterIndex >= 0) {
       acc[matchingClusterIndex].push(loc);
     } else {
       acc.push([loc]);
     }
-
     return acc;
   }, []);
 
-  // Find largest cluster
+  // Get the largest cluster
   const largestCluster = clusters.reduce(
     (max, cluster) => (cluster.length > max.length ? cluster : max),
-    [] as Coordinates[],
+    [],
   );
-
-  // Return center of largest cluster or first location
-  return largestCluster.length > 0
-    ? calculateCenter(largestCluster)
-    : locations[0];
+  return calculateCenter(largestCluster);
 };
 
-// Check if two points are within threshold
+/**
+ * Check if two points are within threshold
+ */
 const isNearby = (
   p1: Coordinates,
   p2: Coordinates,
@@ -124,7 +128,9 @@ const isNearby = (
   Math.abs(p1.lat - p2.lat) < threshold &&
   Math.abs(p1.long - p2.long) < threshold;
 
-// Calculate center of points
+/**
+ * Calculate the center of a list of coordinates
+ */
 const calculateCenter = (points: Coordinates[]): Coordinates => {
   const sum = points.reduce(
     (acc, p) => ({
