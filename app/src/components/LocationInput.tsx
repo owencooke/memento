@@ -1,25 +1,53 @@
+import React, { useRef, useEffect } from "react";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 
+export interface GeoLocation {
+  text: string;
+  lat?: number;
+  long?: number;
+}
+
 interface LocationInputProps {
-  value?: string | null;
-  onChange?: (value: string) => void;
+  value: GeoLocation | null;
+  onChange?: (value: GeoLocation) => void;
 }
 
 const LocationInput = ({
-  value = "",
+  value = { text: "", lat: 0, long: 0 },
   onChange = (_) => {},
 }: LocationInputProps) => {
+  const autocompleteRef = useRef<any>(null);
+
+  // Updates the autocomplete text when controlled value changes
+  useEffect(() => {
+    if (
+      autocompleteRef.current &&
+      value !== null &&
+      typeof value === "string"
+    ) {
+      autocompleteRef.current.setAddressText(value);
+    }
+  }, [value]);
+
   return (
     <GooglePlacesAutocomplete
+      ref={autocompleteRef}
       keyboardShouldPersistTaps="handled"
       enablePoweredByContainer={false}
+      debounce={300}
+      fetchDetails={true}
       placeholder="Search location"
-      onPress={(data) => onChange(data.description || "")}
+      // Handle when user selects an autocomplete option
+      onPress={(data, details) => {
+        const lat = details?.geometry.location.lat;
+        const long = details?.geometry.location.lng;
+        onChange({ text: data.description || "", lat, long });
+      }}
       textInputProps={{
-        value,
-        onChangeText: (text) => onChange(text),
+        onChangeText: (text) => onChange({ text }),
       }}
       query={{
+        types: "(cities)",
         key: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY,
         language: "en",
       }}

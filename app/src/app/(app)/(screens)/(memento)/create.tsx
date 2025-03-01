@@ -19,32 +19,37 @@ import { PlayIcon } from "@/src/components/ui/icon";
 import PhotoSelectGrid from "@/src/components/PhotoSelectGrid";
 import { useMutation } from "@tanstack/react-query";
 import { createNewMementoApiUserUserIdMementoPostMutation } from "@/src/api-client/generated/@tanstack/react-query.gen";
-import { MementoInsert } from "@/src/api-client/generated/types.gen";
 import { useSession } from "@/src/context/AuthContext";
 import { router } from "expo-router";
 import { toISODate } from "@/src/libs/date";
 import { Photo } from "@/src/hooks/usePhotos";
 import { formDataBodySerializer } from "@/src/api-client/formData";
 import { getRelevantExifMetadata } from "@/src/libs/exif";
-import LocationInput from "@/src/components/LocationInput";
+import LocationInput, { GeoLocation } from "@/src/components/LocationInput";
 import { FlatList } from "react-native";
+import { useCallback } from "react";
 
 interface CreateMementoForm {
-  memento: Omit<MementoInsert, "user_id" | "date"> & { date: Date };
+  memento: { date: Date; location: GeoLocation; caption: string };
   photos: Photo[];
 }
 
 export default function CreateMemento() {
   const { session } = useSession();
-  const { control, handleSubmit, setValue } = useForm<CreateMementoForm>({
-    defaultValues: {
-      memento: {
-        caption: "",
-        date: new Date(),
+  const { control, handleSubmit, setValue, watch } = useForm<CreateMementoForm>(
+    {
+      defaultValues: {
+        memento: {
+          caption: "",
+          date: new Date(),
+          location: {
+            text: "",
+          },
+        },
+        photos: [],
       },
-      photos: [],
     },
-  });
+  );
 
   const createMutation = useMutation(
     createNewMementoApiUserUserIdMementoPostMutation(),
@@ -84,6 +89,22 @@ export default function CreateMemento() {
       },
     );
   };
+
+  // Prevent re-rendering location input when Geolocation changes
+  const locationValue = watch("memento.location");
+  const handleLocationChange = useCallback(
+    (location: GeoLocation) => {
+      const hasChanged =
+        locationValue.text !== location.text ||
+        locationValue.lat !== location.lat ||
+        locationValue.long !== location.long;
+
+      if (hasChanged) {
+        setValue("memento.location", location);
+      }
+    },
+    [locationValue, setValue],
+  );
 
   return (
     <SafeAreaView className="flex-1" edges={["bottom"]}>
@@ -164,7 +185,7 @@ export default function CreateMemento() {
                   render={({ field }) => (
                     <LocationInput
                       value={field.value}
-                      onChange={(location) => field.onChange(location)}
+                      onChange={handleLocationChange}
                     />
                   )}
                 />
