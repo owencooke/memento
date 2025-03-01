@@ -1,5 +1,5 @@
 import { Text } from "@/src/components/ui/text";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "@/src/context/AuthContext";
 import { getUsersCollectionsApiUserUserIdCollectionGetOptions } from "@/src/api-client/generated/@tanstack/react-query.gen";
@@ -13,6 +13,7 @@ import { HStack } from "@/src/components/ui/hstack";
 import { VStack } from "@/src/components/ui/vstack";
 import { Image } from "@/src/components/ui/image";
 import { router } from "expo-router";
+import CollectionCard from "@/src/components/cards/CollectionCard";
 
 const placeholderImage = "https://via.placeholder.com/100";
 
@@ -33,6 +34,14 @@ export default function Collections() {
     enabled: !!session?.user.id,
   });
 
+  const gridData = useMemo(
+    () =>
+      collections?.length && collections.length % 2
+        ? [...collections, { spacer: true }]
+        : collections,
+    [collections],
+  );
+
   const showAlert = (message: string) => {
     setAlertMessage(message);
     // Alert for 2 second
@@ -52,54 +61,36 @@ export default function Collections() {
   if (error) return <Text>Error fetching collections.</Text>;
 
   return (
-    <Box className="flex-1 p-4 bg-white">
-      {alertMessage && (
-        <Alert action="muted" variant="solid">
-          <AlertText>{alertMessage}</AlertText>
-        </Alert>
+    <Box className="flex-1 py-4 px-6 bg-background-100">
+      {collections && collections.length > 0 ? (
+        <FlatList
+          numColumns={2}
+          columnWrapperStyle={{ gap: 12 }}
+          contentContainerStyle={{ gap: 12 }}
+          showsVerticalScrollIndicator={false}
+          data={gridData}
+          keyExtractor={(item, index) =>
+            "spacer" in item ? `spacer-${index}` : String(item.id)
+          }
+          renderItem={({ item }) => (
+            <Box className="flex-1">
+              {!("spacer" in item) && (
+                <CollectionCard
+                  {...item}
+                  onPress={() => handleSelect(String(item.id))}
+                  selected={selectedId === String(item.id)}
+                />
+              )}
+            </Box>
+          )}
+        />
+      ) : (
+        <Box className="flex-1 items-center justify-center">
+          <Text>No collections yet!</Text>
+        </Box>
       )}
 
-      <FlatList
-        numColumns={2}
-        columnWrapperStyle={{ gap: 12 }}
-        contentContainerStyle={{ gap: 12 }}
-        data={collections}
-        keyExtractor={(item) => String(item.id)}
-        renderItem={({ item }) => (
-          <Box className="flex-1">
-            <Pressable onPress={() => handleSelect(String(item.id))}>
-              <Box
-                className={`p-4 rounded-md shadow ${
-                  selectedId === String(item.id) ? "bg-gray-300" : "bg-white"
-                }`}
-              >
-                <VStack space="md">
-                  <Box className="aspect-square">
-                    <Image
-                      source={{ uri: "https://placehold.co/400.png" }}
-                      alt="Collection Image"
-                      className="w-auto h-full"
-                    />
-                  </Box>
-                  <VStack className="justify-center">
-                    <Text className="text-lg font-bold flex-1 text-wrap">
-                      {item.title}
-                    </Text>
-                    <HStack className="justify-between">
-                      <Text className="text-gray-700 flex-1">{"Location"}</Text>
-                      <Text className="text-gray-700 flex-1 text-right">
-                        {"Date"}
-                      </Text>
-                    </HStack>
-                  </VStack>
-                </VStack>
-              </Box>
-            </Pressable>
-          </Box>
-        )}
-      />
-
-      <Fab onPress={handleAddCollection}>
+      <Fab size="lg" onPress={handleAddCollection}>
         <FabIcon as={AddIcon} />
       </Fab>
     </Box>
