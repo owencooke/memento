@@ -11,11 +11,7 @@ import { useMemo } from "react";
 export default function Mementos() {
   const { session } = useSession();
 
-  const {
-    data: mementos,
-    error,
-    isLoading,
-  } = useQuery({
+  const { data: mementos } = useQuery({
     ...getUsersMementosApiUserUserIdMementoGetOptions({
       path: {
         user_id: session?.user.id ?? "",

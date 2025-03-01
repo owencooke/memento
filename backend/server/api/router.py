@@ -1,6 +1,6 @@
 from fastapi.routing import APIRouter
 
-from server.api import monitoring, user, memento
+from server.api import memento, monitoring, user
 
 # Nested routers that require user id access
 user_id_router = APIRouter(prefix="/user/{user_id}")

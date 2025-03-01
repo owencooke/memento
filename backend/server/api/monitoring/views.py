@@ -11,4 +11,4 @@ def health_check() -> JSONResponse:
 
     It returns 200 if the project is healthy.
     """
-    return {"message": "Healthy!"}
+    return JSONResponse(content={"message": "Healthy!"})
