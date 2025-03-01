@@ -64,6 +64,6 @@ async def create_new_memento(
 
         # Create new image metadata records in DB
         image_metadata_list[i].filename = path
-        create_image_metadata(image_metadata_list[i], new_memento)
+        create_image_metadata(image_metadata_list[i], new_memento.id)
 
     return new_memento

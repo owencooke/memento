@@ -1,15 +1,13 @@
-from typing import Optional
 from pydantic import Field
-from server.services.db.models.gis import GeoLocationModel, Location
 from server.services.db.models.schema_public_latest import (
     MementoBaseSchema,
     ImageBaseSchema,
 )
 
 
-class ImageWithUrl(ImageBaseSchema, GeoLocationModel):
+class ImageWithUrl(ImageBaseSchema):
     url: str = Field(default="")
 
 
-class MementoWithImages(MementoBaseSchema, GeoLocationModel):
+class MementoWithImages(MementoBaseSchema):
     images: list[ImageWithUrl]
