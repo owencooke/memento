@@ -15,7 +15,7 @@ import { KeyboardAvoidingView, Platform, View } from "react-native";
 import { Textarea, TextareaInput } from "@/src/components/ui/textarea";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { PlayIcon } from "@/src/components/ui/icon";
+import { CalendarDaysIcon, PlayIcon } from "@/src/components/ui/icon";
 import PhotoSelectGrid from "@/src/components/PhotoSelectGrid";
 import { useMutation } from "@tanstack/react-query";
 import {
@@ -33,8 +33,14 @@ import {
 } from "@/src/libs/metadata";
 import LocationInput, { GeoLocation } from "@/src/components/LocationInput";
 import { FlatList } from "react-native";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { queryClient } from "@/src/app/_layout";
+import {
+  Input,
+  InputField,
+  InputIcon,
+  InputSlot,
+} from "@/src/components/ui/input";
 
 interface CreateMementoForm {
   memento: { date: Date; location: GeoLocation; caption: string };
@@ -68,6 +74,14 @@ export default function CreateMemento() {
       location && setValue("memento.location", location);
     }
     setValue("photos", photos);
+  };
+
+  // Handles date picker on android
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const handleDatePickerState = () => {
+    setShowDatePicker((showState) => {
+      return !showState;
+    });
   };
 
   // POST Create Memento form
@@ -189,11 +203,28 @@ export default function CreateMemento() {
                   name="memento.date"
                   control={control}
                   render={({ field }) => (
-                    <DateTimePicker
-                      mode="date"
-                      value={field.value}
-                      onChange={(_, date) => field.onChange(date)}
-                    />
+                    <>
+                      <Input>
+                        <InputField
+                          value={field.value ? field.value.toDateString() : ""}
+                          placeholder="Select a date"
+                          editable={false}
+                        />
+                        <InputSlot onPress={handleDatePickerState}>
+                          <InputIcon as={CalendarDaysIcon} />
+                        </InputSlot>
+                      </Input>
+                      {showDatePicker && (
+                        <DateTimePicker
+                          mode="date"
+                          value={field.value ?? new Date()}
+                          onChange={(_, date) => {
+                            setShowDatePicker(false);
+                            if (date) field.onChange(date);
+                          }}
+                        />
+                      )}
+                    </>
                   )}
                 />
               </FormControl>
