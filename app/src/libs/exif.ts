@@ -9,10 +9,18 @@ export const getRelevantExifMetadata = (photo: Photo) => {
     exif?.DateTimeOriginal || exif?.DateTimeDigitized || exif?.DateTime;
   date = date ? toISODate(date) : null;
 
-  // TODO: location. Available fields are GPSLongitude and GPSLatitude
+  // Extract location coordinates
+  let lat = null,
+    long = null;
+  if (exif && "GPSLatitude" in exif) {
+    lat = (exif.GPSLatitudeRef === "S" ? -1 : 1) * exif.GPSLatitude;
+    long = (exif.GPSLongitudeRef === "W" ? -1 : 1) * exif.GPSLongitude;
+  }
 
   return {
     date,
     filename: fileName ?? "",
+    lat,
+    long,
   };
 };

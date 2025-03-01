@@ -39,20 +39,23 @@ async def create_new_memento(
     user_id: UUID4 = Depends(get_user_id),
 ) -> MementoInsert:
     """Creates a new memento, uploads associated images to object storage, and stores image metadata."""
-    # Split location object
+    # Parse Memento fields from form data
     memento_data = json.loads(memento)
     memento_data["coordinates"] = Location(
         **memento_data["location"]
     ).to_supabase_string()
     memento_data["location"] = memento_data["location"]["text"]
-
-    # Parse and validate form data
     memento_data = MementoInsert.model_validate(memento_data)
-    image_metadata_list = [
-        ImageInsert.model_validate(img) for img in json.loads(imageMetadata)
-    ]
 
-    # Create new memento record
+    # Parse Image metadata fields from form data
+    image_metadata_list = []
+    for img_data in json.loads(imageMetadata):
+        img_data["coordinates"] = (
+            Location(lat=img_data["lat"], long=img_data["long"])
+        ).to_supabase_string()
+        image_metadata_list.append(ImageInsert.model_validate(img_data))
+
+    # Create new memento in DB
     memento_data.user_id = user_id
     new_memento = create_memento(memento_data)
 
@@ -60,7 +63,7 @@ async def create_new_memento(
         # Upload image to object storage
         path = await upload_image(images[i])
 
-        # Create new image metadata records
+        # Create new image metadata records in DB
         image_metadata_list[i].filename = path
         create_image_metadata(image_metadata_list[i], new_memento)
 

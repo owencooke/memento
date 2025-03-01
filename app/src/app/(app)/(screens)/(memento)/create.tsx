@@ -66,6 +66,7 @@ export default function CreateMemento() {
     const imageMetadata = form.photos.map((photo) =>
       getRelevantExifMetadata(photo),
     );
+    console.log(imageMetadata);
 
     // Map each image to its necessary upload info
     const images = form.photos.map((photo) => ({
