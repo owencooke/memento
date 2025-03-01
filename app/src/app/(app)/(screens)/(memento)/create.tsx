@@ -24,7 +24,7 @@ import { router } from "expo-router";
 import { toISODate } from "@/src/libs/date";
 import { Photo } from "@/src/hooks/usePhotos";
 import { formDataBodySerializer } from "@/src/api-client/formData";
-import { getRelevantExifMetadata } from "@/src/libs/exif";
+import { aggregateMetadata, getRelevantImageMetadata } from "@/src/libs/exif";
 import LocationInput, { GeoLocation } from "@/src/components/LocationInput";
 import { FlatList } from "react-native";
 import { useCallback } from "react";
@@ -36,8 +36,8 @@ interface CreateMementoForm {
 
 export default function CreateMemento() {
   const { session } = useSession();
-  const { control, handleSubmit, setValue, watch } = useForm<CreateMementoForm>(
-    {
+  const { control, handleSubmit, setValue, watch, getValues } =
+    useForm<CreateMementoForm>({
       defaultValues: {
         memento: {
           caption: "",
@@ -48,24 +48,31 @@ export default function CreateMemento() {
         },
         photos: [],
       },
-    },
-  );
-
+    });
   const createMutation = useMutation(
     createNewMementoApiUserUserIdMementoPostMutation(),
   );
 
+  // When more photos added, populate date/location fields from image data
+  const handlePhotosChanged = (photos: Photo[]) => {
+    if (photos.length > getValues("photos").length) {
+      const { date, location } = aggregateMetadata(photos);
+      console.log({ date, location });
+      date && setValue("memento.date", date);
+      location && setValue("memento.location", location);
+    }
+    setValue("photos", photos);
+  };
+
+  // POST Create Memento form
   const onSubmit = async (form: CreateMementoForm) => {
-    // Overall memento data
     const memento = {
       ...form.memento,
       date: form.memento.date ? toISODate(form.memento.date) : null,
     };
 
     // Metadata for each image
-    const imageMetadata = form.photos.map((photo) =>
-      getRelevantExifMetadata(photo),
-    );
+    const imageMetadata = form.photos.map(getRelevantImageMetadata);
     console.log(imageMetadata);
 
     // Map each image to its necessary upload info
@@ -75,7 +82,7 @@ export default function CreateMemento() {
       name: photo.fileName,
     }));
 
-    // Call Create API endpoint, with custom serializer for multi-part form data
+    // Call POST endpoint with custom serializer for multi-part form data
     const body = { memento, imageMetadata, images } as any;
     await createMutation.mutateAsync(
       {
@@ -138,9 +145,7 @@ export default function CreateMemento() {
                 <FormControlLabel>
                   <FormControlLabelText>Add Photos</FormControlLabelText>
                 </FormControlLabel>
-                <PhotoSelectGrid
-                  onChange={(photos) => setValue("photos", photos)}
-                />
+                <PhotoSelectGrid onChange={handlePhotosChanged} />
               </FormControl>
               <FormControl size={"lg"}>
                 <FormControlLabel>
