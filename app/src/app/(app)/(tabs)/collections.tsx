@@ -1,6 +1,5 @@
 import { Text } from "@/src/components/ui/text";
 import { useState } from "react";
-import usePhotos from "@/src/hooks/usePhotos";
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "@/src/context/AuthContext";
 import { getUsersCollectionsApiUserUserIdCollectionGetOptions } from "@/src/api-client/generated/@tanstack/react-query.gen";
