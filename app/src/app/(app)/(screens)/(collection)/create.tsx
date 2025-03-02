@@ -9,6 +9,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView, View } from "react-native";
 import {
   FormControl,
+  FormControlError,
+  FormControlErrorIcon,
+  FormControlErrorText,
   FormControlLabel,
   FormControlLabelText,
 } from "@/src/components/ui/form-control";
@@ -24,8 +27,10 @@ import { Textarea, TextareaInput } from "@/src/components/ui/textarea";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Button, ButtonSpinner, ButtonText } from "@/src/components/ui/button";
 import { useCallback, useState } from "react";
-import { CalendarDaysIcon } from "@/src/components/ui/icon";
-import LocationInput, { GeoLocation } from "@/src/components/LocationInput";
+import { AlertCircleIcon, CalendarDaysIcon } from "@/src/components/ui/icon";
+import LocationInput, {
+  GeoLocation,
+} from "@/src/components/inputs/LocationInput";
 import { FlatList } from "react-native";
 
 interface CreateCollectionForm {
