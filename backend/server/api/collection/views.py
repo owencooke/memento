@@ -1,13 +1,12 @@
-from fastapi import APIRouter, Body, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from loguru import logger
 from pydantic import UUID4
 
+from server.api.collection.models import NewCollection
 from server.api.path import get_user_id
-from server.services.db.models.gis import Location
 from server.services.db.models.joins import CollectionWithMementos
 from server.services.db.models.schema_public_latest import (
     Collection,
-    CollectionInsert,
     HasMementoInsert,
 )
 from server.services.db.queries.collection import (
@@ -31,27 +30,16 @@ async def get_users_collections(
     return collections
 
 
-class CreateCollectionWithLocation(CollectionInsert):
-    location: dict
-    mementos: list[int]
-
-
 @router.post("/")
 async def create_new_collection(
-    new_collection: CreateCollectionWithLocation,
+    new_collection: NewCollection,
+    mementos: list[int],
     user_id: UUID4 = Depends(get_user_id),
 ) -> Collection:
     """Create a collection."""
     logger.debug(f"Creating a new collection {new_collection}")
-    new_collection["coordinates"] = Location(
-        **new_collection["location"]
-    ).to_gis_string()
-    new_collection["location"] = new_collection["location"]["text"]
 
-    valid_collection = CollectionInsert.model_validate(new_collection)
-    valid_collection.user_id = user_id
-
-    inserted_collection = create_collection(valid_collection)
+    inserted_collection = create_collection(new_collection, user_id)
     if not inserted_collection:
         raise HTTPException(status_code=400, detail="Insert Collection Failed")
 
