@@ -40,8 +40,12 @@ export default function MementoCard({
           </Text>
         )}
         <View className="flex flex-row justify-between items-center mt-auto font-medium">
-          <Text size="sm">{date}</Text>
-          <Text size="sm">{city}</Text>
+          <Text className="flex-1" size="sm">
+            {date}
+          </Text>
+          <Text className="flex-1 text-right" size="sm">
+            {city}
+          </Text>
         </View>
       </View>
     </View>
