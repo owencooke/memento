@@ -13,7 +13,6 @@ import {
 import { Heading } from "@/src/components/ui/heading";
 import { KeyboardAvoidingView, Platform, View } from "react-native";
 import { Textarea, TextareaInput } from "@/src/components/ui/textarea";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PlayIcon } from "@/src/components/ui/icon";
 import PhotoSelectGrid from "@/src/components/PhotoSelectGrid";
@@ -35,9 +34,10 @@ import LocationInput, { GeoLocation } from "@/src/components/LocationInput";
 import { FlatList } from "react-native";
 import { useCallback } from "react";
 import { queryClient } from "@/src/app/_layout";
+import DatePickerInput from "@/src/components/inputs/DatePickerInput";
 
 interface CreateMementoForm {
-  memento: { date: Date; location: GeoLocation; caption: string };
+  memento: { date: Date | null; location: GeoLocation; caption: string };
   photos: Photo[];
 }
 
@@ -48,7 +48,7 @@ export default function CreateMemento() {
       defaultValues: {
         memento: {
           caption: "",
-          date: new Date(),
+          date: null,
           location: {
             text: "",
           },
@@ -90,8 +90,6 @@ export default function CreateMemento() {
     // Call POST endpoint with custom serializer for multi-part form data
     const path = { user_id: session?.user.id ?? "" };
     const body = { memento, image_metadata, images } as any;
-
-    console.log(body);
     await createMutation.mutateAsync(
       {
         body,
@@ -189,10 +187,9 @@ export default function CreateMemento() {
                   name="memento.date"
                   control={control}
                   render={({ field }) => (
-                    <DateTimePicker
-                      mode="date"
+                    <DatePickerInput
                       value={field.value}
-                      onChange={(_, date) => field.onChange(date)}
+                      onChange={(date) => field.onChange(date)}
                     />
                   )}
                 />
