@@ -82,11 +82,7 @@ export default function CreateCollection() {
         },
 
         onError: (error: any) =>
-          console.error(
-            "Failed to create new collection",
-            error.detail[0].input,
-            error.detail[0].loc,
-          ),
+          console.error("Failed to create new collection", error),
       },
     );
   };

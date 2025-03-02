@@ -27,17 +27,22 @@ async def get_users_collections(
     logger.info("get collection")
     collections = get_collections(user_id)
     if not collections:
-        raise HTTPException(status_code=404, detail="No collections found")
+        return []
     return collections
 
 
-@router.post("/", response_model=CollectionInsert)
+class CreateCollectionWithLocation(CollectionInsert):
+    location: dict
+    mementos: list[int]
+
+
+@router.post("/")
 async def create_new_collection(
-    new_collection: dict,
-    mementos: list[int],
+    new_collection: CreateCollectionWithLocation,
     user_id: UUID4 = Depends(get_user_id),
 ) -> Collection:
     """Create a collection."""
+    logger.debug(f"Creating a new collection {new_collection}")
     new_collection["coordinates"] = Location(
         **new_collection["location"]
     ).to_gis_string()
