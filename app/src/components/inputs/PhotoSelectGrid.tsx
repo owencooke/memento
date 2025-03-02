@@ -1,8 +1,8 @@
 import { View, Text } from "react-native";
-import usePhotos, { Photo } from "../hooks/usePhotos";
-import { Image } from "./ui/image";
-import { Button, ButtonIcon } from "./ui/button";
-import { AddIcon, CloseIcon, EditIcon, EyeOffIcon } from "./ui/icon";
+import usePhotos, { Photo } from "../../hooks/usePhotos";
+import { Image } from "../ui/image";
+import { Button, ButtonIcon } from "../ui/button";
+import { AddIcon, CloseIcon, EditIcon, EyeOffIcon } from "../ui/icon";
 import {
   Actionsheet,
   ActionsheetBackdrop,
@@ -12,7 +12,7 @@ import {
   ActionsheetItem,
   ActionsheetIcon,
   ActionsheetItemText,
-} from "./ui/actionsheet";
+} from "../ui/actionsheet";
 import { useEffect, useState } from "react";
 
 interface PhotoSelectGridProps {

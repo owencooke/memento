@@ -7,16 +7,18 @@ import {
 } from "@/src/components/ui/button";
 import {
   FormControl,
+  FormControlError,
+  FormControlErrorIcon,
+  FormControlErrorText,
   FormControlLabel,
   FormControlLabelText,
 } from "@/src/components/ui/form-control";
 import { Heading } from "@/src/components/ui/heading";
 import { KeyboardAvoidingView, Platform, View } from "react-native";
 import { Textarea, TextareaInput } from "@/src/components/ui/textarea";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { CalendarDaysIcon, PlayIcon } from "@/src/components/ui/icon";
-import PhotoSelectGrid from "@/src/components/PhotoSelectGrid";
+import { AlertCircleIcon, PlayIcon } from "@/src/components/ui/icon";
+import PhotoSelectGrid from "@/src/components/inputs/PhotoSelectGrid";
 import { useMutation } from "@tanstack/react-query";
 import {
   createNewMementoApiUserUserIdMementoPostMutation,
@@ -31,37 +33,39 @@ import {
   aggregateMetadata,
   getRelevantImageMetadata,
 } from "@/src/libs/metadata";
-import LocationInput, { GeoLocation } from "@/src/components/LocationInput";
+import LocationInput, {
+  GeoLocation,
+} from "@/src/components/inputs/LocationInput";
 import { FlatList } from "react-native";
 import { useCallback, useState } from "react";
 import { queryClient } from "@/src/app/_layout";
-import {
-  Input,
-  InputField,
-  InputIcon,
-  InputSlot,
-} from "@/src/components/ui/input";
+import DatePickerInput from "@/src/components/inputs/DatePickerInput";
 
 interface CreateMementoForm {
-  memento: { date: Date; location: GeoLocation; caption: string };
+  memento: { date: Date | null; location: GeoLocation; caption: string };
   photos: Photo[];
 }
 
 export default function CreateMemento() {
   const { session } = useSession();
-  const { control, handleSubmit, setValue, watch, getValues } =
-    useForm<CreateMementoForm>({
-      defaultValues: {
-        memento: {
-          caption: "",
-          date: new Date(),
-          location: {
-            text: "",
-          },
-        },
-        photos: [],
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    watch,
+    getValues,
+    clearErrors,
+    formState: { errors },
+  } = useForm<CreateMementoForm>({
+    defaultValues: {
+      memento: {
+        caption: "",
+        date: null,
+        location: { text: "" },
       },
-    });
+      photos: [],
+    },
+  });
   const createMutation = useMutation(
     createNewMementoApiUserUserIdMementoPostMutation(),
   );
@@ -72,6 +76,7 @@ export default function CreateMemento() {
       const { date, location } = await aggregateMetadata(photos);
       date && setValue("memento.date", date);
       location && setValue("memento.location", location);
+      clearErrors("photos");
     }
     setValue("photos", photos);
   };
@@ -86,9 +91,17 @@ export default function CreateMemento() {
 
   // POST Create Memento form
   const onSubmit = async (form: CreateMementoForm) => {
+    const {
+      location: { lat, long, text },
+      date,
+      ...restMemento
+    } = form.memento;
+    // Only include fields if explictly set
     const memento = {
-      ...form.memento,
-      date: form.memento.date ? toISODateString(form.memento.date) : null,
+      ...restMemento,
+      date: date ? toISODateString(date) : null,
+      location: text ? text : null,
+      coordinates: lat && long ? { lat, long } : null,
     };
 
     // Metadata for each image
@@ -103,12 +116,13 @@ export default function CreateMemento() {
 
     // Call POST endpoint with custom serializer for multi-part form data
     const path = { user_id: session?.user.id ?? "" };
-    const body = { memento, image_metadata, images } as any;
-
-    console.log(body);
     await createMutation.mutateAsync(
       {
-        body,
+        body: {
+          memento_str: memento,
+          image_metadata_str: image_metadata,
+          images,
+        } as any,
         path,
         bodySerializer: formDataBodySerializer.bodySerializer,
       },
@@ -171,11 +185,33 @@ export default function CreateMemento() {
                   <ButtonIcon as={PlayIcon} />
                 </Button>
               </View>
-              <FormControl size={"lg"}>
+              <FormControl size={"lg"} isInvalid={!!errors.photos}>
                 <FormControlLabel>
                   <FormControlLabelText>Add Photos</FormControlLabelText>
                 </FormControlLabel>
-                <PhotoSelectGrid onChange={handlePhotosChanged} />
+                <Controller
+                  name="photos"
+                  control={control}
+                  render={() => (
+                    <PhotoSelectGrid onChange={handlePhotosChanged} />
+                  )}
+                  rules={{
+                    validate: {
+                      required: (value) => {
+                        return (
+                          (value && value.length > 0) ||
+                          "Please add at least one photo"
+                        );
+                      },
+                    },
+                  }}
+                />
+                <FormControlError className="mt-4">
+                  <FormControlErrorIcon as={AlertCircleIcon} />
+                  <FormControlErrorText>
+                    {errors?.photos?.message}
+                  </FormControlErrorText>
+                </FormControlError>
               </FormControl>
               <FormControl size={"lg"}>
                 <FormControlLabel>
@@ -203,28 +239,10 @@ export default function CreateMemento() {
                   name="memento.date"
                   control={control}
                   render={({ field }) => (
-                    <>
-                      <Input>
-                        <InputField
-                          value={field.value ? field.value.toDateString() : ""}
-                          placeholder="Select a date"
-                          editable={false}
-                        />
-                        <InputSlot onPress={handleDatePickerState}>
-                          <InputIcon as={CalendarDaysIcon} />
-                        </InputSlot>
-                      </Input>
-                      {showDatePicker && (
-                        <DateTimePicker
-                          mode="date"
-                          value={field.value ?? new Date()}
-                          onChange={(_, date) => {
-                            setShowDatePicker(false);
-                            if (date) field.onChange(date);
-                          }}
-                        />
-                      )}
-                    </>
+                    <DatePickerInput
+                      value={field.value}
+                      onChange={(date) => field.onChange(date)}
+                    />
                   )}
                 />
               </FormControl>

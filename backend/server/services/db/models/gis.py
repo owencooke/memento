@@ -3,7 +3,7 @@ from typing_extensions import Self
 from pydantic import BaseModel, Field, field_validator
 
 
-class Location(BaseModel):
+class Coordinates(BaseModel):
     """A model that provides methods for converting lat/long
     coordinates between a variety of formats.
     """
@@ -26,20 +26,20 @@ class Location(BaseModel):
         raise ValueError(f"Invalid GeoJSON format: {geojson}")
 
 
-class CoordinatesConverter(BaseModel):
-    """A convenience model that can be inherited from to ensure coordinates are converted into a Location model."""
+class BaseWithCoordinates(BaseModel):
+    """A convenience model that can be inherited from to ensure coordinates are included as a Coordinates model."""
 
-    coordinates: Location | None = Field(default=None)
+    coordinates: Coordinates | None = Field(default=None)
 
     @field_validator("coordinates", mode="before")
     @classmethod
-    def convert_geojson_to_location(cls, v: Any) -> Optional[Location]:
-        """Convert coordinates to Location object if possible"""
+    def convert_geojson_to_location(cls, v: Any) -> Optional[Coordinates]:
+        """Convert coordinates to Coordinates object if possible"""
         if v is None:
             return None
-        if isinstance(v, Location):
+        if isinstance(v, Coordinates):
             return v
         try:
-            return Location.from_geojson(v)
+            return Coordinates.from_geojson(v)
         except (ValueError, TypeError, AttributeError):
             return None

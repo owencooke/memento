@@ -1,4 +1,4 @@
-import { View, StatusBar, Platform } from "react-native";
+import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "@/src/components/ui/image";
 import { useSession } from "@/src/context/AuthContext";
@@ -31,12 +31,7 @@ const Header: React.FC<HeaderProps> = ({ title, mode = "avatar" }) => {
 
   return (
     <SafeAreaView className="bg-background-0" edges={["top"]}>
-      <View
-        className="flex-row items-center justify-between px-4"
-        style={{
-          paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
-        }}
-      >
+      <View className="flex-row items-center justify-between px-4">
         {mode === "goBack" && (
           <Button
             className="p-0"

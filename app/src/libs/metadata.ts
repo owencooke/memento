@@ -1,23 +1,19 @@
-import { GeoLocation } from "../components/LocationInput";
+import { Coordinates, ImageWithUrl } from "../api-client/generated";
+import { GeoLocation } from "../components/inputs/LocationInput";
 import { Photo } from "../hooks/usePhotos";
 import { getDateFromISO, toISODateString } from "./date";
 
-type ImageMetadata = {
-  filename: string;
-  date: string | null;
-  lat: number | null;
-  long: number | null;
-};
-
-type Coordinates = {
-  lat: number;
-  long: number;
-};
+type SelectedPhotoMetadata = Pick<
+  ImageWithUrl,
+  "date" | "filename" | "coordinates"
+>;
 
 /**
  * Extracts "relevant" properties from EXIF metadata of an image for our application.
  */
-export const getRelevantImageMetadata = (photo: Photo): ImageMetadata => {
+export const getRelevantImageMetadata = (
+  photo: Photo,
+): SelectedPhotoMetadata => {
   const { exif, fileName } = photo;
 
   // Date
@@ -26,18 +22,18 @@ export const getRelevantImageMetadata = (photo: Photo): ImageMetadata => {
   date = date ? toISODateString(date) : null;
 
   // Coordinates
-  let lat = null,
-    long = null;
+  let coordinates = null;
   if (exif && "GPSLatitude" in exif) {
-    lat = (exif.GPSLatitudeRef === "S" ? -1 : 1) * exif.GPSLatitude;
-    long = (exif.GPSLongitudeRef === "W" ? -1 : 1) * exif.GPSLongitude;
+    coordinates = {
+      lat: (exif.GPSLatitudeRef === "S" ? -1 : 1) * exif.GPSLatitude,
+      long: (exif.GPSLongitudeRef === "W" ? -1 : 1) * exif.GPSLongitude,
+    };
   }
 
   return {
     date,
     filename: fileName ?? "",
-    lat,
-    long,
+    coordinates,
   };
 };
 
@@ -61,7 +57,9 @@ export const aggregateMetadata = async (photos: Photo[]) => {
 /**
  * Get the most common date from list of metadata.
  */
-const findMostCommonDate = (metadatas: ImageMetadata[]): string | null => {
+const findMostCommonDate = (
+  metadatas: SelectedPhotoMetadata[],
+): string | null => {
   const dateCounts: Record<string, number> = {};
 
   return metadatas
@@ -108,12 +106,12 @@ const reverseCityGeocode = async (
  * Threshold for clustering is ~10km, in attempt to cluster by city
  */
 const findLargestLocationCenter = (
-  metadatas: ImageMetadata[],
+  metadatas: SelectedPhotoMetadata[],
   clusterThreshold = 0.1,
 ): Coordinates | null => {
-  const locations = metadatas.filter(
-    (m) => m.lat !== null && m.long !== null,
-  ) as Coordinates[];
+  const locations = metadatas
+    .filter((m) => m.coordinates)
+    .map((m) => m.coordinates) as Coordinates[];
   if (locations.length === 0) return null;
 
   // Find clusters based on proximity

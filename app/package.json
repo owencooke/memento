@@ -12,7 +12,7 @@
     "test": "jest",
     "test:e2e": "maestro test",
     "lint": "expo lint",
-    "sync-api": "../.openapi/sync-api.sh && openapi-ts"
+    "sync-api": "./scripts/sync-api.sh && openapi-ts"
   },
   "jest": {
     "preset": "jest-expo",
@@ -86,7 +86,7 @@
     "react-native-reanimated": "~3.16.1",
     "react-native-safe-area-context": "5.2.0",
     "react-native-screens": "~4.4.0",
-    "react-native-svg": "15.2.0",
+    "react-native-svg": "15.8.0",
     "react-native-url-polyfill": "^2.0.0",
     "react-native-web": "~0.19.13",
     "react-native-webview": "13.12.5",
