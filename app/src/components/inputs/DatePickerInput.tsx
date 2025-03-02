@@ -37,7 +37,7 @@ const DatePickerInput = ({
           <Input className="bg-background-0">
             <InputField
               value={value ? toISODateString(value) : ""}
-              placeholder="Select a date"
+              placeholder="Select a date..."
               editable={false}
               pointerEvents="none"
             />
