@@ -33,13 +33,34 @@ class BaseWithCoordinates(BaseModel):
 
     @field_validator("coordinates", mode="before")
     @classmethod
-    def convert_geojson_to_location(cls, v: Any) -> Optional[Coordinates]:
-        """Convert coordinates to Coordinates object if possible"""
+    def convert_to_coordinates(cls, v: Any) -> Optional[Coordinates]:
+        """Converts a value to a Coordinates model, if possible"""
         if v is None:
             return None
         if isinstance(v, Coordinates):
             return v
-        try:
-            return Coordinates.from_geojson(v)
-        except (ValueError, TypeError, AttributeError):
-            return None
+        if isinstance(v, dict):
+            # Dict in custom Coordinates format
+            if "lat" in v and "long" in v:
+                return Coordinates.model_validate(v)
+            # Dict in GeoJSON format
+            try:
+                return Coordinates.from_geojson(v)
+            except (ValueError, TypeError, AttributeError):
+                pass
+        return None
+
+
+class CoordinatesInsert(BaseModel):
+    """Base model for Supabase inserts that handles GIS coordinates automatically."""
+
+    def model_dump(self, **kwargs) -> Dict[str, Any]:
+        """Override standard model_dump to include GIS insert form."""
+        data = super().model_dump(**kwargs)
+        if (
+            "coordinates" in data
+            and hasattr(self, "coordinates")
+            and isinstance(self.coordinates, Coordinates)
+        ):
+            data["coordinates"] = self.coordinates.to_gis_string()
+        return data
