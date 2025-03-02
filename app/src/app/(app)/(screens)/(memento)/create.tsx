@@ -7,6 +7,9 @@ import {
 } from "@/src/components/ui/button";
 import {
   FormControl,
+  FormControlError,
+  FormControlErrorIcon,
+  FormControlErrorText,
   FormControlLabel,
   FormControlLabelText,
 } from "@/src/components/ui/form-control";
@@ -14,7 +17,7 @@ import { Heading } from "@/src/components/ui/heading";
 import { KeyboardAvoidingView, Platform, View } from "react-native";
 import { Textarea, TextareaInput } from "@/src/components/ui/textarea";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { PlayIcon } from "@/src/components/ui/icon";
+import { AlertCircleIcon, PlayIcon } from "@/src/components/ui/icon";
 import PhotoSelectGrid from "@/src/components/inputs/PhotoSelectGrid";
 import { useMutation } from "@tanstack/react-query";
 import {
@@ -45,16 +48,23 @@ interface CreateMementoForm {
 
 export default function CreateMemento() {
   const { session } = useSession();
-  const { control, handleSubmit, setValue, watch, getValues } =
-    useForm<CreateMementoForm>({
-      defaultValues: {
-        memento: {
-          caption: "",
-          date: null,
-        },
-        photos: [],
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    watch,
+    getValues,
+    clearErrors,
+    formState: { errors },
+  } = useForm<CreateMementoForm>({
+    defaultValues: {
+      memento: {
+        caption: "",
+        date: null,
       },
-    });
+      photos: [],
+    },
+  });
   const createMutation = useMutation(
     createNewMementoApiUserUserIdMementoPostMutation(),
   );
@@ -65,6 +75,7 @@ export default function CreateMemento() {
       const { date, location } = await aggregateMetadata(photos);
       date && setValue("memento.date", date);
       location && setValue("memento.location", location);
+      clearErrors("photos");
     }
     setValue("photos", photos);
   };
@@ -164,11 +175,33 @@ export default function CreateMemento() {
                   <ButtonIcon as={PlayIcon} />
                 </Button>
               </View>
-              <FormControl size={"lg"}>
+              <FormControl size={"lg"} isInvalid={!!errors.photos}>
                 <FormControlLabel>
                   <FormControlLabelText>Add Photos</FormControlLabelText>
                 </FormControlLabel>
-                <PhotoSelectGrid onChange={handlePhotosChanged} />
+                <Controller
+                  name="photos"
+                  control={control}
+                  render={() => (
+                    <PhotoSelectGrid onChange={handlePhotosChanged} />
+                  )}
+                  rules={{
+                    validate: {
+                      required: (value) => {
+                        return (
+                          (value && value.length > 0) ||
+                          "Please add at least one photo"
+                        );
+                      },
+                    },
+                  }}
+                />
+                <FormControlError className="mt-4">
+                  <FormControlErrorIcon as={AlertCircleIcon} />
+                  <FormControlErrorText>
+                    {errors?.photos?.message}
+                  </FormControlErrorText>
+                </FormControlError>
               </FormControl>
               <FormControl size={"lg"}>
                 <FormControlLabel>
