@@ -2,7 +2,7 @@
 
 import { type Options, healthCheckApiGet, userInfoApiUserIdGet, getUsersMementosApiUserUserIdMementoGet, createNewMementoApiUserUserIdMementoPost } from '../sdk.gen';
 import { queryOptions, type UseMutationOptions } from '@tanstack/react-query';
-import type { HealthCheckApiGetData, UserInfoApiUserIdGetData, GetUsersMementosApiUserUserIdMementoGetData, CreateNewMementoApiUserUserIdMementoPostData, CreateNewMementoApiUserUserIdMementoPostError, CreateNewMementoApiUserUserIdMementoPostResponse } from '../types.gen';
+import type { HealthCheckApiGetData, UserInfoApiUserIdGetData, GetUsersMementosApiUserUserIdMementoGetData, CreateNewMementoApiUserUserIdMementoPostData, CreateNewMementoApiUserUserIdMementoPostError } from '../types.gen';
 import { client as _heyApiClient } from '../client.gen';
 
 export type QueryKey<TOptions extends Options> = [
@@ -105,7 +105,7 @@ export const createNewMementoApiUserUserIdMementoPostOptions = (options: Options
 };
 
 export const createNewMementoApiUserUserIdMementoPostMutation = (options?: Partial<Options<CreateNewMementoApiUserUserIdMementoPostData>>) => {
-    const mutationOptions: UseMutationOptions<CreateNewMementoApiUserUserIdMementoPostResponse, CreateNewMementoApiUserUserIdMementoPostError, Options<CreateNewMementoApiUserUserIdMementoPostData>> = {
+    const mutationOptions: UseMutationOptions<unknown, CreateNewMementoApiUserUserIdMementoPostError, Options<CreateNewMementoApiUserUserIdMementoPostData>> = {
         mutationFn: async (localOptions) => {
             const { data } = await createNewMementoApiUserUserIdMementoPost({
                 ...options,

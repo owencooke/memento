@@ -19,22 +19,6 @@ export type HttpValidationError = {
     detail?: Array<ValidationError>;
 };
 
-/**
- * Image Schema for Pydantic.
- *
- * Inherits from ImageBaseSchema. Add any customization here.
- */
-export type Image = {
-    id: number;
-    memento_id: number;
-    coordinates?: string | null;
-    date?: string | null;
-    detected_text?: string | null;
-    filename: string;
-    image_label?: string | null;
-    memento_ids?: Array<Memento> | null;
-};
-
 export type ImageWithUrl = {
     id: number;
     memento_id: number;
@@ -44,21 +28,6 @@ export type ImageWithUrl = {
     filename: string;
     image_label?: string | null;
     url?: string;
-};
-
-/**
- * Memento Schema for Pydantic.
- *
- * Inherits from MementoBaseSchema. Add any customization here.
- */
-export type Memento = {
-    id: number;
-    caption?: string | null;
-    coordinates?: string | null;
-    date?: string | null;
-    location?: string | null;
-    user_id: string;
-    ids?: Array<Image> | null;
 };
 
 export type MementoWithImages = {
@@ -177,10 +146,8 @@ export type CreateNewMementoApiUserUserIdMementoPostResponses = {
     /**
      * Successful Response
      */
-    200: Memento;
+    200: unknown;
 };
-
-export type CreateNewMementoApiUserUserIdMementoPostResponse = CreateNewMementoApiUserUserIdMementoPostResponses[keyof CreateNewMementoApiUserUserIdMementoPostResponses];
 
 export type ClientOptions = {
     baseUrl: `${string}://${string}` | (string & {});

@@ -61,6 +61,7 @@ export default function CreateMemento() {
       memento: {
         caption: "",
         date: null,
+        location: { text: "" },
       },
       photos: [],
     },
@@ -82,16 +83,17 @@ export default function CreateMemento() {
 
   // POST Create Memento form
   const onSubmit = async (form: CreateMementoForm) => {
-    const { location, date, ...restMemento } = form.memento;
+    const {
+      location: { lat, long, text },
+      date,
+      ...restMemento
+    } = form.memento;
+    // Only include fields if explictly set
     const memento = {
       ...restMemento,
       date: date ? toISODateString(date) : null,
-      location: location.text,
-      // Only include coordinates if available
-      coordinates:
-        location.lat && location.long
-          ? { lat: location.lat, long: location.long }
-          : null,
+      location: text ? text : null,
+      coordinates: lat && long ? { lat, long } : null,
     };
 
     // Metadata for each image
