@@ -1,4 +1,4 @@
-import { View, StatusBar, Platform } from "react-native";
+import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "@/src/components/ui/image";
 import { useSession } from "@/src/context/AuthContext";

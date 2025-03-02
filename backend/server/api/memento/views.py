@@ -1,6 +1,8 @@
 import json
 from typing import Annotated
+
 from fastapi import APIRouter, Depends, File, Form, UploadFile
+from fastapi.responses import JSONResponse
 from pydantic import UUID4
 
 from server.api.memento.models import (
@@ -9,7 +11,6 @@ from server.api.memento.models import (
 )
 from server.api.path import get_user_id
 from server.services.db.models.joins import MementoWithImages
-from server.services.db.models.schema_public_latest import Memento
 from server.services.db.queries.image import create_image_metadata
 from server.services.db.queries.memento import create_memento, get_mementos
 from server.services.storage.image import get_image_url, upload_image
@@ -37,7 +38,7 @@ async def create_new_memento(
     image_metadata_str: Annotated[str, Form()],
     images: Annotated[list[UploadFile], File()],
     user_id: UUID4 = Depends(get_user_id),
-):
+) -> JSONResponse:
     """Post route for creating a new memento.
 
     3 key steps:
@@ -64,4 +65,6 @@ async def create_new_memento(
         image_metadata[i].filename = path
         create_image_metadata(image_metadata[i], new_memento.id)
 
-    # return MementoWithImages(**new_memento, images=image_metadata)
+    return JSONResponse(
+        content={"message": f"Successfully created new Memento[{new_memento.id}]"},
+    )

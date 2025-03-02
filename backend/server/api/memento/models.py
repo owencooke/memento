@@ -4,10 +4,18 @@ from server.services.db.models.schema_public_latest import (
     MementoInsert,
 )
 
-
-class NewMemento(BaseWithCoordinates, MementoInsert):
-    model_config = {"exclude": {"user_id"}}
+# Note: the ignores are for MyPy, to ignore "coordinates" field type differences
 
 
-class NewImageMetadata(BaseWithCoordinates, ImageInsert):
-    pass
+class NewMemento(BaseWithCoordinates, MementoInsert):  # type: ignore[misc]
+    """Inserting a new Memento record to the DB.
+
+    Overrides coordinates with proper Pydantic model.
+    """
+
+
+class NewImageMetadata(BaseWithCoordinates, ImageInsert):  # type: ignore[misc]
+    """Inserting a new Image record to the DB.
+
+    Overrides coordinates with proper Pydantic model.
+    """
