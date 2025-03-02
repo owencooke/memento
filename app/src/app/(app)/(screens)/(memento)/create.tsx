@@ -51,9 +51,6 @@ export default function CreateMemento() {
         memento: {
           caption: "",
           date: null,
-          location: {
-            text: "",
-          },
         },
         photos: [],
       },
@@ -74,9 +71,16 @@ export default function CreateMemento() {
 
   // POST Create Memento form
   const onSubmit = async (form: CreateMementoForm) => {
+    const { location, date, ...restMemento } = form.memento;
     const memento = {
-      ...form.memento,
-      date: form.memento.date ? toISODateString(form.memento.date) : null,
+      ...restMemento,
+      date: date ? toISODateString(date) : null,
+      location: location.text,
+      // Only include coordinates if available
+      coordinates:
+        location.lat && location.long
+          ? { lat: location.lat, long: location.long }
+          : null,
     };
 
     // Metadata for each image
@@ -91,10 +95,13 @@ export default function CreateMemento() {
 
     // Call POST endpoint with custom serializer for multi-part form data
     const path = { user_id: session?.user.id ?? "" };
-    const body = { memento, image_metadata, images } as any;
     await createMutation.mutateAsync(
       {
-        body,
+        body: {
+          memento_str: memento,
+          image_metadata_str: image_metadata,
+          images,
+        } as any,
         path,
         bodySerializer: formDataBodySerializer.bodySerializer,
       },

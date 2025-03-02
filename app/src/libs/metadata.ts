@@ -1,3 +1,4 @@
+import { Coordinates } from "../api-client/generated";
 import { GeoLocation } from "../components/inputs/LocationInput";
 import { Photo } from "../hooks/usePhotos";
 import { getDateFromISO, toISODateString } from "./date";
@@ -7,11 +8,6 @@ type ImageMetadata = {
   date: string | null;
   lat: number | null;
   long: number | null;
-};
-
-type Coordinates = {
-  lat: number;
-  long: number;
 };
 
 /**
