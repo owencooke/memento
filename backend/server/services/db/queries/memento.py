@@ -10,7 +10,7 @@ def create_memento(new_memento: NewMemento, user_id: UUID4) -> Memento:
     """Creates a new memento for a user."""
     response = (
         supabase.table("memento")
-        .insert({**new_memento.model_dump(), "user_id": str(user_id)})
+        .insert({**new_memento.model_dump(mode="json"), "user_id": str(user_id)})
         .execute()
     )
     return Memento(**response.data[0])
