@@ -36,11 +36,10 @@ class CollectionBaseSchema(CustomModel):
 
 	# Columns
 	caption: str | None = Field(default=None)
-	created_at: datetime.datetime
+	coordinates: str | None = Field(default=None)
 	date: datetime.date | None = Field(default=None)
 	location: str | None = Field(default=None)
 	title: str
-	updated_at: datetime.datetime
 	user_id: UUID4
 
 
@@ -99,10 +98,9 @@ class CollectionInsert(CustomModelInsert):
 
 	# Field properties:
 	# caption: nullable
-	# created_at: has default value
+	# coordinates: nullable
 	# date: nullable
 	# location: nullable
-	# updated_at: has default value
 	# user_id: has default value
 
 	# Required fields
@@ -110,10 +108,9 @@ class CollectionInsert(CustomModelInsert):
 
 		# Optional fields
 	caption: str | None = Field(default=None)
-	created_at: datetime.datetime | None = Field(default=None)
+	coordinates: str | None = Field(default=None)
 	date: datetime.date | None = Field(default=None)
 	location: str | None = Field(default=None)
-	updated_at: datetime.datetime | None = Field(default=None)
 	user_id: UUID4 | None = Field(default=None)
 
 
@@ -186,19 +183,17 @@ class CollectionUpdate(CustomModelUpdate):
 
 	# Field properties:
 	# caption: nullable
-	# created_at: has default value
+	# coordinates: nullable
 	# date: nullable
 	# location: nullable
-	# updated_at: has default value
 	# user_id: has default value
 
 		# Optional fields
 	caption: str | None = Field(default=None)
-	created_at: datetime.datetime | None = Field(default=None)
+	coordinates: str | None = Field(default=None)
 	date: datetime.date | None = Field(default=None)
 	location: str | None = Field(default=None)
 	title: str | None = Field(default=None)
-	updated_at: datetime.datetime | None = Field(default=None)
 	user_id: UUID4 | None = Field(default=None)
 
 

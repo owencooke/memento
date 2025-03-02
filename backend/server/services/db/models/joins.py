@@ -1,4 +1,5 @@
 from pydantic import Field
+
 from server.services.db.models.gis import BaseWithCoordinates
 from server.services.db.models.schema_public_latest import (
     CollectionBaseSchema,
@@ -14,3 +15,7 @@ class ImageWithUrl(BaseWithCoordinates, ImageBaseSchema):
 
 class MementoWithImages(BaseWithCoordinates, MementoBaseSchema):
     images: list[ImageWithUrl]
+
+
+class CollectionWithMementos(BaseWithCoordinates, CollectionBaseSchema):
+    mementos: list[HasMementoBaseSchema]
