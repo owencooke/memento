@@ -1,4 +1,4 @@
-import { GeoLocation } from "../components/LocationInput";
+import { GeoLocation } from "../components/inputs/LocationInput";
 import { Photo } from "../hooks/usePhotos";
 import { getDateFromISO, toISODateString } from "./date";
 

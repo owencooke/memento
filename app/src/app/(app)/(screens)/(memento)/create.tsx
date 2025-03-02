@@ -15,7 +15,7 @@ import { KeyboardAvoidingView, Platform, View } from "react-native";
 import { Textarea, TextareaInput } from "@/src/components/ui/textarea";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PlayIcon } from "@/src/components/ui/icon";
-import PhotoSelectGrid from "@/src/components/PhotoSelectGrid";
+import PhotoSelectGrid from "@/src/components/inputs/PhotoSelectGrid";
 import { useMutation } from "@tanstack/react-query";
 import {
   createNewMementoApiUserUserIdMementoPostMutation,
@@ -30,7 +30,9 @@ import {
   aggregateMetadata,
   getRelevantImageMetadata,
 } from "@/src/libs/metadata";
-import LocationInput, { GeoLocation } from "@/src/components/LocationInput";
+import LocationInput, {
+  GeoLocation,
+} from "@/src/components/inputs/LocationInput";
 import { FlatList } from "react-native";
 import { useCallback } from "react";
 import { queryClient } from "@/src/app/_layout";

@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
-import { useColors } from "../hooks/useColors";
+import { useColors } from "../../hooks/useColors";
 
 export interface GeoLocation {
   text: string;
