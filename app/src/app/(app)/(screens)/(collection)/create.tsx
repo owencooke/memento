@@ -34,6 +34,7 @@ import LocationInput, {
 } from "@/src/components/inputs/LocationInput";
 import { FlatList } from "react-native";
 import { queryClient } from "@/src/app/_layout";
+import DatePickerInput from "@/src/components/inputs/DatePickerInput";
 
 interface CreateCollectionForm {
   title: string;
@@ -198,28 +199,10 @@ export default function CreateCollection() {
                 name="date"
                 control={control}
                 render={({ field }) => (
-                  <>
-                    <Input>
-                      <InputField
-                        value={field.value ? field.value.toDateString() : ""}
-                        placeholder="Select a date"
-                        editable={false}
-                      />
-                      <InputSlot onPress={handleDatePickerState}>
-                        <InputIcon as={CalendarDaysIcon} />
-                      </InputSlot>
-                    </Input>
-                    {showDatePicker && (
-                      <DateTimePicker
-                        mode="date"
-                        value={field.value ?? new Date()}
-                        onChange={(_, selectedDate) => {
-                          setShowDatePicker(false);
-                          if (selectedDate) field.onChange(selectedDate);
-                        }}
-                      />
-                    )}
-                  </>
+                  <DatePickerInput
+                    value={field.value}
+                    onChange={(date) => field.onChange(date)}
+                  />
                 )}
               />
             </FormControl>
