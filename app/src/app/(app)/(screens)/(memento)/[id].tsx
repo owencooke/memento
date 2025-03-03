@@ -1,4 +1,5 @@
 import { getUsersMementosApiUserUserIdMementoGetOptions } from "@/src/api-client/generated/@tanstack/react-query.gen";
+import ImageMetadataCard from "@/src/components/cards/ImageMetadataCard";
 import { ButtonIcon, Button } from "@/src/components/ui/button";
 import {
   EditIcon,
@@ -11,15 +12,18 @@ import { Text } from "@/src/components/ui/text";
 import { useSession } from "@/src/context/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
-import React, { useState } from "react";
+import { useState } from "react";
 import { View } from "react-native";
-import PagerView from "react-native-pager-view";
+import PagerView, {
+  PagerViewOnPageSelectedEvent,
+} from "react-native-pager-view";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const buttonClasses = "flex-1";
 const iconClasses = "w-6 h-6";
 
 export default function ViewMemento() {
+  // Get memento
   const { session } = useSession();
   const { id } = useLocalSearchParams<{ id: string }>();
   const [currentPage, setCurrentPage] = useState(0);
@@ -31,12 +35,15 @@ export default function ViewMemento() {
     }),
     refetchOnMount: false,
   });
-
   const memento = mementos?.find((m) => m.id === Number(id));
 
-  const handlePageSelected = (e: any) => {
+  const [showMetadata, setShowMetadata] = useState(false);
+
+  const handleImageSelected = (e: PagerViewOnPageSelectedEvent) => {
     setCurrentPage(e.nativeEvent.position);
   };
+
+  const handleShowMoreDetails = () => setShowMetadata((prev) => !prev);
 
   return (
     <SafeAreaView className="flex-1 bg-primary-500" edges={["bottom"]}>
@@ -48,7 +55,7 @@ export default function ViewMemento() {
               <PagerView
                 style={{ flex: 1 }}
                 initialPage={0}
-                onPageSelected={handlePageSelected}
+                onPageSelected={handleImageSelected}
               >
                 {memento.images.map((image, index) => (
                   <View key={index}>
@@ -74,19 +81,27 @@ export default function ViewMemento() {
               </View>
             </View>
             {/* Details Card */}
-            <View className="bg-background-0 rounded-3xl shadow-hard-3 p-4">
-              {memento.caption && (
-                <Text size="2xl" italic className="font-light">
-                  {memento.caption}
-                </Text>
-              )}
-            </View>
+            {(memento.caption || showMetadata) && (
+              <View className="bg-background-0 rounded-3xl shadow-hard-3 p-4">
+                {showMetadata ? (
+                  <ImageMetadataCard image={memento.images[currentPage]} />
+                ) : (
+                  <Text size="2xl" italic className="font-light">
+                    {memento.caption}
+                  </Text>
+                )}
+              </View>
+            )}
           </>
         )}
       </View>
       {/* Options bar (info, edit, delete, share) */}
       <View className="flex flex-row justify-between items-center bg-primary-500">
-        <Button size="xl" className={buttonClasses}>
+        <Button
+          size="xl"
+          className={buttonClasses}
+          onPress={handleShowMoreDetails}
+        >
           <ButtonIcon as={InfoIcon} className={iconClasses} />
         </Button>
         <Button size="xl" className={buttonClasses}>
