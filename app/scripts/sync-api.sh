@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the output directory and file
-OUTPUT_DIR="../.openapi"
+OUTPUT_DIR="./scripts"
 OUTPUT_FILE="$OUTPUT_DIR/openapi.json"
 
 # Create the output directory if it doesn't exist

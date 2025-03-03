@@ -4,6 +4,15 @@ This mobile application is an [Expo](https://expo.dev) project that was created 
 
 ## Get Started
 
+### Environment Variables
+
+In the `/app/.env` file, ensure the following variables and credentials exist:
+
+```bash
+EXPO_PUBLIC_API_HOST=<YOUR_HOST_IP_ADDRESS> # for backend API calls
+EXPO_PUBLIC_GOOGLE_PLACES_API_KEY=<API_KEY> # for Place Autocomplete and Place Details
+```
+
 ### Running the app
 
 1. Install dependencies

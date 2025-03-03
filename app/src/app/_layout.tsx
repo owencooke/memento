@@ -1,3 +1,4 @@
+import "react-native-get-random-values";
 import {
   DarkTheme,
   DefaultTheme,
@@ -14,8 +15,9 @@ import "react-native-reanimated";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider, useTheme } from "@/src/context/ThemeContext";
 import { AuthProvider } from "@/src/context/AuthContext";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -57,7 +59,9 @@ export default function RootLayout() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <ThemeProvider>
-          <RootContent />
+          <SafeAreaProvider>
+            <RootContent />
+          </SafeAreaProvider>
         </ThemeProvider>
       </AuthProvider>
     </QueryClientProvider>
