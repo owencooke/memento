@@ -70,7 +70,6 @@ export default function CreateCollection() {
       location: text ? text : null,
       coordinates: lat && long ? { lat, long } : null,
     };
-    console.log(collection);
 
     const path = { user_id: session?.user.id ?? "" };
     await createMutation.mutateAsync(
