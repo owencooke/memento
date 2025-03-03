@@ -37,7 +37,7 @@ import LocationInput, {
   GeoLocation,
 } from "@/src/components/inputs/LocationInput";
 import { FlatList } from "react-native";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { queryClient } from "@/src/app/_layout";
 import DatePickerInput from "@/src/components/inputs/DatePickerInput";
 
