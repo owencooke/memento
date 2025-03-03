@@ -1,0 +1,101 @@
+@startuml Activity
+
+' TODO: add FRs where appropriate
+title Create Memento
+
+' Swimlanes
+' format: | optional color | var name | lane title
+|user| User
+|#lightgray|mobile| Mobile App
+|google| Google Places API
+|#lightgray|backend| Backend
+|db| Supabase
+
+
+|user|
+start
+:Clicks add button;
+
+|mobile|
+:Display Create Memento form;
+
+|user|
+:Clicks add photo button;
+
+|mobile|
+:Show photo source options;
+
+' QUESTION: should camera/library be in a diff swimlane? Device vs. Expo?
+|user|
+if (Photo source?) is (Camera) then
+  |mobile|
+  :Access device camera;
+  :Capture photo;
+else (Library)
+  |mobile|
+  :Access photo library;
+  :Select from existing photos;
+endif
+
+|mobile|
+:Extract EXIF metadata;
+:Identify largest location cluster from images;
+:Make /GET call to Google Places Geocoding API;
+
+|google|
+:Convert coordinates to place name;
+:Return place information;
+
+|mobile|
+:Populate input fields with metadata:
+- Date from EXIF
+- Location from geocoding;
+:Display selected photos;
+
+|user|
+:Edit caption (optional);
+:Modify date (optional);
+:Adjust location (optional);
+:Change thumbnail (optional);
+:Click submit button;
+
+|mobile|
+' IF NOT VALID
+:Validate form data;
+:Prepare upload payload;
+:Make /POST call to backend;
+
+|backend|
+' IF NOT VALID
+:Validate request data;
+fork
+  :Remove background from images;
+  |db|
+  :Store images in Storage bucket;
+  :Return stored file path;
+|backend|
+fork again
+  :Extract text from images;
+fork again
+  :Generate image classification labels;
+fork again 
+  |db|
+  :Create memento record in relational DB;
+end fork
+
+|db|
+:Create image metadata records in relational DB;
+
+|backend|
+:Prepare response with new memento id;
+
+|mobile|
+if (Request successful?) is (yes) then
+  :Get memento ID from response;
+  :Navigate to View Memento page;
+else (no)
+  :Display error/retry later message;;
+endif
+
+stop
+@enduml
