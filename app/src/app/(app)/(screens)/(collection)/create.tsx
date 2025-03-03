@@ -47,17 +47,24 @@ interface CreateCollectionForm {
 
 export default function CreateCollection() {
   const { session } = useSession();
-  const { control, handleSubmit, watch, setValue } =
-    useForm<CreateCollectionForm>({
-      defaultValues: {
-        collection: {
-          title: "",
-          caption: "",
-          date: null,
-          location: { text: "" },
-        },
+  const {
+    control,
+    handleSubmit,
+    watch,
+    setValue,
+    getValues,
+    clearErrors,
+    formState: { errors },
+  } = useForm<CreateCollectionForm>({
+    defaultValues: {
+      collection: {
+        title: "",
+        caption: "",
+        date: null,
+        location: { text: "" },
       },
-    });
+    },
+  });
 
   const createMutation = useMutation(
     createNewCollectionApiUserUserIdCollectionPostMutation(),
@@ -139,14 +146,13 @@ export default function CreateCollection() {
             <Heading className="block" size="2xl">
               Create Collection
             </Heading>
-            <FormControl size={"lg"}>
+            <FormControl size={"lg"} isInvalid={!!errors.collection?.title}>
               <FormControlLabel>
                 <FormControlLabelText>Title</FormControlLabelText>
               </FormControlLabel>
               <Controller
                 name="collection.title"
                 control={control}
-                rules={{ required: "Title is required" }}
                 render={({ field }) => (
                   <Input>
                     <InputField
@@ -156,7 +162,20 @@ export default function CreateCollection() {
                     />
                   </Input>
                 )}
+                rules={{
+                  validate: {
+                    required: (value) => {
+                      return (value && value.length > 0) || "Title is required";
+                    },
+                  },
+                }}
               />
+              <FormControlError className="mt-4">
+                <FormControlErrorIcon as={AlertCircleIcon} />
+                <FormControlErrorText>
+                  {errors.collection?.title?.message}
+                </FormControlErrorText>
+              </FormControlError>
             </FormControl>
             <FormControl size={"lg"}>
               <FormControlLabel>
