@@ -1,7 +1,7 @@
 @startuml Activity
 
-' TODO: add FRs where appropriate
-title Create Memento
+' Include relevant FRs covered 
+title Create a New Memento (FRs 4-11,17-21)
 
 ' Swimlanes
 ' format: | optional color | var name | lane title
@@ -27,11 +27,11 @@ start
 
 ' QUESTION: should camera/library be in a diff swimlane? Device vs. Expo?
 |user|
-if (Photo source?) is (Camera) then
+if (Photo source?) is ([camera]) then
   |mobile|
   :Access device camera;
   :Capture photo;
-else (Library)
+else ([library])
   |mobile|
   :Access photo library;
   :Select from existing photos;
@@ -40,11 +40,11 @@ endif
 |mobile|
 :Extract EXIF metadata;
 :Identify largest location cluster from images;
-:Make /GET call to Google Places Geocoding API;
+:Make GET call to Google Places Geocoding API;
 
 |google|
 :Convert coordinates to place name;
-:Return place information;
+:Prepare response with addresses/place info;
 
 |mobile|
 :Populate input fields with metadata:
@@ -53,21 +53,31 @@ endif
 :Display selected photos;
 
 |user|
-:Edit caption (optional);
-:Modify date (optional);
-:Adjust location (optional);
-:Change thumbnail (optional);
+partition "Optional Form Editing" {
+  :Edit caption;
+  :Modify date;
+  :Edit location;
+  :Change thumbnail;
+}
+|mobile|
+:Update tracked form field values;
+|user|
 :Click submit button;
 
 |mobile|
-' IF NOT VALID
 :Validate form data;
-:Prepare upload payload;
-:Make /POST call to backend;
+if (Form valid?) is (no) then
+  :Show validation errors;
+  |user|
+  :User corrects input;
+  :Click submit button again;
+|mobile|
+else (yes)
+endif
+:Prepare upload payload for memento/photos;
+:Make POST call to Create Memento API;
 
 |backend|
-' IF NOT VALID
-:Validate request data;
 fork
   :Remove background from images;
   |db|
@@ -87,14 +97,13 @@ end fork
 :Create image metadata records in relational DB;
 
 |backend|
-:Prepare response with new memento id;
+:Prepare response with new memento/image records;
 
 |mobile|
 if (Request successful?) is (yes) then
-  :Get memento ID from response;
   :Navigate to View Memento page;
 else (no)
-  :Display error/retry later message;;
+  :Display error message;
 endif
 
 stop
