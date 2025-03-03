@@ -1,0 +1,82 @@
+@startuml Apply Filters
+title Apply Filters to Mementos (FRs 12-16)
+
+' Swimlanes
+|user| User
+|#lightgray|mobile| Mobile App
+|backend| Backend
+|#lightgray|db| Supabase
+
+|user|
+start
+:Views Mementos tab;
+
+|user|
+if (Filter action?) is ([text-based search]) then
+  :Enter or delete keywords in search bar;
+else ([advanced filters])
+  :Tap filter icon button;
+  
+  |mobile|
+  :Open advanced filter actionsheet;
+
+  |user|
+  if (Apply filters?) is (Yes) then
+    |user|
+    partition "Optional Filter Selection" {
+      :Select start date;
+      :Select end date;
+      :Enter a location;
+      :Select image classification category;
+    }
+    :Tap "Apply filters" button;
+  else (No)
+    :Tap "Clear all" button;
+  endif
+  |mobile|
+  :Close filter actionsheet;
+endif
+
+|mobile|
+:Update internal applied filters state;
+:Prepare applied filters query parameters;
+:Make GET call to Get Mementos API;
+
+|backend|
+:Validate filter parameters;
+:Construct base query for selecting mementos;
+
+if (Filter includes start/end date?) is (yes) then
+  :Add date range conditions to query;
+else (No)
+endif
+
+if (Filter includes location?) is (yes) then
+  :Add geolocation conditions to query via PostGIS bounding box;
+else (No)
+endif
+
+if (Filter includes category?) is (yes) then
+  :Add image classification category/label condition to query;
+else (No)
+endif
+
+if (Filter includes text search?) is (yes) then
+  :Add text-based search conditions for:
+  - OCR results (image-extracted text)
+  - Keywords from user caption;
+else (No)
+endif
+
+|db|
+:Execute resulting query;
+:Return filtered list of memento records;
+
+|backend|
+:Return filtered response data;
+
+|mobile|
+:Update list of mementos used for grid view;
+
+stop
+@enduml

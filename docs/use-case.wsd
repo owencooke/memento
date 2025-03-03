@@ -76,9 +76,6 @@ rectangle "Context-Aware Keepsake Digitizer" {
     }
 
     package "Collections" {
-        package "Viewing" {
-            usecase "FR-3: View Collections" as FR3
-        }
         package "Manual Creation" {
             usecase "Manually Create Collection"
             usecase "FR-35: Create new collection" as FR35
@@ -90,7 +87,10 @@ rectangle "Context-Aware Keepsake Digitizer" {
             usecase "FR-39: Notify recommendations" as FR39
             usecase "FR-40: Accept/reject recommendations" as FR40
         }
-        package "Editing" {
+        package "View" {
+            usecase "FR-3: View Collections" as FR3
+        }
+        package "Edit" {
             usecase "Edit Collection"
             usecase "FR-41: Add keepsakes" as FR41
             usecase "FR-42: Remove keepsakes" as FR42
@@ -98,7 +98,7 @@ rectangle "Context-Aware Keepsake Digitizer" {
             usecase "FR-44: Modify caption" as FR44
             usecase "FR-45: Modify metadata" as FR45
         }
-        package "Deleting" {
+        package "Delete" {
             usecase "FR-46: Delete collection" as FR46
         }
         package "Metadata Management" {

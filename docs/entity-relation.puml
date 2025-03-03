@@ -1,0 +1,46 @@
+' Doesn't work with VSCode extension
+' Edit in web editor: https://editor.plantuml.com/uml/ 
+@startchen ERD
+
+title Entity Relationship Diagram
+
+/'left to right direction'/
+
+' Entities
+entity User {
+    Id
+    Email
+    Birthday
+}
+
+entity Memento {
+    Id
+    Caption
+    Date
+    Location
+    Coordinates
+}
+
+entity Image {
+    Id
+    Filename
+    Date
+    DetectedText
+    ImageLabel
+    Coordinates
+    OrderIndex
+}
+
+' Relationships
+relationship HasImages {
+}
+Image =(1,N)= HasImages
+HasImages =1= Memento
+
+
+relationship OwnedBy {
+}
+Memento =N= OwnedBy
+OwnedBy -1- User
+
+@endchen
