@@ -53,6 +53,7 @@ endif
 :Display selected photos;
 
 |user|
+' is this good enough for "optional" actions?
 partition "Optional Form Editing" {
   :Edit caption;
   :Modify date;
