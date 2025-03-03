@@ -8,7 +8,7 @@ import {
 import { toISODateString } from "@/src/libs/date";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ScrollView, View } from "react-native";
+import { View } from "react-native";
 import {
   FormControl,
   FormControlError,
@@ -17,7 +17,6 @@ import {
   FormControlLabel,
   FormControlLabelText,
 } from "@/src/components/ui/form-control";
-import { formDataBodySerializer } from "@/src/api-client/formData";
 import { Heading } from "@/src/components/ui/heading";
 import {
   Input,
@@ -37,12 +36,10 @@ import { FlatList } from "react-native";
 import { queryClient } from "@/src/app/_layout";
 
 interface CreateCollectionForm {
-  collection: {
-    title: string;
-    date: Date | null;
-    location: GeoLocation;
-    caption: string;
-  };
+  title: string;
+  date: Date | null;
+  location: GeoLocation;
+  caption: string;
 }
 
 export default function CreateCollection() {
@@ -57,12 +54,10 @@ export default function CreateCollection() {
     formState: { errors },
   } = useForm<CreateCollectionForm>({
     defaultValues: {
-      collection: {
-        title: "",
-        caption: "",
-        date: null,
-        location: { text: "" },
-      },
+      title: "",
+      caption: "",
+      date: null,
+      location: { text: "" },
     },
   });
 
@@ -75,7 +70,7 @@ export default function CreateCollection() {
       location: { lat, long, text },
       date,
       ...restCollection
-    } = form.collection;
+    } = form;
     const collection = {
       ...restCollection,
       date: date ? toISODateString(date) : null,
@@ -118,7 +113,7 @@ export default function CreateCollection() {
   };
 
   // Prevent re-rendering location input when Geolocation changes
-  const locationValue = watch("collection.location");
+  const locationValue = watch("location");
   const handleLocationChange = useCallback(
     (location: GeoLocation) => {
       const hasChanged =
@@ -127,7 +122,7 @@ export default function CreateCollection() {
         locationValue.long !== location.long;
 
       if (hasChanged) {
-        setValue("collection.location", location);
+        setValue("location", location);
       }
     },
     [locationValue, setValue],
@@ -146,12 +141,12 @@ export default function CreateCollection() {
             <Heading className="block" size="2xl">
               Create Collection
             </Heading>
-            <FormControl size={"lg"} isInvalid={!!errors.collection?.title}>
+            <FormControl size={"lg"} isInvalid={!!errors?.title}>
               <FormControlLabel>
                 <FormControlLabelText>Title</FormControlLabelText>
               </FormControlLabel>
               <Controller
-                name="collection.title"
+                name="title"
                 control={control}
                 render={({ field }) => (
                   <Input>
@@ -173,7 +168,7 @@ export default function CreateCollection() {
               <FormControlError className="mt-4">
                 <FormControlErrorIcon as={AlertCircleIcon} />
                 <FormControlErrorText className="flex-1">
-                  {errors.collection?.title?.message}
+                  {errors?.title?.message}
                 </FormControlErrorText>
               </FormControlError>
             </FormControl>
@@ -182,7 +177,7 @@ export default function CreateCollection() {
                 <FormControlLabelText>Caption</FormControlLabelText>
               </FormControlLabel>
               <Controller
-                name="collection.caption"
+                name="caption"
                 control={control}
                 render={({ field }) => (
                   <Textarea size="md">
@@ -200,7 +195,7 @@ export default function CreateCollection() {
                 <FormControlLabelText>Date</FormControlLabelText>
               </FormControlLabel>
               <Controller
-                name="collection.date"
+                name="date"
                 control={control}
                 render={({ field }) => (
                   <>
@@ -233,7 +228,7 @@ export default function CreateCollection() {
                 <FormControlLabelText>Location</FormControlLabelText>
               </FormControlLabel>
               <Controller
-                name="collection.location"
+                name="location"
                 control={control}
                 render={({ field }) => (
                   <LocationInput
