@@ -1,4 +1,3 @@
-from fastapi import HTTPException
 from pydantic import UUID4
 
 from server.services.db.config import supabase
