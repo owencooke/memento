@@ -172,7 +172,7 @@ export default function CreateCollection() {
               />
               <FormControlError className="mt-4">
                 <FormControlErrorIcon as={AlertCircleIcon} />
-                <FormControlErrorText>
+                <FormControlErrorText className="flex-1">
                   {errors.collection?.title?.message}
                 </FormControlErrorText>
               </FormControlError>
