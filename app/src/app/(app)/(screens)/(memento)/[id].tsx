@@ -69,16 +69,18 @@ export default function ViewMemento() {
                 ))}
               </PagerView>
               {/* Pagination dots */}
-              <View className="flex-row justify-center">
-                {memento.images.map((_, index) => (
-                  <View
-                    key={index}
-                    className={`h-2 w-2 mx-1 rounded-full bg-primary-500 ${
-                      currentPage !== index && "opacity-30"
-                    }`}
-                  />
-                ))}
-              </View>
+              {memento.images.length > 1 && (
+                <View className="flex-row justify-center">
+                  {memento.images.map((_, index) => (
+                    <View
+                      key={index}
+                      className={`h-2 w-2 mx-1 rounded-full bg-primary-500 ${
+                        currentPage !== index && "opacity-30"
+                      }`}
+                    />
+                  ))}
+                </View>
+              )}
             </View>
             {/* Details Card */}
             {(memento.caption || showMetadata) && (
@@ -104,12 +106,15 @@ export default function ViewMemento() {
         >
           <ButtonIcon as={InfoIcon} className={iconClasses} />
         </Button>
+        {/* TODO: navigate to Edit page onPress */}
         <Button size="xl" className={buttonClasses}>
           <ButtonIcon as={EditIcon} className={iconClasses} />
         </Button>
+        {/* TODO: open Delete confirmation modal */}
         <Button size="xl" className={buttonClasses}>
           <ButtonIcon as={TrashIcon} className={iconClasses} />
         </Button>
+        {/* TODO: open Share options */}
         <Button size="xl" className={buttonClasses}>
           <ButtonIcon as={ShareIcon} className={iconClasses} />
         </Button>
