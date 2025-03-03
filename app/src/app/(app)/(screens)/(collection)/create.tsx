@@ -18,17 +18,11 @@ import {
   FormControlLabelText,
 } from "@/src/components/ui/form-control";
 import { Heading } from "@/src/components/ui/heading";
-import {
-  Input,
-  InputField,
-  InputSlot,
-  InputIcon,
-} from "@/src/components/ui/input";
+import { Input, InputField } from "@/src/components/ui/input";
 import { Textarea, TextareaInput } from "@/src/components/ui/textarea";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import { Button, ButtonSpinner, ButtonText } from "@/src/components/ui/button";
 import { useCallback, useState } from "react";
-import { AlertCircleIcon, CalendarDaysIcon } from "@/src/components/ui/icon";
+import { AlertCircleIcon } from "@/src/components/ui/icon";
 import LocationInput, {
   GeoLocation,
 } from "@/src/components/inputs/LocationInput";
@@ -50,8 +44,6 @@ export default function CreateCollection() {
     handleSubmit,
     watch,
     setValue,
-    getValues,
-    clearErrors,
     formState: { errors },
   } = useForm<CreateCollectionForm>({
     defaultValues: {
@@ -78,11 +70,9 @@ export default function CreateCollection() {
       location: text ? text : null,
       coordinates: lat && long ? { lat, long } : null,
     };
-
     console.log(collection);
 
     const path = { user_id: session?.user.id ?? "" };
-
     await createMutation.mutateAsync(
       {
         body: {
@@ -104,13 +94,6 @@ export default function CreateCollection() {
           console.error("Failed to create new collection", error),
       },
     );
-  };
-
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const handleDatePickerState = () => {
-    setShowDatePicker((showState) => {
-      return !showState;
-    });
   };
 
   // Prevent re-rendering location input when Geolocation changes

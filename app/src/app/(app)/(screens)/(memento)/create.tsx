@@ -81,14 +81,6 @@ export default function CreateMemento() {
     setValue("photos", photos);
   };
 
-  // Handles date picker on android
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const handleDatePickerState = () => {
-    setShowDatePicker((showState) => {
-      return !showState;
-    });
-  };
-
   // POST Create Memento form
   const onSubmit = async (form: CreateMementoForm) => {
     const {
