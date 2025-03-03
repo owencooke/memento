@@ -1,6 +1,5 @@
 import { useForm, Controller } from "react-hook-form";
 import { useSession } from "@/src/context/AuthContext";
-import { CollectionInsert } from "@/src/api-client/generated";
 import { useMutation } from "@tanstack/react-query";
 import { createNewCollectionApiUserUserIdCollectionPostMutation } from "@/src/api-client/generated/@tanstack/react-query.gen";
 import { toISODateString } from "@/src/libs/date";
@@ -35,10 +34,10 @@ import { FlatList } from "react-native";
 
 interface CreateCollectionForm {
   collection: {
-    date: Date;
+    title: string;
+    date: Date | null;
     location: GeoLocation;
     caption: string;
-    title: string;
   };
 }
 
@@ -50,10 +49,8 @@ export default function CreateCollection() {
         collection: {
           title: "",
           caption: "",
-          date: new Date(),
-          location: {
-            text: "",
-          },
+          date: null,
+          location: { text: "" },
         },
       },
     });
@@ -63,29 +60,34 @@ export default function CreateCollection() {
   );
 
   const onSubmit = async (form: CreateCollectionForm) => {
+    const {
+      location: { lat, long, text },
+      date,
+      ...restCollection
+    } = form.collection;
     const collection = {
-      ...form.collection,
-      date: form.collection.date ? toISODateString(form.collection.date) : null,
+      ...restCollection,
+      date: date ? toISODateString(date) : null,
+      location: text ? text : null,
+      coordinates: lat && long ? { lat, long } : null,
     };
 
-    const path = { user_id: session?.user.id ?? "" };
-    const body = {
-      new_collection: collection,
-      mementos: [],
-    } as any;
+    console.log(collection);
 
-    console.log(body);
+    const path = { user_id: session?.user.id ?? "" };
+
     await createMutation.mutateAsync(
       {
-        body,
+        body: {
+          new_collection: collection,
+          mementos: [],
+        } as any,
         path,
-        bodySerializer: formDataBodySerializer.bodySerializer,
       },
       {
         onSuccess: () => {
           router.replace("/(app)/(tabs)/collections");
         },
-
         onError: (error: any) =>
           console.error("Failed to create new collection", error),
       },
