@@ -1,7 +1,10 @@
 import { useForm, Controller } from "react-hook-form";
 import { useSession } from "@/src/context/AuthContext";
 import { useMutation } from "@tanstack/react-query";
-import { createNewCollectionApiUserUserIdCollectionPostMutation } from "@/src/api-client/generated/@tanstack/react-query.gen";
+import {
+  createNewCollectionApiUserUserIdCollectionPostMutation,
+  getUsersCollectionsApiUserUserIdCollectionGetQueryKey,
+} from "@/src/api-client/generated/@tanstack/react-query.gen";
 import { toISODateString } from "@/src/libs/date";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -31,6 +34,7 @@ import LocationInput, {
   GeoLocation,
 } from "@/src/components/inputs/LocationInput";
 import { FlatList } from "react-native";
+import { queryClient } from "@/src/app/_layout";
 
 interface CreateCollectionForm {
   collection: {
@@ -86,6 +90,11 @@ export default function CreateCollection() {
       },
       {
         onSuccess: () => {
+          queryClient.invalidateQueries({
+            queryKey: getUsersCollectionsApiUserUserIdCollectionGetQueryKey({
+              path,
+            }),
+          });
           router.replace("/(app)/(tabs)/collections");
         },
         onError: (error: any) =>
