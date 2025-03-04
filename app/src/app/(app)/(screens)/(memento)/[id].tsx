@@ -110,12 +110,19 @@ export default function ViewMemento() {
       </View>
       {/* Options bar (info, edit, delete, share) */}
       <View className="flex flex-row justify-between items-center bg-primary-500">
+        {/* TODO: open Share options */}
+        <Button size="xl" className={buttonClasses}>
+          <ButtonIcon as={ShareIcon} className={iconClasses} />
+        </Button>
         <Button
           size="xl"
           className={buttonClasses}
           onPress={handleShowMoreDetails}
         >
-          <ButtonIcon as={InfoIcon} className={iconClasses} />
+          <ButtonIcon
+            as={InfoIcon}
+            className={`${iconClasses} ${showMetadata && "text-tertiary-500"}`}
+          />
         </Button>
         {/* TODO: navigate to Edit page onPress */}
         <Button size="xl" className={buttonClasses}>
@@ -124,10 +131,6 @@ export default function ViewMemento() {
         {/* TODO: open Delete confirmation modal */}
         <Button size="xl" className={buttonClasses}>
           <ButtonIcon as={TrashIcon} className={iconClasses} />
-        </Button>
-        {/* TODO: open Share options */}
-        <Button size="xl" className={buttonClasses}>
-          <ButtonIcon as={ShareIcon} className={iconClasses} />
         </Button>
       </View>
     </SafeAreaView>
