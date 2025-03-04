@@ -56,20 +56,17 @@ export default function EditMemento() {
         long: memento.coordinates?.long,
       } as GeoLocation,
     },
-    // You'd need to adapt this to match how photos are stored/fetched in your API
-    photos: [],
-    // memento.images?.map(
-    //   (img) =>
-    //     ({
-    //       uri: img.url,
-    //       fileName: img.filename || "",
-    //       mimeType: img.mime_type || "image/jpeg",
-    //       // add other required Photo properties
-    //     }) as Photo,
-    // ) || [],
+    photos:
+      memento.images?.map(
+        (img) =>
+          ({
+            uri: img.url,
+            storedInCloud: true,
+          }) as Photo,
+      ) || [],
   });
 
-  // TODO: document
+  // PUT Edit Memento Form
   const onSubmit = async (form: MementoFormData) => {
     const {
       location: { lat, long, text },
@@ -77,6 +74,7 @@ export default function EditMemento() {
       ...restMemento
     } = form.memento;
 
+    // Only include fields if explictly set
     const updatedMemento = {
       ...restMemento,
       date: date ? toISODateString(date) : null,
@@ -84,17 +82,20 @@ export default function EditMemento() {
       coordinates: lat && long ? { lat, long } : null,
     };
 
+    // Metadata for each image (with updated ordering)
     const imageMetadata = form.photos.map((photo, idx) => ({
       ...getRelevantImageMetadata(photo),
       order_index: idx,
     }));
 
-    // don't want to include every photo
-    const images = form.photos.map((photo) => ({
-      uri: photo.uri,
-      type: photo.mimeType,
-      name: photo.fileName,
-    }));
+    // Filter out images already stored in cloud
+    const images = form.photos
+      .filter((photo) => !photo.storedInCloud)
+      .map((photo) => ({
+        uri: photo.uri,
+        type: photo.mimeType,
+        name: photo.fileName,
+      }));
 
     const path = {
       user_id,

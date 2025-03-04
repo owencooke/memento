@@ -8,7 +8,12 @@ import { Camera } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 
 export type DeviceSource = "picker" | "camera";
-export type Photo = ImagePicker.ImagePickerAsset;
+export type Photo = Omit<
+  ImagePicker.ImagePickerAsset,
+  "width" | "height" | "pairedVideoAsset"
+> & {
+  storedInCloud?: boolean;
+};
 
 interface UsePhotosProps {
   initialPhotos?: Photo[];
