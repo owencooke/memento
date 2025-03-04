@@ -16,19 +16,11 @@ def get_collections(
     """Gets collections and associated mementos for a user."""
     response = (
         supabase.table("collection")
-        .select("*, has_memento(*)")
+        .select("*, mementos:has_memento(*)")
         .eq("user_id", str(user_id))
         .execute()
     )
-    collections = response.data or []
-
-    formatted_collections = []
-    for collection in collections:
-        mementos = list(collection.get("has_memento", []))
-        formatted_collections.append(
-            CollectionWithMementos(**collection, mementos=mementos),
-        )
-    return formatted_collections
+    return [CollectionWithMementos(**collection) for collection in response.data]
 
 
 def create_collection(new_collection: NewCollection, user_id: UUID4) -> Collection:
