@@ -162,7 +162,7 @@ export default function CreateCollection() {
                 name="title"
                 control={control}
                 render={({ field }) => (
-                  <Input>
+                  <Input className="bg-background-0">
                     <InputField
                       onChangeText={field.onChange}
                       value={field.value}
@@ -193,7 +193,7 @@ export default function CreateCollection() {
                 name="caption"
                 control={control}
                 render={({ field }) => (
-                  <Textarea size="md">
+                  <Textarea className="bg-background-0" size="md">
                     <TextareaInput
                       onChangeText={field.onChange}
                       value={field.value ?? ""}
