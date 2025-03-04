@@ -15,8 +15,11 @@ This PR accomplishes the following:
 - The implementation works on:
   - [ ] iOS
   - [ ] Android
-- [ ] Documentation is up-to-date
-- [ ] Sync scripts for API/DB run / up-to-date
+- Documentation is up-to-date
+  - [ ] Code is commented, explaining functionality
+  - [ ] Each file references one or more FRs mandating its inclusion
+  - [ ] If new installation steps or environemnt variables required, READMEs updated
+- [ ] Sync scripts for API/DB run and up-to-date
 - [ ] If bugs discovered, issues opened with appropriate severity level
 
 ### Screenshots (if applicable)
