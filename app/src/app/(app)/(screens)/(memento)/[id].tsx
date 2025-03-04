@@ -15,7 +15,7 @@ import { Image } from "@/src/components/ui/image";
 import { Text } from "@/src/components/ui/text";
 import { useSession } from "@/src/context/AuthContext";
 import { useQuery } from "@tanstack/react-query";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { View } from "react-native";
 import PagerView, {
@@ -50,6 +50,9 @@ export default function ViewMemento() {
   };
 
   const handleShowMoreDetails = () => setShowImageMetadata((prev) => !prev);
+
+  const handleEditMemento = () =>
+    router.push(`/(app)/(screens)/(memento)/edit/${memento?.id}`);
 
   return (
     <SafeAreaView className="flex-1 bg-primary-500" edges={["bottom"]}>
@@ -132,8 +135,7 @@ export default function ViewMemento() {
             className={`${iconClasses} ${showImageMetadata && "text-tertiary-500"}`}
           />
         </Button>
-        {/* TODO: navigate to Edit page onPress */}
-        <Button size="xl" className={buttonClasses}>
+        <Button size="xl" className={buttonClasses} onPress={handleEditMemento}>
           <ButtonIcon as={EditIcon} className={iconClasses} />
         </Button>
         {/* TODO: open Delete confirmation modal */}
