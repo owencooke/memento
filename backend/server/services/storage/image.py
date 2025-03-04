@@ -26,3 +26,8 @@ def get_image_url(filename: str) -> str:
     """Uses Supabase Storage API to create signed url for a stored image."""
     response = supabase.storage.from_("images").create_signed_url(filename, 86400)
     return response["signedUrl"]
+
+
+def delete_images(filenames: list[str]) -> bool:
+    response = supabase.storage.from_("images").remove(filenames)
+    return len(response) == 1
