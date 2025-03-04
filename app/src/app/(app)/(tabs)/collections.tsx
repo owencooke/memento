@@ -7,33 +7,22 @@ import { Box } from "@/src/components/ui/box";
 import { Fab, FabIcon } from "@/src/components/ui/fab";
 import { AddIcon } from "@/src/components/ui/icon";
 import { FlatList } from "react-native";
-import { Pressable } from "@/src/components/ui/pressable";
-import { Alert, AlertText } from "@/src/components/ui/alert";
-import { HStack } from "@/src/components/ui/hstack";
-import { VStack } from "@/src/components/ui/vstack";
-import { Image } from "@/src/components/ui/image";
 import { router } from "expo-router";
 import CollectionCard from "@/src/components/cards/CollectionCard";
 
-const placeholderImage = "https://via.placeholder.com/100";
-
 export default function Collections() {
   const { session } = useSession();
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [alertMessage, setAlertMessage] = useState<string | null>(null);
-  const {
-    data: collections,
-    error,
-    isLoading,
-  } = useQuery({
+
+  // Get collections from backend
+  const { data: collections } = useQuery({
     ...getUsersCollectionsApiUserUserIdCollectionGetOptions({
       path: {
         user_id: session?.user.id ?? "",
       },
     }),
-    enabled: !!session?.user.id,
   });
 
+  // add spacer for last grid element if odd
   const gridData = useMemo(
     () =>
       collections?.length && collections.length % 2
@@ -42,23 +31,16 @@ export default function Collections() {
     [collections],
   );
 
-  const showAlert = (message: string) => {
-    setAlertMessage(message);
-    // Alert for 2 second
-    setTimeout(() => setAlertMessage(null), 2000);
-  };
-
+  // Selected collection handling
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const handleSelect = (id: string) => {
     setSelectedId(id);
-    showAlert(`Selected collection: ${id}`);
   };
 
+  // Redirect to collection creation
   const handleAddCollection = () => {
     router.push("/(app)/(screens)/(collection)/create");
   };
-
-  if (isLoading) return <Text>Loading...</Text>;
-  if (error) return <Text>Error fetching collections.</Text>;
 
   return (
     <Box className="flex-1 py-4 px-6 bg-background-100">
