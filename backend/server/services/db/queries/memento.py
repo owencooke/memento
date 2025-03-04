@@ -36,7 +36,7 @@ def update_memento(id: int, updated_memento: UpdateMemento) -> Memento:
     """Updates an existing memento record."""
     response = (
         supabase.table("memento")
-        .update({**updated_memento.model_dump(mode="json")})
+        .update({**updated_memento.model_dump(mode="json", exclude={"user_id"})})
         .eq("id", id)
         .execute()
     )
