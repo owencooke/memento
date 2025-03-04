@@ -3,6 +3,7 @@
 */openapi.json
 *.log
 *.env
+package-lock.json
 
 # build folders
 android/
