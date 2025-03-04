@@ -1,6 +1,10 @@
+"""
+@description CRUD API routes for Keepsakes/Mementos.
+@requirements FR-17, FR-19, FR-20, FR-21, FR-26, FR-27, FR-28
+"""
+
 import json
 from typing import Annotated
-
 from fastapi import APIRouter, Depends, File, Form, UploadFile
 from fastapi.responses import JSONResponse
 from pydantic import UUID4

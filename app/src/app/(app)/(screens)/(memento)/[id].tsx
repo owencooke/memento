@@ -1,3 +1,7 @@
+/**
+ * @description Screen for viewing an individual keepsake/memento.
+ * @requirements FR-26, FR-27, FR-28
+ */
 import { getUsersMementosApiUserUserIdMementoGetOptions } from "@/src/api-client/generated/@tanstack/react-query.gen";
 import ImageMetadataCard from "@/src/components/cards/ImageMetadataCard";
 import { ButtonIcon, Button } from "@/src/components/ui/button";

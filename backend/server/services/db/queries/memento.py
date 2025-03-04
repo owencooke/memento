@@ -1,3 +1,8 @@
+"""
+@description Supabase DB queries for Keepsakes/Mementos.
+@requirements FR-17, FR-19, FR-26, FR-27
+"""
+
 from pydantic import UUID4
 
 from server.api.memento.models import NewMemento

@@ -1,3 +1,8 @@
+/**
+ * @description Screen for creating a new individual keepsake/memento. Form fields for images/metadata.
+ * @requirements FR-9, FR-17, FR-19, FR-20, FR-21
+ */
+
 import { useForm, Controller } from "react-hook-form";
 import {
   Button,

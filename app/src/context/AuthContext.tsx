@@ -1,3 +1,7 @@
+/**
+ * @description App context/hook for managing user authentication via Supabase Auth + Google OAuth
+ * @requirements FR-1, FR-2
+ */
 import React, {
   createContext,
   useContext,
