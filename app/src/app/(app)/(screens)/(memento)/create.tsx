@@ -37,7 +37,7 @@ import LocationInput, {
   GeoLocation,
 } from "@/src/components/inputs/LocationInput";
 import { FlatList } from "react-native";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { queryClient } from "@/src/app/_layout";
 import DatePickerInput from "@/src/components/inputs/DatePickerInput";
 
@@ -47,6 +47,7 @@ interface CreateMementoForm {
 }
 
 export default function CreateMemento() {
+  const [scrollEnabled, setScrollEnabled] = useState(true);
   const { session } = useSession();
   const {
     control,
@@ -158,6 +159,7 @@ export default function CreateMemento() {
       >
         <FlatList
           data={[]}
+          scrollEnabled={scrollEnabled}
           renderItem={() => <></>}
           contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 20 }}
           showsVerticalScrollIndicator={false}
@@ -185,7 +187,10 @@ export default function CreateMemento() {
                   name="photos"
                   control={control}
                   render={() => (
-                    <PhotoSelectGrid onChange={handlePhotosChanged} />
+                    <PhotoSelectGrid
+                      onChange={handlePhotosChanged}
+                      setScrollEnabled={setScrollEnabled}
+                    />
                   )}
                   rules={{
                     validate: {

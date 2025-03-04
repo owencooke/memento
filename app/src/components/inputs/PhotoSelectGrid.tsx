@@ -14,9 +14,13 @@ interface GridItem {
 
 interface PhotoSelectGridProps {
   onChange: (photos: Photo[]) => Promise<void>;
+  setScrollEnabled: (enabled: boolean) => void;
 }
 
-export default function PhotoSelectGrid({ onChange }: PhotoSelectGridProps) {
+export default function PhotoSelectGrid({
+  onChange,
+  setScrollEnabled,
+}: PhotoSelectGridProps) {
   const [showActionsheet, setShowActionsheet] = useState(false);
   const { hasPermission, addPhotos, photos, removePhoto, setPhotos } =
     usePhotos();
@@ -47,8 +51,9 @@ export default function PhotoSelectGrid({ onChange }: PhotoSelectGridProps) {
         .filter((item) => item.photo !== null)
         .map((item) => item.photo) as Photo[];
       setPhotos(newPhotos);
+      setScrollEnabled(true);
     },
-    [setPhotos],
+    [setPhotos, setScrollEnabled],
   );
 
   if (!hasPermission) {
@@ -65,6 +70,7 @@ export default function PhotoSelectGrid({ onChange }: PhotoSelectGridProps) {
       <DraggableGrid
         numColumns={3}
         data={gridData}
+        onDragStart={() => setScrollEnabled(false)}
         onDragRelease={handleReorderPhotos}
         renderItem={(item: GridItem) => (
           <View className="px-1 py-2 flex-1 aspect-square">
