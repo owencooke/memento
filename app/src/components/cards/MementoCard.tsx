@@ -1,6 +1,6 @@
 import { View } from "react-native";
 import { Image } from "@/src/components/ui/image";
-import { MementoWithImages } from "@/src/api-client/generated";
+import { ImageWithUrl, MementoWithImages } from "@/src/api-client/generated";
 import { Text } from "../ui/text";
 import { useMemo } from "react";
 
@@ -10,8 +10,11 @@ export default function MementoCard({
   images,
   location,
 }: MementoWithImages) {
-  // TODO: ensure thumbnail always the same via DB property
-  const [thumbnail] = images;
+  // Get thumbnail
+  const thumbnail = useMemo(
+    () => images.find((image) => image.order_index === 0) as ImageWithUrl,
+    [images],
+  );
 
   // Extract city from whole location
   const city = useMemo(

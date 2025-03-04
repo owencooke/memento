@@ -29,6 +29,9 @@ def get_users_mementos(
     for memento in mementos:
         for image in memento.images:
             image.url = get_image_url(image.filename)
+
+    # Sort images by order index
+    memento.images.sort(key=lambda image: image.order_index)
     return mementos
 
 
