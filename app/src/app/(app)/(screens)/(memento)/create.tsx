@@ -100,7 +100,10 @@ export default function CreateMemento() {
     };
 
     // Metadata for each image
-    const image_metadata = form.photos.map(getRelevantImageMetadata);
+    const imageMetadata = form.photos.map((photo, idx) => ({
+      ...getRelevantImageMetadata(photo),
+      order_index: idx,
+    }));
 
     // Map each image to its necessary upload info
     const images = form.photos.map((photo) => ({
@@ -115,7 +118,7 @@ export default function CreateMemento() {
       {
         body: {
           memento_str: memento,
-          image_metadata_str: image_metadata,
+          image_metadata_str: imageMetadata,
           images,
         } as any,
         path,
