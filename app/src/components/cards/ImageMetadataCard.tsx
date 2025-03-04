@@ -30,6 +30,9 @@ export default function ImageMetadataCard({ image }: ImageMetadataCardProps) {
 
   return (
     <View className="flex flex-col gap-3">
+      <Text size="xl" className="text-center font-light">
+        Image Details
+      </Text>
       {displayItems.map((item) => (
         <View key={item.key} className="flex-row justify-between items-start">
           <Text size="lg" bold>

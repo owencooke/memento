@@ -83,14 +83,25 @@ export default function ViewMemento() {
               )}
             </View>
             {/* Details Card */}
-            {(memento.caption || showMetadata) && (
+            {(memento.caption ||
+              memento.date ||
+              memento.location ||
+              showMetadata) && (
               <View className="bg-background-0 rounded-3xl shadow-hard-3 p-4">
                 {showMetadata ? (
                   <ImageMetadataCard image={memento.images[currentPage]} />
                 ) : (
-                  <Text size="2xl" italic className="font-light">
-                    {memento.caption}
-                  </Text>
+                  <>
+                    <Text size="2xl" italic className="font-light mb-2">
+                      {memento.caption}
+                    </Text>
+                    <View className="flex flex-row justify-between items-center mt-auto font-medium">
+                      <Text className="flex-1">{memento.date}</Text>
+                      <Text className="flex-1 text-right">
+                        {memento.location}
+                      </Text>
+                    </View>
+                  </>
                 )}
               </View>
             )}
