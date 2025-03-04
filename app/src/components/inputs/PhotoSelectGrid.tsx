@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text, Pressable, useWindowDimensions } from "react-native";
 import usePhotos, { Photo } from "../../hooks/usePhotos";
 import { Image } from "../ui/image";
 import { Button, ButtonIcon } from "../ui/button";
@@ -18,6 +18,10 @@ export default function PhotoSelectGrid({ onChange }: PhotoSelectGridProps) {
   const [showActionsheet, setShowActionsheet] = useState(false);
   const { hasPermission, addPhotos, photos, removePhoto, setPhotos } =
     usePhotos();
+  const { width } = useWindowDimensions();
+
+  // Calculate item width: (screen width - total padding - total gaps) / 3 columns
+  const itemWidth = (width - 16 - 16) / 3; // 16px for outer padding, 16px for gaps between items
 
   useEffect(() => {
     onChange(photos).catch((e) => console.error(e));
@@ -44,30 +48,47 @@ export default function PhotoSelectGrid({ onChange }: PhotoSelectGridProps) {
     // For the "add" button
     if (item.photo === null) {
       return (
-        <Pressable className="flex-1" onLongPress={undefined}>
-          <View className="flex-1 aspect-square p-1">
-            <Button
-              size="lg"
-              className="w-full h-full"
-              action="secondary"
-              onPress={() => setShowActionsheet(true)}
-            >
-              <ButtonIcon as={AddIcon} />
-            </Button>
-          </View>
-        </Pressable>
+        <View style={{ width: itemWidth, aspectRatio: 1, padding: 4 }}>
+          <Button
+            size="lg"
+            className="w-full h-full"
+            action="secondary"
+            onPress={() => setShowActionsheet(true)}
+          >
+            <ButtonIcon as={AddIcon} />
+          </Button>
+        </View>
       );
     }
 
     // For photo items
     return (
       <ScaleDecorator>
-        <InteractivePhotoCard
-          photo={item.photo}
-          onDelete={() => removePhoto(item.photo)}
-          onLongPress={drag}
-          isActive={isActive}
-        />
+        <View style={{ width: itemWidth, aspectRatio: 1, padding: 4 }}>
+          <Pressable
+            onLongPress={drag}
+            style={{
+              opacity: isActive ? 0.7 : 1,
+              flex: 1,
+            }}
+          >
+            <View className="relative overflow-hidden rounded-md w-full h-full">
+              <Image
+                source={{ uri: item.photo.uri }}
+                className="w-full h-full"
+                alt=""
+                resizeMode="cover"
+              />
+              <Button
+                onPress={() => removePhoto(item.photo)}
+                className="absolute p-1 rounded-full top-1 right-1"
+                size="sm"
+              >
+                <ButtonIcon className="m-0 p-0" as={CloseIcon} />
+              </Button>
+            </View>
+          </Pressable>
+        </View>
       </ScaleDecorator>
     );
   };
@@ -79,9 +100,8 @@ export default function PhotoSelectGrid({ onChange }: PhotoSelectGridProps) {
         keyExtractor={(item) => item.key}
         renderItem={renderItem}
         numColumns={3}
-        columnWrapperStyle={{ gap: 8 }}
-        contentContainerStyle={{ padding: 8, gap: 8 }}
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ padding: 4 }}
         onDragEnd={({ data }) => {
           // Filter out the add button and update the photos array
           const newPhotos = data
