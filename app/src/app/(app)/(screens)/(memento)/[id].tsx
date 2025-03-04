@@ -26,7 +26,6 @@ export default function ViewMemento() {
   // Get memento
   const { session } = useSession();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const [currentPage, setCurrentPage] = useState(0);
   const { data: mementos } = useQuery({
     ...getUsersMementosApiUserUserIdMementoGetOptions({
       path: {
@@ -37,13 +36,16 @@ export default function ViewMemento() {
   });
   const memento = mementos?.find((m) => m.id === Number(id));
 
-  const [showMetadata, setShowMetadata] = useState(false);
+  // State
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showImageMetadata, setShowImageMetadata] = useState(false);
 
+  // Handlers
   const handleImageSelected = (e: PagerViewOnPageSelectedEvent) => {
-    setCurrentPage(e.nativeEvent.position);
+    setCurrentImageIndex(e.nativeEvent.position);
   };
 
-  const handleShowMoreDetails = () => setShowMetadata((prev) => !prev);
+  const handleShowMoreDetails = () => setShowImageMetadata((prev) => !prev);
 
   return (
     <SafeAreaView className="flex-1 bg-primary-500" edges={["bottom"]}>
@@ -75,7 +77,7 @@ export default function ViewMemento() {
                     <View
                       key={index}
                       className={`h-2 w-2 mx-1 rounded-full bg-primary-500 ${
-                        currentPage !== index && "opacity-30"
+                        currentImageIndex !== index && "opacity-30"
                       }`}
                     />
                   ))}
@@ -86,10 +88,12 @@ export default function ViewMemento() {
             {(memento.caption ||
               memento.date ||
               memento.location ||
-              showMetadata) && (
+              showImageMetadata) && (
               <View className="bg-background-0 rounded-3xl shadow-hard-3 p-4">
-                {showMetadata ? (
-                  <ImageMetadataCard image={memento.images[currentPage]} />
+                {showImageMetadata ? (
+                  <ImageMetadataCard
+                    image={memento.images[currentImageIndex]}
+                  />
                 ) : (
                   <>
                     <Text size="2xl" italic className="font-light mb-2">
@@ -121,7 +125,7 @@ export default function ViewMemento() {
         >
           <ButtonIcon
             as={InfoIcon}
-            className={`${iconClasses} ${showMetadata && "text-tertiary-500"}`}
+            className={`${iconClasses} ${showImageMetadata && "text-tertiary-500"}`}
           />
         </Button>
         {/* TODO: navigate to Edit page onPress */}
