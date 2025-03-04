@@ -10,6 +10,16 @@ import { FlatList } from "react-native";
 import { router } from "expo-router";
 import CollectionCard from "@/src/components/cards/CollectionCard";
 
+/**
+ * Screen displaying a list of user created collections
+ * Users can view collections in a grid layout, select a collection
+ * or navigate to teh collection creation screen
+ *
+ * Requirements Mandating Inclusion:
+ * - FR-3: View Collections
+ *
+ * @return {JSX.Element} The rendered collections tab
+ */
 export default function Collections() {
   const { session } = useSession();
 
@@ -22,7 +32,11 @@ export default function Collections() {
     }),
   });
 
-  // add spacer for last grid element if odd
+  /**
+   * transforms collections list to ensure an even grid layout
+   *
+   * if odd number of collections a spacer element is added to maintain consistent layout
+   */
   const gridData = useMemo(
     () =>
       collections?.length && collections.length % 2
@@ -31,13 +45,19 @@ export default function Collections() {
     [collections],
   );
 
-  // Selected collection handling
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  /**
+   * Handles selection of a collection
+   *
+   * @param id - The ID of the selected collection
+   */
   const handleSelect = (id: string) => {
     setSelectedId(id);
   };
 
-  // Redirect to collection creation
+  /**
+   * Navigates the user to the collection creation screen
+   */
   const handleAddCollection = () => {
     router.push("/(app)/(screens)/(collection)/create");
   };
