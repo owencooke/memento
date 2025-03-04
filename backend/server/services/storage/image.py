@@ -1,9 +1,10 @@
 """
-@description Supabase Storage functions for images.
+@description Supabase Storage functions for images
 @requirements FR-20, FR-28
 """
 
 import uuid
+
 from fastapi import UploadFile
 
 from server.services.db.config import supabase
