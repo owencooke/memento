@@ -64,10 +64,10 @@ export default function CollectionCard({
             {title}
           </Text>
           <View className="flex flex-row justify-between items-center mt-auto font-medium">
-            <Text className="flex-1" size="sm">
+            <Text className="flex-1 text-left" size="sm">
               {date}
             </Text>
-            <Text className="flex-1" size="sm">
+            <Text className="flex-1 text-right" size="sm">
               {city}
             </Text>
           </View>
