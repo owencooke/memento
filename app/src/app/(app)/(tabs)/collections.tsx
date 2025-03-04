@@ -42,16 +42,6 @@ export default function Collections() {
     [collections],
   );
 
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  /**
-   * Handles selection of a collection
-   *
-   * @param id - The ID of the selected collection
-   */
-  const handleSelect = (id: string) => {
-    setSelectedId(id);
-  };
-
   /**
    * Navigates the user to the collection creation screen
    */
@@ -73,13 +63,7 @@ export default function Collections() {
           }
           renderItem={({ item }) => (
             <Box className="flex-1">
-              {!("spacer" in item) && (
-                <CollectionCard
-                  {...item}
-                  onPress={() => handleSelect(String(item.id))}
-                  selected={selectedId === String(item.id)}
-                />
-              )}
+              {!("spacer" in item) && <CollectionCard {...item} />}
             </Box>
           )}
         />
