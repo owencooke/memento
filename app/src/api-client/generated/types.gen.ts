@@ -5,6 +5,7 @@ export type BodyCreateNewCollectionApiUserUserIdCollectionPost = {
     mementos: Array<number>;
 };
 
+
 export type BodyCreateNewMementoApiUserUserIdMementoPost = {
     memento_str: string;
     image_metadata_str: string;
@@ -49,6 +50,27 @@ export type Coordinates = {
 
 export type HttpValidationError = {
     detail?: Array<ValidationError>;
+};
+
+export type ImageWithUrl = {
+    id: number;
+    memento_id: number;
+    coordinates?: Coordinates | null;
+    date?: string | null;
+    detected_text?: string | null;
+    filename: string;
+    image_label?: string | null;
+    url?: string;
+};
+
+export type MementoWithImages = {
+    id: number;
+    caption?: string | null;
+    coordinates?: Coordinates | null;
+    date?: string | null;
+    location?: string | null;
+    user_id: string;
+    images: Array<ImageWithUrl>;
 };
 
 /**
@@ -295,6 +317,7 @@ export type CreateNewCollectionApiUserUserIdCollectionPostResponses = {
 };
 
 export type CreateNewCollectionApiUserUserIdCollectionPostResponse = CreateNewCollectionApiUserUserIdCollectionPostResponses[keyof CreateNewCollectionApiUserUserIdCollectionPostResponses];
+
 
 export type ClientOptions = {
     baseUrl: `${string}://${string}` | (string & {});

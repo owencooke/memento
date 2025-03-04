@@ -6,6 +6,7 @@ from server.services.db.models.schema_public_latest import (
     HasMementoBaseSchema,
     ImageBaseSchema,
     MementoBaseSchema,
+
 )
 
 
@@ -19,3 +20,4 @@ class MementoWithImages(BaseWithCoordinates, MementoBaseSchema):
 
 class CollectionWithMementos(BaseWithCoordinates, CollectionBaseSchema):
     mementos: list[HasMementoBaseSchema]
+
