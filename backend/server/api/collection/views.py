@@ -1,3 +1,9 @@
+"""
+@description CRUD API routes for Collections.
+
+@requirements FR-3, FR-35, FR-36, FR-37
+"""
+
 from fastapi import APIRouter, Depends, HTTPException
 from loguru import logger
 from pydantic import UUID4

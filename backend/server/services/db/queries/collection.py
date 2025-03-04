@@ -1,3 +1,9 @@
+"""
+@description Queries for Collection DB operations.
+
+@requirements FR-3, FR-35, FR-36, FR-37
+"""
+
 from pydantic import UUID4
 
 from server.api.collection.models import NewCollection

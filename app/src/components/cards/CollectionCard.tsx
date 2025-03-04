@@ -17,10 +17,9 @@ interface CollectionCardProps extends CollectionWithMementos {
 }
 
 /**
- * A card component for displaying a collection with its metadata.
+ * @description A card component for displaying a collection with its metadata.
  *
- * Requirements Mandating Inclusion:
- * - FR-3: View Collections
+ * @requirements FR-3
  *
  * @component
  * @param {CollectionCardProps} props - Component props.

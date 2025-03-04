@@ -11,12 +11,9 @@ import { router } from "expo-router";
 import CollectionCard from "@/src/components/cards/CollectionCard";
 
 /**
- * Screen displaying a list of user created collections
- * Users can view collections in a grid layout, select a collection
- * or navigate to teh collection creation screen
+ * @description Screen displaying a list of user created collections
  *
- * Requirements Mandating Inclusion:
- * - FR-3: View Collections
+ * @requirements FR-3
  *
  * @return {JSX.Element} The rendered collections tab
  */

@@ -41,16 +41,9 @@ interface CreateCollectionForm {
 }
 
 /**
- * Screen for creating a new collection
+ * @description Screen for creating a new collection
  *
- * This screen allows users to input details for a new collection,
- * including: title, caption, date, and location.
- * The collection is then submitted to the API.
- *
- * Requirements Mandating Inclusion:
- * - FR-35: Create New Collection
- * - FR-36: Require Collection Title
- * - FR-37: Add Optional Caption
+ * @requirements FR-35, FR-36, FR-37
  *
  * @component
  * @returns {JSX.Element} Rendered CreateCollection screen.
