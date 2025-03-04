@@ -1,3 +1,8 @@
+/**
+ * @description Screen for creating a new individual keepsake/memento. Form fields for images/metadata.
+ * @requirements FR-9, FR-17, FR-19, FR-20, FR-21
+ */
+
 import { useForm, Controller } from "react-hook-form";
 import {
   Button,
@@ -10,6 +15,8 @@ import {
   FormControlError,
   FormControlErrorIcon,
   FormControlErrorText,
+  FormControlHelper,
+  FormControlHelperText,
   FormControlLabel,
   FormControlLabelText,
 } from "@/src/components/ui/form-control";
@@ -37,7 +44,7 @@ import LocationInput, {
   GeoLocation,
 } from "@/src/components/inputs/LocationInput";
 import { FlatList } from "react-native";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { queryClient } from "@/src/app/_layout";
 import DatePickerInput from "@/src/components/inputs/DatePickerInput";
 
@@ -47,6 +54,7 @@ interface CreateMementoForm {
 }
 
 export default function CreateMemento() {
+  const [scrollEnabled, setScrollEnabled] = useState(true);
   const { session } = useSession();
   const {
     control,
@@ -97,7 +105,10 @@ export default function CreateMemento() {
     };
 
     // Metadata for each image
-    const image_metadata = form.photos.map(getRelevantImageMetadata);
+    const imageMetadata = form.photos.map((photo, idx) => ({
+      ...getRelevantImageMetadata(photo),
+      order_index: idx,
+    }));
 
     // Map each image to its necessary upload info
     const images = form.photos.map((photo) => ({
@@ -112,7 +123,7 @@ export default function CreateMemento() {
       {
         body: {
           memento_str: memento,
-          image_metadata_str: image_metadata,
+          image_metadata_str: imageMetadata,
           images,
         } as any,
         path,
@@ -158,6 +169,7 @@ export default function CreateMemento() {
       >
         <FlatList
           data={[]}
+          scrollEnabled={scrollEnabled}
           renderItem={() => <></>}
           contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 20 }}
           showsVerticalScrollIndicator={false}
@@ -185,7 +197,10 @@ export default function CreateMemento() {
                   name="photos"
                   control={control}
                   render={() => (
-                    <PhotoSelectGrid onChange={handlePhotosChanged} />
+                    <PhotoSelectGrid
+                      onChange={handlePhotosChanged}
+                      setScrollEnabled={setScrollEnabled}
+                    />
                   )}
                   rules={{
                     validate: {
@@ -198,6 +213,11 @@ export default function CreateMemento() {
                     },
                   }}
                 />
+                <FormControlHelper>
+                  <FormControlHelperText>
+                    Drag to rearrange photos.
+                  </FormControlHelperText>
+                </FormControlHelper>
                 <FormControlError className="mt-4">
                   <FormControlErrorIcon as={AlertCircleIcon} />
                   <FormControlErrorText>

@@ -16,6 +16,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider, useTheme } from "@/src/context/ThemeContext";
 import { AuthProvider } from "@/src/context/AuthContext";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export const queryClient = new QueryClient();
 
@@ -60,7 +61,9 @@ export default function RootLayout() {
       <AuthProvider>
         <ThemeProvider>
           <SafeAreaProvider>
-            <RootContent />
+            <GestureHandlerRootView>
+              <RootContent />
+            </GestureHandlerRootView>
           </SafeAreaProvider>
         </ThemeProvider>
       </AuthProvider>

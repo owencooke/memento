@@ -1,6 +1,10 @@
+"""
+@description CRUD API routes for Keepsakes/Mementos.
+@requirements FR-17, FR-19, FR-20, FR-21, FR-26, FR-27, FR-28
+"""
+
 import json
 from typing import Annotated
-
 from fastapi import APIRouter, Depends, File, Form, UploadFile
 from fastapi.responses import JSONResponse
 from pydantic import UUID4
@@ -29,6 +33,9 @@ def get_users_mementos(
     for memento in mementos:
         for image in memento.images:
             image.url = get_image_url(image.filename)
+
+    # Sort images by order index
+    memento.images.sort(key=lambda image: image.order_index)
     return mementos
 
 

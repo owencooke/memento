@@ -27,6 +27,7 @@ export type ImageWithUrl = {
     detected_text?: string | null;
     filename: string;
     image_label?: string | null;
+    order_index: number;
     url?: string;
 };
 
