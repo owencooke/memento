@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import usePhotos, { Photo } from "../../hooks/usePhotos";
 import { Image } from "../ui/image";
 import { Button, ButtonIcon } from "../ui/button";
@@ -14,6 +14,10 @@ import {
   ActionsheetItemText,
 } from "../ui/actionsheet";
 import { useEffect, useState } from "react";
+import DraggableFlatList, {
+  ScaleDecorator,
+  RenderItemParams,
+} from "react-native-draggable-flatlist";
 
 interface PhotoSelectGridProps {
   onChange: (photos: Photo[]) => Promise<void>;
@@ -21,7 +25,8 @@ interface PhotoSelectGridProps {
 
 export default function PhotoSelectGrid({ onChange }: PhotoSelectGridProps) {
   const [showActionsheet, setShowActionsheet] = useState(false);
-  const { hasPermission, addPhotos, photos, removePhoto } = usePhotos();
+  const { hasPermission, addPhotos, photos, removePhoto, setPhotos } =
+    usePhotos();
 
   useEffect(() => {
     onChange(photos).catch((e) => console.error(e));
@@ -33,25 +38,71 @@ export default function PhotoSelectGrid({ onChange }: PhotoSelectGridProps) {
     return <Text>No access to camera</Text>;
   }
 
-  return (
-    <View className="flex flex-wrap flex-row gap-[2%]">
-      {photos.map((photo, index) => (
-        <InteractivePhotoCard
-          key={index}
-          photo={photo}
-          onDelete={() => removePhoto(photo)}
-        />
-      ))}
-      <View className="relative basis-[32%] aspect-square">
-        <Button
-          size="lg"
-          className="mt-2 mr-2 h-full"
-          action="secondary"
-          onPress={() => setShowActionsheet(true)}
+  // Create a data structure that works with DraggableFlatList
+  const photoItems = photos.map((photo, index) => ({
+    key: `photo-${index}`,
+    photo,
+  }));
+
+  // Add the "add" button as the last item
+  const data = [...photoItems, { key: "add-button", photo: null }];
+
+  const renderItem = ({
+    item,
+    drag,
+    isActive,
+  }: RenderItemParams<(typeof data)[0]>) => {
+    // For the "add" button
+    if (item.photo === null) {
+      return (
+        <View
+          //   className="relative basis-[32%] aspect-square"
+          //   style={{ width: "32%", margin: "0.5%" }}
+          className="flex-1 aspect-square"
         >
-          <ButtonIcon as={AddIcon} />
-        </Button>
-      </View>
+          <Button
+            size="lg"
+            className="mt-2 mr-2 h-full"
+            action="secondary"
+            onPress={() => setShowActionsheet(true)}
+          >
+            <ButtonIcon as={AddIcon} />
+          </Button>
+        </View>
+      );
+    }
+
+    // For photo items
+    return (
+      <ScaleDecorator>
+        <InteractivePhotoCard
+          photo={item.photo}
+          onDelete={() => removePhoto(item.photo)}
+          onLongPress={drag}
+          isActive={isActive}
+        />
+      </ScaleDecorator>
+    );
+  };
+
+  return (
+    <View className="flex-1">
+      <DraggableFlatList
+        data={data}
+        keyExtractor={(item) => item.key}
+        renderItem={renderItem}
+        numColumns={3}
+        contentContainerStyle={{ gap: 8 }}
+        columnWrapperStyle={{ gap: 8 }}
+        onDragEnd={({ data }) => {
+          // Filter out the add button and update the photos array
+          const newPhotos = data
+            .filter((item) => item.photo !== null)
+            .map((item) => item.photo);
+          setPhotos(newPhotos);
+        }}
+      />
+
       <Actionsheet isOpen={showActionsheet} onClose={handleClose}>
         <ActionsheetBackdrop />
         <ActionsheetContent>
@@ -95,11 +146,25 @@ export default function PhotoSelectGrid({ onChange }: PhotoSelectGridProps) {
 interface InteractivePhotoCardProps {
   photo: Photo;
   onDelete: () => void;
+  onLongPress?: () => void;
+  isActive?: boolean;
 }
 
-function InteractivePhotoCard({ photo, onDelete }: InteractivePhotoCardProps) {
+function InteractivePhotoCard({
+  photo,
+  onDelete,
+  onLongPress,
+  isActive,
+}: InteractivePhotoCardProps) {
   return (
-    <View className="relative basis-[32%] aspect-square">
+    <Pressable
+      className="flex-1 aspect-square"
+      //   style={{
+      //     opacity: isActive ? 0.8 : 1,
+      //     transform: [{ scale: isActive ? 1.05 : 1 }],
+      //   }}
+      onLongPress={onLongPress}
+    >
       <Image
         source={{ uri: photo.uri }}
         className="w-auto h-full mt-2 mr-2"
@@ -111,6 +176,6 @@ function InteractivePhotoCard({ photo, onDelete }: InteractivePhotoCardProps) {
       >
         <ButtonIcon className="m-0 p-0" as={CloseIcon} />
       </Button>
-    </View>
+    </Pressable>
   );
 }

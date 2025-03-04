@@ -49,5 +49,6 @@ export default function usePhotos() {
     photos,
     addPhotos,
     removePhoto,
+    setPhotos,
   };
 }
