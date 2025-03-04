@@ -30,6 +30,9 @@ import { FlatList } from "react-native";
 import { queryClient } from "@/src/app/_layout";
 import DatePickerInput from "@/src/components/inputs/DatePickerInput";
 
+/**
+ * Form values for the CreateCollection screen
+ */
 interface CreateCollectionForm {
   title: string;
   date: Date | null;
@@ -37,6 +40,16 @@ interface CreateCollectionForm {
   caption: string;
 }
 
+/**
+ * Screen for creating a new collection
+ *
+ * This screen allows users to input details for a new collection,
+ * including: title, caption, date, and location.
+ * The collection is then submitted to the API.
+ *
+ * @component
+ * @returns {JSX.Element} Rendered CreateCollection screen.
+ */
 export default function CreateCollection() {
   const { session } = useSession();
   const {
@@ -58,6 +71,12 @@ export default function CreateCollection() {
     createNewCollectionApiUserUserIdCollectionPostMutation(),
   );
 
+  /**
+   * Handles form submission by creating a new collection.
+   *
+   *
+   * @param {CreateCollectionForm} form - Form containing collection detals
+   */
   const onSubmit = async (form: CreateCollectionForm) => {
     const {
       location: { lat, long, text },
@@ -76,7 +95,7 @@ export default function CreateCollection() {
       {
         body: {
           new_collection: collection,
-          mementos: [],
+          mementos: [], // Mementos currently empty
         } as any,
         path,
       },
@@ -97,6 +116,12 @@ export default function CreateCollection() {
 
   // Prevent re-rendering location input when Geolocation changes
   const locationValue = watch("location");
+
+  /**
+   * Updates the location input when GeoLocation changes
+   *
+   * @param {GeoLocation} location - new location value
+   */
   const handleLocationChange = useCallback(
     (location: GeoLocation) => {
       const hasChanged =
