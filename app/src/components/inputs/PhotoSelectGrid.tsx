@@ -2,13 +2,14 @@ import { View, Text } from "react-native";
 import usePhotos, { Photo } from "../../hooks/usePhotos";
 import { Image } from "../ui/image";
 import { Button, ButtonIcon } from "../ui/button";
-import { AddIcon, CloseIcon } from "../ui/icon";
+import { AddIcon, CloseIcon, StarIcon } from "../ui/icon";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import DraggableGrid from "react-native-draggable-grid";
 import PhotoSourceSheet from "./PhotoSourceSheet";
+import { Badge, BadgeIcon } from "../ui/badge";
 
 interface GridItem {
-  key: string;
+  key: number;
   photo: Photo | null;
 }
 
@@ -32,11 +33,11 @@ export default function PhotoSelectGrid({
   const gridData = useMemo(
     () => [
       ...photos.map((photo, index) => ({
-        key: `photo-${index}`,
+        key: index,
         photo,
       })),
       {
-        key: "add-button",
+        key: -1,
         photo: null,
         disabledDrag: true,
         disabledReSorted: true,
@@ -83,6 +84,15 @@ export default function PhotoSelectGrid({
                   alt=""
                   resizeMode="cover"
                 />
+                {/* Thumbnail badge for first photo */}
+                {item.key === 0 && (
+                  <Badge
+                    className="absolute bottom-0 left-0 p-1 bg-tertiary-500"
+                    size="sm"
+                  >
+                    <BadgeIcon as={StarIcon} className="text-typography-900" />
+                  </Badge>
+                )}
                 <Button
                   onPress={() => item.photo && removePhoto(item.photo)}
                   className="absolute p-2 rounded-full top-0 right-0"

@@ -10,6 +10,8 @@ import {
   FormControlError,
   FormControlErrorIcon,
   FormControlErrorText,
+  FormControlHelper,
+  FormControlHelperText,
   FormControlLabel,
   FormControlLabelText,
 } from "@/src/components/ui/form-control";
@@ -203,6 +205,11 @@ export default function CreateMemento() {
                     },
                   }}
                 />
+                <FormControlHelper>
+                  <FormControlHelperText>
+                    Drag to rearrange photos.
+                  </FormControlHelperText>
+                </FormControlHelper>
                 <FormControlError className="mt-4">
                   <FormControlErrorIcon as={AlertCircleIcon} />
                   <FormControlErrorText>
