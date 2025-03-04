@@ -47,6 +47,11 @@ interface CreateCollectionForm {
  * including: title, caption, date, and location.
  * The collection is then submitted to the API.
  *
+ * Requirements Mandating Inclusion:
+ * - FR-35: Create New Collection
+ * - FR-36: Require Collection Title
+ * - FR-37: Add Optional Caption
+ *
  * @component
  * @returns {JSX.Element} Rendered CreateCollection screen.
  */
