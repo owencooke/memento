@@ -29,5 +29,6 @@ def get_image_url(filename: str) -> str:
 
 
 def delete_images(filenames: list[str]) -> bool:
+    """Uses Supabase Storage API to delete a file from /images bucket."""
     response = supabase.storage.from_("images").remove(filenames)
     return len(response) == 1

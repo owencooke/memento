@@ -8,8 +8,8 @@ from typing import Annotated, Optional
 
 from fastapi import APIRouter, Depends, Form, UploadFile
 from fastapi.responses import JSONResponse
-from pydantic import UUID4
 from loguru import logger
+from pydantic import UUID4
 
 from server.api.memento.models import (
     NewImageMetadata,
