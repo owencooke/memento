@@ -3,13 +3,9 @@
  * @requirements FR-43, FR-44, FR-45
  */
 
-import { KeyboardAvoidingView, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
-  updateMementoAndImagesApiUserUserIdMementoIdPutMutation,
-  getUsersMementosApiUserUserIdMementoGetQueryKey,
-  getUsersMementosApiUserUserIdMementoGetOptions,
   getUsersCollectionsApiUserUserIdCollectionGetOptions,
   updateCollectionAndMementosApiUserUserIdCollectionIdPutMutation,
   getUsersCollectionsApiUserUserIdCollectionGetQueryKey,
@@ -17,18 +13,9 @@ import {
 import { useSession } from "@/src/context/AuthContext";
 import { router, useLocalSearchParams } from "expo-router";
 import { getDateFromISO, toISODateString } from "@/src/libs/date";
-import { formDataBodySerializer } from "@/src/api-client/formData";
-import { getRelevantImageMetadata } from "@/src/libs/metadata";
 import { queryClient } from "@/src/app/_layout";
-import MementoForm, {
-  MementoFormData,
-} from "@/src/components/forms/MementoForm";
 import { GeoLocation } from "@/src/components/inputs/LocationInput";
-import { Photo } from "@/src/hooks/usePhotos";
-import {
-  CollectionWithMementos,
-  MementoWithImages,
-} from "@/src/api-client/generated";
+import { CollectionWithMementos } from "@/src/api-client/generated";
 import { isEqual } from "lodash";
 import { useMemo } from "react";
 import CollectionForm, {
@@ -39,7 +26,7 @@ export default function EditCollection() {
   // Get user id
   const { session } = useSession();
   const user_id = String(session?.user.id);
-  // Get existing memento
+  // Get existing collection
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: collections } = useQuery({
     ...getUsersCollectionsApiUserUserIdCollectionGetOptions({
@@ -57,7 +44,7 @@ export default function EditCollection() {
     updateCollectionAndMementosApiUserUserIdCollectionIdPutMutation(),
   );
 
-  // Convert fetched memento into initial form values
+  // Convert fetched collection into initial form values
   const initialFormValues = useMemo((): CollectionFormData => {
     return {
       title: collection?.title || "",
@@ -74,7 +61,7 @@ export default function EditCollection() {
   const handleRedirect = () =>
     router.dismissTo(`/(app)/(screens)/(collection)/${collection.id}`);
 
-  // PUT Edit Memento Form
+  // PUT Edit Collection Form
   const onSubmit = async (form: CollectionFormData) => {
     // Skip form submission if no changes made
     if (isEqual(form, initialFormValues)) {
@@ -111,7 +98,7 @@ export default function EditCollection() {
       },
       {
         onSuccess: () => {
-          //   Invalidate cached GET mementos before redirecting
+          //   Invalidate cached GET collections before redirecting
           queryClient.invalidateQueries({
             queryKey: getUsersCollectionsApiUserUserIdCollectionGetQueryKey({
               path,

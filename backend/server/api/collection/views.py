@@ -91,3 +91,16 @@ async def update_collection_and_mementos(
     #         )
 
     return updated_collection
+
+
+@router.delete("/{id}")
+async def delete_collection(
+    id: int,
+) -> Collection:
+    """Delete a collection."""
+
+    deleted_collection = delete_collection(id)
+    if not deleted_collection:
+        raise HTTPException(status_code=400, detail="Delete collection failed")
+
+    return deleted_collection
