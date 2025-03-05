@@ -4,6 +4,7 @@
  */
 import {
   getUsersCollectionsApiUserUserIdCollectionGetOptions,
+  getUsersMementosApiUserUserIdMementoGetOptions,
 } from "@/src/api-client/generated/@tanstack/react-query.gen";
 import { ButtonIcon, Button } from "@/src/components/ui/button";
 import {
@@ -20,6 +21,9 @@ import { useMemo, useState } from "react";
 import { Box } from "@/src/components/ui/box";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Heading } from "@/src/components/ui/heading";
+import { FlatList, Pressable } from "react-native";
+import MementoCard from "@/src/components/cards/MementoCard";
+
 const buttonClasses = "flex-1";
 const iconClasses = "w-6 h-6";
 
@@ -36,6 +40,24 @@ export default function ViewCollection() {
   });
   const collection = collections?.find((c) => c.id === Number(id));
 
+  const { data: all_mementos } = useQuery({
+    ...getUsersMementosApiUserUserIdMementoGetOptions({
+      path: {
+        user_id: session?.user.id ?? "",
+      },
+    }),
+    refetchOnMount: false,
+  });
+  const mementos = all_mementos?.filter((m) =>
+    collection?.mementos.some((cm) => cm.memento_id === m.id),
+  );
+  const gridData = useMemo(
+    () =>
+      mementos?.length && mementos.length % 2
+        ? [...mementos, { spacer: true }]
+        : mementos,
+    [mementos],
+  );
 
   // TODO: Show more details
   const handleShowMoreDetails = () => console.debug("Not implemented yet");
@@ -43,6 +65,9 @@ export default function ViewCollection() {
   // TODO: Edit Collection
   const handleEditCollection = () => console.debug("Not implemented yet");
 
+  const handleViewMemento = (id: number) => {
+    router.push(`/(app)/(screens)/(memento)/${id}`);
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-primary-500" edges={["bottom"]}>
@@ -66,6 +91,29 @@ export default function ViewCollection() {
                     </Text>
                   </Box>
                 </Heading>
+                <FlatList
+                  numColumns={2}
+                  columnWrapperStyle={{ gap: 12 }}
+                  contentContainerStyle={{ gap: 12 }}
+                  showsVerticalScrollIndicator={false}
+                  // TODO: Fetch and Display Mementos
+                  data={gridData}
+                  keyExtractor={(item, index) =>
+                    "spacer" in item ? `spacer-${index}` : String(item.id)
+                  }
+                  renderItem={({ item }) =>
+                    "spacer" in item ? (
+                      <Box className="flex-1" />
+                    ) : (
+                      <Pressable
+                        className="flex-1"
+                        onPress={() => handleViewMemento(item.id)}
+                      >
+                        <MementoCard {...item} />
+                      </Pressable>
+                    )
+                  }
+                />
               </>
             )}
           </>
