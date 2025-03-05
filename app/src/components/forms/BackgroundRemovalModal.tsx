@@ -15,13 +15,18 @@ import { Photo } from "@/src/hooks/usePhotos";
 
 interface BackgroundRemovalModalProps {
   photo: Photo;
+  accept: () => void;
+  reject: () => void;
 }
 
 export default function BackgroundRemovalModal({
   photo,
+  accept,
+  reject,
 }: BackgroundRemovalModalProps) {
   return (
-    <Modal isOpen={true} onClose={() => {}}>
+    // Modal will be unrendered after accept/reject
+    <Modal isOpen={true}>
       <ModalBackdrop />
       <ModalContent>
         <ModalHeader>
@@ -31,24 +36,16 @@ export default function BackgroundRemovalModal({
         <ModalBody>
           <Image
             source={{ uri: photo.uri }}
-            className="w-full h-48 rounded-md"
-            alt="Processed"
+            className="h-full w-auto aspect-square"
+            alt=""
             resizeMode="contain"
           />
         </ModalBody>
         <ModalFooter>
-          <Button
-            action="secondary"
-            // onPress={closeProcessingModal}
-            className="mr-2"
-          >
+          <Button action="secondary" onPress={reject} className="mr-2">
             <ButtonText>Keep Original</ButtonText>
           </Button>
-          <Button
-            action="primary"
-            // onPress={acceptProcessedPhoto}
-            // disabled={!processedPhoto}
-          >
+          <Button action="primary" onPress={accept}>
             <ButtonText>Confirm</ButtonText>
           </Button>
         </ModalFooter>

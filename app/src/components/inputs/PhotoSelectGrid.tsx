@@ -33,11 +33,9 @@ export default function PhotoSelectGrid({
     removePhoto,
     setPhotos,
     pendingProcessedPhotos,
-    replacePhoto,
+    acceptProcessedPhoto,
+    rejectProcessedPhoto,
   } = usePhotos({ initialPhotos });
-
-  // State for background removal modal
-  const [showProcessingModal, setShowProcessingModal] = useState(false);
 
   useEffect(() => {
     onChange(photos).catch((e) => console.error(e));
@@ -69,21 +67,6 @@ export default function PhotoSelectGrid({
     },
     [setPhotos, setScrollEnabled],
   );
-
-  // Accept the processed image
-  const acceptProcessedPhoto = () => {
-    // if (processedPhoto && processingPhoto) {
-    //   replacePhoto(processingPhoto, processedPhoto);
-    // }
-    closeProcessingModal();
-  };
-
-  // Close the modal and reset states
-  const closeProcessingModal = () => {
-    setShowProcessingModal(false);
-    // setProcessingPhoto(null);
-    // setProcessedPhoto(null);
-  };
 
   if (!hasPermission) {
     return <Text>No access to camera</Text>;
@@ -143,10 +126,14 @@ export default function PhotoSelectGrid({
           </View>
         )}
       />
-
-      {/* Background removal modal */}
+      {/* Accept/reject background removal result */}
       {pendingProcessedPhotos.map((backgroundFreePhoto, idx) => (
-        <BackgroundRemovalModal key={idx} photo={backgroundFreePhoto} />
+        <BackgroundRemovalModal
+          key={idx}
+          photo={backgroundFreePhoto}
+          accept={() => acceptProcessedPhoto(backgroundFreePhoto)}
+          reject={() => rejectProcessedPhoto(backgroundFreePhoto)}
+        />
       ))}
     </View>
   );

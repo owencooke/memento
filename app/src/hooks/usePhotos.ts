@@ -45,6 +45,7 @@ export default function usePhotos({ initialPhotos = [] }: UsePhotosProps) {
         ? ImagePicker.launchCameraAsync
         : ImagePicker.launchImageLibraryAsync;
 
+    // Get photos from device source
     let result = await operation({
       mediaTypes: ["images"],
       quality: 1,
@@ -53,14 +54,22 @@ export default function usePhotos({ initialPhotos = [] }: UsePhotosProps) {
     });
 
     if (!result.canceled) {
-      setPhotos((prevPhotos) => [...prevPhotos, ...result.assets]);
-      const photoStrings = await Promise.all(
-        result.assets.map(removeBackground),
+      const { assets: newPhotos } = result;
+      // Update photos
+      setPhotos((prevPhotos) => [...prevPhotos, ...newPhotos]);
+
+      // Get base64 images for each removed background
+      const processedPhotoStrings = await Promise.all(
+        newPhotos.map(removeBackground),
       );
+      // Include metadata with processed photo and ignore empty base64 strings
       setPendingProcessedPhotos(
-        photoStrings
-          .filter((photoString) => photoString !== undefined)
-          .map((photoString) => ({ uri: photoString })),
+        processedPhotoStrings
+          .map((photoString, idx) => ({
+            ...newPhotos[idx],
+            uri: photoString,
+          }))
+          .filter((p) => !!p.uri),
       );
     }
   };
@@ -76,9 +85,7 @@ export default function usePhotos({ initialPhotos = [] }: UsePhotosProps) {
   const removeBgMutation = useMutation(
     removeImageBackgroundApiImageRemoveBackgroundPostMutation(),
   );
-  const removeBackground = async (
-    photo: Photo,
-  ): Promise<string | undefined> => {
+  const removeBackground = async (photo: Photo): Promise<string> => {
     try {
       const body: any = {
         image_file: {
@@ -94,8 +101,7 @@ export default function usePhotos({ initialPhotos = [] }: UsePhotosProps) {
         bodySerializer: formDataBodySerializer.bodySerializer,
       });
 
-      //   console.log(response);
-
+      // Convert binary blob result to base64 image string
       return new Promise<string>((resolve) => {
         const fileReaderInstance = new FileReader();
         fileReaderInstance.readAsDataURL(response as Blob);
@@ -105,15 +111,22 @@ export default function usePhotos({ initialPhotos = [] }: UsePhotosProps) {
       });
     } catch (error) {
       console.error("Failed to remove image background:", error);
+      return "";
     }
   };
 
-  // Replace a photo with a new version
-  const replacePhoto = (originalPhoto: Photo, newPhoto: Photo) => {
+  // Accept removed background result
+  const acceptProcessedPhoto = (newPhoto: Photo) => {
     setPhotos((prevPhotos) =>
-      prevPhotos.map((p) =>
-        p.assetId === originalPhoto.assetId ? newPhoto : p,
-      ),
+      prevPhotos.map((p) => (p.assetId === newPhoto.assetId ? newPhoto : p)),
+    );
+    rejectProcessedPhoto(newPhoto);
+  };
+
+  // Reject removed background result
+  const rejectProcessedPhoto = (processedPhoto: Photo) => {
+    setPendingProcessedPhotos((prev) =>
+      prev.filter((p) => p.assetId !== processedPhoto.assetId),
     );
   };
 
@@ -123,7 +136,8 @@ export default function usePhotos({ initialPhotos = [] }: UsePhotosProps) {
     addPhotos,
     removePhoto,
     setPhotos,
-    replacePhoto,
     pendingProcessedPhotos,
+    acceptProcessedPhoto,
+    rejectProcessedPhoto,
   };
 }
