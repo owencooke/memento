@@ -19,7 +19,23 @@ export type Photo = Omit<
   "width" | "height" | "pairedVideoAsset"
 > & {
   storedInCloud?: boolean;
-  isProcessed?: boolean;
+};
+
+const getPhotosFromDevice = async (source: DeviceSource): Promise<Photo[]> => {
+  const pickFunction =
+    source === "camera"
+      ? ImagePicker.launchCameraAsync
+      : ImagePicker.launchImageLibraryAsync;
+
+  const result = await pickFunction({
+    mediaTypes: ["images"],
+    quality: 1,
+    exif: true,
+    allowsMultipleSelection: source === "picker",
+  });
+
+  if (result.canceled) return [];
+  return result.assets;
 };
 
 interface UsePhotosProps {
@@ -32,6 +48,9 @@ export default function usePhotos({ initialPhotos = [] }: UsePhotosProps) {
   const [pendingProcessedPhotos, setPendingProcessedPhotos] = useState<Photo[]>(
     [],
   );
+  const removeBgMutation = useMutation(
+    removeImageBackgroundApiImageRemoveBackgroundPostMutation(),
+  );
 
   // Check device has permissions for camera access
   useEffect(() => {
@@ -41,53 +60,21 @@ export default function usePhotos({ initialPhotos = [] }: UsePhotosProps) {
     })();
   }, []);
 
-  // Add new photos
-  const addPhotos = async (source: DeviceSource) => {
-    let operation =
-      source === "camera"
-        ? ImagePicker.launchCameraAsync
-        : ImagePicker.launchImageLibraryAsync;
-
-    // Get photos from device source
-    let result = await operation({
-      mediaTypes: ["images"],
-      quality: 1,
-      exif: true,
-      allowsMultipleSelection: source === "picker",
-    });
-
-    if (!result.canceled) {
-      const { assets: newPhotos } = result;
-      // Update photos
-      setPhotos((prevPhotos) => [...prevPhotos, ...newPhotos]);
-
-      // Get base64 images for each removed background
-      const processedPhotoStrings = await Promise.all(
-        newPhotos.map(removeBackground),
-      );
-      // Include metadata with processed photo and ignore empty base64 strings
-      setPendingProcessedPhotos(
-        processedPhotoStrings
-          .map((photoString, idx) => ({
-            ...newPhotos[idx],
-            uri: photoString,
-          }))
-          .filter((p) => !!p.uri),
-      );
-    }
-  };
-
-  // Remove a selected photo
-  const removePhoto = (photoToRemove: Photo) => {
+  // Remove a specific photo from selection
+  const deletePhoto = (photoToRemove: Photo) => {
     setPhotos((prevPhotos) =>
       prevPhotos.filter((photo) => photo.assetId !== photoToRemove.assetId),
     );
   };
 
+  // Add new photos
+  const addPhotos = async (source: DeviceSource) => {
+    const photos = await getPhotosFromDevice(source);
+    setPhotos((prevPhotos) => [...prevPhotos, ...photos]);
+    processPhotos(photos);
+  };
+
   // Remove background from an image
-  const removeBgMutation = useMutation(
-    removeImageBackgroundApiImageRemoveBackgroundPostMutation(),
-  );
   const removeBackground = async (photo: Photo): Promise<string> => {
     try {
       const body: any = {
@@ -106,6 +93,22 @@ export default function usePhotos({ initialPhotos = [] }: UsePhotosProps) {
       console.error("Failed to remove image background:", error);
       return "";
     }
+  };
+
+  const processPhotos = async (photos: Photo[]) => {
+    // Get base64 images for each removed background
+    const processedPhotoStrings = await Promise.all(
+      photos.map(removeBackground),
+    );
+    const processedPhotos = processedPhotoStrings
+      // Include actual photo details with each base64 string
+      .map((photoString, idx) => ({
+        ...photos[idx],
+        uri: photoString,
+      }))
+      // Don't include empty base64 strings
+      .filter((p) => !!p.uri);
+    setPendingProcessedPhotos((prev) => [...prev, ...processedPhotos]);
   };
 
   // Accept removed background result
@@ -127,7 +130,7 @@ export default function usePhotos({ initialPhotos = [] }: UsePhotosProps) {
     hasPermission,
     photos,
     addPhotos,
-    removePhoto,
+    deletePhoto,
     setPhotos,
     pendingProcessedPhotos,
     acceptProcessedPhoto,

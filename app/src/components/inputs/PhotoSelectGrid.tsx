@@ -30,7 +30,7 @@ export default function PhotoSelectGrid({
     hasPermission,
     addPhotos,
     photos,
-    removePhoto,
+    deletePhoto,
     setPhotos,
     pendingProcessedPhotos,
     acceptProcessedPhoto,
@@ -108,7 +108,7 @@ export default function PhotoSelectGrid({
                   </Badge>
                 )}
                 <Button
-                  onPress={() => item.photo && removePhoto(item.photo)}
+                  onPress={() => item.photo && deletePhoto(item.photo)}
                   className="absolute p-2 rounded-full top-0 right-0"
                   size="sm"
                 >
