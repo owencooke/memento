@@ -8,11 +8,20 @@ import { Camera } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 
 export type DeviceSource = "picker" | "camera";
-export type Photo = ImagePicker.ImagePickerAsset;
+export type Photo = Omit<
+  ImagePicker.ImagePickerAsset,
+  "width" | "height" | "pairedVideoAsset"
+> & {
+  storedInCloud?: boolean;
+};
 
-export default function usePhotos() {
+interface UsePhotosProps {
+  initialPhotos?: Photo[];
+}
+
+export default function usePhotos({ initialPhotos = [] }: UsePhotosProps) {
   const [hasPermission, setHasPermission] = useState(false);
-  const [photos, setPhotos] = useState<Photo[]>([]);
+  const [photos, setPhotos] = useState<Photo[]>(initialPhotos);
 
   useEffect(() => {
     (async () => {

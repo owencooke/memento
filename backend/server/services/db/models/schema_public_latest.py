@@ -138,17 +138,16 @@ class ImageInsert(CustomModelInsert):
 	# date: nullable
 	# detected_text: nullable
 	# image_label: nullable
-	# order_index: has default value
 
 	# Required fields
 	filename: str
+	order_index: int
 
 		# Optional fields
 	coordinates: str | None = Field(default=None)
 	date: datetime.date | None = Field(default=None)
 	detected_text: str | None = Field(default=None)
 	image_label: str | None = Field(default=None)
-	order_index: int | None = Field(default=None)
 
 
 class MementoInsert(CustomModelInsert):
@@ -229,7 +228,6 @@ class ImageUpdate(CustomModelUpdate):
 	# date: nullable
 	# detected_text: nullable
 	# image_label: nullable
-	# order_index: has default value
 
 		# Optional fields
 	coordinates: str | None = Field(default=None)

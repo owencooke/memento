@@ -6,6 +6,12 @@ export type BodyCreateNewMementoApiUserUserIdMementoPost = {
     images: Array<Blob | File>;
 };
 
+export type BodyUpdateMementoAndImagesApiUserUserIdMementoIdPut = {
+    memento_str: string;
+    image_metadata_str: string;
+    images?: Array<Blob | File> | null;
+};
+
 /**
  * A model that provides methods for converting lat/long
  * coordinates between a variety of formats.
@@ -144,6 +150,31 @@ export type CreateNewMementoApiUserUserIdMementoPostErrors = {
 export type CreateNewMementoApiUserUserIdMementoPostError = CreateNewMementoApiUserUserIdMementoPostErrors[keyof CreateNewMementoApiUserUserIdMementoPostErrors];
 
 export type CreateNewMementoApiUserUserIdMementoPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
+export type UpdateMementoAndImagesApiUserUserIdMementoIdPutData = {
+    body: BodyUpdateMementoAndImagesApiUserUserIdMementoIdPut;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/api/user/{user_id}/memento/{id}';
+};
+
+export type UpdateMementoAndImagesApiUserUserIdMementoIdPutErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type UpdateMementoAndImagesApiUserUserIdMementoIdPutError = UpdateMementoAndImagesApiUserUserIdMementoIdPutErrors[keyof UpdateMementoAndImagesApiUserUserIdMementoIdPutErrors];
+
+export type UpdateMementoAndImagesApiUserUserIdMementoIdPutResponses = {
     /**
      * Successful Response
      */

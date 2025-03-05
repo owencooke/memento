@@ -14,17 +14,19 @@ interface GridItem {
 }
 
 interface PhotoSelectGridProps {
+  initialPhotos: Photo[];
   onChange: (photos: Photo[]) => Promise<void>;
   setScrollEnabled: (enabled: boolean) => void;
 }
 
 export default function PhotoSelectGrid({
+  initialPhotos,
   onChange,
   setScrollEnabled,
 }: PhotoSelectGridProps) {
   const [showActionsheet, setShowActionsheet] = useState(false);
   const { hasPermission, addPhotos, photos, removePhoto, setPhotos } =
-    usePhotos();
+    usePhotos({ initialPhotos });
 
   useEffect(() => {
     onChange(photos).catch((e) => console.error(e));

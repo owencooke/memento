@@ -1,11 +1,11 @@
 """
 @description Supabase DB queries for Keepsakes/Mementos.
-@requirements FR-17, FR-19, FR-26, FR-27
+@requirements FR-17, FR-19, FR-26, FR-27, FR30, FR33
 """
 
 from pydantic import UUID4
 
-from server.api.memento.models import NewMemento
+from server.api.memento.models import NewMemento, UpdateMemento
 from server.services.db.config import supabase
 from server.services.db.models.joins import MementoWithImages
 from server.services.db.models.schema_public_latest import Memento
@@ -30,3 +30,14 @@ def get_mementos(user_id: UUID4) -> list[MementoWithImages]:
         .execute()
     )
     return [MementoWithImages(**item) for item in response.data]
+
+
+def update_memento(id: int, updated_memento: UpdateMemento) -> Memento:
+    """Updates an existing memento record."""
+    response = (
+        supabase.table("memento")
+        .update({**updated_memento.model_dump(mode="json", exclude={"user_id"})})
+        .eq("id", id)
+        .execute()
+    )
+    return Memento(**response.data[0])
