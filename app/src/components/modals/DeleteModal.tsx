@@ -3,7 +3,6 @@ import {
   ModalBackdrop,
   ModalContent,
   ModalHeader,
-  ModalCloseButton,
   ModalBody,
   ModalFooter,
 } from "@/src/components/ui/modal";
