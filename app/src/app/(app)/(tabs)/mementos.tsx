@@ -5,13 +5,17 @@ import { AddIcon } from "@/src/components/ui/icon";
 import { useSession } from "@/src/context/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { View, Text, FlatList } from "react-native";
-import { useMemo } from "react";
+import { View, Text, FlatList, Pressable, RefreshControl } from "react-native";
+import { useMemo, useState } from "react";
+import { useColors } from "@/src/hooks/useColors";
 
 export default function Mementos() {
   const { session } = useSession();
+  const { getColor } = useColors();
+  const [refreshing, setRefreshing] = useState(false);
+  const refreshColor = getColor("tertiary-500");
 
-  const { data: mementos } = useQuery({
+  const { data: mementos, refetch } = useQuery({
     ...getUsersMementosApiUserUserIdMementoGetOptions({
       path: {
         user_id: session?.user.id ?? "",
@@ -28,8 +32,18 @@ export default function Mementos() {
     [mementos],
   );
 
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  };
+
   const handleAddMemento = () => {
     router.push("/(app)/(screens)/(memento)/create");
+  };
+
+  const handleViewMemento = (id: number) => {
+    router.push(`/(app)/(screens)/(memento)/${id}`);
   };
 
   return (
@@ -41,11 +55,26 @@ export default function Mementos() {
           numColumns={2}
           showsVerticalScrollIndicator={false}
           data={gridData}
-          renderItem={({ item }) => (
-            <View className="flex-1">
-              {!("spacer" in item) && <MementoCard {...item} />}
-            </View>
-          )}
+          renderItem={({ item }) =>
+            "spacer" in item ? (
+              <View className="flex-1" />
+            ) : (
+              <Pressable
+                className="flex-1"
+                onPress={() => handleViewMemento(item.id)}
+              >
+                <MementoCard {...item} />
+              </Pressable>
+            )
+          }
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              colors={[refreshColor]}
+              tintColor={refreshColor}
+            />
+          }
         />
       ) : (
         <View className="flex-1 items-center justify-center">

@@ -1,3 +1,8 @@
+"""
+@description Supabase Storage functions for images
+@requirements FR-20, FR-28, FR-31
+"""
+
 import uuid
 
 from fastapi import UploadFile
@@ -21,3 +26,9 @@ def get_image_url(filename: str) -> str:
     """Uses Supabase Storage API to create signed url for a stored image."""
     response = supabase.storage.from_("images").create_signed_url(filename, 86400)
     return response["signedUrl"]
+
+
+def delete_images(filenames: list[str]) -> bool:
+    """Uses Supabase Storage API to delete a file from /images bucket."""
+    response = supabase.storage.from_("images").remove(filenames)
+    return len(response) == 1

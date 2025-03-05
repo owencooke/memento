@@ -1,17 +1,27 @@
+/**
+ * @description Hook for requesting camera permissions and fetching
+ *      photos/EXIF metadata from the device's camera or image library.
+ * @requirements FR-4, FR-6, FR-7
+ */
 import { useState, useEffect } from "react";
 import { Camera } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 
 export type DeviceSource = "picker" | "camera";
-export type Photo = ImagePicker.ImagePickerAsset;
+export type Photo = Omit<
+  ImagePicker.ImagePickerAsset,
+  "width" | "height" | "pairedVideoAsset"
+> & {
+  storedInCloud?: boolean;
+};
 
-/**
- * Hook for requesting camera permissions and fetching photos
- * from the device's camera or image library.
- */
-export default function usePhotos() {
+interface UsePhotosProps {
+  initialPhotos?: Photo[];
+}
+
+export default function usePhotos({ initialPhotos = [] }: UsePhotosProps) {
   const [hasPermission, setHasPermission] = useState(false);
-  const [photos, setPhotos] = useState<Photo[]>([]);
+  const [photos, setPhotos] = useState<Photo[]>(initialPhotos);
 
   useEffect(() => {
     (async () => {
@@ -49,5 +59,6 @@ export default function usePhotos() {
     photos,
     addPhotos,
     removePhoto,
+    setPhotos,
   };
 }

@@ -2,115 +2,121 @@ import { View, Text } from "react-native";
 import usePhotos, { Photo } from "../../hooks/usePhotos";
 import { Image } from "../ui/image";
 import { Button, ButtonIcon } from "../ui/button";
-import { AddIcon, CloseIcon, EditIcon, EyeOffIcon } from "../ui/icon";
-import {
-  Actionsheet,
-  ActionsheetBackdrop,
-  ActionsheetContent,
-  ActionsheetDragIndicatorWrapper,
-  ActionsheetDragIndicator,
-  ActionsheetItem,
-  ActionsheetIcon,
-  ActionsheetItemText,
-} from "../ui/actionsheet";
-import { useEffect, useState } from "react";
+import { AddIcon, CloseIcon, StarIcon } from "../ui/icon";
+import { useEffect, useState, useMemo, useCallback } from "react";
+import DraggableGrid from "react-native-draggable-grid";
+import PhotoSourceSheet from "./PhotoSourceSheet";
+import { Badge, BadgeIcon } from "../ui/badge";
 
-interface PhotoSelectGridProps {
-  onChange: (photos: Photo[]) => Promise<void>;
+interface GridItem {
+  key: number;
+  photo: Photo | null;
 }
 
-export default function PhotoSelectGrid({ onChange }: PhotoSelectGridProps) {
+interface PhotoSelectGridProps {
+  initialPhotos: Photo[];
+  onChange: (photos: Photo[]) => Promise<void>;
+  setScrollEnabled: (enabled: boolean) => void;
+}
+
+export default function PhotoSelectGrid({
+  initialPhotos,
+  onChange,
+  setScrollEnabled,
+}: PhotoSelectGridProps) {
   const [showActionsheet, setShowActionsheet] = useState(false);
-  const { hasPermission, addPhotos, photos, removePhoto } = usePhotos();
+  const { hasPermission, addPhotos, photos, removePhoto, setPhotos } =
+    usePhotos({ initialPhotos });
 
   useEffect(() => {
     onChange(photos).catch((e) => console.error(e));
   }, [onChange, photos]);
 
-  const handleClose = () => setShowActionsheet(false);
+  const gridData = useMemo(
+    () => [
+      ...photos.map((photo, index) => ({
+        key: index,
+        photo,
+      })),
+      {
+        key: -1,
+        photo: null,
+        disabledDrag: true,
+        disabledReSorted: true,
+      },
+    ],
+    [photos],
+  );
+
+  const handleReorderPhotos = useCallback(
+    (data: GridItem[]) => {
+      const newPhotos = data
+        .filter((item) => item.photo !== null)
+        .map((item) => item.photo) as Photo[];
+      setPhotos(newPhotos);
+      setScrollEnabled(true);
+    },
+    [setPhotos, setScrollEnabled],
+  );
 
   if (!hasPermission) {
     return <Text>No access to camera</Text>;
   }
 
   return (
-    <View className="flex flex-wrap flex-row gap-[2%]">
-      {photos.map((photo, index) => (
-        <InteractivePhotoCard
-          key={index}
-          photo={photo}
-          onDelete={() => removePhoto(photo)}
-        />
-      ))}
-      <View className="relative basis-[32%] aspect-square">
-        <Button
-          size="lg"
-          className="mt-2 mr-2 h-full"
-          action="secondary"
-          onPress={() => setShowActionsheet(true)}
-        >
-          <ButtonIcon as={AddIcon} />
-        </Button>
-      </View>
-      <Actionsheet isOpen={showActionsheet} onClose={handleClose}>
-        <ActionsheetBackdrop />
-        <ActionsheetContent>
-          <ActionsheetDragIndicatorWrapper>
-            <ActionsheetDragIndicator />
-          </ActionsheetDragIndicatorWrapper>
-          <ActionsheetItem
-            onPress={() => {
-              addPhotos("camera");
-              handleClose();
-            }}
-          >
-            <ActionsheetIcon
-              size="lg"
-              className="stroke-background-700"
-              as={EditIcon}
-            />
-            <ActionsheetItemText size="lg">Take a Photo</ActionsheetItemText>
-          </ActionsheetItem>
-          <ActionsheetItem
-            onPress={() => {
-              addPhotos("picker");
-              handleClose();
-            }}
-          >
-            <ActionsheetIcon
-              size="lg"
-              className="stroke-background-700"
-              as={EyeOffIcon}
-            />
-            <ActionsheetItemText size="lg">
-              Select from Library
-            </ActionsheetItemText>
-          </ActionsheetItem>
-        </ActionsheetContent>
-      </Actionsheet>
-    </View>
-  );
-}
-
-interface InteractivePhotoCardProps {
-  photo: Photo;
-  onDelete: () => void;
-}
-
-function InteractivePhotoCard({ photo, onDelete }: InteractivePhotoCardProps) {
-  return (
-    <View className="relative basis-[32%] aspect-square">
-      <Image
-        source={{ uri: photo.uri }}
-        className="w-auto h-full mt-2 mr-2"
-        alt=""
+    <View className="flex-1">
+      <PhotoSourceSheet
+        addPhotos={addPhotos}
+        visible={showActionsheet}
+        setVisible={setShowActionsheet}
       />
-      <Button
-        onPress={onDelete}
-        className="absolute p-2 rounded-full top-0 right-0"
-      >
-        <ButtonIcon className="m-0 p-0" as={CloseIcon} />
-      </Button>
+      <DraggableGrid
+        numColumns={3}
+        data={gridData}
+        onDragStart={() => setScrollEnabled(false)}
+        onDragRelease={handleReorderPhotos}
+        renderItem={(item: GridItem) => (
+          <View className="px-1 py-2 flex-1 aspect-square">
+            {item.photo ? (
+              // Render a photo
+              <View className="relative overflow-hidden rounded-md">
+                <Image
+                  source={{ uri: item.photo.uri }}
+                  className="w-auto h-full mt-2 mr-2"
+                  alt=""
+                  resizeMode="cover"
+                />
+                {/* Thumbnail badge for first photo */}
+                {item.key === 0 && (
+                  <Badge
+                    className="absolute bottom-0 left-0 p-1 bg-tertiary-500"
+                    size="sm"
+                  >
+                    <BadgeIcon as={StarIcon} className="text-typography-900" />
+                  </Badge>
+                )}
+                <Button
+                  onPress={() => item.photo && removePhoto(item.photo)}
+                  className="absolute p-2 rounded-full top-0 right-0"
+                  size="sm"
+                >
+                  <ButtonIcon className="m-0 p-0" as={CloseIcon} />
+                </Button>
+              </View>
+            ) : (
+              // Render the add button
+              <Button
+                size="lg"
+                className="mt-2 mr-2 h-full"
+                action="secondary"
+                onPress={() => setShowActionsheet(true)}
+              >
+                <ButtonIcon as={AddIcon} />
+              </Button>
+            )}
+          </View>
+        )}
+      />
     </View>
   );
 }
