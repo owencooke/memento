@@ -1,8 +1,12 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import UUID4
 
-from server.services.db.models.schema_public_latest import UserInfo
-from server.services.db.queries.user import get_user_info
+from server.services.db.models.schema_public_latest import (
+    UserInfo,
+)
+from server.services.db.queries.user import (
+    get_user_info,
+)
 
 router = APIRouter()
 
