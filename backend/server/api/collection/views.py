@@ -8,17 +8,20 @@ from fastapi import APIRouter, Depends, HTTPException
 from loguru import logger
 from pydantic import UUID4
 
-from server.api.collection.models import NewCollection
+from server.api.collection.models import NewCollection, UpdateCollection
 from server.api.path import get_user_id
 from server.services.db.models.joins import CollectionWithMementos
 from server.services.db.models.schema_public_latest import (
     Collection,
     HasMementoInsert,
+    HasMementoUpdate,
 )
 from server.services.db.queries.collection import (
     associate_memento,
     create_collection,
     get_collections,
+    update_associate_memento,
+    update_collection,
 )
 
 router = APIRouter()
@@ -50,15 +53,41 @@ async def create_new_collection(
         raise HTTPException(status_code=400, detail="Insert Collection Failed")
 
     # Associate mementos with the collection
-    for memento_id in mementos:
-        has_memento = HasMementoInsert(
-            collection_id=inserted_collection.id,
-            memento_id=memento_id,
-        )
-        if not associate_memento(has_memento):
-            raise HTTPException(
-                status_code=400,
-                detail="Associate Memento to Collection Failed.",
-            )
+    # for memento_id in mementos:
+    #     has_memento = HasMementoInsert(
+    #         collection_id=inserted_collection.id,
+    #         memento_id=memento_id,
+    #     )
+    #     if not associate_memento(has_memento):
+    #         raise HTTPException(
+    #             status_code=400,
+    #             detail="Associate Memento to Collection Failed.",
+    #         )
 
     return inserted_collection
+
+
+@router.put("/{id}")
+async def update_collection_and_mementos(
+    id: int,
+    collection: UpdateCollection,
+    mementos: list[int],
+) -> Collection:
+    """Update a collection."""
+
+    updated_collection = update_collection(id, collection)
+    if not updated_collection:
+        raise HTTPException(status_code=400, detail="Update collection failed")
+
+    # for memento_id in mementos:
+    #     has_memento = HasMementoUpdate(
+    #         collection_id=updated_collection.id,
+    #         memento_id=memento_id,
+    #     )
+    #     if not update_associate_memento(has_memento):
+    #         raise HTTPException(
+    #             status_code=400,
+    #             detail="Update Associate Memento to Collection Failed.",
+    #         )
+
+    return updated_collection
