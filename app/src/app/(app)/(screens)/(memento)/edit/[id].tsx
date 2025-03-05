@@ -22,6 +22,8 @@ import MementoForm, {
 import { GeoLocation } from "@/src/components/inputs/LocationInput";
 import { Photo } from "@/src/hooks/usePhotos";
 import { MementoWithImages } from "@/src/api-client/generated";
+import { isEqual } from "lodash";
+import { useMemo } from "react";
 
 export default function EditMemento() {
   // Get user id
@@ -45,31 +47,42 @@ export default function EditMemento() {
     updateMementoAndImagesApiUserUserIdMementoIdPutMutation(),
   );
 
-  // Convert memento into initial form data values
-  const prepareInitialValues = (): MementoFormData => ({
-    memento: {
-      caption: memento.caption || "",
-      date: memento.date ? getDateFromISO(memento.date) : null,
-      location: {
-        text: memento.location || "",
-        lat: memento.coordinates?.lat,
-        long: memento.coordinates?.long,
-      } as GeoLocation,
-    },
-    photos:
-      memento.images?.map(
-        (img) =>
-          ({
-            uri: img.url,
-            storedInCloud: true,
-            fileName: img.filename,
-            assetId: img.id.toString(),
-          }) as Photo,
-      ) || [],
-  });
+  // Convert fetched memento into initial form values
+  const initialFormValues = useMemo((): MementoFormData => {
+    return {
+      memento: {
+        caption: memento?.caption || "",
+        date: memento?.date ? getDateFromISO(memento.date) : null,
+        location: {
+          text: memento?.location || "",
+          lat: memento?.coordinates?.lat,
+          long: memento?.coordinates?.long,
+        } as GeoLocation,
+      },
+      photos:
+        memento?.images?.map(
+          (img) =>
+            ({
+              uri: img.url,
+              storedInCloud: true,
+              fileName: img.filename,
+              assetId: img.id.toString(),
+            }) as Photo,
+        ) || [],
+    };
+  }, [memento]);
+
+  const handleRedirect = () =>
+    router.dismissTo(`/(app)/(screens)/(memento)/${memento.id}`);
 
   // PUT Edit Memento Form
   const onSubmit = async (form: MementoFormData) => {
+    // Skip form submission if no changes made
+    if (isEqual(form, initialFormValues)) {
+      handleRedirect();
+      return;
+    }
+
     const {
       location: { lat, long, text },
       date,
@@ -104,17 +117,13 @@ export default function EditMemento() {
       id: memento.id,
     };
 
-    let body: any = {
-      memento_str: updatedMemento,
-      image_metadata_str: imageMetadata,
-    };
-    if (images.length > 0) {
-      body = { ...body, images };
-    }
-
     await updateMutation.mutateAsync(
       {
-        body,
+        body: {
+          memento_str: updatedMemento,
+          image_metadata_str: imageMetadata,
+          images: images.length > 0 ? images : null,
+        } as any,
         path,
         bodySerializer: formDataBodySerializer.bodySerializer,
       },
@@ -126,7 +135,7 @@ export default function EditMemento() {
               path: { user_id: user_id },
             }),
           });
-          router.dismissTo(`/(app)/(screens)/(memento)/${memento.id}`);
+          handleRedirect();
         },
         onError: (error: any) =>
           console.error("Failed to update memento", error),
@@ -142,7 +151,7 @@ export default function EditMemento() {
       >
         {memento && (
           <MementoForm
-            initialValues={prepareInitialValues()}
+            initialValues={initialFormValues}
             title="Edit Memento"
             submitButtonText="Save Changes"
             isSubmitting={updateMutation.isPending}
