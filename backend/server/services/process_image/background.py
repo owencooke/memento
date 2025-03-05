@@ -1,3 +1,8 @@
+"""
+@description Background removal for images.
+@requirements FR-10
+"""
+
 from PIL.Image import Image
 from rembg import remove
 

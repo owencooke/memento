@@ -7,6 +7,7 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import DraggableGrid from "react-native-draggable-grid";
 import PhotoSourceSheet from "./PhotoSourceSheet";
 import { Badge, BadgeIcon } from "../ui/badge";
+import BackgroundRemovalModal from "../forms/BackgroundRemovalModal";
 
 interface GridItem {
   key: number;
@@ -25,8 +26,18 @@ export default function PhotoSelectGrid({
   setScrollEnabled,
 }: PhotoSelectGridProps) {
   const [showActionsheet, setShowActionsheet] = useState(false);
-  const { hasPermission, addPhotos, photos, removePhoto, setPhotos } =
-    usePhotos({ initialPhotos });
+  const {
+    hasPermission,
+    addPhotos,
+    photos,
+    removePhoto,
+    setPhotos,
+    pendingProcessedPhotos,
+    replacePhoto,
+  } = usePhotos({ initialPhotos });
+
+  // State for background removal modal
+  const [showProcessingModal, setShowProcessingModal] = useState(false);
 
   useEffect(() => {
     onChange(photos).catch((e) => console.error(e));
@@ -58,6 +69,21 @@ export default function PhotoSelectGrid({
     },
     [setPhotos, setScrollEnabled],
   );
+
+  // Accept the processed image
+  const acceptProcessedPhoto = () => {
+    // if (processedPhoto && processingPhoto) {
+    //   replacePhoto(processingPhoto, processedPhoto);
+    // }
+    closeProcessingModal();
+  };
+
+  // Close the modal and reset states
+  const closeProcessingModal = () => {
+    setShowProcessingModal(false);
+    // setProcessingPhoto(null);
+    // setProcessedPhoto(null);
+  };
 
   if (!hasPermission) {
     return <Text>No access to camera</Text>;
@@ -117,6 +143,11 @@ export default function PhotoSelectGrid({
           </View>
         )}
       />
+
+      {/* Background removal modal */}
+      {pendingProcessedPhotos.map((backgroundFreePhoto, idx) => (
+        <BackgroundRemovalModal key={idx} photo={backgroundFreePhoto} />
+      ))}
     </View>
   );
 }
