@@ -97,7 +97,7 @@ export default function ViewCollection() {
         onSuccess: () => {
           queryClient.invalidateQueries({
             queryKey: getUsersCollectionsApiUserUserIdCollectionGetQueryKey({
-              path: { user_id },
+              path: { user_id: user_id },
             }),
           });
           setDeleteModalVisible(false);
