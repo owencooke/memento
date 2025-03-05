@@ -37,10 +37,12 @@ export default function PhotoSelectGrid({
     rejectProcessedPhoto,
   } = usePhotos({ initialPhotos });
 
+  // When photos change, send updated state to parent component
   useEffect(() => {
     onChange(photos).catch((e) => console.error(e));
   }, [onChange, photos]);
 
+  // Include non-draggable add button at end of photo grid
   const gridData = useMemo(
     () => [
       ...photos.map((photo, index) => ({
@@ -57,6 +59,7 @@ export default function PhotoSelectGrid({
     [photos],
   );
 
+  // Executed when user releases a dragged photo
   const handleReorderPhotos = useCallback(
     (data: GridItem[]) => {
       const newPhotos = data

@@ -1,6 +1,8 @@
 /**
- * @description Hook for requesting camera permissions and fetching
- *      photos/EXIF metadata from the device's camera or image library.
+ * @description Hook for:
+ *      - requesting camera permissions
+ *      - fetching photos/EXIF metadata from device's camera or image library
+ *      - calling background removal API and handling accept/reject result actions
  * @requirements FR-4, FR-6, FR-7, FR-10
  */
 import { useState, useEffect } from "react";
