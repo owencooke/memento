@@ -19,6 +19,7 @@ from server.services.db.models.schema_public_latest import (
 from server.services.db.queries.collection import (
     associate_memento,
     create_collection,
+    db_delete_collection,
     get_collections,
     update_associate_memento,
     update_collection,
@@ -99,7 +100,7 @@ async def delete_collection(
 ) -> Collection:
     """Delete a collection."""
 
-    deleted_collection = delete_collection(id)
+    deleted_collection = db_delete_collection(id)
     if not deleted_collection:
         raise HTTPException(status_code=400, detail="Delete collection failed")
 

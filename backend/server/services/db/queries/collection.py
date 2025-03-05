@@ -51,7 +51,7 @@ def update_collection(id: int, updated_collection: UpdateCollection) -> Collecti
     return Collection(**response.data[0])
 
 
-def delete_collection(id: int) -> Collection:
+def db_delete_collection(id: int) -> Collection:
     """Deletes a collection from the DB."""
     response = supabase.table("collection").delete().eq("id", id).execute()
     return Collection(**response.data[0])
