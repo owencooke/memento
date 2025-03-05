@@ -23,6 +23,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Heading } from "@/src/components/ui/heading";
 import { FlatList, Pressable } from "react-native";
 import MementoCard from "@/src/components/cards/MementoCard";
+import DeleteCollectionModal from "@/src/components/modals/DeleteModal";
 
 const buttonClasses = "flex-1";
 const iconClasses = "w-6 h-6";
@@ -62,13 +63,22 @@ export default function ViewCollection() {
   // TODO: Show more details
   const handleShowMoreDetails = () => console.debug("Not implemented yet");
 
-  // TODO: Edit Collection
-  const handleEditCollection = (id: number) => {
+  const handleEditCollection = () => {
     router.push(`/(app)/(screens)/(collection)/edit/${collection?.id}`);
   };
 
   const handleViewMemento = (id: number) => {
     router.push(`/(app)/(screens)/(memento)/${id}`);
+  };
+
+  const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
+  const handleDeletePress = () => {
+    setDeleteModalVisible(true);
+  };
+
+  const handleConfirmDelete = () => {
+    console.log("Deleting collection..."); // TODO: API call to delete
+    setDeleteModalVisible(false);
   };
 
   return (
@@ -142,10 +152,17 @@ export default function ViewCollection() {
           <ButtonIcon as={EditIcon} className={iconClasses} />
         </Button>
         {/* TODO: open Delete confirmation modal */}
-        <Button size="xl" className={buttonClasses}>
+        <Button size="xl" className={buttonClasses} onPress={handleDeletePress}>
           <ButtonIcon as={TrashIcon} className={iconClasses} />
         </Button>
       </Box>
+
+      {/* Delete Collection Modal */}
+      <DeleteCollectionModal
+        visible={isDeleteModalVisible}
+        onClose={() => setDeleteModalVisible(false)}
+        onConfirm={handleConfirmDelete}
+      />
     </SafeAreaView>
   );
 }
