@@ -31,7 +31,9 @@ export default function CollectionCard({
   );
 
   return (
-    <Box className={"flex-1 gap-4 p-3 rounded-xl shadow-hard-3"}>
+    <Box
+      className={"flex-1 gap-4 p-3 rounded-xl shadow-hard-3 bg-background-0"}
+    >
       <Box className="aspect-square">
         <Image
           source={{ uri: "https://placehold.co/400.png" }}
