@@ -63,6 +63,7 @@ export default function EditMemento() {
             uri: img.url,
             storedInCloud: true,
             fileName: img.filename,
+            assetId: img.id.toString(),
           }) as Photo,
       ) || [],
   });
@@ -97,19 +98,24 @@ export default function EditMemento() {
         type: photo.mimeType,
         name: photo.fileName,
       }));
+    console.log({ images });
 
     const path = {
       user_id,
       id: memento.id,
     };
 
+    let body: any = {
+      memento_str: updatedMemento,
+      image_metadata_str: imageMetadata,
+    };
+    if (images.length > 0) {
+      body = { ...body, images };
+    }
+
     await updateMutation.mutateAsync(
       {
-        body: {
-          memento_str: updatedMemento,
-          image_metadata_str: imageMetadata,
-          images,
-        } as any,
+        body,
         path,
         bodySerializer: formDataBodySerializer.bodySerializer,
       },

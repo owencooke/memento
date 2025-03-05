@@ -4,7 +4,7 @@
 """
 
 import json
-from typing import Annotated
+from typing import Annotated, Optional
 
 from fastapi import APIRouter, Depends, Form, UploadFile
 from fastapi.responses import JSONResponse
@@ -93,7 +93,7 @@ async def update_memento_and_images(
     id: int,
     memento_str: Annotated[str, Form()],
     image_metadata_str: Annotated[str, Form()],
-    images: list[UploadFile],
+    images: Optional[list[UploadFile]] = None,
 ) -> JSONResponse:
     """Put route for updating a memento and its associated images."""
 
@@ -129,18 +129,19 @@ async def update_memento_and_images(
         logger.info(f"Deleted images from storage: {files_to_delete}")
 
     # Upload new images/metadata
-    for image in images:
-        path = await upload_image(image)
-        logger.info(f"Uploaded new image {path} to storage.")
+    if images is not None:
+        for image in images:
+            path = await upload_image(image)
+            logger.info(f"Uploaded new image {path} to storage.")
 
-        for i in range(len(image_metadata)):
-            if image_metadata[i].filename == image.filename:
-                image_metadata[i].filename = path
-                create_image_metadata(image_metadata.pop(i), updated_memento.id)
-                logger.info(
-                    f"Created image metadata for {image.filename} associated with Memento[{updated_memento.id}]"
-                )
-                break
+            for i in range(len(image_metadata)):
+                if image_metadata[i].filename == image.filename:
+                    image_metadata[i].filename = path
+                    create_image_metadata(image_metadata.pop(i), updated_memento.id)
+                    logger.info(
+                        f"Created image metadata for {image.filename} associated with Memento[{updated_memento.id}]"
+                    )
+                    break
 
     return JSONResponse(
         content={"message": f"Successfully updated Memento[{updated_memento.id}]"},
