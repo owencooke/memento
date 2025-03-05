@@ -72,7 +72,7 @@ export default function ViewMemento() {
                       source={{ uri: image.url }}
                       className="w-full h-full"
                       alt=""
-                      resizeMode="cover"
+                      resizeMode="contain"
                     />
                   </View>
                 ))}
