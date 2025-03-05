@@ -1,6 +1,6 @@
 """
 @description Supabase Storage functions for images
-@requirements FR-20, FR-28
+@requirements FR-20, FR-28, FR-31
 """
 
 import uuid

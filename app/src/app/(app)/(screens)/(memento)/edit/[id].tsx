@@ -1,5 +1,6 @@
 /**
  * @description Screen for editing an existing memento.
+ * @requirements FR-30, FR31, FR-32, FR-33
  */
 
 import { KeyboardAvoidingView, Platform } from "react-native";
