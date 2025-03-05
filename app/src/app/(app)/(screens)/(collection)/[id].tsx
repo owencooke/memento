@@ -63,7 +63,9 @@ export default function ViewCollection() {
   const handleShowMoreDetails = () => console.debug("Not implemented yet");
 
   // TODO: Edit Collection
-  const handleEditCollection = () => console.debug("Not implemented yet");
+  const handleEditCollection = (id: number) => {
+    router.push(`/(app)/(screens)/(collection)/edit/${collection?.id}`);
+  };
 
   const handleViewMemento = (id: number) => {
     router.push(`/(app)/(screens)/(memento)/${id}`);
