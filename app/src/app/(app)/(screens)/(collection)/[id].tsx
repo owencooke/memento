@@ -3,7 +3,9 @@
  * @requirements FR-3
  */
 import {
+  deleteCollectionApiUserUserIdCollectionIdDeleteMutation,
   getUsersCollectionsApiUserUserIdCollectionGetOptions,
+  getUsersCollectionsApiUserUserIdCollectionGetQueryKey,
   getUsersMementosApiUserUserIdMementoGetOptions,
 } from "@/src/api-client/generated/@tanstack/react-query.gen";
 import { ButtonIcon, Button } from "@/src/components/ui/button";
@@ -15,7 +17,7 @@ import {
 } from "@/src/components/ui/icon";
 import { Text } from "@/src/components/ui/text";
 import { useSession } from "@/src/context/AuthContext";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import { useMemo, useState } from "react";
 import { Box } from "@/src/components/ui/box";
@@ -24,12 +26,14 @@ import { Heading } from "@/src/components/ui/heading";
 import { FlatList, Pressable } from "react-native";
 import MementoCard from "@/src/components/cards/MementoCard";
 import DeleteCollectionModal from "@/src/components/modals/DeleteModal";
+import { queryClient } from "@/src/app/_layout";
 
 const buttonClasses = "flex-1";
 const iconClasses = "w-6 h-6";
 
 export default function ViewCollection() {
   const { session } = useSession();
+  const user_id = String(session?.user.id);
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: collections } = useQuery({
     ...getUsersCollectionsApiUserUserIdCollectionGetOptions({
@@ -59,6 +63,9 @@ export default function ViewCollection() {
         : mementos,
     [mementos],
   );
+  const deleteMutation = useMutation(
+    deleteCollectionApiUserUserIdCollectionIdDeleteMutation(),
+  );
 
   // TODO: Show more details
   const handleShowMoreDetails = () => console.debug("Not implemented yet");
@@ -78,7 +85,28 @@ export default function ViewCollection() {
 
   const handleConfirmDelete = () => {
     console.log("Deleting collection..."); // TODO: API call to delete
-    setDeleteModalVisible(false);
+    onDelete(Number(id)); // FIXME: collection?.id is number | undefined
+  };
+
+  const onDelete = async (id: number) => {
+    const path = { user_id, id };
+
+    await deleteMutation.mutateAsync(
+      { path },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({
+            queryKey: getUsersCollectionsApiUserUserIdCollectionGetQueryKey({
+              path,
+            }),
+          });
+          setDeleteModalVisible(false);
+          router.dismissTo("/(app)/(tabs)/collections");
+        },
+        onError: (error: any) =>
+          console.error("Failed to delete collection", error),
+      },
+    );
   };
 
   return (

@@ -350,6 +350,33 @@ export type CreateNewCollectionApiUserUserIdCollectionPostResponses = {
 
 export type CreateNewCollectionApiUserUserIdCollectionPostResponse = CreateNewCollectionApiUserUserIdCollectionPostResponses[keyof CreateNewCollectionApiUserUserIdCollectionPostResponses];
 
+export type DeleteCollectionApiUserUserIdCollectionIdDeleteData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/api/user/{user_id}/collection/{id}';
+};
+
+export type DeleteCollectionApiUserUserIdCollectionIdDeleteErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type DeleteCollectionApiUserUserIdCollectionIdDeleteError = DeleteCollectionApiUserUserIdCollectionIdDeleteErrors[keyof DeleteCollectionApiUserUserIdCollectionIdDeleteErrors];
+
+export type DeleteCollectionApiUserUserIdCollectionIdDeleteResponses = {
+    /**
+     * Successful Response
+     */
+    200: Collection;
+};
+
+export type DeleteCollectionApiUserUserIdCollectionIdDeleteResponse = DeleteCollectionApiUserUserIdCollectionIdDeleteResponses[keyof DeleteCollectionApiUserUserIdCollectionIdDeleteResponses];
+
 export type UpdateCollectionAndMementosApiUserUserIdCollectionIdPutData = {
     body: BodyUpdateCollectionAndMementosApiUserUserIdCollectionIdPut;
     path: {
