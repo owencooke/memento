@@ -18,7 +18,7 @@ This PR accomplishes the following:
 - Documentation is up-to-date
   - [ ] Code is commented, explaining functionality
   - [ ] Each file references one or more FRs mandating its inclusion
-  - [ ] If new installation steps or environemnt variables required, READMEs updated
+  - [ ] If new installation steps or environment variables required, READMEs updated
 - [ ] Sync scripts for API/DB run and up-to-date
 - [ ] If bugs discovered, issues opened with appropriate severity level
 
