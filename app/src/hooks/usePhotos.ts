@@ -11,6 +11,7 @@ import * as ImagePicker from "expo-image-picker";
 import { useMutation } from "@tanstack/react-query";
 import { removeImageBackgroundApiImageRemoveBackgroundPostMutation } from "../api-client/generated/@tanstack/react-query.gen";
 import { formDataBodySerializer } from "../api-client/formData";
+import { convertBlobToBase64 } from "../libs/blob";
 
 export type DeviceSource = "picker" | "camera";
 export type Photo = Omit<
@@ -96,21 +97,11 @@ export default function usePhotos({ initialPhotos = [] }: UsePhotosProps) {
           name: photo.fileName,
         },
       };
-
-      // Call POST endpoint to remove background
       const response = await removeBgMutation.mutateAsync({
         body,
         bodySerializer: formDataBodySerializer.bodySerializer,
       });
-
-      // Convert binary blob result to base64 image string
-      return new Promise<string>((resolve) => {
-        const fileReaderInstance = new FileReader();
-        fileReaderInstance.readAsDataURL(response as Blob);
-        fileReaderInstance.onload = () => {
-          resolve(fileReaderInstance.result as string);
-        };
-      });
+      return convertBlobToBase64(response as Blob);
     } catch (error) {
       console.error("Failed to remove image background:", error);
       return "";
