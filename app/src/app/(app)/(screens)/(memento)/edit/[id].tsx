@@ -115,12 +115,12 @@ export default function EditMemento() {
       },
       {
         onSuccess: () => {
-          // Invalidate cached GET mementos before redirecting
-          //   queryClient.invalidateQueries({
-          //     queryKey: getUsersMementosApiUserUserIdMementoGetQueryKey({
-          //       path: { user_id: user_id },
-          //     }),
-          //   });
+          //   Invalidate cached GET mementos before redirecting
+          queryClient.invalidateQueries({
+            queryKey: getUsersMementosApiUserUserIdMementoGetQueryKey({
+              path: { user_id: user_id },
+            }),
+          });
           router.dismissTo(`/(app)/(screens)/(memento)/${memento.id}`);
         },
         onError: (error: any) =>

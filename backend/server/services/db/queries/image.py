@@ -27,11 +27,11 @@ def delete_image_metadata(id: int) -> bool:
     return len(response.data) == 1
 
 
-def update_image_metadata(id: int, new_metadata: NewImageMetadata) -> bool:
-    """Deletes an image metadata record for specific id."""
+def update_image_order(id: int, order_index: int) -> bool:
+    """Updates an image metadata record with new re-ordered index."""
     response = (
         supabase.table("image")
-        .update(**new_metadata.model_dump(mode="json"))
+        .update({"order_index": order_index})
         .eq("id", id)
         .execute()
     )

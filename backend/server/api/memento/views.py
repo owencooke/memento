@@ -22,7 +22,7 @@ from server.services.db.queries.image import (
     create_image_metadata,
     delete_image_metadata,
     get_images_for_memento,
-    update_image_metadata,
+    update_image_order,
 )
 from server.services.db.queries.memento import (
     create_memento,
@@ -96,17 +96,12 @@ async def update_memento_and_images(
     images: list[UploadFile],
 ) -> JSONResponse:
     """Put route for updating a memento and its associated images."""
-    logger.info(f"Updating memento with ID={id}")
 
     # Parse JSON objects from multipart form strings
     new_memento_fields = UpdateMemento.model_validate(json.loads(memento_str))
     image_metadata = [
         NewImageMetadata.model_validate(item) for item in json.loads(image_metadata_str)
     ]
-
-    # Log parsed memento and metadata
-    logger.info(f"Parsed updated memento fields: {new_memento_fields}")
-    logger.info(f"Parsed updated image metadata: {image_metadata}")
 
     # Update the memento record
     updated_memento = update_memento(id, new_memento_fields)
@@ -126,7 +121,7 @@ async def update_memento_and_images(
             files_to_delete.append(old_metadata.filename)
         else:
             # User kept old image; update DB record in case images re-ordered
-            update_image_metadata(old_metadata.id, new_metadata)
+            update_image_order(old_metadata.id, new_metadata.order_index)
             logger.info(f"Updated image metadata for {new_metadata.filename}")
 
     if len(files_to_delete) > 0:
