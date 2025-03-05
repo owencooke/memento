@@ -9,7 +9,7 @@ export type BodyCreateNewMementoApiUserUserIdMementoPost = {
 export type BodyUpdateMementoAndImagesApiUserUserIdMementoIdPut = {
     memento_str: string;
     image_metadata_str: string;
-    images: Array<Blob | File>;
+    images?: Array<Blob | File> | null;
 };
 
 /**
@@ -162,7 +162,7 @@ export type UpdateMementoAndImagesApiUserUserIdMementoIdPutData = {
         id: number;
     };
     query?: never;
-    url: '/api/user/{user_id}/memento/{id}}';
+    url: '/api/user/{user_id}/memento/{id}';
 };
 
 export type UpdateMementoAndImagesApiUserUserIdMementoIdPutErrors = {

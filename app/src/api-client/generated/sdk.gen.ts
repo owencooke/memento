@@ -57,7 +57,7 @@ export const getUsersMementosApiUserUserIdMementoGet = <ThrowOnError extends boo
  * Create New Memento
  * Post route for creating a new memento.
  *
- * 3 key steps:
+ * Three main steps:
  * 1. Creates a memento DB record
  * 2. Uploads associated images to object storage,
  * 3. Stores a metadata DB record for each image.
@@ -80,18 +80,17 @@ export const createNewMementoApiUserUserIdMementoPost = <ThrowOnError extends bo
  * Update Memento And Images
  * Put route for updating a memento and its associated images.
  *
- * 4 key steps:
+ * Three main steps:
  * 1. Updates the memento DB record
- * 2. For new images, uploads files to object storage / creates new DB record
- * 3. Updates any image DB records with new order_index (position could have changed)
- * 4. Delete any images from DB/storage that were removed
+ * 2. For old images, delete entries user removed or update with new re-ordering
+ * 3. For new images, uploads files to object storage / creates new DB record
  *
  * Uses multipart/form-data to upload JSON/binary payloads simultaneously.
  */
 export const updateMementoAndImagesApiUserUserIdMementoIdPut = <ThrowOnError extends boolean = false>(options: Options<UpdateMementoAndImagesApiUserUserIdMementoIdPutData, ThrowOnError>) => {
     return (options.client ?? _heyApiClient).put<unknown, UpdateMementoAndImagesApiUserUserIdMementoIdPutError, ThrowOnError>({
         ...formDataBodySerializer,
-        url: '/api/user/{user_id}/memento/{id}}',
+        url: '/api/user/{user_id}/memento/{id}',
         ...options,
         headers: {
             'Content-Type': null,

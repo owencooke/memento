@@ -98,7 +98,6 @@ export default function EditMemento() {
         type: photo.mimeType,
         name: photo.fileName,
       }));
-    console.log({ images });
 
     const path = {
       user_id,

@@ -59,7 +59,7 @@ async def create_new_memento(
 ) -> JSONResponse:
     """Post route for creating a new memento.
 
-    3 key steps:
+    Three main steps:
         1. Creates a memento DB record
         2. Uploads associated images to object storage,
         3. Stores a metadata DB record for each image.
@@ -88,14 +88,22 @@ async def create_new_memento(
     )
 
 
-@router.put("/{id}}")
+@router.put("/{id}")
 async def update_memento_and_images(
     id: int,
     memento_str: Annotated[str, Form()],
     image_metadata_str: Annotated[str, Form()],
     images: Optional[list[UploadFile]] = None,
 ) -> JSONResponse:
-    """Put route for updating a memento and its associated images."""
+    """Put route for updating a memento and its associated images.
+
+    Three main steps:
+        1. Updates the memento DB record
+        2. For old images, delete entries user removed or update with new re-ordering
+        3. For new images, uploads files to object storage / creates new DB record
+
+    Uses multipart/form-data to upload JSON/binary payloads simultaneously.
+    """
 
     # Parse JSON objects from multipart form strings
     new_memento_fields = UpdateMemento.model_validate(json.loads(memento_str))
@@ -107,41 +115,39 @@ async def update_memento_and_images(
     updated_memento = update_memento(id, new_memento_fields)
     logger.info(f"Updated memento with ID={updated_memento.id}")
 
-    # Update ordering of previous images (or delete if removed)
+    # Old images
     files_to_delete = []
-    for old_metadata in get_images_for_memento(id):
-        new_metadata = next(
-            (new for new in image_metadata if new.filename == old_metadata.filename),
+    for metadata in get_images_for_memento(id):
+        image_kept = next(
+            (new for new in image_metadata if new.filename == metadata.filename),
             None,
         )
-        if new_metadata is None:
-            # User removed the old image; delete from DB/storage
-            logger.info(f"Removing image {old_metadata.filename} from DB and storage.")
-            delete_image_metadata(old_metadata.id)
-            files_to_delete.append(old_metadata.filename)
-        else:
+        if image_kept:
             # User kept old image; update DB record in case images re-ordered
-            update_image_order(old_metadata.id, new_metadata.order_index)
-            logger.info(f"Updated image metadata for {new_metadata.filename}")
-
-    if len(files_to_delete) > 0:
+            update_image_order(metadata.id, image_kept.order_index)
+            logger.info(f"Updated image metadata for file: {image_kept.filename}")
+        else:
+            # User removed the old image; delete from DB/storage
+            delete_image_metadata(metadata.id)
+            files_to_delete.append(metadata.filename)
+            logger.info(f"Removed Image[{metadata.id}] record from DB")
+    if files_to_delete:
         delete_images(files_to_delete)
         logger.info(f"Deleted images from storage: {files_to_delete}")
 
-    # Upload new images/metadata
-    if images is not None:
+    # New images
+    if images:
         for image in images:
+            # Upload image file to storage
             path = await upload_image(image)
             logger.info(f"Uploaded new image {path} to storage.")
-
-            for i in range(len(image_metadata)):
-                if image_metadata[i].filename == image.filename:
-                    image_metadata[i].filename = path
-                    create_image_metadata(image_metadata.pop(i), updated_memento.id)
-                    logger.info(
-                        f"Created image metadata for {image.filename} associated with Memento[{updated_memento.id}]"
-                    )
-                    break
+            # Create new DB record for metadata
+            new_metadata = next(
+                new for new in image_metadata if new.filename == image.filename
+            )
+            new_metadata.filename = path
+            create_image_metadata(new_metadata, updated_memento.id)
+            logger.info(f"Created image metadata record for {image.filename}")
 
     return JSONResponse(
         content={"message": f"Successfully updated Memento[{updated_memento.id}]"},
