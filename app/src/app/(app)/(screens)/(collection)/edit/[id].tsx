@@ -101,7 +101,7 @@ export default function EditCollection() {
           //   Invalidate cached GET collections before redirecting
           queryClient.invalidateQueries({
             queryKey: getUsersCollectionsApiUserUserIdCollectionGetQueryKey({
-              path,
+              path: { user_id },
             }),
           });
           handleRedirect();
