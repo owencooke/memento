@@ -32,6 +32,7 @@ export interface IDraggableGridProps<DataType extends IBaseItemType> {
   renderItem: (item: DataType, order: number) => React.ReactElement<any>;
   style?: ViewStyle;
   itemHeight?: number;
+  itemHeights?: (number | undefined)[]; // Add this line
   dragStartAnimation?: StyleProp<any>;
   onItemPress?: (item: DataType) => void;
   onDragItemActive?: (item: DataType) => void;
@@ -40,7 +41,6 @@ export interface IDraggableGridProps<DataType extends IBaseItemType> {
   onDragRelease?: (newSortedData: DataType[]) => void;
   onResetSort?: (newSortedData: DataType[]) => void;
   delayLongPress?: number;
-  itemHeights?: (number | undefined)[];
 }
 interface IMap<T> {
   [key: string]: T;
@@ -79,6 +79,22 @@ export const DraggableGrid = function <DataType extends IBaseItemType>(
   });
   const [activeItemIndex, setActiveItemIndex] = useState<undefined | number>();
 
+  function getItemHeight(index: number): number {
+    // Instead of using the direct index, we need to find the corresponding
+    // item in the data array based on the order
+    if (props.itemHeights) {
+      const item = items[index];
+      if (item) {
+        // Find the current order of this item
+        const order = orderMap[item.key].order;
+        // Use the height based on its order position
+        if (props.itemHeights[order] !== undefined) {
+          return props.itemHeights[order]!;
+        }
+      }
+    }
+    return blockHeight;
+  }
   const assessGridSize = (event: IOnLayoutEvent) => {
     if (!hadInitBlockSize) {
       let blockWidth = event.nativeEvent.layout.width / props.numColumns;
@@ -112,20 +128,47 @@ export const DraggableGrid = function <DataType extends IBaseItemType>(
     if (blockPositions[order]) {
       return blockPositions[order];
     }
+
     const columnOnRow = order % props.numColumns;
-    const y = blockHeight;
-    //   (props?.itemHeights && props?.itemHeights[order] !== undefined
-    //     ? props?.itemHeights[order]
-    //     : blockHeight) * Math.floor(order / props.numColumns);
+
+    // Calculate Y position based on heights of items above this one
+    let y = 0;
+    const rowIndex = Math.floor(order / props.numColumns);
+
+    // For each row before this one, add the height of items in that row
+    for (let i = 0; i < rowIndex; i++) {
+      // Find the tallest item in this row
+      let rowMaxHeight = 0;
+      for (let j = 0; j < props.numColumns; j++) {
+        const itemIndex = i * props.numColumns + j;
+        if (itemIndex < props.data.length) {
+          rowMaxHeight = Math.max(rowMaxHeight, getItemHeight(itemIndex));
+        }
+      }
+      y += rowMaxHeight || blockHeight;
+    }
+
     const x = columnOnRow * blockWidth;
-    return {
-      x,
-      y,
-    };
+    return { x, y };
   }
   function resetGridHeight() {
-    const rowCount = Math.ceil(props.data.length / props.numColumns);
-    gridHeight.setValue(rowCount * blockHeight);
+    let totalHeight = 0;
+    const itemCount = props.data.length;
+    const rowCount = Math.ceil(itemCount / props.numColumns);
+
+    // Calculate height by summing the tallest item in each row
+    for (let i = 0; i < rowCount; i++) {
+      let maxHeightInRow = 0;
+      for (let j = 0; j < props.numColumns; j++) {
+        const itemIndex = i * props.numColumns + j;
+        if (itemIndex < itemCount) {
+          maxHeightInRow = Math.max(maxHeightInRow, getItemHeight(itemIndex));
+        }
+      }
+      totalHeight += maxHeightInRow || blockHeight;
+    }
+
+    gridHeight.setValue(totalHeight);
   }
   function onBlockPress(itemIndex: number) {
     props.onItemPress && props.onItemPress(items[itemIndex].itemData);
@@ -300,12 +343,8 @@ export const DraggableGrid = function <DataType extends IBaseItemType>(
     }
   }
   function getBlockStyle(itemIndex: number) {
-    console.log(
-      "blockHeight",
-      props?.itemHeights && props?.itemHeights[itemIndex] !== undefined
-        ? props?.itemHeights[itemIndex]
-        : blockHeight,
-    );
+    const itemHeight = getItemHeight(itemIndex);
+
     return [
       {
         justifyContent: "center",
@@ -313,10 +352,7 @@ export const DraggableGrid = function <DataType extends IBaseItemType>(
       },
       hadInitBlockSize && {
         width: blockWidth,
-        height:
-          props?.itemHeights && props?.itemHeights[itemIndex] !== undefined
-            ? props?.itemHeights[itemIndex]
-            : blockHeight,
+        height: itemHeight,
         position: "absolute",
         top: items[itemIndex].currentPosition.getLayout().top,
         left:

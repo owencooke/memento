@@ -96,7 +96,7 @@ export default function BulkCreateMemento() {
           data={gridData}
           onDragRelease={handleReorderPhotos}
           itemHeights={gridData.map((item) =>
-            item.type === "photo" ? undefined : 24,
+            item.type === "photo" ? undefined : 21,
           )}
           renderItem={(item: GridItem) => {
             if (item.type === "spacer") {
@@ -114,11 +114,7 @@ export default function BulkCreateMemento() {
               );
             } else {
               return (
-                <Button
-                  size="lg"
-                  variant="link"
-                  className="p-0 max-h-5 bg-red-300"
-                >
+                <Button size="lg" variant="link" className="p-0 bg-red-300">
                   <ButtonText> Memento #{item.group + 1}</ButtonText>
                   <ButtonIcon as={EditIcon} className="ml-2" />
                 </Button>
