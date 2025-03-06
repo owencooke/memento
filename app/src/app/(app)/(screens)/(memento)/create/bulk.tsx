@@ -96,9 +96,10 @@ export default function BulkCreateMemento() {
           renderItem={(item: GridItem) => {
             if (item.type === "spacer") {
               return (
-                <View>
-                  <Text>{item.key}</Text>
-                </View>
+                <>
+                  {/* Uncomment if debugging spacer behaviour */}
+                  {/* <Text>{item.key}</Text> */}
+                </>
               );
             } else if (item.type === "photo" && item.photo) {
               return (
@@ -163,12 +164,12 @@ const addPhotosInGroup = (
       group,
     }));
 
-// Adds trailing spacers after photos
+// Adds trailing spacers after photos (to ensure header starts on next row)
 const addTrailingSpacers = (
   group: number,
   groupPhotosLength: number,
 ): GridItem[] => {
-  const remainder = (groupPhotosLength + 1) % 3;
+  const remainder = groupPhotosLength % 3;
   const spacersNeeded = remainder === 0 ? 3 : 3 - remainder;
   return Array.from({ length: spacersNeeded }, (_, i) =>
     createSpacer(group, i + 4, "spacer" as ItemType, false),
@@ -180,8 +181,9 @@ const buildGroupItems = (group: number, groupedPhotos: PhotoWithGroup[]) => {
   const header = [
     createSpacer(group, 0, "header"),
     createSpacer(group, 1, "spacer"),
-    createSpacer(group, 2, "spacer"),
-    createSpacer(group, 3, "spacer", false),
+    // Note: this spacer must be re-orderable, because trying to move a photo down to
+    // a different group will move the first photo from moved-to group to move up (instead of staying)
+    createSpacer(group, 2, "spacer", false),
   ];
   const photos = addPhotosInGroup(group, groupedPhotos);
   const trailingSpacers = addTrailingSpacers(group, photos.length);
