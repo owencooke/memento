@@ -141,7 +141,6 @@ export const DraggableGrid = function <DataType extends IBaseItemType>(
     const itemCount = props.data.length;
     const rowCount = Math.ceil(itemCount / props.numColumns);
 
-    // Calculate height by summing the tallest item in each row
     for (let i = 0; i < rowCount; i++) {
       let maxHeightInRow = 0;
       for (let j = 0; j < props.numColumns; j++) {

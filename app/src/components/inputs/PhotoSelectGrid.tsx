@@ -3,7 +3,7 @@ import usePhotos, { Photo } from "../../hooks/usePhotos";
 import { Button, ButtonIcon } from "../ui/button";
 import { AddIcon } from "../ui/icon";
 import { useEffect, useState, useMemo, useCallback } from "react";
-import DraggableGrid from "react-native-draggable-grid";
+import DraggableGrid from "@/src/components/draggable-grid";
 import PhotoSourceSheet from "./PhotoSourceSheet";
 import InteractivePhotoCard from "../cards/InteractivePhotoCard";
 

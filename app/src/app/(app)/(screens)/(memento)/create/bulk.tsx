@@ -6,7 +6,6 @@
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useCallback, useMemo, useState } from "react";
 import { View } from "react-native";
-// import DraggableGrid from "react-native-draggable-grid";
 import DraggableGrid from "@/src/components/draggable-grid";
 import { Button, ButtonIcon, ButtonText } from "@/src/components/ui/button";
 import usePhotos, { Photo } from "@/src/hooks/usePhotos";
