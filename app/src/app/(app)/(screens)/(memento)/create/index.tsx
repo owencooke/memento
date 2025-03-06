@@ -85,6 +85,9 @@ export default function CreateMemento() {
     );
   };
 
+  const handleBulkCreate = () =>
+    router.push("/(app)/(screens)/(memento)/create/bulk");
+
   return (
     <SafeAreaView className="flex-1" edges={["bottom"]}>
       <KeyboardAvoidingView
@@ -105,6 +108,7 @@ export default function CreateMemento() {
                 className="p-3.5"
                 action="secondary"
                 variant="solid"
+                onPress={handleBulkCreate}
               >
                 <ButtonIcon as={PlayIcon} />
               </Button>
