@@ -14,7 +14,6 @@ import { Image } from "@/src/components/ui/image";
 import { Heading } from "@/src/components/ui/heading";
 import { Text } from "@/src/components/ui/text";
 
-// Types for our grid items
 type ItemType = "photo" | "header" | "spacer";
 
 interface GridItem {
@@ -26,46 +25,39 @@ interface GridItem {
   disabledReSorted?: boolean;
 }
 
+type PhotoWithGroup = Photo & { group: number };
+
 export default function BulkCreateMemento() {
-  const { hasPermission, addPhotos, photos, removePhoto, setPhotos } =
-    usePhotos({ initialPhotos: [] });
+  const { hasPermission, addPhotos, photos } = usePhotos({
+    initialPhotos: [],
+  });
+  const [photoGroups, setPhotoGroups] = useState<PhotoWithGroup[]>([]);
 
-  // Track groups separately from photos
-  const [groups, setGroups] = useState<number[]>([]);
-
-  // When photos are added, assign each to its own group
+  // Replace handleAddPhotos with this simpler version
   const handleAddPhotos = useCallback(
     async (source: "picker" | "camera") => {
-      const newPhotos = await addPhotos(source);
-      const newGroupCount = newPhotos.length;
+      const newRawPhotos = await addPhotos(source);
 
-      if (newGroupCount > 0) {
-        const newGroups = Array.from(
-          { length: newGroupCount },
-          (_, i) => groups.length + i + 1,
-        );
+      // Assign each new photo to its own group
+      const newPhotosWithGroups = newRawPhotos.map((photo, index) => ({
+        ...photo,
+        group: photoGroups.length + index,
+      }));
 
-        setGroups((prev) => [...prev, ...newGroups]);
-      }
+      setPhotoGroups((prev) => [...prev, ...newPhotosWithGroups]);
     },
-    [addPhotos, groups.length],
+    [addPhotos, photoGroups.length],
   );
 
   // Create grid data with headers, photos, and add-group button
   const gridData = useMemo(() => {
-    // Start with an empty array
     const items: GridItem[] = [];
+    const groups = [...new Set(photoGroups.map((p) => p.group))].sort(
+      (a, b) => a - b,
+    );
 
-    // If no groups exist yet, add one
-    if (groups.length === 0 && photos.length > 0) {
-      setGroups([0]);
-    }
-
-    // Distribute photos among groups
-    let photoIndex = 0;
-
-    // Add headers and photos for each group
-    groups.forEach((groupId, index) => {
+    // For each group, add header and photos
+    groups.forEach((groupId) => {
       // Add group header
       items.push({
         key: `header-${groupId}`,
@@ -75,22 +67,22 @@ export default function BulkCreateMemento() {
         disabledReSorted: true,
       });
 
-      const spacer = {
-        type: "spacer" as ItemType,
+      // Add header spacers
+      items.push({
+        key: `header-spacer-${groupId}-1`,
+        type: "spacer",
         disabledDrag: true,
-        // disabledReSorted: true,
         groupId,
-      };
+      });
+      items.push({
+        key: `header-spacer-${groupId}-2`,
+        type: "spacer",
+        disabledDrag: true,
+        groupId,
+      });
 
-      items.push({ ...spacer, key: `header-spacer-${groupId}-1` });
-      items.push({ ...spacer, key: `header-spacer-${groupId}-2` });
-
-      // Add photos that belong to this group
-      const groupPhotos =
-        index < groups.length - 1
-          ? photos.slice(photoIndex, photoIndex + 1) // Initial state: 1 photo per group
-          : photos.slice(photoIndex); // Last group gets any remaining photos
-
+      // Add photos for this group
+      const groupPhotos = photoGroups.filter((p) => p.group === groupId);
       groupPhotos.forEach((photo) => {
         items.push({
           key: `photo-${photo.assetId || photo.uri}`,
@@ -100,107 +92,44 @@ export default function BulkCreateMemento() {
         });
       });
 
-      photoIndex += groupPhotos.length;
-
-      // Calculate how many spacers are needed
+      // Add trailing spacers if needed
       const remainder = groupPhotos.length % 3;
       const spacersNeeded = remainder === 0 ? 0 : 3 - remainder;
 
       for (let i = 0; i < spacersNeeded; i++) {
-        items.push({ ...spacer, key: `photo-spacer-${groupId}-${i}` });
+        items.push({
+          key: `photo-spacer-${groupId}-${i}`,
+          type: "spacer",
+          disabledDrag: true,
+          groupId,
+        });
       }
     });
 
     return items;
-  }, [groups, photos]);
+  }, [photoGroups]);
 
   // Handle reordering of photos
-  const handleReorderPhotos = useCallback(
-    (newItems: GridItem[]) => {
-      console.log(
-        "Before cleanup:",
-        newItems.map((item) => item.key),
-      );
+  const handleReorderPhotos = useCallback((newItems: GridItem[]) => {
+    let currentGroup: number | null = null;
+    const updatedPhotos: PhotoWithGroup[] = [];
 
-      const cleanedItems: GridItem[] = [];
-      let lastHeaderIndex: number | null = null;
-      let lastGroupId: number | null = null;
-
-      newItems.forEach((item, index) => {
-        if (item.type === "header") {
-          // If we already encountered a header and only saw spacers in between, remove them
-          if (lastHeaderIndex !== null) {
-            let onlySpacersBetween = true;
-
-            for (let i = lastHeaderIndex + 1; i < index; i++) {
-              if (newItems[i].type !== "spacer") {
-                onlySpacersBetween = false;
-                break;
-              }
-            }
-
-            if (onlySpacersBetween) {
-              // Remove the previous header and its spacers
-              cleanedItems.splice(lastHeaderIndex);
-            }
-          }
-
-          // Update the current header index and groupId
-          lastHeaderIndex = cleanedItems.length;
-          lastGroupId = item.groupId!;
-        }
-
-        // Update the groupId for photo items if necessary
-        if (item.type === "photo" && item.photo) {
-          item.groupId = lastGroupId!;
-        }
-
-        cleanedItems.push(item);
-      });
-
-      // Check if the last group only contains spacers, if so, remove it
-      const lastGroupIndex = cleanedItems.findIndex(
-        (item) => item.type === "header" && item.groupId === lastGroupId,
-      );
-      if (lastGroupIndex !== -1) {
-        const remainingItems = cleanedItems.slice(lastGroupIndex + 1);
-        if (remainingItems.every((item) => item.type === "spacer")) {
-          cleanedItems.splice(lastGroupIndex); // Remove the last group with only spacers
-        }
+    // Process the items in order to update group assignments
+    newItems.forEach((item) => {
+      if (item.type === "header") {
+        currentGroup = item.groupId!;
+      } else if (item.type === "photo" && item.photo && currentGroup !== null) {
+        // Add the photo to our updated list with the current group
+        updatedPhotos.push({
+          ...item.photo,
+          group: currentGroup,
+        } as PhotoWithGroup);
       }
+    });
 
-      console.log(
-        "After cleanup:",
-        cleanedItems.map((item) => item.key),
-      );
-
-      // Now update the groups and photos state accordingly
-      const newGroups = cleanedItems
-        .filter((item) => item.type === "header" && item.groupId !== undefined)
-        .map((item) => item.groupId!); // Using `!` because we've filtered out `undefined`
-
-      const newPhotos = cleanedItems
-        .filter((item) => item.type === "photo" && item.photo !== undefined)
-        .map((item) => item.photo!); // Using `!` to ensure no `undefined` values
-
-      setGroups(newGroups);
-      setPhotos(newPhotos);
-    },
-    [setPhotos, setGroups],
-  );
-
-  // Remove a photo
-  const handleRemovePhoto = useCallback(
-    (photo: Photo) => {
-      removePhoto(photo);
-
-      // If this was the last photo and there's more than one group, remove a group
-      if (photos.length <= groups.length && groups.length > 0) {
-        setGroups((prev) => prev.slice(0, -1));
-      }
-    },
-    [photos.length, groups.length, removePhoto],
-  );
+    // Update state with new photo assignments
+    setPhotoGroups(updatedPhotos);
+  }, []);
 
   if (!hasPermission) {
     return <Text>No access to camera</Text>;
@@ -254,8 +183,9 @@ export default function BulkCreateMemento() {
                       resizeMode="cover"
                     />
                     <Button
-                      onPress={() =>
-                        item.photo && handleRemovePhoto(item.photo)
+                      onPress={
+                        () => {}
+                        // item.photo && handleRemovePhoto(item.photo)
                       }
                       className="absolute p-2 rounded-full top-0 right-0"
                       size="sm"
@@ -272,9 +202,9 @@ export default function BulkCreateMemento() {
         <View className="mt-auto mb-4">
           <Button
             size="lg"
-            onPress={() => console.log("Process groups", groups)}
+            // onPress={() => console.log("Process groups", groups)}
           >
-            <ButtonText>Create {groups.length} Mementos</ButtonText>
+            <ButtonText>Create X Mementos</ButtonText>
           </Button>
         </View>
       </View>
