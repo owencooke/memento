@@ -6,12 +6,14 @@
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useCallback, useMemo, useState } from "react";
 import { View } from "react-native";
-import DraggableGrid from "react-native-draggable-grid";
-import { Button, ButtonText } from "@/src/components/ui/button";
+// import DraggableGrid from "react-native-draggable-grid";
+import DraggableGrid from "@/src/components/draggable-grid";
+import { Button, ButtonIcon, ButtonText } from "@/src/components/ui/button";
 import usePhotos, { Photo } from "@/src/hooks/usePhotos";
 import { Heading } from "@/src/components/ui/heading";
 import { Text } from "@/src/components/ui/text";
 import InteractivePhotoCard from "@/src/components/cards/InteractivePhotoCard";
+import { EditIcon } from "@/src/components/ui/icon";
 
 type ItemType = "photo" | "header" | "spacer";
 
@@ -93,13 +95,16 @@ export default function BulkCreateMemento() {
           numColumns={3}
           data={gridData}
           onDragRelease={handleReorderPhotos}
+          itemHeights={gridData.map((item) =>
+            item.type === "photo" ? undefined : 24,
+          )}
           renderItem={(item: GridItem) => {
             if (item.type === "spacer") {
               return (
-                <>
+                <View className="max-h-5 bg-red-300">
                   {/* Uncomment if debugging spacer behaviour */}
-                  {/* <Text>{item.key}</Text> */}
-                </>
+                  <Text>{item.key}</Text>
+                </View>
               );
             } else if (item.type === "photo" && item.photo) {
               return (
@@ -109,11 +114,14 @@ export default function BulkCreateMemento() {
               );
             } else {
               return (
-                <View className="w-full h-fit bg-red-300 p-3 bg-muted-100 mb-2 rounded-md flex-row justify-between items-center">
-                  <Text className="font-semibold">
-                    Memento #{item.group + 1}
-                  </Text>
-                </View>
+                <Button
+                  size="lg"
+                  variant="link"
+                  className="p-0 max-h-5 bg-red-300"
+                >
+                  <ButtonText> Memento #{item.group + 1}</ButtonText>
+                  <ButtonIcon as={EditIcon} className="ml-2" />
+                </Button>
               );
             }
           }}
