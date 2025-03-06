@@ -4,98 +4,105 @@
  */
 
 import { SafeAreaView } from "react-native-safe-area-context";
-import React, { useState } from "react";
-import { View, Text, Image, StyleSheet } from "react-native";
+import React, { useCallback, useMemo } from "react";
+import { View } from "react-native";
 import DraggableGrid from "react-native-draggable-grid";
+import { Button, ButtonIcon, ButtonText } from "@/src/components/ui/button";
+import { CloseIcon, AddIcon } from "@/src/components/ui/icon";
+import usePhotos, { Photo } from "@/src/hooks/usePhotos";
+import { Image } from "@/src/components/ui/image";
+import { Heading } from "@/src/components/ui/heading";
+import { Text } from "@/src/components/ui/text";
 
 interface GridItem {
-  key: string;
-  uri: string;
+  key: number;
+  photo: Photo | null;
 }
 
-type Groups = Record<string, GridItem[]>;
-
-const initialGroups: Groups = {
-  group1: [
-    { key: "1", uri: "https://via.placeholder.com/100" },
-    { key: "2", uri: "https://via.placeholder.com/100/222" },
-  ],
-  group2: [
-    { key: "3", uri: "https://via.placeholder.com/100/444" },
-    { key: "4", uri: "https://via.placeholder.com/100/666" },
-  ],
-};
-
 export default function BulkCreateMemento() {
-  const [groups, setGroups] = useState<Groups>(initialGroups);
-  const [draggedItem, setDraggedItem] = useState<GridItem | null>(null);
-  const [sourceGroup, setSourceGroup] = useState<string | null>(null);
+  const { hasPermission, addPhotos, photos, removePhoto, setPhotos } =
+    usePhotos({ initialPhotos: [] });
 
-  const handleDragStart = (item: GridItem, groupKey: string) => {
-    setDraggedItem(item);
-    setSourceGroup(groupKey);
-  };
+  const gridData = useMemo(
+    () => [
+      ...photos.map((photo, index) => ({
+        key: index,
+        photo,
+      })),
+      {
+        key: -1,
+        photo: null,
+        disabledDrag: true,
+        disabledReSorted: true,
+      },
+    ],
+    [photos],
+  );
 
-  const handleDragEnd = (groupKey: string, newData: GridItem[]) => {
-    setGroups((prev) => ({
-      ...prev,
-      [groupKey]: newData,
-    }));
-  };
+  const handleReorderPhotos = useCallback(
+    (data: GridItem[]) => {
+      const newPhotos = data
+        .filter((item) => item.photo !== null)
+        .map((item) => item.photo) as Photo[];
+      setPhotos(newPhotos);
+    },
+    [setPhotos],
+  );
 
-  const handleDropOutside = (targetGroup: string) => {
-    if (!draggedItem || !sourceGroup || sourceGroup === targetGroup) return;
-
-    setGroups((prev) => {
-      const updatedSourceGroup = prev[sourceGroup].filter(
-        (item) => item.key !== draggedItem.key,
-      );
-
-      const updatedTargetGroup = [...prev[targetGroup], draggedItem];
-
-      return {
-        ...prev,
-        [sourceGroup]: updatedSourceGroup,
-        [targetGroup]: updatedTargetGroup,
-      };
-    });
-
-    // Reset drag state
-    setDraggedItem(null);
-    setSourceGroup(null);
-  };
+  if (!hasPermission) {
+    return <Text>No access to camera</Text>;
+  }
 
   return (
     <SafeAreaView className="flex-1" edges={["bottom"]}>
-      <View style={styles.container}>
-        {Object.entries(groups).map(([groupKey, items]) => (
-          <View key={groupKey} style={styles.gridContainer}>
-            <Text>{groupKey}</Text>
-            <DraggableGrid<GridItem>
-              data={items}
-              renderItem={(item) => (
-                <Image source={{ uri: item.uri }} style={styles.image} />
+      <View className="flex-1">
+        <Heading className="block" size="2xl">
+          Create Multiple
+        </Heading>
+        <Text size="xl" italic className="text-left font-light mb-2">
+          Want to add multiple new mementos at once? Start by uploading all of
+          the photos you want to include!
+        </Text>
+        <Button onPress={() => addPhotos("picker")} size="lg">
+          <ButtonText>Select photos from library</ButtonText>
+        </Button>
+        <DraggableGrid
+          numColumns={3}
+          data={gridData}
+          onDragRelease={handleReorderPhotos}
+          renderItem={(item: GridItem) => (
+            <View className="px-1 py-2 flex-1 aspect-square">
+              {item.photo ? (
+                // Render a photo
+                <View className="relative overflow-hidden rounded-md">
+                  <Image
+                    source={{ uri: item.photo.uri }}
+                    className="w-auto h-full mt-2 mr-2"
+                    alt=""
+                    resizeMode="cover"
+                  />
+                  <Button
+                    onPress={() => item.photo && removePhoto(item.photo)}
+                    className="absolute p-2 rounded-full top-0 right-0"
+                    size="sm"
+                  >
+                    <ButtonIcon className="m-0 p-0" as={CloseIcon} />
+                  </Button>
+                </View>
+              ) : (
+                // Render the add button
+                <Button
+                  size="lg"
+                  className="mt-2 mr-2 h-full"
+                  action="secondary"
+                >
+                  <ButtonIcon as={AddIcon} />
+                </Button>
               )}
-              onDragStart={(draggedItem) =>
-                handleDragStart(draggedItem, groupKey)
-              }
-              onDragRelease={(newData) => handleDragEnd(groupKey, newData)}
-              numColumns={2}
-            />
-            <View
-              style={styles.dropZone}
-              onLayout={() => handleDropOutside(groupKey)}
-            />
-          </View>
-        ))}
+            </View>
+          )}
+        />
       </View>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  gridContainer: { marginBottom: 20 },
-  image: { width: 50, height: 50, borderRadius: 8 },
-  dropZone: { height: 50, backgroundColor: "#f0f0f0", marginTop: 10 },
-});
