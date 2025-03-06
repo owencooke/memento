@@ -71,14 +71,14 @@ export default function BulkCreateMemento() {
         key: `header-${groupId}`,
         type: "header",
         groupId,
-        // disabledDrag: true,
-        // disabledReSorted: true,
+        disabledDrag: true,
+        disabledReSorted: true,
       });
 
       const spacer = {
         type: "spacer" as ItemType,
         disabledDrag: true,
-        disabledReSorted: true,
+        // disabledReSorted: true,
         groupId,
       };
 
@@ -117,37 +117,76 @@ export default function BulkCreateMemento() {
   // Handle reordering of photos
   const handleReorderPhotos = useCallback(
     (newItems: GridItem[]) => {
-      // Reconstruct the photo array in the new order
-      const photoGroups: Record<number, Photo[]> = {};
-      let currentGroup: number | undefined;
+      console.log(
+        "Before cleanup:",
+        newItems.map((item) => item.key),
+      );
 
-      // First pass - group photos by their group
-      newItems.forEach((item) => {
+      const cleanedItems: GridItem[] = [];
+      let lastHeaderIndex: number | null = null;
+      let lastGroupId: number | null = null;
+
+      newItems.forEach((item, index) => {
         if (item.type === "header") {
-          currentGroup = item.groupId;
-        } else if (
-          item.type === "photo" &&
-          item.photo &&
-          currentGroup !== undefined
-        ) {
-          if (!photoGroups[currentGroup]) {
-            photoGroups[currentGroup] = [];
+          // If we already encountered a header and only saw spacers in between, remove them
+          if (lastHeaderIndex !== null) {
+            let onlySpacersBetween = true;
+
+            for (let i = lastHeaderIndex + 1; i < index; i++) {
+              if (newItems[i].type !== "spacer") {
+                onlySpacersBetween = false;
+                break;
+              }
+            }
+
+            if (onlySpacersBetween) {
+              // Remove the previous header and its spacers
+              cleanedItems.splice(lastHeaderIndex);
+            }
           }
-          photoGroups[currentGroup].push(item.photo);
+
+          // Update the current header index and groupId
+          lastHeaderIndex = cleanedItems.length;
+          lastGroupId = item.groupId!;
         }
+
+        // Update the groupId for photo items if necessary
+        if (item.type === "photo" && item.photo) {
+          item.groupId = lastGroupId!;
+        }
+
+        cleanedItems.push(item);
       });
 
-      // Second pass - flatten the grouped photos
-      const newPhotos: Photo[] = [];
-      groups.forEach((groupId) => {
-        if (photoGroups[groupId]) {
-          newPhotos.push(...photoGroups[groupId]);
+      // Check if the last group only contains spacers, if so, remove it
+      const lastGroupIndex = cleanedItems.findIndex(
+        (item) => item.type === "header" && item.groupId === lastGroupId,
+      );
+      if (lastGroupIndex !== -1) {
+        const remainingItems = cleanedItems.slice(lastGroupIndex + 1);
+        if (remainingItems.every((item) => item.type === "spacer")) {
+          cleanedItems.splice(lastGroupIndex); // Remove the last group with only spacers
         }
-      });
+      }
 
+      console.log(
+        "After cleanup:",
+        cleanedItems.map((item) => item.key),
+      );
+
+      // Now update the groups and photos state accordingly
+      const newGroups = cleanedItems
+        .filter((item) => item.type === "header" && item.groupId !== undefined)
+        .map((item) => item.groupId!); // Using `!` because we've filtered out `undefined`
+
+      const newPhotos = cleanedItems
+        .filter((item) => item.type === "photo" && item.photo !== undefined)
+        .map((item) => item.photo!); // Using `!` to ensure no `undefined` values
+
+      setGroups(newGroups);
       setPhotos(newPhotos);
     },
-    [groups, setPhotos],
+    [setPhotos, setGroups],
   );
 
   // Remove a photo
@@ -191,7 +230,11 @@ export default function BulkCreateMemento() {
           dragStartAnimation={null}
           renderItem={(item: GridItem) => {
             if (item.type === "spacer") {
-              return <></>;
+              return (
+                <View className="bg-orange-300">
+                  <Text className="font-semibold">{item.key}</Text>
+                </View>
+              );
             } else if (item.type === "header") {
               // Render group header
               return (
