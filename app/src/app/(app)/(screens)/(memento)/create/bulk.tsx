@@ -20,7 +20,7 @@ interface GridItem {
   key: string;
   type: ItemType;
   photo?: Photo;
-  groupId?: number;
+  group: number;
   disabledDrag?: boolean;
   disabledReSorted?: boolean;
 }
@@ -28,107 +28,49 @@ interface GridItem {
 type PhotoWithGroup = Photo & { group: number };
 
 export default function BulkCreateMemento() {
-  const { hasPermission, addPhotos, photos } = usePhotos({
+  const { hasPermission, addPhotos } = usePhotos({
     initialPhotos: [],
   });
-  const [photoGroups, setPhotoGroups] = useState<PhotoWithGroup[]>([]);
-
-  // Replace handleAddPhotos with this simpler version
-  const handleAddPhotos = useCallback(
-    async (source: "picker" | "camera") => {
-      const newRawPhotos = await addPhotos(source);
-
-      // Assign each new photo to its own group
-      const newPhotosWithGroups = newRawPhotos.map((photo, index) => ({
-        ...photo,
-        group: photoGroups.length + index,
-      }));
-
-      setPhotoGroups((prev) => [...prev, ...newPhotosWithGroups]);
-    },
-    [addPhotos, photoGroups.length],
+  const [groupedPhotos, setGroupedPhotos] = useState<PhotoWithGroup[]>([]);
+  const groups = useMemo(
+    () => [...new Set(groupedPhotos.map((p) => p.group))],
+    [groupedPhotos],
   );
 
-  // Create grid data with headers, photos, and add-group button
-  const gridData = useMemo(() => {
-    const items: GridItem[] = [];
-    const groups = [...new Set(photoGroups.map((p) => p.group))].sort(
-      (a, b) => a - b,
-    );
+  // Adds multiple photos, each in own group initially
+  const handleAddPhotos = useCallback(async () => {
+    const newPhotos = await addPhotos("picker");
+    setGroupedPhotos((prev) => [
+      ...prev,
+      ...newPhotos.map((photo, index) => ({
+        ...photo,
+        group: groupedPhotos.length + index,
+      })),
+    ]);
+  }, [addPhotos, groupedPhotos.length]);
 
-    // For each group, add header and photos
-    groups.forEach((groupId) => {
-      // Add group header
-      items.push({
-        key: `header-${groupId}`,
-        type: "header",
-        groupId,
-        disabledDrag: true,
-        disabledReSorted: true,
-      });
+  // Create grouped photos for display in grid
+  const gridData = useMemo(
+    () =>
+      groups.reduce<GridItem[]>((items, group) => {
+        const groupItems = buildGroupItems(group, groupedPhotos);
+        return [...items, ...groupItems];
+      }, []),
+    [groupedPhotos, groups],
+  );
 
-      // Add header spacers
-      items.push({
-        key: `header-spacer-${groupId}-1`,
-        type: "spacer",
-        disabledDrag: true,
-        groupId,
-      });
-      items.push({
-        key: `header-spacer-${groupId}-2`,
-        type: "spacer",
-        disabledDrag: true,
-        groupId,
-      });
-
-      // Add photos for this group
-      const groupPhotos = photoGroups.filter((p) => p.group === groupId);
-      groupPhotos.forEach((photo) => {
-        items.push({
-          key: `photo-${photo.assetId || photo.uri}`,
-          type: "photo",
-          photo,
-          groupId,
-        });
-      });
-
-      // Add trailing spacers if needed
-      const remainder = groupPhotos.length % 3;
-      const spacersNeeded = remainder === 0 ? 0 : 3 - remainder;
-
-      for (let i = 0; i < spacersNeeded; i++) {
-        items.push({
-          key: `photo-spacer-${groupId}-${i}`,
-          type: "spacer",
-          disabledDrag: true,
-          groupId,
-        });
-      }
-    });
-
-    return items;
-  }, [photoGroups]);
-
-  // Handle reordering of photos
+  // Updates the position and/or group number for a photo if moved
   const handleReorderPhotos = useCallback((newItems: GridItem[]) => {
-    let currentGroup: number | null = null;
-    const updatedPhotos: PhotoWithGroup[] = [];
-
-    // Process the items in order to update group assignments
-    newItems.forEach((item) => {
+    let currentGroup = 0;
+    const updatedPhotos = newItems.reduce<PhotoWithGroup[]>((acc, item) => {
       if (item.type === "header") {
-        currentGroup = item.groupId!;
-      } else if (item.type === "photo" && item.photo && currentGroup !== null) {
-        // Add the photo to our updated list with the current group
-        updatedPhotos.push({
-          ...item.photo,
-          group: currentGroup,
-        } as PhotoWithGroup);
+        currentGroup = item.group;
+      } else if (item.type === "photo" && item.photo) {
+        acc.push({ ...item.photo, group: currentGroup });
       }
-    });
-
-    // Update state with new photo assignments
-    setPhotoGroups(updatedPhotos);
+      return acc;
+    }, []);
+    setGroupedPhotos(updatedPhotos);
   }, []);
 
   if (!hasPermission) {
@@ -145,11 +87,7 @@ export default function BulkCreateMemento() {
           Upload photos and organize them into separate mementos by dragging
           them between groups.
         </Text>
-        <Button
-          onPress={() => handleAddPhotos("picker")}
-          size="lg"
-          className="mb-4"
-        >
+        <Button onPress={handleAddPhotos} size="lg" className="mb-4">
           <ButtonText>Select photos from library</ButtonText>
         </Button>
         <DraggableGrid
@@ -168,7 +106,9 @@ export default function BulkCreateMemento() {
               // Render group header
               return (
                 <View className="w-full h-fit bg-red-300 p-3 bg-muted-100 mb-2 rounded-md flex-row justify-between items-center">
-                  <Text className="font-semibold">Memento #{item.groupId}</Text>
+                  <Text className="font-semibold">
+                    Memento #{item.group + 1}
+                  </Text>
                 </View>
               );
             } else {
@@ -211,3 +151,60 @@ export default function BulkCreateMemento() {
     </SafeAreaView>
   );
 }
+
+/**
+ * Logic for headers, spacers, and photo items for dividing grid into groups
+ */
+
+// Creates a spacer
+const createSpacer = (
+  group: number,
+  index: number,
+  type: ItemType,
+  disabledReSorted = true,
+) => ({
+  key: `${type}-${group}-${index}`,
+  type,
+  group,
+  disabledDrag: true,
+  disabledReSorted,
+});
+
+// Adds photos for specific group
+const addPhotosInGroup = (
+  group: number,
+  groupedPhotos: PhotoWithGroup[],
+): GridItem[] =>
+  groupedPhotos
+    .filter((p) => p.group === group)
+    .map((photo, idx) => ({
+      key: `photo-${group}-${idx}`,
+      type: "photo" as ItemType,
+      photo,
+      group,
+    }));
+
+// Adds trailing spacers after photos
+const addTrailingSpacers = (
+  group: number,
+  groupPhotosLength: number,
+): GridItem[] => {
+  const remainder = groupPhotosLength % 3;
+  const spacersNeeded = remainder === 0 ? 0 : 3 - remainder;
+  return Array.from({ length: spacersNeeded }, (_, i) =>
+    createSpacer(group, i + 3, "spacer" as ItemType, false),
+  );
+};
+
+// Builds the full grid data for each group
+const buildGroupItems = (group: number, groupedPhotos: PhotoWithGroup[]) => {
+  const header = [
+    createSpacer(group, 0, "header"),
+    createSpacer(group, 1, "spacer"),
+    createSpacer(group, 2, "spacer"),
+  ];
+  const photos = addPhotosInGroup(group, groupedPhotos);
+  const trailingSpacers = addTrailingSpacers(group, photos.length);
+
+  return [...header, ...photos, ...trailingSpacers];
+};
