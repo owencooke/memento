@@ -7,12 +7,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useCallback, useMemo, useState } from "react";
 import { View } from "react-native";
 import DraggableGrid from "react-native-draggable-grid";
-import { Button, ButtonIcon, ButtonText } from "@/src/components/ui/button";
-import { CloseIcon } from "@/src/components/ui/icon";
+import { Button, ButtonText } from "@/src/components/ui/button";
 import usePhotos, { Photo } from "@/src/hooks/usePhotos";
-import { Image } from "@/src/components/ui/image";
 import { Heading } from "@/src/components/ui/heading";
 import { Text } from "@/src/components/ui/text";
+import InteractivePhotoCard from "@/src/components/cards/InteractivePhotoCard";
 
 type ItemType = "photo" | "header" | "spacer";
 
@@ -61,10 +60,10 @@ export default function BulkCreateMemento() {
 
   // Updates the position and/or group number for a photo if moved
   const handleReorderPhotos = useCallback((newItems: GridItem[]) => {
-    let currentGroup = 0;
+    let currentGroup = -1;
     const updatedPhotos = newItems.reduce<PhotoWithGroup[]>((acc, item) => {
       if (item.type === "header") {
-        currentGroup = item.group;
+        currentGroup += 1;
       } else if (item.type === "photo" && item.photo) {
         acc.push({ ...item.photo, group: currentGroup });
       }
@@ -94,7 +93,6 @@ export default function BulkCreateMemento() {
           numColumns={3}
           data={gridData}
           onDragRelease={handleReorderPhotos}
-          dragStartAnimation={null}
           renderItem={(item: GridItem) => {
             if (item.type === "spacer") {
               return (
@@ -102,37 +100,14 @@ export default function BulkCreateMemento() {
                   <Text className="font-semibold">{item.key}</Text>
                 </View>
               );
-            } else if (item.type === "header") {
-              // Render group header
+            } else if (item.type === "photo" && item.photo) {
+              return <InteractivePhotoCard photo={item.photo} />;
+            } else {
               return (
                 <View className="w-full h-fit bg-red-300 p-3 bg-muted-100 mb-2 rounded-md flex-row justify-between items-center">
                   <Text className="font-semibold">
                     Memento #{item.group + 1}
                   </Text>
-                </View>
-              );
-            } else {
-              // Render a photo
-              return (
-                <View className="p-1 aspect-square">
-                  <View className="relative overflow-hidden rounded-md">
-                    <Image
-                      source={{ uri: item.photo?.uri }}
-                      className="w-full h-full"
-                      alt=""
-                      resizeMode="cover"
-                    />
-                    <Button
-                      onPress={
-                        () => {}
-                        // item.photo && handleRemovePhoto(item.photo)
-                      }
-                      className="absolute p-2 rounded-full top-0 right-0"
-                      size="sm"
-                    >
-                      <ButtonIcon className="m-0 p-0" as={CloseIcon} />
-                    </Button>
-                  </View>
                 </View>
               );
             }
@@ -144,7 +119,7 @@ export default function BulkCreateMemento() {
             size="lg"
             // onPress={() => console.log("Process groups", groups)}
           >
-            <ButtonText>Create X Mementos</ButtonText>
+            <ButtonText>Create {groups.length} Mementos</ButtonText>
           </Button>
         </View>
       </View>
