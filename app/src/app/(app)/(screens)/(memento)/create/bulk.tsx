@@ -95,7 +95,11 @@ export default function BulkCreateMemento() {
           onDragRelease={handleReorderPhotos}
           renderItem={(item: GridItem) => {
             if (item.type === "spacer") {
-              return <></>;
+              return (
+                <View>
+                  <Text>{item.key}</Text>
+                </View>
+              );
             } else if (item.type === "photo" && item.photo) {
               return (
                 <View>
@@ -164,10 +168,10 @@ const addTrailingSpacers = (
   group: number,
   groupPhotosLength: number,
 ): GridItem[] => {
-  const remainder = groupPhotosLength % 3;
-  const spacersNeeded = remainder === 0 ? 0 : 3 - remainder;
+  const remainder = (groupPhotosLength + 1) % 3;
+  const spacersNeeded = remainder === 0 ? 3 : 3 - remainder;
   return Array.from({ length: spacersNeeded }, (_, i) =>
-    createSpacer(group, i + 3, "spacer" as ItemType, false),
+    createSpacer(group, i + 4, "spacer" as ItemType, false),
   );
 };
 
@@ -177,6 +181,7 @@ const buildGroupItems = (group: number, groupedPhotos: PhotoWithGroup[]) => {
     createSpacer(group, 0, "header"),
     createSpacer(group, 1, "spacer"),
     createSpacer(group, 2, "spacer"),
+    createSpacer(group, 3, "spacer", false),
   ];
   const photos = addPhotosInGroup(group, groupedPhotos);
   const trailingSpacers = addTrailingSpacers(group, photos.length);
