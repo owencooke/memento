@@ -3,7 +3,7 @@
  * @requirements FR-9, FR-17, FR-19, FR-20, FR-21
  */
 
-import { KeyboardAvoidingView, Platform } from "react-native";
+import { KeyboardAvoidingView, Platform, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useMutation } from "@tanstack/react-query";
 import {
@@ -19,6 +19,9 @@ import { queryClient } from "@/src/app/_layout";
 import MementoForm, {
   MementoFormData,
 } from "@/src/components/forms/MementoForm";
+import { ButtonIcon, Button } from "@/src/components/ui/button";
+import { Heading } from "@/src/components/ui/heading";
+import { PlayIcon } from "@/src/components/ui/icon";
 
 export default function CreateMemento() {
   const { session } = useSession();
@@ -89,10 +92,24 @@ export default function CreateMemento() {
         className="flex-1"
       >
         <MementoForm
-          title="Create Memento"
           submitButtonText="Create Memento"
           isSubmitting={createMutation.isPending}
           onSubmit={onSubmit}
+          FormHeader={
+            <View className="flex flex-row justify-between items-center">
+              <Heading className="block" size="2xl">
+                Create Memento
+              </Heading>
+              <Button
+                size="lg"
+                className="p-3.5"
+                action="secondary"
+                variant="solid"
+              >
+                <ButtonIcon as={PlayIcon} />
+              </Button>
+            </View>
+          }
         />
       </KeyboardAvoidingView>
     </SafeAreaView>

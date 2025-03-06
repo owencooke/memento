@@ -25,6 +25,7 @@ import { Photo } from "@/src/hooks/usePhotos";
 import { MementoWithImages } from "@/src/api-client/generated";
 import { isEqual } from "lodash";
 import { useMemo } from "react";
+import { Heading } from "@/src/components/ui/heading";
 
 export default function EditMemento() {
   // Get user id
@@ -153,10 +154,14 @@ export default function EditMemento() {
         {memento && (
           <MementoForm
             initialValues={initialFormValues}
-            title="Edit Memento"
             submitButtonText="Save Changes"
             isSubmitting={updateMutation.isPending}
             onSubmit={onSubmit}
+            FormHeader={
+              <Heading className="block" size="2xl">
+                Edit Memento
+              </Heading>
+            }
           />
         )}
       </KeyboardAvoidingView>

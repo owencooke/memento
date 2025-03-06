@@ -10,13 +10,12 @@ import {
   FormControlLabel,
   FormControlLabelText,
 } from "@/src/components/ui/form-control";
-import { Heading } from "@/src/components/ui/heading";
 import { View } from "react-native";
 import { Textarea, TextareaInput } from "@/src/components/ui/textarea";
 import { AlertCircleIcon } from "@/src/components/ui/icon";
 import PhotoSelectGrid from "@/src/components/inputs/PhotoSelectGrid";
 import { FlatList } from "react-native";
-import { useCallback, useState } from "react";
+import { ReactElement, useCallback, useState } from "react";
 import { Photo } from "@/src/hooks/usePhotos";
 import DatePickerInput from "@/src/components/inputs/DatePickerInput";
 import LocationInput, {
@@ -31,18 +30,18 @@ export interface MementoFormData {
 
 export interface MementoFormProps {
   initialValues?: MementoFormData;
-  title: string;
   submitButtonText: string;
   isSubmitting: boolean;
   onSubmit: (data: MementoFormData) => Promise<void>;
+  FormHeader?: ReactElement;
 }
 
 export default function MementoForm({
   initialValues,
-  title,
   submitButtonText,
   isSubmitting,
   onSubmit,
+  FormHeader,
 }: MementoFormProps) {
   const [scrollEnabled, setScrollEnabled] = useState(true);
 
@@ -104,9 +103,7 @@ export default function MementoForm({
       keyboardShouldPersistTaps="handled"
       ListHeaderComponent={
         <View className="flex justify-center gap-6 pb-32">
-          <Heading className="block" size="2xl">
-            {title}
-          </Heading>
+          {FormHeader}
           <FormControl size={"lg"} isInvalid={!!errors.photos}>
             <FormControlLabel>
               <FormControlLabelText>Add Photos</FormControlLabelText>
