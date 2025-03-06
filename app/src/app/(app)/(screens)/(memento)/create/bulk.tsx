@@ -15,7 +15,7 @@ import { Heading } from "@/src/components/ui/heading";
 import { Text } from "@/src/components/ui/text";
 
 // Types for our grid items
-type ItemType = "photo" | "header";
+type ItemType = "photo" | "header" | "spacer";
 
 interface GridItem {
   key: string;
@@ -71,9 +71,19 @@ export default function BulkCreateMemento() {
         key: `header-${groupId}`,
         type: "header",
         groupId,
+        // disabledDrag: true,
+        // disabledReSorted: true,
+      });
+
+      const spacer = {
+        type: "spacer" as ItemType,
         disabledDrag: true,
         disabledReSorted: true,
-      });
+        groupId,
+      };
+
+      items.push({ ...spacer, key: `header-spacer-${groupId}-1` });
+      items.push({ ...spacer, key: `header-spacer-${groupId}-2` });
 
       // Add photos that belong to this group
       const groupPhotos =
@@ -91,6 +101,14 @@ export default function BulkCreateMemento() {
       });
 
       photoIndex += groupPhotos.length;
+
+      // Calculate how many spacers are needed
+      const remainder = groupPhotos.length % 3;
+      const spacersNeeded = remainder === 0 ? 0 : 3 - remainder;
+
+      for (let i = 0; i < spacersNeeded; i++) {
+        items.push({ ...spacer, key: `photo-spacer-${groupId}-${i}` });
+      }
     });
 
     return items;
@@ -170,11 +188,14 @@ export default function BulkCreateMemento() {
           numColumns={3}
           data={gridData}
           onDragRelease={handleReorderPhotos}
+          dragStartAnimation={null}
           renderItem={(item: GridItem) => {
-            if (item.type === "header") {
+            if (item.type === "spacer") {
+              return <></>;
+            } else if (item.type === "header") {
               // Render group header
               return (
-                <View className="w-full p-3 bg-muted-100 mb-2 rounded-md flex-row justify-between items-center">
+                <View className="w-full h-fit bg-red-300 p-3 bg-muted-100 mb-2 rounded-md flex-row justify-between items-center">
                   <Text className="font-semibold">Memento #{item.groupId}</Text>
                 </View>
               );
