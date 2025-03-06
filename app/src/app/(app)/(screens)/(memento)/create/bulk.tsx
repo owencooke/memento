@@ -95,13 +95,13 @@ export default function BulkCreateMemento() {
           onDragRelease={handleReorderPhotos}
           renderItem={(item: GridItem) => {
             if (item.type === "spacer") {
+              return <></>;
+            } else if (item.type === "photo" && item.photo) {
               return (
-                <View className="bg-orange-300">
-                  <Text className="font-semibold">{item.key}</Text>
+                <View>
+                  <InteractivePhotoCard photo={item.photo} />
                 </View>
               );
-            } else if (item.type === "photo" && item.photo) {
-              return <InteractivePhotoCard photo={item.photo} />;
             } else {
               return (
                 <View className="w-full h-fit bg-red-300 p-3 bg-muted-100 mb-2 rounded-md flex-row justify-between items-center">
