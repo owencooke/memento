@@ -4,49 +4,145 @@
  */
 
 import { SafeAreaView } from "react-native-safe-area-context";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { View } from "react-native";
 import DraggableGrid from "react-native-draggable-grid";
 import { Button, ButtonIcon, ButtonText } from "@/src/components/ui/button";
-import { CloseIcon, AddIcon } from "@/src/components/ui/icon";
+import { CloseIcon } from "@/src/components/ui/icon";
 import usePhotos, { Photo } from "@/src/hooks/usePhotos";
 import { Image } from "@/src/components/ui/image";
 import { Heading } from "@/src/components/ui/heading";
 import { Text } from "@/src/components/ui/text";
 
+// Types for our grid items
+type ItemType = "photo" | "header";
+
 interface GridItem {
-  key: number;
-  photo: Photo | null;
+  key: string;
+  type: ItemType;
+  photo?: Photo;
+  groupId?: number;
+  disabledDrag?: boolean;
+  disabledReSorted?: boolean;
 }
 
 export default function BulkCreateMemento() {
   const { hasPermission, addPhotos, photos, removePhoto, setPhotos } =
     usePhotos({ initialPhotos: [] });
 
-  const gridData = useMemo(
-    () => [
-      ...photos.map((photo, index) => ({
-        key: index,
-        photo,
-      })),
-      {
-        key: -1,
-        photo: null,
-        disabledDrag: true,
-        disabledReSorted: true,
-      },
-    ],
-    [photos],
+  // Track groups separately from photos
+  const [groups, setGroups] = useState<number[]>([]);
+
+  // When photos are added, assign each to its own group
+  const handleAddPhotos = useCallback(
+    async (source: "picker" | "camera") => {
+      const newPhotos = await addPhotos(source);
+      const newGroupCount = newPhotos.length;
+
+      if (newGroupCount > 0) {
+        const newGroups = Array.from(
+          { length: newGroupCount },
+          (_, i) => groups.length + i + 1,
+        );
+
+        setGroups((prev) => [...prev, ...newGroups]);
+      }
+    },
+    [addPhotos, groups.length],
   );
 
+  // Create grid data with headers, photos, and add-group button
+  const gridData = useMemo(() => {
+    // Start with an empty array
+    const items: GridItem[] = [];
+
+    // If no groups exist yet, add one
+    if (groups.length === 0 && photos.length > 0) {
+      setGroups([0]);
+    }
+
+    // Distribute photos among groups
+    let photoIndex = 0;
+
+    // Add headers and photos for each group
+    groups.forEach((groupId, index) => {
+      // Add group header
+      items.push({
+        key: `header-${groupId}`,
+        type: "header",
+        groupId,
+        disabledDrag: true,
+        disabledReSorted: true,
+      });
+
+      // Add photos that belong to this group
+      const groupPhotos =
+        index < groups.length - 1
+          ? photos.slice(photoIndex, photoIndex + 1) // Initial state: 1 photo per group
+          : photos.slice(photoIndex); // Last group gets any remaining photos
+
+      groupPhotos.forEach((photo) => {
+        items.push({
+          key: `photo-${photo.assetId || photo.uri}`,
+          type: "photo",
+          photo,
+          groupId,
+        });
+      });
+
+      photoIndex += groupPhotos.length;
+    });
+
+    return items;
+  }, [groups, photos]);
+
+  // Handle reordering of photos
   const handleReorderPhotos = useCallback(
-    (data: GridItem[]) => {
-      const newPhotos = data
-        .filter((item) => item.photo !== null)
-        .map((item) => item.photo) as Photo[];
+    (newItems: GridItem[]) => {
+      // Reconstruct the photo array in the new order
+      const photoGroups: Record<number, Photo[]> = {};
+      let currentGroup: number | undefined;
+
+      // First pass - group photos by their group
+      newItems.forEach((item) => {
+        if (item.type === "header") {
+          currentGroup = item.groupId;
+        } else if (
+          item.type === "photo" &&
+          item.photo &&
+          currentGroup !== undefined
+        ) {
+          if (!photoGroups[currentGroup]) {
+            photoGroups[currentGroup] = [];
+          }
+          photoGroups[currentGroup].push(item.photo);
+        }
+      });
+
+      // Second pass - flatten the grouped photos
+      const newPhotos: Photo[] = [];
+      groups.forEach((groupId) => {
+        if (photoGroups[groupId]) {
+          newPhotos.push(...photoGroups[groupId]);
+        }
+      });
+
       setPhotos(newPhotos);
     },
-    [setPhotos],
+    [groups, setPhotos],
+  );
+
+  // Remove a photo
+  const handleRemovePhoto = useCallback(
+    (photo: Photo) => {
+      removePhoto(photo);
+
+      // If this was the last photo and there's more than one group, remove a group
+      if (photos.length <= groups.length && groups.length > 0) {
+        setGroups((prev) => prev.slice(0, -1));
+      }
+    },
+    [photos.length, groups.length, removePhoto],
   );
 
   if (!hasPermission) {
@@ -55,53 +151,68 @@ export default function BulkCreateMemento() {
 
   return (
     <SafeAreaView className="flex-1" edges={["bottom"]}>
-      <View className="flex-1">
-        <Heading className="block" size="2xl">
+      <View className="flex-1 p-4">
+        <Heading className="block mb-2" size="2xl">
           Create Multiple
         </Heading>
-        <Text size="xl" italic className="text-left font-light mb-2">
-          Want to add multiple new mementos at once? Start by uploading all of
-          the photos you want to include!
+        <Text size="md" className="text-left font-light mb-4">
+          Upload photos and organize them into separate mementos by dragging
+          them between groups.
         </Text>
-        <Button onPress={() => addPhotos("picker")} size="lg">
+        <Button
+          onPress={() => handleAddPhotos("picker")}
+          size="lg"
+          className="mb-4"
+        >
           <ButtonText>Select photos from library</ButtonText>
         </Button>
         <DraggableGrid
           numColumns={3}
           data={gridData}
           onDragRelease={handleReorderPhotos}
-          renderItem={(item: GridItem) => (
-            <View className="px-1 py-2 flex-1 aspect-square">
-              {item.photo ? (
-                // Render a photo
-                <View className="relative overflow-hidden rounded-md">
-                  <Image
-                    source={{ uri: item.photo.uri }}
-                    className="w-auto h-full mt-2 mr-2"
-                    alt=""
-                    resizeMode="cover"
-                  />
-                  <Button
-                    onPress={() => item.photo && removePhoto(item.photo)}
-                    className="absolute p-2 rounded-full top-0 right-0"
-                    size="sm"
-                  >
-                    <ButtonIcon className="m-0 p-0" as={CloseIcon} />
-                  </Button>
+          renderItem={(item: GridItem) => {
+            if (item.type === "header") {
+              // Render group header
+              return (
+                <View className="w-full p-3 bg-muted-100 mb-2 rounded-md flex-row justify-between items-center">
+                  <Text className="font-semibold">Memento #{item.groupId}</Text>
                 </View>
-              ) : (
-                // Render the add button
-                <Button
-                  size="lg"
-                  className="mt-2 mr-2 h-full"
-                  action="secondary"
-                >
-                  <ButtonIcon as={AddIcon} />
-                </Button>
-              )}
-            </View>
-          )}
+              );
+            } else {
+              // Render a photo
+              return (
+                <View className="p-1 aspect-square">
+                  <View className="relative overflow-hidden rounded-md">
+                    <Image
+                      source={{ uri: item.photo?.uri }}
+                      className="w-full h-full"
+                      alt=""
+                      resizeMode="cover"
+                    />
+                    <Button
+                      onPress={() =>
+                        item.photo && handleRemovePhoto(item.photo)
+                      }
+                      className="absolute p-2 rounded-full top-0 right-0"
+                      size="sm"
+                    >
+                      <ButtonIcon className="m-0 p-0" as={CloseIcon} />
+                    </Button>
+                  </View>
+                </View>
+              );
+            }
+          }}
         />
+
+        <View className="mt-auto mb-4">
+          <Button
+            size="lg"
+            onPress={() => console.log("Process groups", groups)}
+          >
+            <ButtonText>Create {groups.length} Mementos</ButtonText>
+          </Button>
+        </View>
       </View>
     </SafeAreaView>
   );

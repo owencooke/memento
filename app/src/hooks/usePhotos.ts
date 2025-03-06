@@ -30,7 +30,7 @@ export default function usePhotos({ initialPhotos = [] }: UsePhotosProps) {
     })();
   }, []);
 
-  const addPhotos = async (source: DeviceSource) => {
+  const addPhotos = async (source: DeviceSource): Promise<Photo[]> => {
     let operation =
       source === "camera"
         ? ImagePicker.launchCameraAsync
@@ -45,7 +45,9 @@ export default function usePhotos({ initialPhotos = [] }: UsePhotosProps) {
 
     if (!result.canceled) {
       setPhotos((prevPhotos) => [...prevPhotos, ...result.assets]);
+      return result.assets;
     }
+    return [];
   };
 
   const removePhoto = (photoToRemove: Photo) => {
