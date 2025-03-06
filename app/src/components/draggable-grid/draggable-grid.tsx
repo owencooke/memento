@@ -24,6 +24,7 @@ interface IBaseItemType {
   key: string | number;
   disabledDrag?: boolean;
   disabledReSorted?: boolean;
+  height?: number;
 }
 
 export interface IDraggableGridProps<DataType extends IBaseItemType> {
@@ -32,7 +33,6 @@ export interface IDraggableGridProps<DataType extends IBaseItemType> {
   renderItem: (item: DataType, order: number) => React.ReactElement<any>;
   style?: ViewStyle;
   itemHeight?: number;
-  itemHeights?: (number | undefined)[]; // Add this line
   dragStartAnimation?: StyleProp<any>;
   onItemPress?: (item: DataType) => void;
   onDragItemActive?: (item: DataType) => void;
@@ -79,21 +79,9 @@ export const DraggableGrid = function <DataType extends IBaseItemType>(
   });
   const [activeItemIndex, setActiveItemIndex] = useState<undefined | number>();
 
-  function getItemHeight(index: number): number {
-    // Instead of using the direct index, we need to find the corresponding
-    // item in the data array based on the order
-    if (props.itemHeights) {
-      const item = items[index];
-      if (item) {
-        // Find the current order of this item
-        const order = orderMap[item.key].order;
-        // Use the height based on its order position
-        if (props.itemHeights[order] !== undefined) {
-          return props.itemHeights[order]!;
-        }
-      }
-    }
-    return blockHeight;
+  function getItemHeight(key: string | number): number {
+    const height = itemMap[key]?.height;
+    return height ? height : blockHeight;
   }
   const assessGridSize = (event: IOnLayoutEvent) => {
     if (!hadInitBlockSize) {
@@ -125,31 +113,28 @@ export const DraggableGrid = function <DataType extends IBaseItemType>(
     });
   }
   function getBlockPositionByOrder(order: number) {
-    if (blockPositions[order]) {
-      return blockPositions[order];
-    }
+    const column = order % props.numColumns;
+    const row = Math.floor(order / props.numColumns);
 
-    const columnOnRow = order % props.numColumns;
-
-    // Calculate Y position based on heights of items above this one
     let y = 0;
-    const rowIndex = Math.floor(order / props.numColumns);
-
-    // For each row before this one, add the height of items in that row
-    for (let i = 0; i < rowIndex; i++) {
-      // Find the tallest item in this row
+    for (let i = 0; i < row; i++) {
       let rowMaxHeight = 0;
       for (let j = 0; j < props.numColumns; j++) {
-        const itemIndex = i * props.numColumns + j;
-        if (itemIndex < props.data.length) {
-          rowMaxHeight = Math.max(rowMaxHeight, getItemHeight(itemIndex));
+        const itemOrder = i * props.numColumns + j;
+        if (itemOrder < props.data.length) {
+          const itemKey = getKeyByOrder(itemOrder);
+          const itemHeight = getItemHeight(itemKey);
+          rowMaxHeight = Math.max(rowMaxHeight, itemHeight);
         }
       }
-      y += rowMaxHeight || blockHeight;
+      y += rowMaxHeight;
     }
 
-    const x = columnOnRow * blockWidth;
-    return { x, y };
+    const x = column * blockWidth;
+    return {
+      x,
+      y,
+    };
   }
   function resetGridHeight() {
     let totalHeight = 0;
@@ -160,12 +145,13 @@ export const DraggableGrid = function <DataType extends IBaseItemType>(
     for (let i = 0; i < rowCount; i++) {
       let maxHeightInRow = 0;
       for (let j = 0; j < props.numColumns; j++) {
-        const itemIndex = i * props.numColumns + j;
-        if (itemIndex < itemCount) {
-          maxHeightInRow = Math.max(maxHeightInRow, getItemHeight(itemIndex));
+        const itemOrder = i * props.numColumns + j;
+        if (itemOrder < itemCount) {
+          const itemKey = getKeyByOrder(itemOrder);
+          maxHeightInRow = Math.max(maxHeightInRow, getItemHeight(itemKey));
         }
       }
-      totalHeight += maxHeightInRow || blockHeight;
+      totalHeight += maxHeightInRow;
     }
 
     gridHeight.setValue(totalHeight);
@@ -343,7 +329,7 @@ export const DraggableGrid = function <DataType extends IBaseItemType>(
     }
   }
   function getBlockStyle(itemIndex: number) {
-    const itemHeight = getItemHeight(itemIndex);
+    const itemHeight = getItemHeight(items[itemIndex].key);
 
     return [
       {

@@ -95,9 +95,6 @@ export default function BulkCreateMemento() {
           numColumns={3}
           data={gridData}
           onDragRelease={handleReorderPhotos}
-          itemHeights={gridData.map((item) =>
-            item.type === "photo" ? undefined : 21,
-          )}
           renderItem={(item: GridItem) => {
             if (item.type === "spacer") {
               return (
@@ -152,6 +149,7 @@ const createSpacer = (
   group,
   disabledDrag: true,
   disabledReSorted,
+  height: 21,
 });
 
 // Adds photos for specific group
