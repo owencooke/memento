@@ -21,6 +21,7 @@ import { Heading } from "@/src/components/ui/heading";
 import { Input, InputField } from "@/src/components/ui/input";
 import { Textarea, TextareaInput } from "@/src/components/ui/textarea";
 import { Button, ButtonSpinner, ButtonText } from "@/src/components/ui/button";
+//import { MementoCard } from "@/src/components/cards/MementoCard";
 import { useCallback, useState } from "react";
 import { AlertCircleIcon } from "@/src/components/ui/icon";
 import LocationInput, {
@@ -38,6 +39,7 @@ interface CreateCollectionForm {
   date: Date | null;
   location: GeoLocation;
   caption: string;
+  mementos: string;
 }
 
 /**
@@ -134,6 +136,13 @@ export default function CreateCollection() {
     [locationValue, setValue],
   );
 
+  /*
+
+  */
+  const handleAddMementosPress = () => {
+    router.push("/(app)/(screens)/(select_mementos)/select_mementos");
+  }
+
   return (
     <SafeAreaView className="flex-1" edges={["bottom"]}>
       <FlatList
@@ -225,6 +234,25 @@ export default function CreateCollection() {
                   />
                 )}
               />
+            </FormControl>
+            <FormControl size={"lg"}>
+              <FormControlLabel>
+                  <FormControlLabelText>Mementos</FormControlLabelText>
+                </FormControlLabel>
+                <Controller
+                  name="mementos"
+                  control={control}
+                  render={({ field }) => (
+                    <Button
+                      className="mt-auto"
+                      size={"lg"}
+                      onPress={handleAddMementosPress}
+                    >
+                      <ButtonText>+</ButtonText>
+                    </Button>
+                  
+                  )}
+                />
             </FormControl>
             <Button
               className="mt-auto"
