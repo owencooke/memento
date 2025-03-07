@@ -61,12 +61,15 @@ export default function BulkCreateMemento() {
 
   // Updates the position and/or group number for a photo if moved
   const handleReorderPhotos = useCallback((newItems: GridItem[]) => {
-    let currentGroup = -1;
+    let currentGroup = 0;
+    let photoInGroup = false;
     const updatedPhotos = newItems.reduce<PhotoWithGroup[]>((acc, item) => {
-      if (item.type === "header") {
+      if (item.type === "header" && photoInGroup) {
         currentGroup += 1;
+        photoInGroup = false;
       } else if (item.type === "photo" && item.photo) {
         acc.push({ ...item.photo, group: currentGroup });
+        photoInGroup = true;
       }
       return acc;
     }, []);
@@ -99,7 +102,7 @@ export default function BulkCreateMemento() {
               return (
                 <View className="max-h-5 bg-red-300">
                   {/* Uncomment if debugging spacer behaviour */}
-                  <Text>{item.key}</Text>
+                  {/* <Text>{item.key}</Text> */}
                 </View>
               );
             } else if (item.type === "photo" && item.photo) {
@@ -110,15 +113,16 @@ export default function BulkCreateMemento() {
               );
             } else {
               return (
-                <Button size="lg" variant="link" className="p-0 bg-red-300">
-                  <ButtonText> Memento #{item.group + 1}</ButtonText>
-                  <ButtonIcon as={EditIcon} className="ml-2" />
-                </Button>
+                <View className="mt-4">
+                  <Button size="lg" variant="link" className="p-0">
+                    <ButtonText> Memento #{item.group + 1}</ButtonText>
+                    <ButtonIcon as={EditIcon} className="ml-2" />
+                  </Button>
+                </View>
               );
             }
           }}
         />
-
         <View className="mt-auto mb-4">
           <Button
             size="lg"
@@ -148,7 +152,7 @@ const createSpacer = (
   group,
   disabledDrag: true,
   disabledReSorted,
-  height: 21,
+  height: 48,
 });
 
 // Adds photos for specific group
