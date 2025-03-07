@@ -32,19 +32,11 @@ export default function Mementos() {
     [mementos],
   );
 
-  const handleRefresh = async () => {
-    setRefreshing(true);
-    await refetch();
-    setRefreshing(false);
-  };
+  const [opacity, setOpacity] = useState(1);
 
-  const handleAddMemento = () => {
-    router.push("/(app)/(screens)/(memento)/create");
-  };
-
-  const handleViewMemento = (id: number) => {
-    router.push(`/(app)/(screens)/(memento)/${id}`);
-  };
+  const handleSelectMemento = () => {
+    setOpacity(0.5);
+  }
 
   return (
     <View className="flex-1 bg-background-100 py-4 px-6">
@@ -61,19 +53,14 @@ export default function Mementos() {
             ) : (
               <Pressable
                 className="flex-1"
-                onPress={() => handleViewMemento(item.id)}
+                style={{
+                  opacity: opacity,
+                }}
+                onPress={() => handleSelectMemento}
               >
                 <MementoCard {...item} />
               </Pressable>
             )
-          }
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={handleRefresh}
-              colors={[refreshColor]}
-              tintColor={refreshColor}
-            />
           }
         />
       ) : (
