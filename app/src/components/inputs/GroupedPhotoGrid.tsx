@@ -26,7 +26,6 @@ interface GridItem {
 export type PhotoWithGroup = Photo & { group: number };
 
 interface GroupedPhotoGridProps {
-  groupNumbers: number[];
   groupedPhotos: PhotoWithGroup[];
   setGroupedPhotos: (photos: PhotoWithGroup[]) => void;
   setScrollEnabled: (enabled: boolean) => void;
@@ -34,21 +33,19 @@ interface GroupedPhotoGridProps {
 }
 
 export default function GroupedPhotoGrid({
-  groupNumbers,
   groupedPhotos,
   setScrollEnabled,
   setGroupedPhotos,
   onEditGroup,
 }: GroupedPhotoGridProps) {
   // Create grouped photos for display in grid
-  const gridData = useMemo(
-    () =>
-      groupNumbers.reduce<GridItem[]>(
-        (items, group) => [...items, ...buildGroupItems(group, groupedPhotos)],
-        [],
-      ),
-    [groupedPhotos, groupNumbers],
-  );
+  const gridData = useMemo(() => {
+    const groupNumbers = [...new Set(groupedPhotos.map((p) => p.group))];
+    return groupNumbers.reduce<GridItem[]>(
+      (items, group) => [...items, ...buildGroupItems(group, groupedPhotos)],
+      [],
+    );
+  }, [groupedPhotos]);
 
   // Updates the position and/or group number for a photo if moved
   const handleReorderPhotos = useCallback(
@@ -97,11 +94,11 @@ export default function GroupedPhotoGrid({
               <Button
                 size="lg"
                 variant="link"
-                className="p-0"
+                className="p-0 pr-2"
                 onPress={() => onEditGroup(item.group)}
               >
-                <ButtonText> Memento #{item.group + 1}</ButtonText>
-                <ButtonIcon as={EditIcon} className="ml-2" />
+                <ButtonText>Memento #{item.group + 1}</ButtonText>
+                <ButtonIcon as={EditIcon} />
               </Button>
             </View>
           );

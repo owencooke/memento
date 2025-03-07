@@ -29,6 +29,15 @@ export interface MementoFormData {
   photos: Photo[];
 }
 
+export const defaultMementoFormValues: MementoFormData = {
+  memento: {
+    caption: "",
+    date: null,
+    location: { text: "" },
+  },
+  photos: [],
+};
+
 export interface MementoFormProps {
   initialValues?: MementoFormData;
   submitButtonText: string;
@@ -48,15 +57,6 @@ export default function MementoForm({
 }: MementoFormProps) {
   const [scrollEnabled, setScrollEnabled] = useState(true);
 
-  const defaultValues: MementoFormData = {
-    memento: {
-      caption: "",
-      date: null,
-      location: { text: "" },
-    },
-    photos: [],
-  };
-
   const {
     control,
     handleSubmit,
@@ -66,7 +66,7 @@ export default function MementoForm({
     clearErrors,
     formState: { errors },
   } = useForm<MementoFormData>({
-    defaultValues: initialValues || defaultValues,
+    defaultValues: initialValues || defaultMementoFormValues,
   });
 
   // When more photos added, populate date/location fields from image data

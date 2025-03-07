@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FlatList } from "react-native";
 import { Button, ButtonText } from "@/src/components/ui/button";
@@ -10,6 +10,7 @@ import GroupedPhotoGrid, {
 } from "@/src/components/inputs/GroupedPhotoGrid";
 import usePhotos from "@/src/hooks/usePhotos";
 import MementoForm, {
+  defaultMementoFormValues,
   MementoFormData,
 } from "@/src/components/forms/MementoForm";
 import {
@@ -19,8 +20,12 @@ import {
   ActionsheetDragIndicatorWrapper,
   ActionsheetDragIndicator,
 } from "@/src/components/ui/actionsheet";
+import { CloseIcon, Icon } from "@/src/components/ui/icon";
 
-type GroupedMemento = MementoFormData["memento"] & { group: number };
+type BulkMementoGroup = MementoFormData["memento"] & {
+  groupId: number;
+  photos: PhotoWithGroup[];
+};
 
 export default function BulkCreateMemento() {
   const [scrollEnabled, setScrollEnabled] = useState(true);
@@ -28,86 +33,83 @@ export default function BulkCreateMemento() {
     initialPhotos: [],
   });
 
-  const [groupedPhotos, setGroupedPhotos] = useState<PhotoWithGroup[]>([]);
-  const groupNumbers = useMemo(
-    () => [...new Set(groupedPhotos.map((p) => p.group))],
-    [groupedPhotos],
+  const [mementoGroups, setMementoGroups] = useState<BulkMementoGroup[]>([]);
+
+  const groupedPhotos = useMemo(
+    () => mementoGroups.flatMap((group) => group.photos),
+    [mementoGroups],
   );
 
-  // State for modal and tracking group mementos
-  const [editingGroup, setEditingGroup] = useState<number | null>(null);
-  const [groupedMementos, setGroupedMementos] = useState<GroupedMemento[]>([]);
+  const [editingGroup, setEditingGroup] = useState<BulkMementoGroup | null>(
+    null,
+  );
 
-  // Find photos for current editing group
-  const currentGroupPhotos = useMemo(() => {
-    if (editingGroup === null) return [];
-    return groupedPhotos.filter((photo) => photo.group === editingGroup);
-  }, [editingGroup, groupedPhotos]);
-
-  // Get current group memento data if exists
-  const currentGroupMemento = useMemo(() => {
-    if (editingGroup === null) return null;
-    return groupedMementos.find((gm) => gm.group === editingGroup);
-  }, [editingGroup, groupedMementos]);
-
-  // Adds multiple photos, each in own group initially
+  // Add more photos (each new photo starts as a new group)
   const handleAddPhotos = useCallback(async () => {
     const newPhotos = await addPhotos("picker");
-    setGroupedPhotos((prev) => [
-      ...prev,
-      ...newPhotos.map((photo, index) => ({
-        ...photo,
-        group: groupNumbers.length + index,
-      })),
-    ]);
-  }, [addPhotos, groupNumbers.length]);
+    const newMementoGroups = newPhotos.map((photo, index) => {
+      const groupId = mementoGroups.length + index;
+      return {
+        groupId,
+        ...defaultMementoFormValues.memento,
+        photos: [{ ...photo, group: groupId }],
+      };
+    });
+    setMementoGroups((prev) => [...prev, ...newMementoGroups]);
+  }, [addPhotos, mementoGroups.length]);
 
-  // Handle opening the edit form for a specific group
-  const handleEditGroup = useCallback((group: number) => {
-    setEditingGroup(group);
-  }, []);
+  // Update memento groups when user drags/reorders a photo
+  const handlePhotosReordered = useCallback(
+    (updatedPhotos: PhotoWithGroup[]) => {
+      const updatedGroups = mementoGroups
+        .map((currentGroup) => {
+          // Get updated photos in group
+          const photosInGroup = updatedPhotos.filter(
+            (p) => p.group === currentGroup.groupId,
+          );
+          return { ...currentGroup, photos: photosInGroup };
+        })
+        // Remove groups with no photos
+        .filter((group) => group.photos.length > 0);
 
-  // Handle form submission for a group
-  const handleGroupFormSubmit = useCallback(
-    async (formData: MementoFormData) => {
-      if (editingGroup === null) return;
-
-      // Update or add new group metadata
-      setGroupedMementos((prev) => {
-        const existingIndex = prev.findIndex((gm) => gm.group === editingGroup);
-        const newMemento = {
-          group: editingGroup,
-          caption: formData.memento.caption,
-          date: formData.memento.date,
-          location: formData.memento.location,
-        };
-
-        if (existingIndex >= 0) {
-          // Update existing
-          const updated = [...prev];
-          updated[existingIndex] = newMemento;
-          return updated;
-        } else {
-          // Add new
-          return [...prev, newMemento];
-        }
-      });
-
-      // Close the modal
-      setEditingGroup(null);
+      setMementoGroups(updatedGroups);
+      setScrollEnabled(true);
     },
-    [editingGroup],
+    [mementoGroups],
   );
 
-  // Create initial form values for the current group
-  const initialFormValues = useMemo((): MementoFormData | undefined => {
-    if (!currentGroupMemento) return undefined;
+  // Open the edit memento form for a specific group
+  const handleEditGroup = useCallback(
+    (groupId: number) => {
+      const editedGroup = mementoGroups.find(
+        (group) => group.groupId === groupId,
+      );
+      setEditingGroup(editedGroup ? editedGroup : null);
+    },
+    [mementoGroups],
+  );
 
-    return {
-      memento: currentGroupMemento,
-      photos: currentGroupPhotos,
-    };
-  }, [currentGroupMemento, currentGroupPhotos]);
+  // Save the new user-inputted memento details for an edited group
+  const handleSaveGroupDetails = useCallback(
+    async (formData: MementoFormData) => {
+      setMementoGroups((prevGroups) =>
+        prevGroups.map((group) =>
+          group.groupId === editingGroup?.groupId
+            ? {
+                ...group,
+                caption: formData.memento.caption,
+                date: formData.memento.date,
+                location: formData.memento.location,
+              }
+            : group,
+        ),
+      );
+      setEditingGroup(null);
+    },
+    [editingGroup?.groupId],
+  );
+
+  const handleCloseGroupForm = () => setEditingGroup(null);
 
   if (!hasPermission) {
     return <Text>No access to camera</Text>;
@@ -140,54 +142,63 @@ export default function BulkCreateMemento() {
               <ButtonText>Add photos from library</ButtonText>
             </Button>
             <GroupedPhotoGrid
-              groupNumbers={groupNumbers}
               groupedPhotos={groupedPhotos}
-              setGroupedPhotos={setGroupedPhotos}
+              setGroupedPhotos={handlePhotosReordered}
               setScrollEnabled={setScrollEnabled}
               onEditGroup={handleEditGroup}
             />
-            {groupedPhotos.length > 0 && (
+            {mementoGroups.length > 0 && (
               <Button
                 className="mt-6"
                 size="lg"
                 onPress={() => {
-                  // Here you would implement the bulk creation logic
-                  console.log("Grouped photos:", groupedPhotos);
-                  console.log("Group mementos:", groupedMementos);
+                  console.log("Memento groups:", mementoGroups);
                 }}
               >
                 <ButtonText>
-                  Create {groupNumbers.length} Memento
-                  {groupNumbers.length > 1 && "s"}
+                  Create {mementoGroups.length} Memento
+                  {mementoGroups.length > 1 && "s"}
                 </ButtonText>
               </Button>
             )}
           </View>
         }
       />
-
-      {/* Modal for editing group */}
-      <Actionsheet
-        isOpen={editingGroup !== null}
-        onClose={() => setEditingGroup(null)}
-      >
-        <ActionsheetBackdrop />
-        <ActionsheetContent>
-          <ActionsheetDragIndicatorWrapper>
-            <ActionsheetDragIndicator />
-          </ActionsheetDragIndicatorWrapper>
-          {typeof editingGroup === "number" && (
-            <MementoForm
-              initialValues={initialFormValues}
-              submitButtonText="Save Changes"
-              isSubmitting={false}
-              photosEditable={false}
-              onSubmit={handleGroupFormSubmit}
-              FormHeader={`Memento #${editingGroup + 1}`}
-            />
-          )}
-        </ActionsheetContent>
-      </Actionsheet>
+      {/* Actionsheet for editing a memento groups' details */}
+      {editingGroup && (
+        <Actionsheet isOpen onClose={handleCloseGroupForm}>
+          <ActionsheetBackdrop />
+          <ActionsheetContent>
+            <ActionsheetDragIndicatorWrapper className="h-8">
+              <ActionsheetDragIndicator />
+            </ActionsheetDragIndicatorWrapper>
+            <View className="w-full">
+              <Pressable className="self-end" onPress={handleCloseGroupForm}>
+                <Icon
+                  as={CloseIcon}
+                  size="xl"
+                  className="stroke-background-500"
+                />
+              </Pressable>
+              <MementoForm
+                initialValues={{
+                  memento: {
+                    caption: editingGroup.caption,
+                    date: editingGroup.date,
+                    location: editingGroup.location,
+                  },
+                  photos: editingGroup.photos,
+                }}
+                submitButtonText="Save Changes"
+                isSubmitting={false}
+                photosEditable={false}
+                onSubmit={handleSaveGroupDetails}
+                FormHeader={`Memento #${editingGroup.groupId + 1}`}
+              />
+            </View>
+          </ActionsheetContent>
+        </Actionsheet>
+      )}
     </SafeAreaView>
   );
 }
