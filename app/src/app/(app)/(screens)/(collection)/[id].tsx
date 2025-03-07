@@ -113,19 +113,26 @@ export default function ViewCollection() {
         {collection && (
           <>
             {/* Details Card */}
-            {(collection.title || collection.caption) && (
+            {(collection.title ||
+              collection.caption ||
+              collection.location ||
+              collection.date) && (
               <>
-                <Heading className="p-4">
+                <Heading>
                   <Text size="3xl" bold className="mb-2">
                     {collection.title}
                   </Text>
-                  <Box className="flex mt-auto font-medium">
-                    <Text
-                      size="xl"
-                      italic
-                      className="text-left font-light mb-2"
-                    >
+                  <Box className="flex font-medium">
+                    <Text size="xl" italic className="text-left font-light">
                       {collection.caption}
+                    </Text>
+                  </Box>
+                  <Box className="flex-row justify-between items-center gap-x-4 mt-auto font-medium">
+                    <Text size="lg" className="text-left font-light">
+                      {collection.location}
+                    </Text>
+                    <Text size="lg" className="text-right font-light">
+                      {collection.date}
                     </Text>
                   </Box>
                 </Heading>
@@ -161,13 +168,6 @@ export default function ViewCollection() {
         {/* TODO: open Share options */}
         <Button size="xl" className={buttonClasses}>
           <ButtonIcon as={ShareIcon} className={iconClasses} />
-        </Button>
-        <Button
-          size="xl"
-          className={buttonClasses}
-          onPress={handleShowMoreDetails}
-        >
-          <ButtonIcon as={InfoIcon} className={`${iconClasses}`} />
         </Button>
         <Button
           size="xl"
