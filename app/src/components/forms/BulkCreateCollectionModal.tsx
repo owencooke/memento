@@ -37,6 +37,7 @@ import { AlertCircleIcon } from "../ui/icon";
 import { Input, InputField } from "../ui/input";
 import { Textarea, TextareaInput } from "../ui/textarea";
 import { useMutation } from "@tanstack/react-query";
+import { View } from "react-native";
 
 interface CreateCollectionForm {
   title: string;
@@ -109,62 +110,65 @@ export default function BulkCreateCollectionModal({
       <ModalBackdrop />
       <ModalContent>
         <ModalHeader>
-          <Heading size="lg">Add to a new collection?</Heading>
+          <Heading size="lg">Add to a collection?</Heading>
           <ModalCloseButton />
         </ModalHeader>
         <ModalBody>
-          <Text className="text-left font-light mb-4">
-            Choose if you want to create a collection for your newest mementos.
-          </Text>
-          <FormControl size={"lg"} isInvalid={!!errors?.title}>
-            <FormControlLabel>
-              <FormControlLabelText>Title</FormControlLabelText>
-            </FormControlLabel>
-            <Controller
-              name="title"
-              control={control}
-              render={({ field }) => (
-                <Input className="bg-background-0">
-                  <InputField
-                    onChangeText={field.onChange}
-                    value={field.value}
-                    placeholder="Collection Title"
-                  />
-                </Input>
-              )}
-              rules={{
-                validate: {
-                  required: (value) => {
-                    return (value && value.length > 0) || "Title is required";
+          <View className="flex justify-center gap-6">
+            <Text className="text-left font-light">
+              Your new mementos have been created! Do you also want to add them
+              to a new collection?
+            </Text>
+            <FormControl size={"lg"} isInvalid={!!errors?.title}>
+              <FormControlLabel>
+                <FormControlLabelText>Title</FormControlLabelText>
+              </FormControlLabel>
+              <Controller
+                name="title"
+                control={control}
+                render={({ field }) => (
+                  <Input className="bg-background-0">
+                    <InputField
+                      onChangeText={field.onChange}
+                      value={field.value}
+                      placeholder="Collection Title"
+                    />
+                  </Input>
+                )}
+                rules={{
+                  validate: {
+                    required: (value) => {
+                      return (value && value.length > 0) || "Title is required";
+                    },
                   },
-                },
-              }}
-            />
-            <FormControlError className="mt-4">
-              <FormControlErrorIcon as={AlertCircleIcon} />
-              <FormControlErrorText className="flex-1">
-                {errors?.title?.message}
-              </FormControlErrorText>
-            </FormControlError>
-          </FormControl>
-          <FormControl size={"lg"}>
-            <FormControlLabel>
-              <FormControlLabelText>Caption</FormControlLabelText>
-            </FormControlLabel>
-            <Controller
-              name="caption"
-              control={control}
-              render={({ field }) => (
-                <Textarea className="bg-background-0" size="md">
-                  <TextareaInput
-                    onChangeText={field.onChange}
-                    value={field.value ?? ""}
-                    placeholder="Add a caption"
-                  />
-                </Textarea>
-              )}
-            />
-          </FormControl>
+                }}
+              />
+              <FormControlError className="mt-4">
+                <FormControlErrorIcon as={AlertCircleIcon} />
+                <FormControlErrorText className="flex-1">
+                  {errors?.title?.message}
+                </FormControlErrorText>
+              </FormControlError>
+            </FormControl>
+            <FormControl size={"lg"}>
+              <FormControlLabel>
+                <FormControlLabelText>Caption</FormControlLabelText>
+              </FormControlLabel>
+              <Controller
+                name="caption"
+                control={control}
+                render={({ field }) => (
+                  <Textarea className="bg-background-0" size="md">
+                    <TextareaInput
+                      onChangeText={field.onChange}
+                      value={field.value ?? ""}
+                      placeholder="Add a caption"
+                    />
+                  </Textarea>
+                )}
+              />
+            </FormControl>
+          </View>
         </ModalBody>
         <ModalFooter>
           <Button
