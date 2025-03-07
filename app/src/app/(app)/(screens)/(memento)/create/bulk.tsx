@@ -1,3 +1,9 @@
+/**
+ * @description Screen that allows user to create multiple keepsakes in bulk.
+ *      Uses multi-select image picking and drag-and-drop to sort into groups.
+ * @requirements FR-22, FR-23, FR-24
+ */
+
 import { useState, useCallback, useMemo } from "react";
 import { Pressable, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -20,19 +26,15 @@ import {
   ActionsheetDragIndicator,
 } from "@/src/components/ui/actionsheet";
 import { CloseIcon, Icon } from "@/src/components/ui/icon";
-import {
-  createNewMementoApiUserUserIdMementoPostMutation,
-  getUsersMementosApiUserUserIdMementoGetQueryKey,
-} from "@/src/api-client/generated/@tanstack/react-query.gen";
+import { createNewMementoApiUserUserIdMementoPostMutation } from "@/src/api-client/generated/@tanstack/react-query.gen";
 import { useMutation } from "@tanstack/react-query";
 import {
   MementoFormData,
   prepareMementoPayload,
 } from "@/src/api-client/memento";
 import { formDataBodySerializer } from "@/src/api-client/formData";
-import { queryClient } from "@/src/app/_layout";
-import { router } from "expo-router";
 import { useSession } from "@/src/context/AuthContext";
+import BulkCreateCollectionModal from "@/src/components/forms/BulkCreateCollectionModal";
 
 type BulkMementoGroup = MementoFormData["memento"] & {
   groupId: number;
@@ -41,6 +43,7 @@ type BulkMementoGroup = MementoFormData["memento"] & {
 
 export default function BulkCreateMemento() {
   const { session } = useSession();
+
   const [scrollEnabled, setScrollEnabled] = useState(true);
   const { hasPermission, addPhotos } = usePhotos({
     initialPhotos: [],
@@ -59,6 +62,8 @@ export default function BulkCreateMemento() {
   const [editingGroup, setEditingGroup] = useState<BulkMementoGroup | null>(
     null,
   );
+
+  const [createdMementoIds, setCreatedMementoIds] = useState<number[]>([]);
 
   // Add more photos (each new photo starts as a new group)
   const handleAddPhotos = useCallback(async () => {
@@ -130,26 +135,18 @@ export default function BulkCreateMemento() {
   // Make POST call to Create Memento for each memento group
   const handleSubmit = async () => {
     try {
-      const path = { user_id: String(session?.user.id) };
       const responses = await Promise.all(
         mementoGroups.map(async (group) => {
           const { groupId, photos, ...memento } = group;
           const body: any = prepareMementoPayload({ memento, photos });
           return createMutation.mutateAsync({
             body,
-            path,
+            path: { user_id: String(session?.user.id) },
             bodySerializer: formDataBodySerializer.bodySerializer,
           });
         }),
       );
-      // After all mementos created successfully
-      queryClient.invalidateQueries({
-        queryKey: getUsersMementosApiUserUserIdMementoGetQueryKey({
-          path,
-        }),
-      });
-      router.replace("/(app)/(tabs)/mementos");
-      return responses;
+      setCreatedMementoIds(responses.map((r) => r.new_memento_id));
     } catch (error: any) {
       // TODO: add error toast or indicator?
       console.error(
@@ -165,6 +162,7 @@ export default function BulkCreateMemento() {
 
   return (
     <SafeAreaView className="flex-1" edges={["bottom"]}>
+      {/* Bulk Create Form */}
       <FlatList
         data={[]}
         scrollEnabled={scrollEnabled}
@@ -215,7 +213,7 @@ export default function BulkCreateMemento() {
           </View>
         }
       />
-      {/* Actionsheet for editing a memento groups' details */}
+      {/* Actionsheet for editing a memento group's details */}
       {editingGroup && (
         <Actionsheet isOpen onClose={handleCloseGroupForm}>
           <ActionsheetBackdrop />
@@ -249,6 +247,11 @@ export default function BulkCreateMemento() {
             </View>
           </ActionsheetContent>
         </Actionsheet>
+      )}
+
+      {/* Modal for optional creation of new collection */}
+      {createdMementoIds.length > 0 && (
+        <BulkCreateCollectionModal newMementoIds={createdMementoIds} />
       )}
     </SafeAreaView>
   );
