@@ -30,6 +30,7 @@ interface GroupedPhotoGridProps {
   groupedPhotos: PhotoWithGroup[];
   setGroupedPhotos: (photos: PhotoWithGroup[]) => void;
   setScrollEnabled: (enabled: boolean) => void;
+  onEditGroup: (groupNumber: number) => void;
 }
 
 export default function GroupedPhotoGrid({
@@ -37,6 +38,7 @@ export default function GroupedPhotoGrid({
   groupedPhotos,
   setScrollEnabled,
   setGroupedPhotos,
+  onEditGroup,
 }: GroupedPhotoGridProps) {
   // Create grouped photos for display in grid
   const gridData = useMemo(
@@ -92,7 +94,12 @@ export default function GroupedPhotoGrid({
         } else {
           return (
             <View className="mt-4">
-              <Button size="lg" variant="link" className="p-0">
+              <Button
+                size="lg"
+                variant="link"
+                className="p-0"
+                onPress={() => onEditGroup(item.group)}
+              >
                 <ButtonText> Memento #{item.group + 1}</ButtonText>
                 <ButtonIcon as={EditIcon} className="ml-2" />
               </Button>

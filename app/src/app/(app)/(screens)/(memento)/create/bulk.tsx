@@ -1,11 +1,7 @@
-/**
- * @description Screen for creating multiple new keepsake/mementos in bulk.
- * @requirements FR-22, FR-23
- */
-
+import { useState, useCallback, useMemo } from "react";
+import { View, Modal } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import React, { useCallback, useMemo, useState } from "react";
-import { FlatList, View } from "react-native";
+import { FlatList } from "react-native";
 import { Button, ButtonText } from "@/src/components/ui/button";
 import { Heading } from "@/src/components/ui/heading";
 import { Text } from "@/src/components/ui/text";
@@ -13,6 +9,11 @@ import GroupedPhotoGrid, {
   PhotoWithGroup,
 } from "@/src/components/inputs/GroupedPhotoGrid";
 import usePhotos from "@/src/hooks/usePhotos";
+import MementoForm, {
+  MementoFormData,
+} from "@/src/components/forms/MementoForm";
+
+type GroupedMemento = MementoFormData["memento"] & { group: number };
 
 export default function BulkCreateMemento() {
   const [scrollEnabled, setScrollEnabled] = useState(true);
@@ -26,6 +27,22 @@ export default function BulkCreateMemento() {
     [groupedPhotos],
   );
 
+  // State for modal and tracking group mementos
+  const [editingGroup, setEditingGroup] = useState<number | null>(null);
+  const [groupedMementos, setGroupedMementos] = useState<GroupedMemento[]>([]);
+
+  // Find photos for current editing group
+  const currentGroupPhotos = useMemo(() => {
+    if (editingGroup === null) return [];
+    return groupedPhotos.filter((photo) => photo.group === editingGroup);
+  }, [editingGroup, groupedPhotos]);
+
+  // Get current group memento data if exists
+  const currentGroupMemento = useMemo(() => {
+    if (editingGroup === null) return null;
+    return groupedMementos.find((gm) => gm.group === editingGroup);
+  }, [editingGroup, groupedMementos]);
+
   // Adds multiple photos, each in own group initially
   const handleAddPhotos = useCallback(async () => {
     const newPhotos = await addPhotos("picker");
@@ -37,6 +54,53 @@ export default function BulkCreateMemento() {
       })),
     ]);
   }, [addPhotos, groupNumbers.length]);
+
+  // Handle opening the edit form for a specific group
+  const handleEditGroup = useCallback((group: number) => {
+    setEditingGroup(group);
+  }, []);
+
+  // Handle form submission for a group
+  const handleGroupFormSubmit = useCallback(
+    async (formData: MementoFormData) => {
+      if (editingGroup === null) return;
+
+      // Update or add new group metadata
+      setGroupedMementos((prev) => {
+        const existingIndex = prev.findIndex((gm) => gm.group === editingGroup);
+        const newMemento = {
+          group: editingGroup,
+          caption: formData.memento.caption,
+          date: formData.memento.date,
+          location: formData.memento.location,
+        };
+
+        if (existingIndex >= 0) {
+          // Update existing
+          const updated = [...prev];
+          updated[existingIndex] = newMemento;
+          return updated;
+        } else {
+          // Add new
+          return [...prev, newMemento];
+        }
+      });
+
+      // Close the modal
+      setEditingGroup(null);
+    },
+    [editingGroup],
+  );
+
+  // Create initial form values for the current group
+  const initialFormValues = useMemo((): MementoFormData | undefined => {
+    if (!currentGroupMemento) return undefined;
+
+    return {
+      memento: currentGroupMemento,
+      photos: currentGroupPhotos,
+    };
+  }, [currentGroupMemento, currentGroupPhotos]);
 
   if (!hasPermission) {
     return <Text>No access to camera</Text>;
@@ -73,12 +137,17 @@ export default function BulkCreateMemento() {
               groupedPhotos={groupedPhotos}
               setGroupedPhotos={setGroupedPhotos}
               setScrollEnabled={setScrollEnabled}
+              onEditGroup={handleEditGroup}
             />
             {groupedPhotos.length > 0 && (
               <Button
                 className="mt-6"
                 size="lg"
-                // onPress={() => console.log("Process groups", groups)}
+                onPress={() => {
+                  // Here you would implement the bulk creation logic
+                  console.log("Grouped photos:", groupedPhotos);
+                  console.log("Group mementos:", groupedMementos);
+                }}
               >
                 <ButtonText>
                   Create {groupNumbers.length} Memento
@@ -89,6 +158,38 @@ export default function BulkCreateMemento() {
           </View>
         }
       />
+
+      {/* Modal for editing group */}
+      <Modal
+        visible={editingGroup !== null}
+        animationType="slide"
+        onRequestClose={() => setEditingGroup(null)}
+      >
+        <SafeAreaView className="flex-1">
+          <MementoForm
+            initialValues={initialFormValues}
+            submitButtonText="Save Group"
+            isSubmitting={false}
+            onSubmit={handleGroupFormSubmit}
+            FormHeader={
+              <View className="flex flex-row justify-between items-center">
+                <Heading className="block" size="2xl">
+                  Edit Memento #{editingGroup !== null ? editingGroup + 1 : ""}
+                </Heading>
+                <Button
+                  size="lg"
+                  className="p-3.5"
+                  action="secondary"
+                  variant="solid"
+                  onPress={() => setEditingGroup(null)}
+                >
+                  <ButtonText>Cancel</ButtonText>
+                </Button>
+              </View>
+            }
+          />
+        </SafeAreaView>
+      </Modal>
     </SafeAreaView>
   );
 }
