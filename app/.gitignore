@@ -3,6 +3,7 @@
 */openapi.json
 *.log
 *.env
+*.env.bak
 package-lock.json
 
 # build folders
