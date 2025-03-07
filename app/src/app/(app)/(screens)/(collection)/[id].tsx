@@ -1,6 +1,6 @@
 /**
  * @description Screen for viewing an collection
- * @requirements FR-3
+ * @requirements FR-3 FR-46
  */
 import {
   deleteCollectionApiUserUserIdCollectionIdDeleteMutation,
@@ -9,12 +9,7 @@ import {
   getUsersMementosApiUserUserIdMementoGetOptions,
 } from "@/src/api-client/generated/@tanstack/react-query.gen";
 import { ButtonIcon, Button } from "@/src/components/ui/button";
-import {
-  EditIcon,
-  ShareIcon,
-  TrashIcon,
-  InfoIcon,
-} from "@/src/components/ui/icon";
+import { EditIcon, ShareIcon, TrashIcon } from "@/src/components/ui/icon";
 import { Text } from "@/src/components/ui/text";
 import { useSession } from "@/src/context/AuthContext";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -35,6 +30,8 @@ export default function ViewCollection() {
   const { session } = useSession();
   const user_id = String(session?.user.id);
   const { id } = useLocalSearchParams<{ id: string }>();
+
+  // Get collection
   const { data: collections } = useQuery({
     ...getUsersCollectionsApiUserUserIdCollectionGetOptions({
       path: {
@@ -45,6 +42,7 @@ export default function ViewCollection() {
   });
   const collection = collections?.find((c) => c.id === Number(id));
 
+  // Get associated mementos
   const { data: all_mementos } = useQuery({
     ...getUsersMementosApiUserUserIdMementoGetOptions({
       path: {
@@ -56,6 +54,8 @@ export default function ViewCollection() {
   const mementos = all_mementos?.filter((m) =>
     collection?.mementos.some((cm) => cm.memento_id === m.id),
   );
+
+  // Spacer for odd # of mementos
   const gridData = useMemo(
     () =>
       mementos?.length && mementos.length % 2
@@ -63,12 +63,11 @@ export default function ViewCollection() {
         : mementos,
     [mementos],
   );
+
+  // Delete collection query
   const deleteMutation = useMutation(
     deleteCollectionApiUserUserIdCollectionIdDeleteMutation(),
   );
-
-  // TODO: Show more details
-  const handleShowMoreDetails = () => console.debug("Not implemented yet");
 
   const handleEditCollection = () => {
     router.push(`/(app)/(screens)/(collection)/edit/${collection?.id}`);
@@ -78,16 +77,15 @@ export default function ViewCollection() {
     router.push(`/(app)/(screens)/(memento)/${id}`);
   };
 
+  // Delete collection
   const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
   const handleDeletePress = () => {
     setDeleteModalVisible(true);
   };
-
   const handleConfirmDelete = () => {
-    console.log("Deleting collection..."); // TODO: API call to delete
+    console.log("Deleting collection...");
     onDelete(Number(id)); // FIXME: collection?.id is number | undefined
   };
-
   const onDelete = async (id: number) => {
     const path = { user_id, id };
 
@@ -136,7 +134,6 @@ export default function ViewCollection() {
                   columnWrapperStyle={{ gap: 12 }}
                   contentContainerStyle={{ gap: 12 }}
                   showsVerticalScrollIndicator={false}
-                  // TODO: Fetch and Display Mementos
                   data={gridData}
                   keyExtractor={(item, index) =>
                     "spacer" in item ? `spacer-${index}` : String(item.id)
@@ -179,7 +176,6 @@ export default function ViewCollection() {
         >
           <ButtonIcon as={EditIcon} className={iconClasses} />
         </Button>
-        {/* TODO: open Delete confirmation modal */}
         <Button size="xl" className={buttonClasses} onPress={handleDeletePress}>
           <ButtonIcon as={TrashIcon} className={iconClasses} />
         </Button>
