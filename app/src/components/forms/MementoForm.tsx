@@ -22,6 +22,7 @@ import LocationInput, {
   GeoLocation,
 } from "@/src/components/inputs/LocationInput";
 import { aggregateMetadata } from "@/src/libs/metadata";
+import { Heading } from "../ui/heading";
 
 export interface MementoFormData {
   memento: { date: Date | null; location: GeoLocation; caption: string };
@@ -34,7 +35,7 @@ export interface MementoFormProps {
   isSubmitting: boolean;
   photosEditable?: boolean;
   onSubmit: (data: MementoFormData) => Promise<void>;
-  FormHeader?: ReactElement;
+  FormHeader?: ReactElement | string;
 }
 
 export default function MementoForm({
@@ -105,7 +106,13 @@ export default function MementoForm({
       keyboardShouldPersistTaps="handled"
       ListHeaderComponent={
         <View className="flex justify-center gap-6 pb-32">
-          {FormHeader}
+          {typeof FormHeader === "string" ? (
+            <Heading className="block" size="2xl">
+              {FormHeader}
+            </Heading>
+          ) : (
+            FormHeader
+          )}
           <FormControl size={"lg"} isInvalid={!!errors.photos}>
             <FormControlLabel>
               <FormControlLabelText>

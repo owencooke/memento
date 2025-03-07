@@ -1,8 +1,8 @@
 import { useState, useCallback, useMemo } from "react";
-import { View, Modal } from "react-native";
+import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FlatList } from "react-native";
-import { Button, ButtonIcon, ButtonText } from "@/src/components/ui/button";
+import { Button, ButtonText } from "@/src/components/ui/button";
 import { Heading } from "@/src/components/ui/heading";
 import { Text } from "@/src/components/ui/text";
 import GroupedPhotoGrid, {
@@ -12,7 +12,13 @@ import usePhotos from "@/src/hooks/usePhotos";
 import MementoForm, {
   MementoFormData,
 } from "@/src/components/forms/MementoForm";
-import { CloseIcon } from "@/src/components/ui/icon";
+import {
+  Actionsheet,
+  ActionsheetBackdrop,
+  ActionsheetContent,
+  ActionsheetDragIndicatorWrapper,
+  ActionsheetDragIndicator,
+} from "@/src/components/ui/actionsheet";
 
 type GroupedMemento = MementoFormData["memento"] & { group: number };
 
@@ -161,37 +167,27 @@ export default function BulkCreateMemento() {
       />
 
       {/* Modal for editing group */}
-      <Modal
-        visible={editingGroup !== null}
-        animationType="slide"
-        onRequestClose={() => setEditingGroup(null)}
+      <Actionsheet
+        isOpen={editingGroup !== null}
+        onClose={() => setEditingGroup(null)}
       >
-        <SafeAreaView className="flex-1">
-          <MementoForm
-            initialValues={initialFormValues}
-            submitButtonText="Save Group"
-            isSubmitting={false}
-            photosEditable={false}
-            onSubmit={handleGroupFormSubmit}
-            FormHeader={
-              <View className="flex flex-row justify-between items-center">
-                <Heading className="block" size="2xl">
-                  Edit Memento #{editingGroup !== null ? editingGroup + 1 : ""}
-                </Heading>
-                <Button
-                  size="lg"
-                  className="p-3.5"
-                  action="secondary"
-                  variant="solid"
-                  onPress={() => setEditingGroup(null)}
-                >
-                  <ButtonIcon as={CloseIcon} />
-                </Button>
-              </View>
-            }
-          />
-        </SafeAreaView>
-      </Modal>
+        <ActionsheetBackdrop />
+        <ActionsheetContent>
+          <ActionsheetDragIndicatorWrapper>
+            <ActionsheetDragIndicator />
+          </ActionsheetDragIndicatorWrapper>
+          {typeof editingGroup === "number" && (
+            <MementoForm
+              initialValues={initialFormValues}
+              submitButtonText="Save Changes"
+              isSubmitting={false}
+              photosEditable={false}
+              onSubmit={handleGroupFormSubmit}
+              FormHeader={`Memento #${editingGroup + 1}`}
+            />
+          )}
+        </ActionsheetContent>
+      </Actionsheet>
     </SafeAreaView>
   );
 }
