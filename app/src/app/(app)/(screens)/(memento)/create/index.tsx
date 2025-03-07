@@ -3,7 +3,7 @@
  * @requirements FR-9, FR-17, FR-19, FR-20, FR-21
  */
 
-import { KeyboardAvoidingView, Platform, View } from "react-native";
+import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useMutation } from "@tanstack/react-query";
 import {
@@ -20,7 +20,7 @@ import { Heading } from "@/src/components/ui/heading";
 import { PlayIcon } from "@/src/components/ui/icon";
 import {
   MementoFormData,
-  prepareCreateMementoPayload,
+  prepareMementoPayload,
 } from "@/src/api-client/memento";
 
 export default function CreateMemento() {
@@ -31,7 +31,7 @@ export default function CreateMemento() {
 
   // Call POST Create Memento endpoint with custom serializer for multi-part form data
   const onSubmit = async (form: MementoFormData) => {
-    const body: any = prepareCreateMementoPayload(form);
+    const body: any = prepareMementoPayload(form);
     const path = { user_id: session?.user.id ?? "" };
     await createMutation.mutateAsync(
       {
@@ -60,32 +60,27 @@ export default function CreateMemento() {
 
   return (
     <SafeAreaView className="flex-1" edges={["bottom"]}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        className="flex-1"
-      >
-        <MementoForm
-          submitButtonText="Create Memento"
-          isSubmitting={createMutation.isPending}
-          onSubmit={onSubmit}
-          FormHeader={
-            <View className="flex flex-row justify-between items-center">
-              <Heading className="block" size="2xl">
-                Create Memento
-              </Heading>
-              <Button
-                size="lg"
-                className="p-3.5"
-                action="secondary"
-                variant="solid"
-                onPress={handleBulkCreate}
-              >
-                <ButtonIcon as={PlayIcon} />
-              </Button>
-            </View>
-          }
-        />
-      </KeyboardAvoidingView>
+      <MementoForm
+        submitButtonText="Create Memento"
+        isSubmitting={createMutation.isPending}
+        onSubmit={onSubmit}
+        FormHeader={
+          <View className="flex flex-row justify-between items-center">
+            <Heading className="block" size="2xl">
+              Create Memento
+            </Heading>
+            <Button
+              size="lg"
+              className="p-3.5"
+              action="secondary"
+              variant="solid"
+              onPress={handleBulkCreate}
+            >
+              <ButtonIcon as={PlayIcon} />
+            </Button>
+          </View>
+        }
+      />
     </SafeAreaView>
   );
 }

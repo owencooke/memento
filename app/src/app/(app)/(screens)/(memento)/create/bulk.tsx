@@ -27,7 +27,7 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import {
   MementoFormData,
-  prepareCreateMementoPayload,
+  prepareMementoPayload,
 } from "@/src/api-client/memento";
 import { formDataBodySerializer } from "@/src/api-client/formData";
 import { queryClient } from "@/src/app/_layout";
@@ -134,7 +134,7 @@ export default function BulkCreateMemento() {
       const responses = await Promise.all(
         mementoGroups.map(async (group) => {
           const { groupId, photos, ...memento } = group;
-          const body: any = prepareCreateMementoPayload({ memento, photos });
+          const body: any = prepareMementoPayload({ memento, photos });
           return createMutation.mutateAsync({
             body,
             path,

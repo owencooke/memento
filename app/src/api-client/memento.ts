@@ -9,7 +9,7 @@ export interface MementoFormData {
 }
 
 // Maps the form data for a Memento into the proper payload for Create API
-export const prepareCreateMementoPayload = (form: MementoFormData) => {
+export const prepareMementoPayload = (form: MementoFormData) => {
   const {
     location: { lat, long, text },
     date,
