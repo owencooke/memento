@@ -5,7 +5,12 @@ from tempfile import gettempdir
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-TEMP_DIR = Path(gettempdir())
+from dotenv import load_dotenv
+# Define the path to the .env file
+ENV_PATH = Path(__file__).resolve().parent.parent.parent.parent / "app" / ".env"
+
+# Load the .env file
+load_dotenv(dotenv_path=ENV_PATH, override=True)
 
 
 class LogLevel(str, enum.Enum):
