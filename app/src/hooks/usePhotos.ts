@@ -71,7 +71,9 @@ export default function usePhotos({ initialPhotos = [] }: UsePhotosProps) {
   const addPhotos = async (source: DeviceSource) => {
     const photos = await getPhotosFromDevice(source);
     setPhotos((prevPhotos) => [...prevPhotos, ...photos]);
-    processPhotos(photos);
+    if (process.env.EXPO_PUBLIC_DISABLE_BG_REMOVAL !== "true") {
+      processPhotos(photos);
+    }
   };
 
   // Remove background from an image
