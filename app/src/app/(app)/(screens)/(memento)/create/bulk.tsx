@@ -34,11 +34,10 @@ import { queryClient } from "@/src/app/_layout";
 import { router } from "expo-router";
 import { useSession } from "@/src/context/AuthContext";
 
-interface BulkMementoGroup {
+type BulkMementoGroup = MementoFormData["memento"] & {
   groupId: number;
-  memento: MementoFormData["memento"];
   photos: PhotoWithGroup[];
-}
+};
 
 export default function BulkCreateMemento() {
   const { session } = useSession();
@@ -67,8 +66,8 @@ export default function BulkCreateMemento() {
     const newMementoGroups = newPhotos.map((photo, index) => {
       const groupId = mementoGroups.length + index;
       return {
+        ...defaultMementoFormValues.memento,
         groupId,
-        memento: defaultMementoFormValues.memento,
         photos: [{ ...photo, group: groupId }],
       };
     });
@@ -134,7 +133,8 @@ export default function BulkCreateMemento() {
       const path = { user_id: String(session?.user.id) };
       const responses = await Promise.all(
         mementoGroups.map(async (group) => {
-          const body: any = prepareCreateMementoPayload(group);
+          const { groupId, photos, ...memento } = group;
+          const body: any = prepareCreateMementoPayload({ memento, photos });
           return createMutation.mutateAsync({
             body,
             path,
@@ -142,7 +142,6 @@ export default function BulkCreateMemento() {
           });
         }),
       );
-
       // After all mementos created successfully
       queryClient.invalidateQueries({
         queryKey: getUsersMementosApiUserUserIdMementoGetQueryKey({
@@ -151,9 +150,12 @@ export default function BulkCreateMemento() {
       });
       router.replace("/(app)/(tabs)/mementos");
       return responses;
-    } catch (error) {
+    } catch (error: any) {
       // TODO: add error toast or indicator?
-      console.error("Failed to bulk create mementos:", error);
+      console.error(
+        "Failed to bulk create mementos:",
+        JSON.stringify(error?.detail, undefined, 2),
+      );
     }
   };
 
@@ -223,9 +225,9 @@ export default function BulkCreateMemento() {
               <MementoForm
                 initialValues={{
                   memento: {
-                    caption: editingGroup.memento.caption,
-                    date: editingGroup.memento.date,
-                    location: editingGroup.memento.location,
+                    caption: editingGroup.caption,
+                    date: editingGroup.date,
+                    location: editingGroup.location,
                   },
                   photos: editingGroup.photos,
                 }}

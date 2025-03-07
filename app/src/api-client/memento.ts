@@ -17,13 +17,13 @@ export const prepareCreateMementoPayload = (form: MementoFormData) => {
   } = form.memento;
 
   return {
-    memento: {
+    memento_str: {
       ...restMemento,
       date: date ? toISODateString(date) : null,
       location: text || null,
       coordinates: lat && long ? { lat, long } : null,
     },
-    imageMetadata: form.photos.map((photo, idx) => ({
+    image_metadata_str: form.photos.map((photo, idx) => ({
       ...getRelevantImageMetadata(photo),
       order_index: idx,
     })),
