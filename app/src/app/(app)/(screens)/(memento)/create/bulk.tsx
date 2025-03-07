@@ -11,7 +11,6 @@ import GroupedPhotoGrid, {
 import usePhotos from "@/src/hooks/usePhotos";
 import MementoForm, {
   defaultMementoFormValues,
-  MementoFormData,
 } from "@/src/components/forms/MementoForm";
 import {
   Actionsheet,
@@ -21,17 +20,35 @@ import {
   ActionsheetDragIndicator,
 } from "@/src/components/ui/actionsheet";
 import { CloseIcon, Icon } from "@/src/components/ui/icon";
+import {
+  createNewMementoApiUserUserIdMementoPostMutation,
+  getUsersMementosApiUserUserIdMementoGetQueryKey,
+} from "@/src/api-client/generated/@tanstack/react-query.gen";
+import { useMutation } from "@tanstack/react-query";
+import {
+  MementoFormData,
+  prepareCreateMementoPayload,
+} from "@/src/api-client/memento";
+import { formDataBodySerializer } from "@/src/api-client/formData";
+import { queryClient } from "@/src/app/_layout";
+import { router } from "expo-router";
+import { useSession } from "@/src/context/AuthContext";
 
-type BulkMementoGroup = MementoFormData["memento"] & {
+interface BulkMementoGroup {
   groupId: number;
+  memento: MementoFormData["memento"];
   photos: PhotoWithGroup[];
-};
+}
 
 export default function BulkCreateMemento() {
+  const { session } = useSession();
   const [scrollEnabled, setScrollEnabled] = useState(true);
   const { hasPermission, addPhotos } = usePhotos({
     initialPhotos: [],
   });
+  const createMutation = useMutation(
+    createNewMementoApiUserUserIdMementoPostMutation(),
+  );
 
   const [mementoGroups, setMementoGroups] = useState<BulkMementoGroup[]>([]);
 
@@ -51,7 +68,7 @@ export default function BulkCreateMemento() {
       const groupId = mementoGroups.length + index;
       return {
         groupId,
-        ...defaultMementoFormValues.memento,
+        memento: defaultMementoFormValues.memento,
         photos: [{ ...photo, group: groupId }],
       };
     });
@@ -104,12 +121,41 @@ export default function BulkCreateMemento() {
             : group,
         ),
       );
-      setEditingGroup(null);
+      handleCloseGroupForm();
     },
     [editingGroup?.groupId],
   );
 
   const handleCloseGroupForm = () => setEditingGroup(null);
+
+  // Make POST call to Create Memento for each memento group
+  const handleSubmit = async () => {
+    try {
+      const path = { user_id: String(session?.user.id) };
+      const responses = await Promise.all(
+        mementoGroups.map(async (group) => {
+          const body: any = prepareCreateMementoPayload(group);
+          return createMutation.mutateAsync({
+            body,
+            path,
+            bodySerializer: formDataBodySerializer.bodySerializer,
+          });
+        }),
+      );
+
+      // After all mementos created successfully
+      queryClient.invalidateQueries({
+        queryKey: getUsersMementosApiUserUserIdMementoGetQueryKey({
+          path,
+        }),
+      });
+      router.replace("/(app)/(tabs)/mementos");
+      return responses;
+    } catch (error) {
+      // TODO: add error toast or indicator?
+      console.error("Failed to bulk create mementos:", error);
+    }
+  };
 
   if (!hasPermission) {
     return <Text>No access to camera</Text>;
@@ -148,13 +194,7 @@ export default function BulkCreateMemento() {
               onEditGroup={handleEditGroup}
             />
             {mementoGroups.length > 0 && (
-              <Button
-                className="mt-6"
-                size="lg"
-                onPress={() => {
-                  console.log("Memento groups:", mementoGroups);
-                }}
-              >
+              <Button className="mt-6" size="lg" onPress={handleSubmit}>
                 <ButtonText>
                   Create {mementoGroups.length} Memento
                   {mementoGroups.length > 1 && "s"}
@@ -183,9 +223,9 @@ export default function BulkCreateMemento() {
               <MementoForm
                 initialValues={{
                   memento: {
-                    caption: editingGroup.caption,
-                    date: editingGroup.date,
-                    location: editingGroup.location,
+                    caption: editingGroup.memento.caption,
+                    date: editingGroup.memento.date,
+                    location: editingGroup.memento.location,
                   },
                   photos: editingGroup.photos,
                 }}

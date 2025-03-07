@@ -38,6 +38,7 @@ export default function PhotoSelectGrid({
       ...photos.map((photo, index) => ({
         key: index,
         photo,
+        disabledDrag: !editable,
       })),
       {
         key: -1,
@@ -46,7 +47,7 @@ export default function PhotoSelectGrid({
         disabledReSorted: true,
       },
     ],
-    [photos],
+    [editable, photos],
   );
 
   const handleReorderPhotos = useCallback(

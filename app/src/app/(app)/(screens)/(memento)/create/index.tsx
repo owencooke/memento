@@ -12,16 +12,16 @@ import {
 } from "@/src/api-client/generated/@tanstack/react-query.gen";
 import { useSession } from "@/src/context/AuthContext";
 import { router } from "expo-router";
-import { toISODateString } from "@/src/libs/date";
 import { formDataBodySerializer } from "@/src/api-client/formData";
-import { getRelevantImageMetadata } from "@/src/libs/metadata";
 import { queryClient } from "@/src/app/_layout";
-import MementoForm, {
-  MementoFormData,
-} from "@/src/components/forms/MementoForm";
+import MementoForm from "@/src/components/forms/MementoForm";
 import { ButtonIcon, Button } from "@/src/components/ui/button";
 import { Heading } from "@/src/components/ui/heading";
 import { PlayIcon } from "@/src/components/ui/icon";
+import {
+  MementoFormData,
+  prepareCreateMementoPayload,
+} from "@/src/api-client/memento";
 
 export default function CreateMemento() {
   const { session } = useSession();
@@ -29,43 +29,13 @@ export default function CreateMemento() {
     createNewMementoApiUserUserIdMementoPostMutation(),
   );
 
-  // POST Create Memento form
+  // Call POST Create Memento endpoint with custom serializer for multi-part form data
   const onSubmit = async (form: MementoFormData) => {
-    const {
-      location: { lat, long, text },
-      date,
-      ...restMemento
-    } = form.memento;
-    // Only include fields if explictly set
-    const memento = {
-      ...restMemento,
-      date: date ? toISODateString(date) : null,
-      location: text ? text : null,
-      coordinates: lat && long ? { lat, long } : null,
-    };
-
-    // Metadata for each image
-    const imageMetadata = form.photos.map((photo, idx) => ({
-      ...getRelevantImageMetadata(photo),
-      order_index: idx,
-    }));
-
-    // Map each image to its necessary upload info
-    const images = form.photos.map((photo) => ({
-      uri: photo.uri,
-      type: photo.mimeType,
-      name: photo.fileName,
-    }));
-
-    // Call POST endpoint with custom serializer for multi-part form data
+    const body: any = prepareCreateMementoPayload(form);
     const path = { user_id: session?.user.id ?? "" };
     await createMutation.mutateAsync(
       {
-        body: {
-          memento_str: memento,
-          image_metadata_str: imageMetadata,
-          images,
-        } as any,
+        body,
         path,
         bodySerializer: formDataBodySerializer.bodySerializer,
       },

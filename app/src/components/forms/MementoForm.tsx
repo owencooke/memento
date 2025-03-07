@@ -23,11 +23,7 @@ import LocationInput, {
 } from "@/src/components/inputs/LocationInput";
 import { aggregateMetadata } from "@/src/libs/metadata";
 import { Heading } from "../ui/heading";
-
-export interface MementoFormData {
-  memento: { date: Date | null; location: GeoLocation; caption: string };
-  photos: Photo[];
-}
+import { MementoFormData } from "@/src/api-client/memento";
 
 export const defaultMementoFormValues: MementoFormData = {
   memento: {
