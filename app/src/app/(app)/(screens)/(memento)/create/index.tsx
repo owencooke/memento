@@ -3,7 +3,6 @@
  * @requirements FR-9, FR-17, FR-19, FR-20, FR-21
  */
 
-import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useMutation } from "@tanstack/react-query";
 import {
@@ -15,9 +14,6 @@ import { router } from "expo-router";
 import { formDataBodySerializer } from "@/src/api-client/formData";
 import { queryClient } from "@/src/app/_layout";
 import MementoForm from "@/src/components/forms/MementoForm";
-import { ButtonIcon, Button } from "@/src/components/ui/button";
-import { Heading } from "@/src/components/ui/heading";
-import { PlayIcon } from "@/src/components/ui/icon";
 import {
   MementoFormData,
   prepareMementoPayload,
@@ -55,31 +51,13 @@ export default function CreateMemento() {
     );
   };
 
-  const handleBulkCreate = () =>
-    router.push("/(app)/(screens)/(memento)/create/bulk");
-
   return (
     <SafeAreaView className="flex-1" edges={["bottom"]}>
       <MementoForm
         submitButtonText="Create Memento"
         isSubmitting={createMutation.isPending}
         onSubmit={onSubmit}
-        FormHeader={
-          <View className="flex flex-row justify-between items-center">
-            <Heading className="block" size="2xl">
-              Create Memento
-            </Heading>
-            <Button
-              size="lg"
-              className="p-3.5"
-              action="secondary"
-              variant="solid"
-              onPress={handleBulkCreate}
-            >
-              <ButtonIcon as={PlayIcon} />
-            </Button>
-          </View>
-        }
+        FormHeader="Create Memento"
       />
     </SafeAreaView>
   );

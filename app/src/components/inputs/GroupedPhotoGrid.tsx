@@ -11,6 +11,7 @@ import { Button, ButtonIcon, ButtonText } from "@/src/components/ui/button";
 import { Photo } from "@/src/hooks/usePhotos";
 import InteractivePhotoCard from "@/src/components/cards/InteractivePhotoCard";
 import { EditIcon } from "@/src/components/ui/icon";
+import { Text } from "../ui/text";
 
 type ItemType = "photo" | "header" | "spacer";
 
