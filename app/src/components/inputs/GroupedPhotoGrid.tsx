@@ -29,11 +29,13 @@ interface GroupedPhotoGridProps {
   groupNumbers: number[];
   groupedPhotos: PhotoWithGroup[];
   setGroupedPhotos: (photos: PhotoWithGroup[]) => void;
+  setScrollEnabled: (enabled: boolean) => void;
 }
 
 export default function GroupedPhotoGrid({
   groupNumbers,
   groupedPhotos,
+  setScrollEnabled,
   setGroupedPhotos,
 }: GroupedPhotoGridProps) {
   // Create grouped photos for display in grid
@@ -62,14 +64,16 @@ export default function GroupedPhotoGrid({
         return acc;
       }, []);
       setGroupedPhotos(updatedPhotos);
+      setScrollEnabled(true);
     },
-    [setGroupedPhotos],
+    [setGroupedPhotos, setScrollEnabled],
   );
 
   return (
     <DraggableGrid
       numColumns={3}
       data={gridData}
+      onDragStart={() => setScrollEnabled(false)}
       onDragRelease={handleReorderPhotos}
       renderItem={(item: GridItem) => {
         if (item.type === "spacer") {
