@@ -32,6 +32,7 @@ export interface MementoFormProps {
   initialValues?: MementoFormData;
   submitButtonText: string;
   isSubmitting: boolean;
+  photosEditable?: boolean;
   onSubmit: (data: MementoFormData) => Promise<void>;
   FormHeader?: ReactElement;
 }
@@ -42,6 +43,7 @@ export default function MementoForm({
   isSubmitting,
   onSubmit,
   FormHeader,
+  photosEditable = true,
 }: MementoFormProps) {
   const [scrollEnabled, setScrollEnabled] = useState(true);
 
@@ -106,7 +108,9 @@ export default function MementoForm({
           {FormHeader}
           <FormControl size={"lg"} isInvalid={!!errors.photos}>
             <FormControlLabel>
-              <FormControlLabelText>Add Photos</FormControlLabelText>
+              <FormControlLabelText>
+                {photosEditable && "Add"} Photos
+              </FormControlLabelText>
             </FormControlLabel>
             <Controller
               name="photos"
@@ -114,6 +118,7 @@ export default function MementoForm({
               render={() => (
                 <PhotoSelectGrid
                   initialPhotos={getValues("photos")}
+                  editable={photosEditable}
                   onChange={handlePhotosChanged}
                   setScrollEnabled={setScrollEnabled}
                 />
@@ -129,17 +134,21 @@ export default function MementoForm({
                 },
               }}
             />
-            <FormControlHelper>
-              <FormControlHelperText>
-                Drag to rearrange photos.
-              </FormControlHelperText>
-            </FormControlHelper>
-            <FormControlError className="mt-4">
-              <FormControlErrorIcon as={AlertCircleIcon} />
-              <FormControlErrorText>
-                {errors?.photos?.message}
-              </FormControlErrorText>
-            </FormControlError>
+            {photosEditable && (
+              <>
+                <FormControlHelper>
+                  <FormControlHelperText>
+                    Drag to rearrange photos.
+                  </FormControlHelperText>
+                </FormControlHelper>
+                <FormControlError className="mt-4">
+                  <FormControlErrorIcon as={AlertCircleIcon} />
+                  <FormControlErrorText>
+                    {errors?.photos?.message}
+                  </FormControlErrorText>
+                </FormControlError>
+              </>
+            )}
           </FormControl>
           <FormControl size={"lg"}>
             <FormControlLabel>

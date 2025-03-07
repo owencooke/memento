@@ -16,10 +16,12 @@ interface PhotoSelectGridProps {
   initialPhotos: Photo[];
   onChange: (photos: Photo[]) => Promise<void>;
   setScrollEnabled: (enabled: boolean) => void;
+  editable?: boolean;
 }
 
 export default function PhotoSelectGrid({
   initialPhotos,
+  editable = true,
   onChange,
   setScrollEnabled,
 }: PhotoSelectGridProps) {
@@ -81,19 +83,21 @@ export default function PhotoSelectGrid({
               {photo ? (
                 <InteractivePhotoCard
                   photo={photo}
-                  onDelete={() => removePhoto(photo)}
+                  onDelete={editable ? () => removePhoto(photo) : undefined}
                   showThumbnailBadge={item.key === 0}
                 />
               ) : (
-                // Render the add button
-                <Button
-                  size="lg"
-                  className="mt-2 mr-2 h-full"
-                  action="secondary"
-                  onPress={() => setShowActionsheet(true)}
-                >
-                  <ButtonIcon as={AddIcon} />
-                </Button>
+                editable && (
+                  // Render the add button
+                  <Button
+                    size="lg"
+                    className="mt-2 mr-2 h-full"
+                    action="secondary"
+                    onPress={() => setShowActionsheet(true)}
+                  >
+                    <ButtonIcon as={AddIcon} />
+                  </Button>
+                )
               )}
             </View>
           );

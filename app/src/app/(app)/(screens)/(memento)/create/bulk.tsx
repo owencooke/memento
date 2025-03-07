@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo } from "react";
 import { View, Modal } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FlatList } from "react-native";
-import { Button, ButtonText } from "@/src/components/ui/button";
+import { Button, ButtonIcon, ButtonText } from "@/src/components/ui/button";
 import { Heading } from "@/src/components/ui/heading";
 import { Text } from "@/src/components/ui/text";
 import GroupedPhotoGrid, {
@@ -12,6 +12,7 @@ import usePhotos from "@/src/hooks/usePhotos";
 import MementoForm, {
   MementoFormData,
 } from "@/src/components/forms/MementoForm";
+import { CloseIcon } from "@/src/components/ui/icon";
 
 type GroupedMemento = MementoFormData["memento"] & { group: number };
 
@@ -170,6 +171,7 @@ export default function BulkCreateMemento() {
             initialValues={initialFormValues}
             submitButtonText="Save Group"
             isSubmitting={false}
+            photosEditable={false}
             onSubmit={handleGroupFormSubmit}
             FormHeader={
               <View className="flex flex-row justify-between items-center">
@@ -183,7 +185,7 @@ export default function BulkCreateMemento() {
                   variant="solid"
                   onPress={() => setEditingGroup(null)}
                 >
-                  <ButtonText>Cancel</ButtonText>
+                  <ButtonIcon as={CloseIcon} />
                 </Button>
               </View>
             }
