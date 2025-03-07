@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo } from "react";
 import { Pressable, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FlatList } from "react-native";
-import { Button, ButtonText } from "@/src/components/ui/button";
+import { Button, ButtonSpinner, ButtonText } from "@/src/components/ui/button";
 import { Heading } from "@/src/components/ui/heading";
 import { Text } from "@/src/components/ui/text";
 import GroupedPhotoGrid, {
@@ -196,11 +196,20 @@ export default function BulkCreateMemento() {
               onEditGroup={handleEditGroup}
             />
             {mementoGroups.length > 0 && (
-              <Button className="mt-6" size="lg" onPress={handleSubmit}>
-                <ButtonText>
-                  Create {mementoGroups.length} Memento
-                  {mementoGroups.length > 1 && "s"}
-                </ButtonText>
+              <Button
+                className="mt-6"
+                size="lg"
+                onPress={handleSubmit}
+                disabled={createMutation.isPending}
+              >
+                {createMutation.isPending ? (
+                  <ButtonSpinner />
+                ) : (
+                  <ButtonText>
+                    Create {mementoGroups.length} Memento
+                    {mementoGroups.length > 1 && "s"}
+                  </ButtonText>
+                )}
               </Button>
             )}
           </View>
