@@ -40,6 +40,7 @@ export default function EditCollection() {
     (c) => c.id === Number(id),
   ) as CollectionWithMementos;
 
+  // Update query
   const updateMutation = useMutation(
     updateCollectionAndMementosApiUserUserIdCollectionIdPutMutation(),
   );
@@ -82,7 +83,6 @@ export default function EditCollection() {
       location: text ? text : null,
       coordinates: lat && long ? { lat, long } : null,
     };
-
     const path = {
       user_id,
       id: collection.id,
