@@ -33,10 +33,10 @@ export default function BulkCreateMemento() {
       ...prev,
       ...newPhotos.map((photo, index) => ({
         ...photo,
-        group: groupedPhotos.length + index,
+        group: groupNumbers.length + index,
       })),
     ]);
-  }, [addPhotos, groupedPhotos.length]);
+  }, [addPhotos, groupNumbers.length]);
 
   if (!hasPermission) {
     return <Text>No access to camera</Text>;
