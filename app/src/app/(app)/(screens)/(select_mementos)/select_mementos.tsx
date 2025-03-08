@@ -53,7 +53,7 @@ export default function Mementos() {
       ? {...prev, [item.id]: item.id,} 
       : Object.fromEntries(Object.entries(prev).filter(([key]) => key !== item.id.toString())) // Remove item if not selected
     );
-  }
+  };
 
   useEffect(() => {
     console.log(Object.keys(ids).toString());
@@ -61,15 +61,10 @@ export default function Mementos() {
 
   const handleMementosSelected = () => {
     const ids_string: string = Object.keys(ids).toString();
-
-    // Fix back arrow
-    router.push({
-      pathname: "/(app)/(screens)/(collection)/create",
-      params: {
-        ids: ids_string,
-      },
-    });
-  }
+    
+    router.back();
+    router.setParams({ ids: ids_string });
+  };
 
   return (
     <View className="flex-1 bg-background-100 py-4 px-6">
