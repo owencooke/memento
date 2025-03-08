@@ -8,7 +8,7 @@ import {
 import { toISODateString } from "@/src/libs/date";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { View } from "react-native";
+import { View, Text } from "react-native";
 import {
   FormControl,
   FormControlError,
@@ -30,6 +30,7 @@ import LocationInput, {
 import { FlatList } from "react-native";
 import { queryClient } from "@/src/app/_layout";
 import DatePickerInput from "@/src/components/inputs/DatePickerInput";
+import { useLocalSearchParams } from "expo-router";
 
 /**
  * Form values for the CreateCollection screen
@@ -143,6 +144,17 @@ export default function CreateCollection() {
     router.push("/(app)/(screens)/(select_mementos)/select_mementos");
   }
 
+  const params = useLocalSearchParams();
+  console.log("Received params:", params);
+
+  const ids = !params.ids
+    ? []
+    : Array.isArray(params.ids)
+    ? params.ids
+    : params.ids.split(",");
+  
+  console.log("ids:", ids);
+  
   return (
     <SafeAreaView className="flex-1" edges={["bottom"]}>
       <FlatList
@@ -238,21 +250,21 @@ export default function CreateCollection() {
             <FormControl size={"lg"}>
               <FormControlLabel>
                   <FormControlLabelText>Mementos</FormControlLabelText>
-                </FormControlLabel>
-                <Controller
-                  name="mementos"
-                  control={control}
-                  render={({ field }) => (
-                    <Button
-                      className="mt-auto"
-                      size={"lg"}
-                      onPress={handleAddMementosPress}
-                    >
-                      <ButtonText>+</ButtonText>
-                    </Button>
-                  
-                  )}
-                />
+              </FormControlLabel>
+              {ids.length > 0 && <Text>{ids.length} mementos selected</Text>}
+              <Controller
+                name="mementos"
+                control={control}
+                render={({ field }) => (
+                  <Button
+                    className="mt-auto"
+                    size={"lg"}
+                    onPress={handleAddMementosPress}
+                  >
+                    <ButtonText>+</ButtonText>
+                  </Button>
+                )}
+              />
             </FormControl>
             <Button
               className="mt-auto"

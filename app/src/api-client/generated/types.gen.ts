@@ -81,6 +81,7 @@ export type MementoWithImages = {
   user_id: string;
   images: Array<ImageWithUrl>;
   style?: StyleProp<ViewStyle> | null;
+  selected?: boolean | null;
 };
 
 /**
