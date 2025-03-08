@@ -33,8 +33,13 @@ export default function Mementos() {
   );
 
   const [opacity, setOpacity] = useState(1);
+  const [ids, setIds] = useState({});
 
-  const handleSelectMemento = () => {
+  const handleSelectMemento = (id: number) => {
+    setIds(prev => ({
+      ...prev,
+      id,
+    }));
     setOpacity(opacity === 1 ? 0.5 : 1);
   }
 
@@ -53,7 +58,7 @@ export default function Mementos() {
             ) : (
               <Pressable
                 className="flex-1"
-                onPress={handleSelectMemento}
+                onPress={() => handleSelectMemento(item.id)}
               >
                 <MementoCard 
                   style={{
@@ -62,6 +67,7 @@ export default function Mementos() {
                   {...item} 
                 />
               </Pressable>
+              
             )
           }
         />
