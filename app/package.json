@@ -12,7 +12,8 @@
     "test": "jest",
     "test:e2e": "maestro test",
     "lint": "expo lint",
-    "sync-api": "./scripts/sync-api.sh && openapi-ts"
+    "sync-api": "./scripts/sync-api.sh && openapi-ts",
+    "tunnel-api": "./scripts/tunnel-api.sh"
   },
   "jest": {
     "preset": "jest-expo",
