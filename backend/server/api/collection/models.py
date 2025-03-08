@@ -14,5 +14,5 @@ class NewCollection(CoordinatesInsert, BaseWithCoordinates, CollectionInsert):  
     """
 
 
-class UpdateCollection(CoordinatesInsert, BaseWithCoordinates, CollectionUpdate):
+class UpdateCollection(CoordinatesInsert, BaseWithCoordinates, CollectionUpdate):  # type: ignore[misc]
     """Updating an existing Collection record in the DB."""

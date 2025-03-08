@@ -14,14 +14,12 @@ from server.services.db.models.joins import CollectionWithMementos
 from server.services.db.models.schema_public_latest import (
     Collection,
     HasMementoInsert,
-    HasMementoUpdate,
 )
 from server.services.db.queries.collection import (
     associate_memento,
     create_collection,
     db_delete_collection,
     get_collections,
-    update_associate_memento,
     update_collection,
 )
 
@@ -54,16 +52,16 @@ async def create_new_collection(
         raise HTTPException(status_code=400, detail="Insert Collection Failed")
 
     # Associate mementos with the collection
-    # for memento_id in mementos:
-    #     has_memento = HasMementoInsert(
-    #         collection_id=inserted_collection.id,
-    #         memento_id=memento_id,
-    #     )
-    #     if not associate_memento(has_memento):
-    #         raise HTTPException(
-    #             status_code=400,
-    #             detail="Associate Memento to Collection Failed.",
-    #         )
+    for memento_id in mementos:
+        has_memento = HasMementoInsert(
+            collection_id=inserted_collection.id,
+            memento_id=memento_id,
+        )
+        if not associate_memento(has_memento):
+            raise HTTPException(
+                status_code=400,
+                detail="Associate Memento to Collection Failed.",
+            )
 
     return inserted_collection
 
@@ -80,16 +78,7 @@ async def update_collection_and_mementos(
     if not updated_collection:
         raise HTTPException(status_code=400, detail="Update collection failed")
 
-    # for memento_id in mementos:
-    #     has_memento = HasMementoUpdate(
-    #         collection_id=updated_collection.id,
-    #         memento_id=memento_id,
-    #     )
-    #     if not update_associate_memento(has_memento):
-    #         raise HTTPException(
-    #             status_code=400,
-    #             detail="Update Associate Memento to Collection Failed.",
-    #         )
+    # FIXME: Updating what mementos are on a collection is more difficult than adding
 
     return updated_collection
 
