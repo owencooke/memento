@@ -29,6 +29,17 @@ entity Image {
     ImageLabel
     Coordinates
     OrderIndex
+entity Collection {
+    Id: INTEGER <<key>>
+    Title: STRING
+    Caption: STRING
+    Date: DATE
+    Location: STRING
+    Coordinates {
+      Latitude: REAL
+      Longitude: REAL
+    }
+    Keywords: STRING
 }
 
 ' Relationships
@@ -41,6 +52,13 @@ HasImages =1= Memento
 relationship OwnedBy {
 }
 Memento =N= OwnedBy
+Collection =N= OwnedBy
 OwnedBy -1- User
+
+
+relationship HasMemento {
+}
+Collection -N- HasMemento
+Memento -N- HasMemento
 
 @endchen
