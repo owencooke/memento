@@ -118,24 +118,22 @@ export default function ViewCollection() {
               collection.location ||
               collection.date) && (
               <>
-                <Heading>
-                  <Text size="3xl" bold className="mb-2">
+                <Box className="flex">
+                  <Text size="3xl" bold className="">
                     {collection.title}
                   </Text>
-                  <Box className="flex font-medium">
-                    <Text size="xl" italic className="text-left font-light">
-                      {collection.caption}
-                    </Text>
-                  </Box>
-                  <Box className="flex-row justify-between items-center gap-x-4 mt-auto font-medium">
-                    <Text size="lg" className="text-left font-light">
+                  <Text size="xl" italic className="font-light">
+                    {collection.caption}
+                  </Text>
+                  <Box className="flex-row justify-between items-center gap-x-4 font-medium">
+                    <Text size="lg" className="font-light">
                       {collection.location}
                     </Text>
                     <Text size="lg" className="text-right font-light">
                       {collection.date}
                     </Text>
                   </Box>
-                </Heading>
+                </Box>
                 <FlatList
                   numColumns={2}
                   columnWrapperStyle={{ gap: 12 }}
