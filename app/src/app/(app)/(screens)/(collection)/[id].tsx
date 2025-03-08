@@ -109,7 +109,7 @@ export default function ViewCollection() {
 
   return (
     <SafeAreaView className="flex-1 bg-primary-500" edges={["bottom"]}>
-      <Box className="flex-1 bg-background-100 p-6 flex gap-6">
+      <Box className="flex-1 bg-background-100 p-6 flex gap-2">
         {collection && (
           <>
             {/* Details Card */}
