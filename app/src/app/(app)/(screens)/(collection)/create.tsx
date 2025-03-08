@@ -72,6 +72,17 @@ export default function CreateCollection() {
     createNewCollectionApiUserUserIdCollectionPostMutation(),
   );
 
+  const params = useLocalSearchParams();
+  console.log("Received params:", params);
+
+  const ids = !params.ids
+    ? []
+    : Array.isArray(params.ids)
+    ? params.ids
+    : params.ids.split(",").map(Number);
+  
+  console.log("ids:", ids);
+
   /**
    * Handles form submission by creating a new collection.
    *
@@ -96,7 +107,7 @@ export default function CreateCollection() {
       {
         body: {
           new_collection: collection,
-          mementos: [], // Mementos currently empty
+          mementos: ids, // Mementos currently empty
         } as any,
         path,
       },
@@ -144,16 +155,7 @@ export default function CreateCollection() {
     router.push("/(app)/(screens)/(select_mementos)/select_mementos");
   }
 
-  const params = useLocalSearchParams();
-  console.log("Received params:", params);
 
-  const ids = !params.ids
-    ? []
-    : Array.isArray(params.ids)
-    ? params.ids
-    : params.ids.split(",");
-  
-  console.log("ids:", ids);
   
   return (
     <SafeAreaView className="flex-1" edges={["bottom"]}>
