@@ -8,27 +8,35 @@ title Entity Relationship Diagram
 
 ' Entities
 entity User {
-    Id
-    Email
-    Birthday
+    Id: INTEGER <<key>>
+    Email: STRING
+    Birthday: DATE
 }
 
 entity Memento {
-    Id
-    Caption
-    Date
-    Location
-    Coordinates
+    Id: INTEGER <<key>>
+    Caption: STRING
+    Date: DATE
+    Location: STRING
+    Coordinates {
+      Latitude: REAL
+      Longitude: REAL
+    }
 }
 
-entity Image {
-    Id
-    Filename
-    Date
-    DetectedText
-    ImageLabel
-    Coordinates
-    OrderIndex
+entity Image <<weak>> {
+    Id: INTEGER <<key>>
+    Filename: STRING
+    Date: DATE
+    DetectedText: STRING
+    ImageLabel: STRING
+    Coordinates {
+      Latitude: REAL
+      Longitude: REAL
+    }
+    OrderIndex: INTEGER
+}
+
 entity Collection {
     Id: INTEGER <<key>>
     Title: STRING
@@ -43,7 +51,7 @@ entity Collection {
 }
 
 ' Relationships
-relationship HasImages {
+relationship HasImages <<identifying>> {
 }
 Image =(1,N)= HasImages
 HasImages =1= Memento
