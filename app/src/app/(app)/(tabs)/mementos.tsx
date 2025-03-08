@@ -18,6 +18,7 @@ import {
   ActionsheetItem,
   ActionsheetItemText,
 } from "@/src/components/ui/actionsheet";
+import { Grid2x2Plus } from "lucide-react-native";
 
 export default function Mementos() {
   const { session } = useSession();
@@ -125,11 +126,10 @@ export default function Mementos() {
             <ActionsheetIcon
               size="lg"
               className="stroke-background-700"
-              // TODO: find a good icon representation
-              //   as={EyeOffIcon}
+              as={Grid2x2Plus}
             />
             <ActionsheetItemText size="xl">
-              Create several at once
+              Create multiple mementos
             </ActionsheetItemText>
           </ActionsheetItem>
         </ActionsheetContent>
