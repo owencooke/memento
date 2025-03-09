@@ -33,6 +33,7 @@ import { queryClient } from "@/src/app/_layout";
 import DatePickerInput from "@/src/components/inputs/DatePickerInput";
 import { useLocalSearchParams } from "expo-router";
 import MementoCard from "@/src/components/cards/MementoCard";
+import { ScrollView } from "react-native-gesture-handler";
 
 /**
  * Form values for the CreateCollection screen
@@ -277,23 +278,20 @@ export default function CreateCollection() {
               </FormControlLabel>
               {ids.length > 0 &&
                 <View className="flex-1 bg-background-100 py-4 px-6">
-                  <FlatList
-                    columnWrapperStyle={{ gap: 12 }}
-                    contentContainerStyle={{ gap: 12 }}
-                    numColumns={2}
-                    showsVerticalScrollIndicator={false}
-                    data={gridData}
-                    renderItem={({ item }) =>
+                  <ScrollView
+                    horizontal={true}  // Enables horizontal scrolling
+                    showsHorizontalScrollIndicator={false} // Hides the scrollbar
+                    contentContainerStyle={{ gap: 12, flexDirection: "row" }} // Ensure items are in a row
+                  >
+                    {gridData && gridData.map((item, index) =>
                       "spacer" in item ? (
-                        <View className="flex-1" />
+                        <View key={index} className="flex-1" />
                       ) : (
-                        <MementoCard {...item} />
+                        <MementoCard key={index} {...item} />
                       )
-                    }
-              
-                  />
+                    )}
+                  </ScrollView>
                 </View>
-              
               }
               <Controller
                 name="mementos"
