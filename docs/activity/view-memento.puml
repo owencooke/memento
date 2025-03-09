@@ -1,0 +1,54 @@
+@startuml
+title View a Keepsake (FRs 25-28)
+
+|user| User
+|#lightgray|mobile| Mobile App
+|#lightgray|backend| Backend
+|db| Supabase
+
+|user|
+start
+:Opens app;
+
+|mobile|
+:Display Memento gridview;
+
+|user|
+:Selects a keepsake from the grid view;
+
+|mobile|
+:Make GET call to View Keepsake API;
+
+|backend|
+:Query database for keepsake details;
+|db|
+:Fetch keepsake record;
+:Fetch associated images and metadata;
+
+|backend|
+:Prepare keepsake data response;
+
+|mobile|
+if (Request successful?) is (yes) then
+  :Display keepsake details:
+  - Title
+  - Description
+  - Metadata
+  - Photos in carousel;
+else (no)
+  :Show error message;
+endif
+
+|user|
+if (Wants to see more details?) is (yes) then
+  :Expand details section;
+  |mobile|
+  :Display image details;
+else (no)
+endif
+
+|user|
+:Returns to grid view;
+
+stop
+@enduml

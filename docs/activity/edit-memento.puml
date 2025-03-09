@@ -1,0 +1,85 @@
+@startuml
+title Edit a Keepsake (FRs 29-33)
+
+|user| User
+|#lightgray|mobile| Mobile App
+|#lightgray|backend| Backend
+|db| Supabase
+
+|user|
+start
+:Opens app;
+:Selects a keepsake from the grid view;
+
+|mobile|
+:Display keepsake details;
+:Show "Edit" button;
+
+|user|
+:Clicks "Edit" button;
+
+|mobile|
+:Display Edit Keepsake form with:
+- Description
+- Metadata
+- Thumbnail
+- Photos;
+
+|user|
+partition "Optional Edits" {
+  :Modify description;
+  :Change thumbnail;
+  :Add or remove photos;
+  :Edit location;
+  :Edit date;
+}
+
+|mobile|
+:Update tracked form field values;
+
+|user|
+:Clicks "Save Changes" button;
+
+|mobile|
+:Validate updated form data;
+if (Form valid?) is (no) then
+  :Show validation errors;
+  |user|
+  :User corrects input;
+  :Clicks "Save Changes" again;
+|mobile|
+else (yes)
+endif
+
+:Prepare PUT request for updated keepsake details;
+:Make PUT call to Edit Keepsake API;
+
+|backend|
+:Update keepsake record in relational DB;
+if (New images uploaded?) is (yes) then
+  |db|
+  :Store new images in Storage bucket;
+  :Create new image metadata records;
+endif
+if (Images removed?) is (yes) then
+  |db|
+  :Delete old image records;
+  :Remove corresponding files from Storage bucket;
+endif
+
+|backend|
+:Prepare updated keepsake response;
+
+|mobile|
+if (Request successful?) is (yes) then
+  :Display updated keepsake details;
+else (no)
+  :Show error message;
+endif
+
+|user|
+:Returns to keepsake view;
+
+stop
+@enduml
+
