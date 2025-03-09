@@ -17,7 +17,6 @@ export default function Mementos() {
   const [refreshing, setRefreshing] = useState(false);
   const refreshColor = getColor("tertiary-500");
 
-  // WAIT TO LOAD BEFORE PROCEEDING
   const { data: mementos, refetch, isLoading, isFetching } = useQuery({
     ...getUsersMementosApiUserUserIdMementoGetOptions({
       path: {

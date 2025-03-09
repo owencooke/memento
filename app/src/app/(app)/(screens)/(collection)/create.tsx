@@ -1,14 +1,15 @@
 import { useForm, Controller } from "react-hook-form";
 import { useSession } from "@/src/context/AuthContext";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   createNewCollectionApiUserUserIdCollectionPostMutation,
   getUsersCollectionsApiUserUserIdCollectionGetQueryKey,
+  getUsersMementosApiUserUserIdMementoGetOptions,
 } from "@/src/api-client/generated/@tanstack/react-query.gen";
 import { toISODateString } from "@/src/libs/date";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { View, Text } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import {
   FormControl,
   FormControlError,
@@ -22,7 +23,7 @@ import { Input, InputField } from "@/src/components/ui/input";
 import { Textarea, TextareaInput } from "@/src/components/ui/textarea";
 import { Button, ButtonSpinner, ButtonText } from "@/src/components/ui/button";
 //import { MementoCard } from "@/src/components/cards/MementoCard";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { AlertCircleIcon } from "@/src/components/ui/icon";
 import LocationInput, {
   GeoLocation,
@@ -31,6 +32,7 @@ import { FlatList } from "react-native";
 import { queryClient } from "@/src/app/_layout";
 import DatePickerInput from "@/src/components/inputs/DatePickerInput";
 import { useLocalSearchParams } from "expo-router";
+import MementoCard from "@/src/components/cards/MementoCard";
 
 /**
  * Form values for the CreateCollection screen
@@ -72,16 +74,36 @@ export default function CreateCollection() {
     createNewCollectionApiUserUserIdCollectionPostMutation(),
   );
 
+  const { data: mementos, refetch, isLoading, isFetching } = useQuery({
+    ...getUsersMementosApiUserUserIdMementoGetOptions({
+      path: {
+        user_id: session?.user.id ?? "",
+      },
+    }),
+  });
+
   const params = useLocalSearchParams();
   console.log("Received params:", params);
 
-  const ids = !params.ids
+  const ids: Number[] = !params.ids
     ? []
     : Array.isArray(params.ids)
-    ? params.ids
+    ? params.ids.map(Number)
     : params.ids.split(",").map(Number);
   
   console.log("ids:", ids);
+
+  // Filter for mementos selected by the user
+  const mementos_filtered = mementos?.filter(memento => ids.includes(memento.id));
+
+  // For odd number of mementos, add a spacer for last grid element
+  const gridData = useMemo(
+    () =>
+      mementos_filtered?.length && mementos_filtered.length % 2
+        ? [...mementos_filtered, { spacer: true }]
+        : mementos_filtered,
+    [mementos_filtered],
+  );
 
   /**
    * Handles form submission by creating a new collection.
@@ -107,7 +129,7 @@ export default function CreateCollection() {
       {
         body: {
           new_collection: collection,
-          mementos: ids, // Mementos currently empty
+          mementos: ids,
         } as any,
         path,
       },
@@ -253,7 +275,26 @@ export default function CreateCollection() {
               <FormControlLabel>
                   <FormControlLabelText>Mementos</FormControlLabelText>
               </FormControlLabel>
-              {ids.length > 0 && <Text>{ids.length} mementos selected</Text>}
+              {ids.length > 0 &&
+                <View className="flex-1 bg-background-100 py-4 px-6">
+                  <FlatList
+                    columnWrapperStyle={{ gap: 12 }}
+                    contentContainerStyle={{ gap: 12 }}
+                    numColumns={2}
+                    showsVerticalScrollIndicator={false}
+                    data={gridData}
+                    renderItem={({ item }) =>
+                      "spacer" in item ? (
+                        <View className="flex-1" />
+                      ) : (
+                        <MementoCard {...item} />
+                      )
+                    }
+              
+                  />
+                </View>
+              
+              }
               <Controller
                 name="mementos"
                 control={control}
