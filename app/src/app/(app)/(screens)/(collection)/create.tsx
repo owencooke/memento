@@ -9,7 +9,7 @@ import {
 import { toISODateString } from "@/src/libs/date";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { View, Text, Pressable } from "react-native";
+import { View } from "react-native";
 import {
   FormControl,
   FormControlError,
@@ -22,9 +22,8 @@ import { Heading } from "@/src/components/ui/heading";
 import { Input, InputField } from "@/src/components/ui/input";
 import { Textarea, TextareaInput } from "@/src/components/ui/textarea";
 import { Button, ButtonSpinner, ButtonText } from "@/src/components/ui/button";
-//import { MementoCard } from "@/src/components/cards/MementoCard";
-import { useCallback, useMemo, useState } from "react";
-import { AlertCircleIcon } from "@/src/components/ui/icon";
+import { useCallback } from "react";
+import { AlertCircleIcon, TrashIcon } from "@/src/components/ui/icon";
 import LocationInput, {
   GeoLocation,
 } from "@/src/components/inputs/LocationInput";
@@ -34,6 +33,7 @@ import DatePickerInput from "@/src/components/inputs/DatePickerInput";
 import { useLocalSearchParams } from "expo-router";
 import MementoCard from "@/src/components/cards/MementoCard";
 import { ScrollView } from "react-native-gesture-handler";
+import { Fab, FabIcon } from "@/src/components/ui/fab";
 
 /**
  * Form values for the CreateCollection screen
@@ -49,7 +49,7 @@ interface CreateCollectionForm {
 /**
  * @description Screen for creating a new collection
  *
- * @requirements FR-35, FR-36, FR-37
+ * @requirements FR-35, FR-36, FR-37, FR-41
  *
  * @component
  * @returns {JSX.Element} Rendered CreateCollection screen.
@@ -75,7 +75,7 @@ export default function CreateCollection() {
     createNewCollectionApiUserUserIdCollectionPostMutation(),
   );
 
-  const { data: mementos, refetch, isLoading, isFetching } = useQuery({
+  const { data: mementos } = useQuery({
     ...getUsersMementosApiUserUserIdMementoGetOptions({
       path: {
         user_id: session?.user.id ?? "",
@@ -98,13 +98,9 @@ export default function CreateCollection() {
   const mementos_filtered = mementos?.filter(memento => ids.includes(memento.id));
 
   // For odd number of mementos, add a spacer for last grid element
-  const gridData = useMemo(
-    () =>
-      mementos_filtered?.length && mementos_filtered.length % 2
-        ? [...mementos_filtered, { spacer: true }]
-        : mementos_filtered,
-    [mementos_filtered],
-  );
+  const gridData = mementos_filtered?.length && mementos_filtered.length % 2
+    ? [...mementos_filtered, { spacer: true }]
+    : mementos_filtered;
 
   /**
    * Handles form submission by creating a new collection.
@@ -171,15 +167,21 @@ export default function CreateCollection() {
     [locationValue, setValue],
   );
 
-  /*
-
-  */
   const handleAddMementosPress = () => {
     router.push("/(app)/(screens)/(select_mementos)/select_mementos");
-  }
-
-
+  };
   
+  const handleRemoveSelection = (id: number) => {
+    console.log("Delete", id);
+    const updatedIds = ids.filter(_id => _id !== id);
+
+    router.setParams({
+      ids: updatedIds.length ? updatedIds.join(",") : "",
+    });
+
+    console.log(ids);    
+  };
+
   return (
     <SafeAreaView className="flex-1" edges={["bottom"]}>
       <FlatList
@@ -277,17 +279,22 @@ export default function CreateCollection() {
                   <FormControlLabelText>Mementos</FormControlLabelText>
               </FormControlLabel>
               {ids.length > 0 &&
-                <View className="flex-1 bg-background-100 py-4 px-6">
+                <View className="flex-1 bg-background-100 py-4">
                   <ScrollView
-                    horizontal={true}  // Enables horizontal scrolling
-                    showsHorizontalScrollIndicator={false} // Hides the scrollbar
-                    contentContainerStyle={{ gap: 12, flexDirection: "row" }} // Ensure items are in a row
+                    horizontal={true}
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={{ gap: 12, flexDirection: "row" }} 
                   >
-                    {gridData && gridData.map((item, index) =>
+                    {gridData?.map((item, index) =>
                       "spacer" in item ? (
                         <View key={index} className="flex-1" />
                       ) : (
-                        <MementoCard key={index} {...item} />
+                        <View key={index}>
+                          <MementoCard key={index} {...item} />
+                          <Fab size="lg" onPress={() => handleRemoveSelection(item.id)}>
+                            <FabIcon as={TrashIcon} />
+                          </Fab>
+                        </View>
                       )
                     )}
                   </ScrollView>
@@ -302,7 +309,7 @@ export default function CreateCollection() {
                     size={"lg"}
                     onPress={handleAddMementosPress}
                   >
-                    <ButtonText>+</ButtonText>
+                    <ButtonText>Select Mementos</ButtonText>
                   </Button>
                 )}
               />

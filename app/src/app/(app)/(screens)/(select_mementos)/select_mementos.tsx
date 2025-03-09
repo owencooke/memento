@@ -1,23 +1,17 @@
 import { getUsersMementosApiUserUserIdMementoGetOptions } from "@/src/api-client/generated/@tanstack/react-query.gen";
 import MementoCard from "@/src/components/cards/MementoCard";
-import { Fab, FabIcon } from "@/src/components/ui/fab";
-import { AddIcon } from "@/src/components/ui/icon";
 import { useSession } from "@/src/context/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { View, Text, FlatList, Pressable, RefreshControl } from "react-native";
-import { useEffect, useMemo, useState } from "react";
-import { useColors } from "@/src/hooks/useColors";
+import { View, Text, FlatList, Pressable } from "react-native";
+import { useEffect, useState } from "react";
 import { Button, ButtonText } from "@/src/components/ui/button";
 import { MementoWithImages } from "@/src/api-client/generated";
 
 export default function Mementos() {
   const { session } = useSession();
-  const { getColor } = useColors();
-  const [refreshing, setRefreshing] = useState(false);
-  const refreshColor = getColor("tertiary-500");
 
-  const { data: mementos, refetch, isLoading, isFetching } = useQuery({
+  const { data: mementos, isLoading, isFetching } = useQuery({
     ...getUsersMementosApiUserUserIdMementoGetOptions({
       path: {
         user_id: session?.user.id ?? "",
@@ -26,13 +20,9 @@ export default function Mementos() {
   });
 
   // For odd number of mementos, add a spacer for last grid element
-  const gridData = useMemo(
-    () =>
-      mementos?.length && mementos.length % 2
-        ? [...mementos, { spacer: true }]
-        : mementos,
-    [mementos],
-  );
+  const gridData = mementos?.length && mementos.length % 2
+    ? [...mementos, { spacer: true }]
+    : mementos;
 
   const [ids, setIds] = useState({});
   const [selectedCount, setSelectedCount] = useState(0);
@@ -49,14 +39,10 @@ export default function Mementos() {
 
     setIds(prev => 
       item.selected 
-      ? {...prev, [item.id]: item.id,} 
-      : Object.fromEntries(Object.entries(prev).filter(([key]) => key !== item.id.toString())) // Remove item if not selected
+        ? {...prev, [item.id]: item.id,} // Add ID
+        : Object.fromEntries(Object.entries(prev).filter(([key]) => key !== item.id.toString())) // Remove ID if not selected
     );
   };
-
-  useEffect(() => {
-    console.log(Object.keys(ids).toString());
-  }, [ids]);
 
   const handleMementosSelected = () => {
     const ids_string: string = Object.keys(ids).toString();
@@ -98,7 +84,7 @@ export default function Mementos() {
             }
           />
           <Button
-            className="mt-auto"
+            className="mt-4"
             size={"lg"}
             onPress={handleMementosSelected}
           >
