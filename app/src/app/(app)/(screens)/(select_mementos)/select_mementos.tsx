@@ -18,7 +18,7 @@ export default function Mementos() {
   const refreshColor = getColor("tertiary-500");
 
   // WAIT TO LOAD BEFORE PROCEEDING
-  const { data: mementos, refetch } = useQuery({
+  const { data: mementos, refetch, isLoading, isFetching } = useQuery({
     ...getUsersMementosApiUserUserIdMementoGetOptions({
       path: {
         user_id: session?.user.id ?? "",
@@ -68,7 +68,11 @@ export default function Mementos() {
 
   return (
     <View className="flex-1 bg-background-100 py-4 px-6">
-      {mementos && mementos.length > 0 ? (
+      {isLoading || isFetching ? (
+        <View className="flex-1 items-center justify-center">
+          <Text>Loading...</Text>
+        </View>
+      ) : mementos && mementos.length > 0 ? (
         <View>
           <FlatList
             columnWrapperStyle={{ gap: 12 }}
