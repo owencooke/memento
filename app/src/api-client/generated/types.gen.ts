@@ -11,6 +11,10 @@ export type BodyCreateNewMementoApiUserUserIdMementoPost = {
     images: Array<Blob | File>;
 };
 
+export type BodyRemoveImageBackgroundApiImageRemoveBackgroundPost = {
+    image_file: Blob | File;
+};
+
 export type BodyUpdateCollectionAndMementosApiUserUserIdCollectionIdPut = {
     collection: UpdateCollection;
     mementos: Array<number>;
@@ -218,6 +222,29 @@ export type UserInfoApiUserIdGetResponses = {
 };
 
 export type UserInfoApiUserIdGetResponse = UserInfoApiUserIdGetResponses[keyof UserInfoApiUserIdGetResponses];
+
+export type RemoveImageBackgroundApiImageRemoveBackgroundPostData = {
+    body: BodyRemoveImageBackgroundApiImageRemoveBackgroundPost;
+    path?: never;
+    query?: never;
+    url: '/api/image/remove-background';
+};
+
+export type RemoveImageBackgroundApiImageRemoveBackgroundPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type RemoveImageBackgroundApiImageRemoveBackgroundPostError = RemoveImageBackgroundApiImageRemoveBackgroundPostErrors[keyof RemoveImageBackgroundApiImageRemoveBackgroundPostErrors];
+
+export type RemoveImageBackgroundApiImageRemoveBackgroundPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
 
 export type GetUsersMementosApiUserUserIdMementoGetData = {
     body?: never;

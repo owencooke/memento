@@ -46,7 +46,7 @@ trap cleanup SIGINT SIGTERM
 echo "Starting local tunnel on port 8000..."
 
 # Start lt and capture its output
-lt --port 8000 > >(
+npx localtunnel --port 8000 > >(
     # Process the output to find the URL
     while read line; do
         echo "$line"
