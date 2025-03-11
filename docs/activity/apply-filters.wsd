@@ -3,13 +3,13 @@ title Apply Filters to Mementos (FRs 12-16)
 
 ' Swimlanes
 |user| User
-|#lightgray|mobile| Mobile App
+|mobile| Mobile App
 |backend| Backend
-|#lightgray|db| Supabase
+|db| Supabase
 
 |user|
 start
-:Views Mementos tab;
+:Navigate to Mementos tab;
 
 |user|
 if (Filter action?) is ([text-based search]) then
