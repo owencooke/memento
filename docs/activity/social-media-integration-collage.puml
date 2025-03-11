@@ -3,14 +3,18 @@ title Share Collages to Social Media (FR-55)
 
 |user| User
 |mobile| Mobile App
-|backend| Backend
-|db| Supabase
 
 |user|
 start
 :Opens app;
-:Navigates to "Collages" page;
-:Selects a collage;
+:Navigates to "Collections" page;
+:Selects a collection;
+
+|mobile|
+:Opens collection details;
+
+|user|
+:Generates collage (see activity diagram for collage creation);
 
 |mobile|
 :Display collage;
@@ -26,11 +30,6 @@ start
 
 |mobile|
 :Make request to share collage API for the selected social media site;
-
-|backend|
-:Shares the collage on the social media site;
-
-|mobile|
 :Return to collage;
 
 stop
