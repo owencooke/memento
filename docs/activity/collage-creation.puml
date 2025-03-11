@@ -24,9 +24,6 @@ start
 |backend|
 :Generate a collage using the keepsakes in the collection;
 
-|db|
-:Store collage record associating a collection;
-
 |mobile|
 :Display collage;
 
