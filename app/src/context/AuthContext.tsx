@@ -1,3 +1,7 @@
+/**
+ * @description App context/hook for managing user authentication via Supabase Auth + Google OAuth
+ * @requirements FR-1, FR-2
+ */
 import React, {
   createContext,
   useContext,
@@ -6,7 +10,7 @@ import React, {
   ReactNode,
 } from "react";
 import { Session } from "@supabase/supabase-js";
-import { supabase } from "@/src/libs/supabase/config";
+import { supabase } from "@/src/libs/supabase";
 import * as WebBrowser from "expo-web-browser";
 import { useRouter } from "expo-router";
 import * as AuthSession from "expo-auth-session";

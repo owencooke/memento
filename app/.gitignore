@@ -1,7 +1,10 @@
 # Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
 
+*/openapi.json
 *.log
 *.env
+*.env.bak
+package-lock.json
 
 # build folders
 android/

@@ -36,6 +36,7 @@ keras = "^3.8.0"
 onnxruntime = "^1.20.1"
 numba = "0.61.0"
 rembg = {version = "2.0.61", extras = ["cpu"]}
+python-multipart = "^0.0.20"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -113,6 +114,8 @@ lint.select = [
     "RUF", # Specific to Ruff checks
 ]
 lint.ignore = [
+    "D205",    # 1 blank line required between summary line and description
+    "D400",    # First line should end with a period
     "D105",    # Missing docstring in magic method
     "D107",    # Missing docstring in __init__
     "B008",    # Do not perform function calls in argument defaults

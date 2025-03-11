@@ -4,6 +4,15 @@ This mobile application is an [Expo](https://expo.dev) project that was created 
 
 ## Get Started
 
+### Environment Variables
+
+In the `/app/.env` file, ensure the following variables and credentials exist:
+
+```bash
+EXPO_PUBLIC_API_HOST=<YOUR_HOST_IP_ADDRESS> # for backend API calls
+EXPO_PUBLIC_GOOGLE_PLACES_API_KEY=<API_KEY> # for Place Autocomplete and Place Details
+```
+
 ### Running the app
 
 1. Install dependencies
@@ -29,6 +38,8 @@ The easiest, quickstart option is to download the Expo Go app on your physical d
 
 ### Connecting to Backend
 
+### On Local Netwrok
+
 To call the Backend APIs, the Expo app needs to know the IP address of the host the backend is running on. The app host and backend host should be on the same LAN. To specify the host IP, set the following environment variable in a `.env` file:
 
 ```
@@ -36,6 +47,25 @@ EXPO_PUBLIC_API_HOST = <host_machine_ip>
 ```
 
 You can find the local IP using the command `ipconfig` in Windows or `ip addr show eth0` in Linux.
+
+### On External Network (ex: UWS)
+
+Certain networks such as UWS do not permit targeting a specific IP on the network due to firewall permissions. As a workaround for this, it is possible to tunnel both the development servers (app and backend) which makes them accessible to a mobile phone via Expo Go via the Internet.
+
+A bash script has been written to handle the tunnel setup for the backend and connecting the app via an environemnt variable pointed to the tunneled host at runtime.
+
+#### Prerequisites
+
+1. Requires `npx` to be installed
+2. Ensure the script has permission to be ran using `chmod +x ./scripts/tunnel-api.sh`.
+
+#### Running
+
+1. Start your local backend server: `poetry run start`
+2. Expose the backend to the Internet via localtunnel: `pnpm tunnel-api`. This will also add a variable to `/app/.env` containing the host URL for the API.
+3. Start the mobile app: `pnpm start:tunnel`
+
+Overall, this double tunnel approach should allow your app to connect to the backend regardless of network setup/firewalls.
 
 ## Sync Backend API
 

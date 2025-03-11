@@ -1,73 +1,109 @@
-import { Button, ButtonIcon, ButtonText } from "@/src/components/ui/button";
 import { Text } from "@/src/components/ui/text";
-import usePhotos from "@/src/hooks/usePhotos";
-import { Image } from "@/src/components/ui/image";
-import { View } from "react-native";
-import { ScrollView } from "react-native";
-import { TrashIcon } from "@/src/components/ui/icon";
+import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useColors } from "@/src/hooks/useColors";
 import { useSession } from "@/src/context/AuthContext";
-import { userInfoApiUserIdGetOptions } from "@/src/api-client/generated/@tanstack/react-query.gen";
+import { getUsersCollectionsApiUserUserIdCollectionGetOptions } from "@/src/api-client/generated/@tanstack/react-query.gen";
+import { Box } from "@/src/components/ui/box";
+import { Fab, FabIcon } from "@/src/components/ui/fab";
+import { AddIcon } from "@/src/components/ui/icon";
+import { FlatList, Pressable, RefreshControl } from "react-native";
+import { router } from "expo-router";
+import CollectionCard from "@/src/components/cards/CollectionCard";
 
+/**
+ * @description Screen displaying a list of user created collections
+ *
+ * @requirements FR-3
+ *
+ * @return {JSX.Element} The rendered collections tab
+ */
 export default function Collections() {
   const { session } = useSession();
-  const { hasPermission, addPhotos, photos, removePhoto } = usePhotos();
-  const {
-    data: userInfo,
-    error,
-    isLoading,
-  } = useQuery({
-    ...userInfoApiUserIdGetOptions({
+  const { getColor } = useColors();
+  const [refreshing, setRefreshing] = useState(false);
+  const refreshColor = getColor("tertiary-500");
+
+  // Get collections from backend
+  const { data: collections, refetch } = useQuery({
+    ...getUsersCollectionsApiUserUserIdCollectionGetOptions({
       path: {
-        id: session?.user.id ?? "",
+        user_id: session?.user.id ?? "",
       },
     }),
   });
 
-  console.log({ userInfo, error, isLoading });
+  /**
+   * transforms collections list to ensure an even grid layout
+   *
+   * if odd number of collections a spacer element is added to maintain consistent layout
+   */
+  const gridData = useMemo(
+    () =>
+      collections?.length && collections.length % 2
+        ? [...collections, { spacer: true }]
+        : collections,
+    [collections],
+  );
 
-  if (!hasPermission) {
-    return <Text>No access to camera</Text>;
-  }
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  };
+
+  /**
+   * Navigates the user to the collection creation screen
+   */
+  const handleAddCollection = () => {
+    router.push("/(app)/(screens)/(collection)/create");
+  };
+
+  const handleViewCollection = (id: number) => {
+    router.push(`/(app)/(screens)/(collection)/${id}`);
+  };
+
   return (
-    <ScrollView
-      contentContainerStyle={{
-        flexGrow: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        paddingBlock: 8,
-      }}
-    >
-      <Text className="text-center w-full">
-        Your Birthday: {userInfo?.birthday}
-      </Text>
-      <Button onPress={() => addPhotos("camera")}>
-        <ButtonText>Take a photo</ButtonText>
-      </Button>
-      <Button className="my-4" onPress={() => addPhotos("picker")}>
-        <ButtonText>Select from camera roll</ButtonText>
-      </Button>
-      <>
-        {photos.map((photo, index) => (
-          <View key={index}>
-            <Image source={photo.uri} size="xl" alt="" />
-            {photo.exif && (
-              <Text style={{ marginTop: 5 }}>
-                {Object.entries(photo.exif).map(([key, value]) => (
-                  <Text key={key}>{`${key}: ${value}\n`}</Text>
-                ))}
-              </Text>
-            )}
-            <Button
-              size="lg"
-              className="rounded-full p-3.5"
-              onPress={() => removePhoto(photo)}
-            >
-              <ButtonIcon as={TrashIcon} />
-            </Button>
-          </View>
-        ))}
-      </>
-    </ScrollView>
+    <Box className="flex-1 py-4 px-6 bg-background-100">
+      {collections && collections.length > 0 ? (
+        <FlatList
+          numColumns={2}
+          columnWrapperStyle={{ gap: 12 }}
+          contentContainerStyle={{ gap: 12 }}
+          showsVerticalScrollIndicator={false}
+          data={gridData}
+          keyExtractor={(item, index) =>
+            "spacer" in item ? `spacer-${index}` : String(item.id)
+          }
+          renderItem={({ item }) =>
+            "spacer" in item ? (
+              <Box className="flex-1" />
+            ) : (
+              <Pressable
+                className="flex-1"
+                onPress={() => handleViewCollection(item.id)}
+              >
+                <CollectionCard {...item} />
+              </Pressable>
+            )
+          }
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              colors={[refreshColor]}
+              tintColor={refreshColor}
+            />
+          }
+        />
+      ) : (
+        <Box className="flex-1 items-center justify-center">
+          <Text>No collections yet!</Text>
+        </Box>
+      )}
+      <Fab size="lg" onPress={handleAddCollection}>
+        <FabIcon as={AddIcon} />
+      </Fab>
+    </Box>
   );
 }
