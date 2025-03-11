@@ -4,11 +4,19 @@ import { useSession } from "@/src/context/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { View, Text, FlatList, Pressable } from "react-native";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button, ButtonText } from "@/src/components/ui/button";
 import { MementoWithImages } from "@/src/api-client/generated";
 
-export default function Mementos() {
+/**
+ * @description Screen for selecting mementos to add to a collection
+ *
+ * @requirements FR-41
+ *
+ * @component
+ * @returns {JSX.Element} Rendered SelectMementos screen.
+ */
+export default function SelectMementos() {
   const { session } = useSession();
 
   const { data: mementos, isLoading, isFetching } = useQuery({
@@ -24,8 +32,8 @@ export default function Mementos() {
     ? [...mementos, { spacer: true }]
     : mementos;
 
-  const [ids, setIds] = useState({});
-  const [selectedCount, setSelectedCount] = useState(0);
+  const [ids, setIds] = useState({}); // IDs of mementos selected
+  const [selectedCount, setSelectedCount] = useState(0); // Number of mementos selected
 
   const handleSelectMemento = (item: MementoWithImages) => {
     item.selected = !item.selected;
@@ -47,6 +55,7 @@ export default function Mementos() {
   const handleMementosSelected = () => {
     const ids_string: string = Object.keys(ids).toString();
     
+    // Navigate back to the collection create page with selected mementos' IDs
     router.back();
     router.setParams({ ids: ids_string });
   };

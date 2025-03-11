@@ -83,16 +83,15 @@ export default function CreateCollection() {
     }),
   });
 
+  // Receive selected mementos from select_mementos page
   const params = useLocalSearchParams();
-  console.log("Received params:", params);
 
+  // Array of memento IDs selected by the user
   const ids: Number[] = !params.ids
     ? []
     : Array.isArray(params.ids)
     ? params.ids.map(Number)
     : params.ids.split(",").map(Number);
-  
-  console.log("ids:", ids);
 
   // Filter for mementos selected by the user
   const mementos_filtered = mementos?.filter(memento => ids.includes(memento.id));
@@ -172,14 +171,11 @@ export default function CreateCollection() {
   };
   
   const handleRemoveSelection = (id: number) => {
-    console.log("Delete", id);
     const updatedIds = ids.filter(_id => _id !== id);
 
     router.setParams({
       ids: updatedIds.length ? updatedIds.join(",") : "",
-    });
-
-    console.log(ids);    
+    }); 
   };
 
   return (
@@ -300,19 +296,13 @@ export default function CreateCollection() {
                   </ScrollView>
                 </View>
               }
-              <Controller
-                name="mementos"
-                control={control}
-                render={({ field }) => (
-                  <Button
-                    className="mt-auto"
-                    size={"lg"}
-                    onPress={handleAddMementosPress}
-                  >
-                    <ButtonText>Select Mementos</ButtonText>
-                  </Button>
-                )}
-              />
+              <Button
+                className="mt-auto"
+                size={"lg"}
+                onPress={handleAddMementosPress}
+              >
+                <ButtonText>Select Mementos</ButtonText>
+              </Button>
             </FormControl>
             <Button
               className="mt-auto"
