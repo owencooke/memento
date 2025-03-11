@@ -1,0 +1,37 @@
+@startuml
+title Share Collages to Social Media (FR-55)
+
+|user| User
+|#lightgray|mobile| Mobile App
+|#lightgray|backend| Backend
+|db| Supabase
+
+|user|
+start
+:Opens app;
+:Navigates to "Collages" page;
+:Selects a collage;
+
+|mobile|
+:Display collage;
+
+|user|
+:Clicks "Share" button;
+
+|mobile|
+:Display window with list of social media sites;
+
+|user|
+:Clicks on a social media site;
+
+|mobile|
+:Make request to share collage API for the selected social media site;
+
+|backend|
+:Shares the collage on the social media site;
+
+|mobile|
+:Return to collage;
+
+stop
+@enduml

@@ -1,0 +1,34 @@
+@startuml
+title Create a Collage (FR-53)
+
+|user| User
+|#lightgray|mobile| Mobile App
+|#lightgray|backend| Backend
+|db| Supabase
+
+|user|
+start
+:Opens app;
+:Navigates to "Collections" tab;
+:Selects a collection;
+
+|mobile|
+:Display button to generate a collage;
+
+|user|
+:Clicks generate collage button;
+
+|mobile|
+:Make request to generate collage API;
+
+|backend|
+:Generate a collage using the keepsakes in the collection;
+
+|db|
+:Store collage record associating a collection;
+
+|mobile|
+:Display collage;
+
+stop
+@enduml
