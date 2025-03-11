@@ -1,4 +1,4 @@
-@startuml Activity
+@startuml 
 
 ' Include relevant FRs covered 
 title Create a New Memento (FRs 4-11,17-21)

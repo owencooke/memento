@@ -1,4 +1,4 @@
-@startuml Apply Filters
+@startuml 
 title Apply Filters to Mementos (FRs 12-16)
 
 ' Swimlanes

@@ -1,4 +1,4 @@
-@startuml User Authentication
+@startuml 
 title User Authentication (FRs 1-2)
 
 ' Swimlanes
