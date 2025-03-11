@@ -23,7 +23,7 @@ start
 |mobile|
 :Display map view;
 :Extract locations of collections;
-:Overlay map with collections from their collections;
+:Overlay map with collections from their locations;
 
 |user|
 :Clicks on a collection marker;
