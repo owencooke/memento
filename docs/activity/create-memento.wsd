@@ -14,7 +14,14 @@ title Create a New Memento (FRs 4-11,17-21)
 
 |user|
 start
+:Navigate to Mementos tab;
 :Clicks add button;
+
+|mobile|
+:Display options for individual or bulk create;
+
+|user|
+:Select individual create option;
 
 |mobile|
 :Display Create Memento form;
@@ -30,10 +37,13 @@ start
 if (Photo source?) is ([camera]) then
   |mobile|
   :Access device camera;
+  |user|
   :Capture photo;
 else ([library])
   |mobile|
   :Access photo library;
+  |user|
+ -[#blue]->
   :Select from existing photos;
 endif
 
