@@ -21,7 +21,9 @@ start
 :Retrieve collections;
 
 |mobile|
-:Display map view with collections;
+:Display map view;
+:Extract locations of collections;
+:Overlay map with collections from their collections;
 
 |user|
 :Clicks on a collection marker;
