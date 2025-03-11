@@ -24,6 +24,10 @@ entity Memento {
     }
 }
 
+entity Collage {
+    Id: INTEGER <<key>>
+}
+
 entity Image <<weak>> {
     Id: INTEGER <<key>>
     Filename: STRING
@@ -55,6 +59,11 @@ relationship HasImages <<identifying>> {
 }
 Image =(1,N)= HasImages
 HasImages =1= Memento
+
+relationship HasCollection {
+}
+Collage -1- HasCollection
+Collection -1- HasCollection
 
 
 relationship OwnedBy {
