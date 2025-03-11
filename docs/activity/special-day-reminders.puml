@@ -17,6 +17,9 @@ start
 if (Today special?) is (yes) then
   |mobile|
   :Push notification to remind user;
+else (no)
+  |backend|
+  stop
 endif
 
 |user|
