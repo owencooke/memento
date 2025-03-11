@@ -1,5 +1,5 @@
 @startuml
-title View a Keepsake (FRs 25-28)
+title View a Keepsake (FRs 26-28)
 
 |user| User
 |#lightgray|mobile| Mobile App
@@ -31,7 +31,6 @@ start
 |mobile|
 if (Request successful?) is (yes) then
   :Display keepsake details:
-  - Title
   - Description
   - Metadata
   - Photos in carousel;

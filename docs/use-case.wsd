@@ -57,14 +57,12 @@ rectangle "Context-Aware Keepsake Digitizer" {
         }
         package "Viewing" {
             usecase "View Keepsake"
-            usecase "FR-25: View title" as FR25
             usecase "FR-26: View description" as FR26
             usecase "FR-27: View metadata" as FR27
             usecase "FR-28: View photos in carousel" as FR28
         }
         package "Editing" {
             usecase "Edit Keepsake"
-            usecase "FR-29: Modify title" as FR29
             usecase "FR-30: Modify description" as FR30
             usecase "FR-31: Modify images" as FR31
             usecase "FR-32: Change thumbnail" as FR32
@@ -191,13 +189,11 @@ SSO --- (FR2) : issues token
 (Bulk Create Keepsakes) <-. (FR24) : <<extend>>
 
 ' View Keepsake
-(View Keepsake) <-. (FR25) : <<extend>>
 (View Keepsake) <-. (FR26) : <<extend>>
 (View Keepsake) <-. (FR27) : <<extend>>
 (View Keepsake) <-. (FR28) : <<extend>>
 
 ' Edit Keepsake
-(Edit Keepsake) <-. (FR29) : <<extend>>
 (Edit Keepsake) <-. (FR30) : <<extend>>
 (Edit Keepsake) .-> (FR31) : <<include>>
 (Edit Keepsake) <-. (FR32) : <<extend>>
