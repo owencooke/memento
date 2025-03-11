@@ -2,8 +2,8 @@
 title Create a Collage (FR-53)
 
 |user| User
-|#lightgray|mobile| Mobile App
-|#lightgray|backend| Backend
+|mobile| Mobile App
+|backend| Backend
 |db| Supabase
 
 |user|
@@ -22,10 +22,18 @@ start
 :Make request to generate collage API;
 
 |backend|
-:Generate a collage using the keepsakes in the collection;
+:Call Get Image API to get the images of the keepsakes in the collection;
+
+|db|
+:Retrieve the images of the keepsakes;
+
+|backend|
+:Transform the retrieved images into a collage;
+:Convert the collage into a format that the app can read;
+:Send the collage to the mobile app;
 
 |mobile|
-:Display collage;
+:Render received collage;
 
 stop
 @enduml
