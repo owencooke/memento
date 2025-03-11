@@ -1,0 +1,30 @@
+@startuml
+title Share Keepsakes to Social Media (FR-54)
+
+|user| User
+|mobile| Mobile App
+
+|user|
+start
+:Opens app;
+:Navigates to "Mementos" page;
+:Selects a keepsake;
+
+|mobile|
+:Display keepsake details;
+
+|user|
+:Clicks "Share" button;
+
+|mobile|
+:Display window with list of social media sites;
+
+|user|
+:Clicks on a social media site;
+
+|mobile|
+:Make request to share keepsake API for the selected social media site;
+:Return to keepsake details;
+
+stop
+@enduml

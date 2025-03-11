@@ -1,0 +1,47 @@
+@startuml
+title View a Collection (FR 3)
+
+|user| User
+|mobile| Mobile App
+|backend| Backend
+|db| Supabase
+
+|user|
+start
+:Navigate to View Collections screen;
+
+|mobile|
+:Display Collections gridview;
+
+|user|
+:Selects a Collection from the grid view;
+
+|mobile|
+:Make GET call to View Collection API;
+
+|backend|
+:Query database for collection details;
+|db|
+:Fetch collection record;
+:Fetch associated keepsakes;
+
+|backend|
+:Prepare collection data response;
+
+|mobile|
+if (Request successful?) is (yes) then
+  :Display collection details:
+  - Title
+  - Description
+  - Date
+  - Location
+  - Associated Keepsakes
+else (no)
+  :Show error message;
+endif
+
+|user|
+:Returns to grid view;
+
+stop
+@enduml

@@ -1,0 +1,121 @@
+@startuml 
+
+' Include relevant FRs covered 
+title Create a New Memento (FRs 4-11,17-21)
+
+' Swimlanes
+' format: | optional color | var name | lane title
+|user| User
+|mobile| Mobile App
+|google| Google Places API
+|backend| Backend
+|db| Supabase
+
+
+|user|
+start
+:Navigate to Mementos tab;
+:Clicks add button;
+
+|mobile|
+:Display options for individual or bulk create;
+
+|user|
+:Select individual create option;
+
+|mobile|
+:Display Create Memento form;
+
+|user|
+:Clicks add photo button;
+
+|mobile|
+:Show photo source options;
+
+' QUESTION: should camera/library be in a diff swimlane? Device vs. Expo?
+|user|
+if (Photo source?) is ([camera]) then
+  |mobile|
+  :Access device camera;
+  |user|
+  :Capture photo;
+else ([library])
+  |mobile|
+  :Access photo library;
+  |user|
+ -[#blue]->
+  :Select from existing photos;
+endif
+
+|mobile|
+:Extract EXIF metadata;
+:Identify largest location cluster from images;
+:Make GET call to Google Places Geocoding API;
+
+|google|
+:Convert coordinates to place name;
+:Prepare response with addresses/place info;
+
+|mobile|
+:Populate input fields with metadata:
+- Date from EXIF
+- Location from geocoding;
+:Display selected photos;
+
+|user|
+' is this good enough for "optional" actions?
+partition "Optional Form Editing" {
+  :Edit caption;
+  :Modify date;
+  :Edit location;
+  :Change thumbnail;
+}
+|mobile|
+:Update tracked form field values;
+|user|
+:Click submit button;
+
+|mobile|
+:Validate form data;
+if (Form valid?) is (no) then
+  :Show validation errors;
+  |user|
+  :User corrects input;
+  :Click submit button again;
+|mobile|
+else (yes)
+endif
+:Prepare upload payload for memento/photos;
+:Make POST call to Create Memento API;
+
+|backend|
+fork
+  :Remove background from images;
+  |db|
+  :Store images in Storage bucket;
+  :Return stored file path;
+|backend|
+fork again
+  :Extract text from images;
+fork again
+  :Generate image classification labels;
+fork again 
+  |db|
+  :Create memento record in relational DB;
+end fork
+
+|db|
+:Create image metadata records in relational DB;
+
+|backend|
+:Prepare response with new memento/image records;
+
+|mobile|
+if (Request successful?) is (yes) then
+  :Navigate to View Memento page;
+else (no)
+  :Display error message;
+endif
+
+stop
+@enduml
