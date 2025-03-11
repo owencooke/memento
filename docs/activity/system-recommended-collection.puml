@@ -10,7 +10,7 @@ title System Recommended Collection (FRs 38-40)
 start
 :Periodically analyze keepsakes for patterns;
 :Identify potential collection groupings;
-:Generate collection title and metadata;
+:Generate collection metadata;
 
 |db|
 :Retrieve relevant keepsakes for recommendation;
