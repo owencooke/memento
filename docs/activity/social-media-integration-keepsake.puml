@@ -3,8 +3,6 @@ title Share Keepsakes to Social Media (FR-54)
 
 |user| User
 |mobile| Mobile App
-|backend| Backend
-|db| Supabase
 
 |user|
 start
@@ -26,11 +24,6 @@ start
 
 |mobile|
 :Make request to share keepsake API for the selected social media site;
-
-|backend|
-:Shares the keepsake on the social media site;
-
-|mobile|
 :Return to keepsake details;
 
 stop

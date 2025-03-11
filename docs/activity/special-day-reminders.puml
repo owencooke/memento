@@ -19,6 +19,9 @@ if (Today special?) is (yes) then
   :Push notification to remind user;
 endif
 
+|user|
+:View notification;
+
 stop
 @enduml
 
