@@ -3,9 +3,9 @@ title User Authentication (FRs 1-2)
 
 ' Swimlanes
 |user| User
-|#lightgray|mobile| Mobile App
+|mobile| Mobile App
 |db| Supabase
-|#lightgray|google| Google OAuth
+|google| Google OAuth
 |backend| Backend
 
 |user|

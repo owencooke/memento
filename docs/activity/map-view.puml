@@ -2,8 +2,8 @@
 title View Collections on a Map (FRs 51-52)
 
 |user| User
-|#lightgray|mobile| Mobile App
-|#lightgray|backend| Backend
+|mobile| Mobile App
+|backend| Backend
 |db| Supabase
 
 |user|

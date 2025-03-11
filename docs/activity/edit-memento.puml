@@ -2,8 +2,8 @@
 title Edit a Keepsake (FRs 30-33)
 
 |user| User
-|#lightgray|mobile| Mobile App
-|#lightgray|backend| Backend
+|mobile| Mobile App
+|backend| Backend
 |db| Supabase
 
 |user|
@@ -60,11 +60,13 @@ if (New images uploaded?) is (yes) then
   |db|
   :Store new images in Storage bucket;
   :Create new image metadata records;
+else (no)
 endif
 if (Images removed?) is (yes) then
   |db|
   :Delete old image records;
   :Remove corresponding files from Storage bucket;
+else (no)
 endif
 
 |backend|

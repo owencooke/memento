@@ -2,8 +2,8 @@
 title Edit Collection (FRs 41-45)
 
 |user| User
-|#lightgray|mobile| Mobile App
-|#lightgray|backend| Backend
+|mobile| Mobile App
+|backend| Backend
 |db| Supabase
 
 |user|
@@ -53,6 +53,7 @@ if (Keepsake changes?) is (yes) then
   fork again
     :Remove deselected keepsakes from join table;
   end fork
+else (no)
 endif
 
 |backend|

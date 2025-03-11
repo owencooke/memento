@@ -2,8 +2,8 @@
 title View a Keepsake (FRs 26-28)
 
 |user| User
-|#lightgray|mobile| Mobile App
-|#lightgray|backend| Backend
+|mobile| Mobile App
+|backend| Backend
 |db| Supabase
 
 |user|

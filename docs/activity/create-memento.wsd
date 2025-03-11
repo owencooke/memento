@@ -6,9 +6,9 @@ title Create a New Memento (FRs 4-11,17-21)
 ' Swimlanes
 ' format: | optional color | var name | lane title
 |user| User
-|#lightgray|mobile| Mobile App
+|mobile| Mobile App
 |google| Google Places API
-|#lightgray|backend| Backend
+|backend| Backend
 |db| Supabase
 
 
