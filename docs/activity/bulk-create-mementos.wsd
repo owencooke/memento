@@ -1,4 +1,4 @@
-@startuml Bulk Create Mementos
+@startuml 
 
 ' Include relevant FRs covered 
 title Bulk Create Mementos (FRs 22-24)
