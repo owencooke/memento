@@ -1,5 +1,5 @@
 @startuml
-title Delete a Keepsake (FR-46)
+title Delete a Collection (FR-46)
 
 |user| User
 |#lightgray|mobile| Mobile App
