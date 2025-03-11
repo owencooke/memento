@@ -15,17 +15,14 @@ entity User {
 
 entity Memento {
     Id: INTEGER <<key>>
-    Caption: STRING
+    Description: STRING
     Date: DATE
     Location: STRING
     Coordinates {
       Latitude: REAL
       Longitude: REAL
     }
-}
-
-entity Collage {
-    Id: INTEGER <<key>>
+    Keywords: STRING <<multi>>
 }
 
 entity Image <<weak>> {
@@ -43,15 +40,14 @@ entity Image <<weak>> {
 
 entity Collection {
     Id: INTEGER <<key>>
-    Title: STRING
-    Caption: STRING
+    Name: STRING
+    Description: STRING
     Date: DATE
     Location: STRING
     Coordinates {
       Latitude: REAL
       Longitude: REAL
     }
-    Keywords: STRING
 }
 
 ' Relationships
@@ -59,11 +55,6 @@ relationship HasImages <<identifying>> {
 }
 Image =(1,N)= HasImages
 HasImages =1= Memento
-
-relationship HasCollection {
-}
-Collage -1- HasCollection
-Collection -1- HasCollection
 
 
 relationship OwnedBy {
@@ -75,7 +66,7 @@ OwnedBy -1- User
 
 relationship HasMemento {
 }
-Collection -N- HasMemento
+Collection -M- HasMemento
 Memento -N- HasMemento
 
 @endchen
