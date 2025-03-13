@@ -11,6 +11,7 @@ import { FlatList, Pressable, RefreshControl, View } from "react-native";
 import { router } from "expo-router";
 import CollectionCard from "@/src/components/cards/CollectionCard";
 import { Switch } from "@/src/components/ui/switch";
+import MapView, { Marker } from "react-native-maps";
 
 /**
  * @description Screen displaying a list of user created collections
@@ -68,9 +69,10 @@ export default function Collections() {
     router.push(`/(app)/(screens)/(collection)/${id}`);
   };
 
+  console.log(collections);
   return (
-    <Box className="flex-1 py-2 px-6 bg-background-100 flex gap-2">
-      <View className="flex flex-row gap-2 items-center w-full">
+    <Box className="flex-1 py-2 bg-background-100 flex gap-2">
+      <View className="flex flex-row gap-2 items-center w-full px-6">
         <Text bold size="md">
           Map View
         </Text>
@@ -88,36 +90,70 @@ export default function Collections() {
         />
       </View>
       {collections && collections.length > 0 ? (
-        <FlatList
-          numColumns={2}
-          columnWrapperStyle={{ gap: 12 }}
-          contentContainerStyle={{ gap: 12 }}
-          showsVerticalScrollIndicator={false}
-          data={gridData}
-          keyExtractor={(item, index) =>
-            "spacer" in item ? `spacer-${index}` : String(item.id)
-          }
-          renderItem={({ item }) =>
-            "spacer" in item ? (
-              <Box className="flex-1" />
-            ) : (
-              <Pressable
-                className="flex-1"
-                onPress={() => handleViewCollection(item.id)}
-              >
-                <CollectionCard {...item} />
-              </Pressable>
-            )
-          }
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={handleRefresh}
-              colors={[refreshColor]}
-              tintColor={refreshColor}
-            />
-          }
-        />
+        showMapView ? (
+          <MapView
+            style={{
+              width: "100%",
+              height: "100%",
+            }}
+            initialRegion={{
+              latitude: 52.2681,
+              longitude: -113.8112,
+              latitudeDelta: 5,
+              longitudeDelta: 5,
+            }}
+          >
+            {collections
+              .filter((collection) => collection.coordinates)
+              .map((collection) => (
+                <Marker
+                  key={collection.id}
+                  coordinate={{
+                    latitude: collection.coordinates?.lat!,
+                    longitude: collection.coordinates?.long!,
+                  }}
+                >
+                  <Pressable
+                    //   className="flex-1"
+                    onPress={() => handleViewCollection(collection.id)}
+                  >
+                    <CollectionCard {...collection} />
+                  </Pressable>
+                </Marker>
+              ))}
+          </MapView>
+        ) : (
+          <FlatList
+            numColumns={2}
+            columnWrapperStyle={{ gap: 12 }}
+            contentContainerStyle={{ gap: 12, paddingHorizontal: 24 }}
+            showsVerticalScrollIndicator={false}
+            data={gridData}
+            keyExtractor={(item, index) =>
+              "spacer" in item ? `spacer-${index}` : String(item.id)
+            }
+            renderItem={({ item }) =>
+              "spacer" in item ? (
+                <Box className="flex-1" />
+              ) : (
+                <Pressable
+                  className="flex-1"
+                  onPress={() => handleViewCollection(item.id)}
+                >
+                  <CollectionCard {...item} />
+                </Pressable>
+              )
+            }
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={handleRefresh}
+                colors={[refreshColor]}
+                tintColor={refreshColor}
+              />
+            }
+          />
+        )
       ) : (
         <Box className="flex-1 items-center justify-center">
           <Text>No collections yet!</Text>
