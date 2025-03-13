@@ -7,9 +7,10 @@ import { getUsersCollectionsApiUserUserIdCollectionGetOptions } from "@/src/api-
 import { Box } from "@/src/components/ui/box";
 import { Fab, FabIcon } from "@/src/components/ui/fab";
 import { AddIcon } from "@/src/components/ui/icon";
-import { FlatList, Pressable, RefreshControl } from "react-native";
+import { FlatList, Pressable, RefreshControl, View } from "react-native";
 import { router } from "expo-router";
 import CollectionCard from "@/src/components/cards/CollectionCard";
+import { Switch } from "@/src/components/ui/switch";
 
 /**
  * @description Screen displaying a list of user created collections
@@ -23,6 +24,8 @@ export default function Collections() {
   const { getColor } = useColors();
   const [refreshing, setRefreshing] = useState(false);
   const refreshColor = getColor("tertiary-500");
+
+  const [showMapView, setShowMapView] = useState(false);
 
   // Get collections from backend
   const { data: collections, refetch } = useQuery({
@@ -52,6 +55,8 @@ export default function Collections() {
     setRefreshing(false);
   };
 
+  const handleToggleMapView = () => setShowMapView((prev) => !prev);
+
   /**
    * Navigates the user to the collection creation screen
    */
@@ -64,7 +69,24 @@ export default function Collections() {
   };
 
   return (
-    <Box className="flex-1 py-4 px-6 bg-background-100">
+    <Box className="flex-1 py-2 px-6 bg-background-100 flex gap-2">
+      <View className="flex flex-row gap-2 items-center w-full">
+        <Text bold size="md">
+          Map View
+        </Text>
+        {/* TODO: map icon might look nicer? */}
+        <Switch
+          size="sm"
+          value={showMapView}
+          onToggle={handleToggleMapView}
+          trackColor={{
+            true: getColor("primary-500"),
+            false: getColor("background-300"),
+          }}
+          ios_backgroundColor={getColor("background-300")}
+          thumbColor={getColor("secondary-100")}
+        />
+      </View>
       {collections && collections.length > 0 ? (
         <FlatList
           numColumns={2}
