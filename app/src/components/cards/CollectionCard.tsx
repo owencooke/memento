@@ -33,7 +33,7 @@ export default function CollectionCard({
         {/* Actual Card with Contents */}
         <View
           className={`relative flex flex-col rounded-xl shadow-hard-3 bg-background-0 ${
-            isMarker ? "w-[80px] p-[6px]" : "flex-1 gap-4 p-3"
+            isMarker ? "w-[80px] p-[6px]" : "flex-1 gap-1 p-3"
           }`}
         >
           <View className="aspect-square flex-1">
@@ -44,16 +44,19 @@ export default function CollectionCard({
               resizeMode="cover"
             />
           </View>
-          <Text size={isMarker ? "sm" : "lg"} className="font-bold text-center">
+          <Text
+            size={isMarker ? "sm" : "lg"}
+            className="font-bold text-center mt-2"
+          >
             {title}
           </Text>
           {!isMarker && (
             <View className="flex flex-col justify-between items-center">
-              <Text className="text-left" size="sm">
-                {date}
+              <Text className="font-extralight" size="sm">
+                {city || ""}
               </Text>
-              <Text className="text-right" size="sm">
-                {city}
+              <Text className="font-extralight" size="sm">
+                {date || ""}
               </Text>
             </View>
           )}
