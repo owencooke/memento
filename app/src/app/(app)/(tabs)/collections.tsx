@@ -12,6 +12,7 @@ import { router } from "expo-router";
 import CollectionCard from "@/src/components/cards/CollectionCard";
 import { Switch } from "@/src/components/ui/switch";
 import MapView, { Marker } from "react-native-maps";
+import { StyleSheet } from "react-native";
 
 /**
  * @description Screen displaying a list of user created collections
@@ -91,18 +92,7 @@ export default function Collections() {
       </View>
       {collections && collections.length > 0 ? (
         showMapView ? (
-          <MapView
-            style={{
-              width: "100%",
-              height: "100%",
-            }}
-            initialRegion={{
-              latitude: 52.2681,
-              longitude: -113.8112,
-              latitudeDelta: 5,
-              longitudeDelta: 5,
-            }}
-          >
+          <MapView style={styles.mapView} initialRegion={initialMapRegion}>
             {collections
               .filter((collection) => collection.coordinates)
               .map((collection) => (
@@ -114,10 +104,9 @@ export default function Collections() {
                   }}
                 >
                   <Pressable
-                    //   className="flex-1"
                     onPress={() => handleViewCollection(collection.id)}
                   >
-                    <CollectionCard {...collection} />
+                    <CollectionCard {...collection} variant="marker" />
                   </Pressable>
                 </Marker>
               ))}
@@ -165,3 +154,16 @@ export default function Collections() {
     </Box>
   );
 }
+
+// Map View Configurations
+
+const initialMapRegion = {
+  latitude: 52.2681,
+  longitude: -113.8112,
+  latitudeDelta: 5,
+  longitudeDelta: 5,
+};
+
+const styles = StyleSheet.create({
+  mapView: { width: "100%", height: "100%" },
+});

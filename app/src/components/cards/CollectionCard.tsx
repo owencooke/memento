@@ -3,24 +3,19 @@ import { Image } from "@/src/components/ui/image";
 import { CollectionWithMementos } from "@/src/api-client/generated";
 import { Text } from "@/src/components/ui/text";
 import { useMemo } from "react";
-import { Box } from "@/src/components/ui/box";
 
-/**
- * @description A card component for displaying a collection with its metadata.
- *
- * @requirements FR-3
- *
- * @component
- * @param {CollectionCardProps} props - Component props.
- * @returns {JSX.Element} The rendered collection card component.
- */
+type CollectionCardProps = CollectionWithMementos & {
+  variant?: "default" | "marker";
+};
+
 export default function CollectionCard({
   id,
   title,
   date,
   location,
   mementos,
-}: CollectionWithMementos): JSX.Element {
+  variant = "default",
+}: CollectionCardProps) {
   // Get thumbnail from first memento
   const thumbnail = null;
 
@@ -30,31 +25,37 @@ export default function CollectionCard({
     [location],
   );
 
+  const isMarker = variant === "marker";
+
   return (
-    <Box
-      className={"flex-1 gap-4 p-3 rounded-xl shadow-hard-3 bg-background-0"}
+    <View
+      className={`flex flex-col rounded-xl shadow-hard-3 bg-background-0 ${
+        isMarker ? "w-[80px] p-[6px]" : "flex-1 gap-4 p-3"
+      }`}
     >
-      <Box className="aspect-square">
+      <View className="aspect-square flex-1">
         <Image
           source={{ uri: "https://placehold.co/400.png" }}
-          className="w-full h-full"
+          className="h-full w-full"
           alt=""
           resizeMode="cover"
         />
-      </Box>
-      <Box className="flex flex-1 justify-between gap-1">
-        <Text size="lg" className="font-bold text-center flex-1">
+      </View>
+      <View>
+        <Text size={isMarker ? "sm" : "lg"} className="font-bold text-center">
           {title}
         </Text>
+      </View>
+      {!isMarker && (
         <View className="flex flex-row justify-between items-center mt-auto font-medium">
-          <Text className="flex-1 text-left" size="sm">
+          <Text className="text-left" size="sm">
             {date}
           </Text>
-          <Text className="flex-1 text-right" size="sm">
+          <Text className="text-right" size="sm">
             {city}
           </Text>
         </View>
-      </Box>
-    </Box>
+      )}
+    </View>
   );
 }
