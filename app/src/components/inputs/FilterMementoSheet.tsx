@@ -23,14 +23,12 @@ export interface FilterMementoFormData {
 interface FilterMementoSheetProps {
   visible: boolean;
   setVisible: (open: boolean) => void;
-  isSubmitting: boolean;
-  onSubmit: (data: FilterMementoFormData) => Promise<void>;
+  onSubmit: (data: FilterMementoFormData) => void;
 }
 
 export default function FilterMementoSheet({
   visible,
   setVisible,
-  isSubmitting,
   onSubmit,
 }: FilterMementoSheetProps) {
   const handleClose = () => setVisible(false);
@@ -85,13 +83,8 @@ export default function FilterMementoSheet({
             className="mt-auto"
             size={"lg"}
             onPress={handleSubmit(onSubmit)}
-            disabled={isSubmitting}
           >
-            {isSubmitting ? (
-              <ButtonSpinner />
-            ) : (
-              <ButtonText>Apply Filters</ButtonText>
-            )}
+            <ButtonText>Apply Filters</ButtonText>
           </Button>
         </Box>
       </ActionsheetContent>

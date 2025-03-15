@@ -17,7 +17,9 @@ import {
 import { SearchIcon } from "@/src/components/ui/icon";
 import { Button, ButtonIcon } from "@/src/components/ui/button";
 import { ListFilter } from "lucide-react-native";
-import FilterMementoSheet from "@/src/components/inputs/FilterMementoSheet";
+import FilterMementoSheet, {
+  FilterMementoFormData,
+} from "@/src/components/inputs/FilterMementoSheet";
 
 export default function Mementos() {
   const { session } = useSession();
@@ -26,10 +28,22 @@ export default function Mementos() {
   const [showActionsheet, setShowActionsheet] = useState(false);
   const refreshColor = getColor("tertiary-500");
 
+  const [filterParams, setFilterParams] = useState<{
+    start_date: string | null;
+    end_date: string | null;
+  }>({
+    start_date: null,
+    end_date: null,
+  });
+
   const { data: mementos, refetch } = useQuery({
     ...getUsersMementosApiUserUserIdMementoGetOptions({
       path: {
         user_id: session?.user.id ?? "",
+      },
+      query: {
+        start_date: filterParams.start_date ?? undefined,
+        end_date: filterParams.end_date ?? undefined,
       },
     }),
   });
@@ -55,6 +69,15 @@ export default function Mementos() {
 
   const handleViewMemento = (id: number) => {
     router.push(`/(app)/(screens)/(memento)/${id}`);
+  };
+
+  const handleApplyFilters = (data: FilterMementoFormData) => {
+    setFilterParams({
+      start_date: data.start_date?.toISOString().split("T")[0] ?? null,
+      end_date: data.end_date?.toISOString().split("T")[0] ?? null,
+    });
+    setShowActionsheet(false);
+    refetch();
   };
 
   return (
@@ -115,6 +138,7 @@ export default function Mementos() {
       <FilterMementoSheet
         visible={showActionsheet}
         setVisible={setShowActionsheet}
+        onSubmit={handleApplyFilters}
       />
     </View>
   );
