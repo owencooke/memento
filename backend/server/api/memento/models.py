@@ -1,7 +1,7 @@
 import datetime
 from typing import Any
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from server.services.db.models.gis import BaseWithCoordinates, CoordinatesInsert
 from server.services.db.models.schema_public_latest import (
@@ -40,13 +40,9 @@ class MementoFilterParams(BaseModel):
     start_date: datetime.date | None = Field(default=None)
     end_date: datetime.date | None = Field(default=None)
 
-    @field_validator("end_date")
+    @model_validator(mode="before")
     @classmethod
-    def check_date_order(
-        cls,
-        end_date: datetime.date,
-        values: dict[str, Any],
-    ) -> datetime.date:
+    def check_date_order(cls, data: Any) -> Any:
         """Checks that end date is gte start_date"""
         if end_date and values.get("start_date") and end_date < values["start_date"]:
             raise ValueError("end date must be greater than or equal to start date")
