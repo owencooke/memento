@@ -6,12 +6,13 @@
 import json
 from typing import Annotated, Optional
 
-from fastapi import APIRouter, Depends, Form, UploadFile
+from fastapi import APIRouter, Depends, Form, Query, UploadFile
 from fastapi.responses import JSONResponse
 from loguru import logger
 from pydantic import UUID4
 
 from server.api.memento.models import (
+    MementoFilterParams,
     NewImageMetadata,
     NewMemento,
     UpdateMemento,
@@ -37,16 +38,17 @@ router = APIRouter()
 @router.get("/")
 def get_users_mementos(
     user_id: UUID4 = Depends(get_user_id),
+    filter_query: MementoFilterParams = Depends(),
 ) -> list[MementoWithImages]:
     """Gets all the mementos belonging to a user."""
-    mementos = get_mementos(user_id)
-
+    mementos = get_mementos(user_id, filter_query)
     for memento in mementos:
         # Get private URLs for each image
         for image in memento.images:
             image.url = get_image_url(image.filename)
         # Sort images by order index
         memento.images.sort(key=lambda image: image.order_index)
+
     return mementos
 
 
