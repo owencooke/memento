@@ -46,8 +46,8 @@ class MementoFilterParams(BaseModel):
         """Checks that end date is gte start_date"""
         if (
             isinstance(data, dict)
-            and "end_date" in data
-            and "start_date" in data
+            and data["end_date"]
+            and data["start_date"]
             and data["end_date"] < data["start_date"]
         ):
             raise ValueError("end date must be greater than or equal to start date")
