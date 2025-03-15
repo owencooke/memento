@@ -17,11 +17,13 @@ import {
 import { SearchIcon } from "@/src/components/ui/icon";
 import { Button, ButtonIcon } from "@/src/components/ui/button";
 import { ListFilter } from "lucide-react-native";
+import FilterMementoSheet from "@/src/components/inputs/FilterMementoSheet";
 
 export default function Mementos() {
   const { session } = useSession();
   const { getColor } = useColors();
   const [refreshing, setRefreshing] = useState(false);
+  const [showActionsheet, setShowActionsheet] = useState(false);
   const refreshColor = getColor("tertiary-500");
 
   const { data: mementos, refetch } = useQuery({
@@ -64,7 +66,12 @@ export default function Mementos() {
           </InputSlot>
           <InputField placeholder="Search..." />
         </Input>
-        <Button size="md" variant="link" className="rounded-full p-3.5">
+        <Button
+          size="md"
+          variant="link"
+          className="rounded-full p-3.5"
+          onPress={() => setShowActionsheet(true)}
+        >
           <ButtonIcon as={ListFilter} />
         </Button>
       </View>
@@ -105,6 +112,10 @@ export default function Mementos() {
       <Fab size="lg" onPress={handleAddMemento}>
         <FabIcon as={AddIcon} />
       </Fab>
+      <FilterMementoSheet
+        visible={showActionsheet}
+        setVisible={setShowActionsheet}
+      />
     </View>
   );
 }
