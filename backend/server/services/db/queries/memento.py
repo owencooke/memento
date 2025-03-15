@@ -5,7 +5,7 @@
 
 from pydantic import UUID4
 
-from server.api.memento.models import NewMemento, UpdateMemento
+from server.api.memento.models import MementoFilterParams, NewMemento, UpdateMemento
 from server.services.db.config import supabase
 from server.services.db.models.joins import MementoWithImages
 from server.services.db.models.schema_public_latest import Memento
@@ -21,14 +21,23 @@ def create_memento(new_memento: NewMemento, user_id: UUID4) -> Memento:
     return Memento(**response.data[0])
 
 
-def get_mementos(user_id: UUID4) -> list[MementoWithImages]:
+def get_mementos(
+    user_id: UUID4, filter_query: MementoFilterParams | None
+) -> list[MementoWithImages]:
     """Gets all the mementos belonging to a user."""
-    response = (
+    query = (
         supabase.table("memento")
         .select("*, images:image(*)")
         .eq("user_id", str(user_id))
-        .execute()
     )
+
+    if filter_query:
+        if filter_query.start_date:
+            query.gte("date", filter_query.start_date.isoformat())
+        if filter_query.end_date:
+            query.lte("date", filter_query.end_date.isoformat())
+
+    response = query.execute()
     return [MementoWithImages(**item) for item in response.data]
 
 
