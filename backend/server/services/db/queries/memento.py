@@ -3,6 +3,7 @@
 @requirements FR-17, FR-19, FR-26, FR-27, FR30, FR33
 """
 
+from loguru import logger
 from pydantic import UUID4
 
 from server.api.memento.models import MementoFilterParams, NewMemento, UpdateMemento
@@ -36,6 +37,33 @@ def get_mementos(
             query.gte("date", filter_query.start_date.isoformat())
         if filter_query.end_date:
             query.lte("date", filter_query.end_date.isoformat())
+
+        # Bounding box filtering using the RPC function
+        if all(
+            [
+                filter_query.min_lat,
+                filter_query.min_long,
+                filter_query.max_lat,
+                filter_query.max_long,
+            ]
+        ):
+            bbox_response = supabase.rpc(
+                "mementos_in_bounds",
+                {
+                    "min_lat": float(filter_query.min_lat),
+                    "min_long": float(filter_query.min_long),
+                    "max_lat": float(filter_query.max_lat),
+                    "max_long": float(filter_query.max_long),
+                },
+            ).execute()
+
+            bbox_memento_ids = [item["id"] for item in bbox_response.data]
+            if bbox_memento_ids:
+                # rest of query mementos must be in bounding box mementos
+                query.in_("id", bbox_memento_ids)
+            else:
+                # If no mementos are in the bounding box, return an empty list early
+                return []
 
     response = query.execute()
     return [MementoWithImages(**item) for item in response.data]
