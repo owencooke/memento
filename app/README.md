@@ -4,7 +4,14 @@ This mobile application is an [Expo](https://expo.dev) project that was created 
 
 ## Get Started
 
-### Environment Variables
+### Prerequisites
+
+- Install [nvm (Node Version Manager)](https://github.com/nvm-sh/nvm)
+- Use nvm to install Node.js (v20+)
+- Install [npm (Node's package manager).](https://www.npmjs.com/)
+- Use npm to install [pnpm (faster and more efficient package manager)](https://pnpm.io/installation#using-npm)
+
+#### Environment Variables
 
 In the `/app/.env` file, ensure the following variables and credentials exist:
 
@@ -24,7 +31,7 @@ EXPO_PUBLIC_GOOGLE_PLACES_API_KEY=<API_KEY> # for Place Autocomplete and Place D
 2. Start the app
 
    ```bash
-    pnpm start
+    pnpm start [--port <PORT_NUMBER>]
    ```
 
 In the output, you'll find options to open the app in a
