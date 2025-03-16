@@ -1,5 +1,5 @@
 import datetime
-from typing import Any
+from typing import Any, Optional
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
@@ -37,8 +37,12 @@ class UpdateMemento(CoordinatesInsert, BaseWithCoordinates, MementoUpdate):  # t
 class MementoFilterParams(BaseModel):
     """Filter parameters for Memento"""
 
-    start_date: datetime.date | None = Field(default=None)
-    end_date: datetime.date | None = Field(default=None)
+    start_date: Optional[datetime.date] = Field(default=None)
+    end_date: Optional[datetime.date] = Field(default=None)
+    min_lat: Optional[float] = Field(default=None)
+    min_long: Optional[float] = Field(default=None)
+    max_lat: Optional[float] = Field(default=None)
+    max_long: Optional[float] = Field(default=None)
 
     @model_validator(mode="before")
     @classmethod
@@ -51,5 +55,18 @@ class MementoFilterParams(BaseModel):
             and data["end_date"] < data["start_date"]
         ):
             raise ValueError("end date must be greater than or equal to start date")
+
+        return data
+
+    @model_validator(mode="before")
+    @classmethod
+    def all_bounds_values(cls, data: Any) -> Any:
+        """Ensure all bounding box values are provided if any are set"""
+        bbox_fields = ["min_lat", "min_long", "max_lat", "max_long"]
+        bbox_values = [data.get(field) for field in bbox_fields]
+        if any(bbox_values) and not all(bbox_values):
+            raise ValueError(
+                "All bounding box coordinates (min_lat, min_long, max_lat, max_long) must be provided"
+            )
 
         return data
