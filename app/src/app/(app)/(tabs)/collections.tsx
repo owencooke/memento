@@ -5,8 +5,8 @@ import { useColors } from "@/src/hooks/useColors";
 import { useSession } from "@/src/context/AuthContext";
 import { getUsersCollectionsApiUserUserIdCollectionGetOptions } from "@/src/api-client/generated/@tanstack/react-query.gen";
 import { Box } from "@/src/components/ui/box";
-import { Fab, FabIcon } from "@/src/components/ui/fab";
-import { AddIcon } from "@/src/components/ui/icon";
+import { Fab, FabIcon, FabLabel } from "@/src/components/ui/fab";
+import { AddIcon, GlobeIcon, MenuIcon } from "@/src/components/ui/icon";
 import { FlatList, Pressable, RefreshControl, View } from "react-native";
 import { router } from "expo-router";
 import CollectionCard from "@/src/components/cards/CollectionCard";
@@ -70,26 +70,8 @@ export default function Collections() {
     router.push(`/(app)/(screens)/(collection)/${id}`);
   };
 
-  console.log(collections);
   return (
-    <Box className="flex-1 py-2 bg-background-100 flex gap-2">
-      <View className="flex flex-row gap-2 items-center w-full px-6">
-        <Text bold size="md">
-          Map View
-        </Text>
-        {/* TODO: map icon might look nicer? */}
-        <Switch
-          size="sm"
-          value={showMapView}
-          onToggle={handleToggleMapView}
-          trackColor={{
-            true: getColor("primary-500"),
-            false: getColor("background-300"),
-          }}
-          ios_backgroundColor={getColor("background-300")}
-          thumbColor={getColor("secondary-100")}
-        />
-      </View>
+    <Box className="flex-1 bg-background-100">
       {collections && collections.length > 0 ? (
         showMapView ? (
           <MapView style={styles.mapView} initialRegion={initialMapRegion}>
@@ -115,7 +97,11 @@ export default function Collections() {
           <FlatList
             numColumns={2}
             columnWrapperStyle={{ gap: 12 }}
-            contentContainerStyle={{ gap: 12, paddingHorizontal: 24 }}
+            contentContainerStyle={{
+              gap: 12,
+              paddingHorizontal: 24,
+              paddingVertical: 24,
+            }}
             showsVerticalScrollIndicator={false}
             data={gridData}
             keyExtractor={(item, index) =>
@@ -150,6 +136,21 @@ export default function Collections() {
       )}
       <Fab size="lg" onPress={handleAddCollection}>
         <FabIcon as={AddIcon} />
+      </Fab>
+      <Fab
+        className="bg-secondary-500 border-secondary-300 data-[hover=true]:bg-secondary-600 data-[hover=true]:border-secondary-400 data-[active=true]:bg-secondary-700 data-[active=true]:border-secondary-700 data-[focus-visible=true]:web:ring-indicator-info"
+        placement="bottom left"
+        size="lg"
+        onPress={handleToggleMapView}
+      >
+        {/* TODO: replace with better icons once Lucide added; maybe remove label */}
+        <FabIcon
+          className="text-typography-800 data-[hover=true]:text-typography-800 data-[active=true]:text-typography-800"
+          as={showMapView ? MenuIcon : GlobeIcon}
+        />
+        <FabLabel className="text-typography-800 data-[hover=true]:text-typography-800 data-[active=true]:text-typography-800">
+          {showMapView ? "Grid" : "Map"}
+        </FabLabel>
       </Fab>
     </Box>
   );
