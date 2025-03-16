@@ -16,7 +16,7 @@ import {
 import DatePickerInput from "@/src/components/inputs/DatePickerInput";
 import { useForm, Controller } from "react-hook-form";
 import { Box } from "../ui/box";
-import { Button, ButtonText } from "../ui/button";
+import { Button, ButtonGroup, ButtonText } from "../ui/button";
 import { AlertCircleIcon } from "../ui/icon";
 
 export interface FilterMementoFormData {
@@ -45,6 +45,7 @@ export default function FilterMementoSheet({
     control,
     handleSubmit,
     watch,
+    reset,
     formState: { errors },
   } = useForm<FilterMementoFormData>({
     defaultValues,
@@ -59,7 +60,7 @@ export default function FilterMementoSheet({
         <ActionsheetDragIndicatorWrapper>
           <ActionsheetDragIndicator />
         </ActionsheetDragIndicatorWrapper>
-        <Box className="w-full">
+        <Box className="w-full gap-y-4">
           <FormControl size={"lg"}>
             <FormControlLabel>
               <FormControlLabelText>Start Date</FormControlLabelText>
@@ -99,9 +100,9 @@ export default function FilterMementoSheet({
                 },
               }}
             />
-            <FormControlError className="mt-4">
+            <FormControlError>
               <FormControlErrorIcon as={AlertCircleIcon} />
-              <FormControlErrorText className="flex-1">
+              <FormControlErrorText>
                 {errors?.end_date?.message}
               </FormControlErrorText>
             </FormControlError>
