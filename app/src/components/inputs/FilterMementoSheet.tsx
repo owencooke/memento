@@ -106,13 +106,19 @@ export default function FilterMementoSheet({
               </FormControlErrorText>
             </FormControlError>
           </FormControl>
-          <Button
-            className="mt-auto"
-            size={"lg"}
-            onPress={handleSubmit(onSubmit)}
-          >
-            <ButtonText>Apply Filters</ButtonText>
-          </Button>
+          <ButtonGroup>
+            <Button
+              size={"lg"}
+              onPress={() => reset()}
+              action="negative"
+              variant="outline"
+            >
+              <ButtonText className="text-error-500">Clear All</ButtonText>
+            </Button>
+            <Button size={"lg"} onPress={handleSubmit(onSubmit)}>
+              <ButtonText>Apply Filters</ButtonText>
+            </Button>
+          </ButtonGroup>
         </Box>
       </ActionsheetContent>
     </Actionsheet>
