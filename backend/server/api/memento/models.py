@@ -43,6 +43,9 @@ class MementoFilterParams(BaseModel):
     min_long: Optional[float] = Field(default=None)
     max_lat: Optional[float] = Field(default=None)
     max_long: Optional[float] = Field(default=None)
+    text: Optional[str] = Field(
+        default=None, description="Text to search in memento caption and detected text"
+    )
 
     @model_validator(mode="before")
     @classmethod

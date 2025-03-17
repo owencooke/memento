@@ -37,6 +37,8 @@ def get_mementos(
             query.gte("date", filter_query.start_date.isoformat())
         if filter_query.end_date:
             query.lte("date", filter_query.end_date.isoformat())
+        if filter_query.text:
+            query.text_search("memento_searchable_content", filter_query.text)
 
         # Bounding box filtering using the RPC function
         if all(
