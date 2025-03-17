@@ -21,11 +21,13 @@ import FilterMementoSheet, {
   FilterMementoFormData,
 } from "@/src/components/inputs/FilterMementoSheet";
 import { BoundingBox } from "@/src/components/inputs/LocationInput";
+import { debounce } from "lodash";
 
 export default function Mementos() {
   const { session } = useSession();
   const { getColor } = useColors();
   const [refreshing, setRefreshing] = useState(false);
+  const [searchText, setSearchText] = useState("");
   const [showActionsheet, setShowActionsheet] = useState(false);
   const refreshColor = getColor("tertiary-500");
 
@@ -51,6 +53,7 @@ export default function Mementos() {
         min_long: filterParams.bbox?.southwest.lng ?? undefined,
         max_lat: filterParams.bbox?.northeast.lat ?? undefined,
         max_long: filterParams.bbox?.northeast.lng ?? undefined,
+        text: searchText.trim() || undefined,
       },
     }),
   });
@@ -89,6 +92,11 @@ export default function Mementos() {
     refetch();
   };
 
+  const handleTextChange = debounce((text: string) => {
+    setSearchText(text);
+    refetch();
+  }, 300);
+
   return (
     <View className="flex-1 bg-background-100 py-4 px-6">
       <View className="flex-row items-center gap-x-2 py-2">
@@ -96,7 +104,11 @@ export default function Mementos() {
           <InputSlot className="pl-3">
             <InputIcon as={SearchIcon} />
           </InputSlot>
-          <InputField placeholder="Search..." />
+          <InputField
+            placeholder="Search..."
+            value={searchText}
+            onChangeText={handleTextChange}
+          />
         </Input>
         <Button
           size="md"

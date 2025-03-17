@@ -258,6 +258,7 @@ export type GetUsersMementosApiUserUserIdMementoGetData = {
         min_long?: number | null;
         max_lat?: number | null;
         max_long?: number | null;
+        text?: string | null;
     };
     url: '/api/user/{user_id}/memento/';
 };
