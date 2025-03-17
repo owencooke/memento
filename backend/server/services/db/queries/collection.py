@@ -17,6 +17,18 @@ from server.services.db.models.schema_public_latest import (
 )
 
 
+def get_collection(collection_id: int) -> Collection | None:
+    """Fetch a single collection by its ID, if it exists."""
+    response = (
+        supabase.from_("collection")
+        .select("*")
+        .eq("id", collection_id)
+        .single()
+        .execute()
+    )
+    return Collection(**response.data) if response.data is not None else None
+
+
 def get_collections(
     user_id: UUID4,
 ) -> list[CollectionWithMementos]:

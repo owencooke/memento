@@ -19,6 +19,7 @@ from server.services.db.queries.collection import (
     associate_memento,
     create_collection,
     db_delete_collection,
+    get_collection,
     get_collection_image_filenames,
     get_collections,
     update_collection,
@@ -104,9 +105,10 @@ async def delete_collection(
 async def generate_collage(id: int) -> Response:
     """Post route that generates an image representation of a collection as a collage."""
     try:
+        collection = get_collection(id)
         image_filenames = get_collection_image_filenames(id)
         images = download_images(image_filenames)
-        output_image = await create_collage(images)
+        output_image = await create_collage(collection, images)
         output_bytes = await pil_to_png_bytes(output_image)
         return Response(content=output_bytes, media_type="image/png")
     except Exception as e:
