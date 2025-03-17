@@ -5,7 +5,7 @@ from loguru import logger
 
 
 class ImageProcessor:
-    """Handles image processing operations for the collage."""
+    """Handles image processing operations for a collage."""
 
     @staticmethod
     def prepare_image(
@@ -26,9 +26,7 @@ class ImageProcessor:
 
             # Apply mask to create rounded corners
             rounded_img.paste(resized_img, (0, 0), mask)
-
             return rounded_img
-
         except Exception as e:
             logger.error(f"Error preparing image: {str(e)}")
             raise
@@ -46,7 +44,6 @@ class ImageProcessor:
                 angle, expand=True, resample=Image.Resampling.BICUBIC
             )
             return rotated
-
         except Exception as e:
             logger.error(f"Error rotating image: {str(e)}")
             raise
@@ -59,7 +56,7 @@ class ImageProcessor:
         max_attempts: int = 100,
         max_overlap_percent: float = 0.3,
     ) -> Optional[tuple[int, int]]:
-        """Find a suitable position for an image with limited overlap."""
+        """Find a position for a new image with limited overlap with previous used areas."""
         margin, top, canvas_width, bottom = bounds
         img_width, img_height = image_size
 
@@ -99,4 +96,5 @@ class ImageProcessor:
             if not overlap_too_much:
                 return x_offset, y_offset
 
-        return None  # Could not find suitable position
+        # Could not find a suitable position
+        return None
