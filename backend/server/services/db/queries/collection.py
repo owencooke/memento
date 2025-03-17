@@ -80,3 +80,20 @@ def update_associate_memento(updated_has_memento: HasMementoUpdate) -> HasMement
         .execute()
     )
     return HasMemento(**response.data[0])
+
+
+def get_collection_image_filenames(collection_id: int) -> list[str]:
+    """Fetch all image filenames for mementos in a specific collection."""
+    response = (
+        supabase.from_("has_memento")
+        .select("memento:memento_id(images:image(filename))")
+        .eq("collection_id", collection_id)
+        .execute()
+    )
+
+    return [
+        image["filename"]
+        for record in response.data or []
+        for image in record.get("memento", {}).get("images", [])
+        if "filename" in image
+    ]
