@@ -103,7 +103,7 @@ async def delete_collection(
     return deleted_collection
 
 
-@router.post("/{id}")
+@router.post("/{id}/collage")
 async def generate_collage(id: int) -> Response:
     """Post route that generates an image representation of a collection as a collage."""
     try:

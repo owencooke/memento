@@ -13,8 +13,8 @@ class CollageGenerator:
         self,
         canvas_size=(1170, 2532),  # iPhone 13 aspect ratio
         canvas_color=(255, 255, 255),
-        min_image_size=(300, 500),
-        max_image_size=(500, 700),
+        min_image_size=(700, 900),
+        max_image_size=(900, 1500),
         max_images_used=15,
         image_radius=20,
         margin=40,
@@ -51,7 +51,7 @@ class CollageGenerator:
 
         # Create blank white canvas
         collage_width, collage_height = self.canvas_size
-        footer_y = collage_height - self.margin * 2
+        footer_y = collage_height - self.margin * 3
         collage = Image.new("RGB", self.canvas_size, self.canvas_color)
 
         # Load fonts
@@ -90,7 +90,7 @@ class CollageGenerator:
                 collage,
                 metadata_text,
                 metadata_font,
-                footer_y + self.margin,
+                footer_y - self.text_padding * 2,
             )
 
         logger.success("Collage created successfully")
@@ -109,10 +109,10 @@ class CollageGenerator:
 
         # Calculate image area bounds
         bounds = (
-            self.margin,
-            self.margin,
-            self.canvas_size[0] - self.margin,
-            self.canvas_size[1] - self.margin,
+            -self.margin,
+            -self.margin,
+            self.canvas_size[0] + self.margin,
+            self.canvas_size[1] + self.margin,
         )
 
         used_areas = []
@@ -140,7 +140,7 @@ class CollageGenerator:
                     rotated_img.size, used_areas, bounds
                 )
                 if not position:
-                    logger.warn(f"Could not find suitable position for image {idx}")
+                    logger.warning(f"Could not find suitable position for image {idx}")
                     continue
 
                 # Add the processed image to the canvas
