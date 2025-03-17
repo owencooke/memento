@@ -20,6 +20,7 @@ import { ListFilter } from "lucide-react-native";
 import FilterMementoSheet, {
   FilterMementoFormData,
 } from "@/src/components/inputs/FilterMementoSheet";
+import { BoundingBox } from "@/src/components/inputs/LocationInput";
 
 export default function Mementos() {
   const { session } = useSession();
@@ -31,9 +32,11 @@ export default function Mementos() {
   const [filterParams, setFilterParams] = useState<{
     start_date: string | null;
     end_date: string | null;
+    bbox: BoundingBox | null;
   }>({
     start_date: null,
     end_date: null,
+    bbox: null,
   });
 
   const { data: mementos, refetch } = useQuery({
@@ -44,6 +47,10 @@ export default function Mementos() {
       query: {
         start_date: filterParams.start_date ?? undefined,
         end_date: filterParams.end_date ?? undefined,
+        min_lat: filterParams.bbox?.southwest.lat ?? undefined,
+        min_long: filterParams.bbox?.southwest.lng ?? undefined,
+        max_lat: filterParams.bbox?.northeast.lat ?? undefined,
+        max_long: filterParams.bbox?.northeast.lng ?? undefined,
       },
     }),
   });
@@ -75,7 +82,9 @@ export default function Mementos() {
     setFilterParams({
       start_date: data.start_date?.toISOString().split("T")[0] ?? null,
       end_date: data.end_date?.toISOString().split("T")[0] ?? null,
+      bbox: data.location.bbox ?? null,
     });
+    console.log(data.location.bbox);
     setShowActionsheet(false);
     refetch();
   };
