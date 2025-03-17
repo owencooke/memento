@@ -8,14 +8,30 @@ export interface GeoLocation {
   long?: number;
 }
 
+// This is the type that represents the bounding box received from places api
+export interface BoundingBox {
+  northeast: {
+    lat: number;
+    lng: number;
+  };
+  southwest: {
+    lat: number;
+    lng: number;
+  };
+}
+
 interface LocationInputProps {
   value: GeoLocation | null;
-  onChange?: (value: GeoLocation) => void;
+  onChange?: (value: GeoLocation | BoundingBox) => void;
+  queryType?: string;
+  returnBoundingBox?: boolean;
 }
 
 const LocationInput = ({
   value = { text: "", lat: 0, long: 0 },
   onChange = (_) => {},
+  queryType = "(cities)",
+  returnBoundingBox = false,
 }: LocationInputProps) => {
   const { getColor } = useColors();
   const autocompleteRef = useRef<any>(null);
@@ -46,8 +62,14 @@ const LocationInput = ({
         const lat = details?.geometry.location.lat;
         const long = details?.geometry.location.lng;
         const text = data.description || "";
+        const bounds = details?.geometry.viewport; // This is how the bounding box is accessed
         prevTextRef.current = text;
-        onChange({ text, lat, long });
+
+        if (returnBoundingBox && bounds) {
+          onChange(bounds);
+        } else {
+          onChange({ text, lat, long });
+        }
       }}
       textInputProps={{
         onChangeText: (text) => {
@@ -58,7 +80,7 @@ const LocationInput = ({
         },
       }}
       query={{
-        types: "(cities)",
+        types: queryType,
         key: process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY,
         language: "en",
       }}
