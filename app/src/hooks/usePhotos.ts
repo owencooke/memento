@@ -12,6 +12,7 @@ import { useMutation } from "@tanstack/react-query";
 import { removeImageBackgroundApiImageRemoveBackgroundPostMutation } from "../api-client/generated/@tanstack/react-query.gen";
 import { formDataBodySerializer } from "../api-client/formData";
 import { convertBlobToBase64 } from "../libs/blob";
+import { uniqueId } from "lodash";
 
 export type DeviceSource = "picker" | "camera";
 export type Photo = Omit<
@@ -29,13 +30,20 @@ const getPhotosFromDevice = async (source: DeviceSource): Promise<Photo[]> => {
 
   const result = await pickFunction({
     mediaTypes: ["images"],
-    quality: 1,
+    quality: 0.25,
     exif: true,
     allowsMultipleSelection: source === "picker",
+    base64: false,
   });
 
   if (result.canceled) return [];
-  return result.assets;
+  return result.assets.map((photo) => ({
+    ...photo,
+    // Image uploads to server require a filename to pass validation
+    fileName: photo.fileName ?? "photo.jpg",
+    // Captured images may not have id (required for internal state management)
+    assetId: photo.assetId ?? uniqueId("photo_"),
+  }));
 };
 
 interface UsePhotosProps {
@@ -127,6 +135,7 @@ export default function usePhotos({ initialPhotos = [] }: UsePhotosProps) {
       prev.filter((p) => p.assetId !== processedPhoto.assetId),
     );
   };
+  console.log(photos.map((photo) => photo.assetId));
 
   return {
     hasPermission,
