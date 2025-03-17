@@ -74,7 +74,7 @@ export default function EditMemento() {
   }, [memento]);
 
   const handleRedirect = () =>
-    router.dismissTo(`/(app)/(screens)/(memento)/${memento.id}`);
+    router.dismissTo(`/(app)/(screens)/memento/${memento.id}`);
 
   // PUT Edit Memento Form
   const onSubmit = async (form: MementoFormData) => {

@@ -39,11 +39,11 @@ export default function Mementos() {
   };
 
   const handleAddMemento = () => {
-    router.push("/(app)/(screens)/(memento)/create");
+    router.push("/(app)/(screens)/memento/create");
   };
 
   const handleViewMemento = (id: number) => {
-    router.push(`/(app)/(screens)/(memento)/${id}`);
+    router.push(`/(app)/(screens)/memento/${id}`);
   };
 
   return (
