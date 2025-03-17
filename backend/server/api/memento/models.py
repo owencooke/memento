@@ -1,4 +1,5 @@
 import datetime
+import re
 from typing import Any, Optional
 
 from pydantic import BaseModel, Field, field_validator, model_validator
@@ -46,6 +47,24 @@ class MementoFilterParams(BaseModel):
     text: Optional[str] = Field(
         default=None, description="Text to search in memento caption and detected text"
     )
+
+    @field_validator("text")
+    @classmethod
+    def format_text_for_tsquery(cls, v: Optional[str]) -> Optional[str]:
+        """Format the text for tsquery by joining words with &"""
+        if not v:
+            return None
+
+        # remove special characters and extra spaces
+        cleaned_text = re.sub(r"[^\w\s]", "", v).strip()
+        # replace multiple spaces with single space
+        cleaned_text = re.sub(r"\s+", " ", cleaned_text)
+
+        if " " in cleaned_text:
+            words = cleaned_text.split()
+            return " & ".join(words)
+
+        return cleaned_text
 
     @model_validator(mode="before")
     @classmethod
