@@ -101,54 +101,67 @@ class CollageGenerator:
         collage: Image.Image,
         images: list[Image.Image],
     ) -> None:
-        """Render images in a scattered, overlapping arrangement."""
+        """Render images in a grid-based scattered arrangement to ensure canvas coverage."""
 
         # Limit number of images to avoid excessive overlap
         images_to_use = images[: min(self.max_images_used, len(images))]
         logger.info(f"Adding {len(images_to_use)} images to the canvas")
+        cell_width, cell_height, grid_cells = self._initialize_grid(len(images_to_use))
 
-        # Calculate image area bounds
-        bounds = (
-            -self.margin,
-            -self.margin,
-            self.canvas_size[0] + self.margin,
-            self.canvas_size[1] + self.margin,
-        )
-
+        # Ensure we have at least one image per grid cell if possible
         used_areas = []
         for idx, image in enumerate(images_to_use):
+            if not grid_cells:
+                break
+
             try:
-                # Randomly determine image size within constraints
-                img_width = random.randint(
-                    self.min_image_size[0], self.max_image_size[0]
-                )
-                img_height = random.randint(
-                    self.min_image_size[1], self.max_image_size[1]
-                )
+                # Get a grid cell position
+                row, col = grid_cells.pop(0)
+
+                # Calculate base position for the cell
+                base_x = col * cell_width
+                base_y = row * cell_height
+
+                # Calculate cell coverage (how much of the cell should the image cover)
+                # coverage = random.uniform(
+                #     1.0, 1.5
+                # )  # Between 100% and 150% of cell size
+                coverage = 1.5
+
+                # Determine image dimensions based on cell size and desired coverage
+                img_width = int(cell_width * coverage)
+                img_height = int(cell_height * coverage)
 
                 # Prepare the image (resize and round corners)
                 rounded_img = self.image_processor.prepare_image(
                     image, (img_width, img_height), self.image_radius
                 )
 
-                # Apply random rotation (-15 to 15 degrees)
+                # Apply random rotation
                 rotation = random.randint(-15, 15)
                 rotated_img = self.image_processor.rotate_image(rounded_img, rotation)
 
-                # Find a non-taken position on canvas
-                position = self.image_processor.find_placement_position(
-                    rotated_img.size, used_areas, bounds
-                )
-                if not position:
-                    logger.warning(f"Could not find suitable position for image {idx}")
-                    continue
+                # Calculate final position with jitter
+                # jitter_x = random.randint(-cell_width // 4, cell_width // 4)
+                # jitter_y = random.randint(-cell_height // 4, cell_height // 4)
+                # x_offset = base_x + jitter_x
+                # y_offset = base_y + jitter_y
+                # x_offset = base_x
+                # y_offset = base_y
+                rotation_shift_x = int(
+                    (rotation / 30) * cell_width * 0.3
+                )  # Scale the shift by rotation angle
+                rotation_shift_y = int((rotation / 30) * cell_height * 0.3)
+
+                # Apply the rotation-based compensation
+                x_offset = base_x - rotation_shift_x
+                y_offset = base_y - rotation_shift_y
 
                 # Add the processed image to the canvas
-                x_offset, y_offset = position
                 collage.paste(rotated_img, (x_offset, y_offset), rotated_img)
 
                 logger.info(
-                    f"Placed image {idx} at position ({x_offset}, {y_offset}) with rotation {rotation}°"
+                    f"Placed image {idx} at cell ({row}, {col}) position ({x_offset}, {y_offset}) with rotation {rotation}°"
                 )
 
                 # Store the positions of taken by images to avoid placing again
@@ -174,3 +187,34 @@ class CollageGenerator:
         if len(metadata_parts) == 1:
             return metadata_parts[0]
         return " • ".join(metadata_parts) if metadata_parts else ""
+
+    def _initialize_grid(
+        self, num_images: int
+    ) -> tuple[int, int, list[tuple[int, int]]]:
+        """Initialize a grid for image placement based on number of images."""
+        grid_cols = 2
+        grid_rows = 2
+
+        # Adjust grid dimensions based on image count
+        if num_images > 4:
+            grid_cols = min(4, max(2, int(num_images**0.5)))
+            grid_rows = min(4, max(2, (num_images + grid_cols - 1) // grid_cols))
+
+        logger.info(f"Using grid of {grid_cols}x{grid_rows} for {num_images} images")
+
+        # Calculate cell dimensions with extended canvas area
+        overflow = self.margin * 2
+        cell_width = (self.canvas_size[0] + overflow) // grid_cols
+        cell_height = (self.canvas_size[1] + overflow) // grid_rows
+
+        # Create a list of all grid cells with offset starting position
+        grid_cells = []
+        for row in range(grid_rows):
+            for col in range(grid_cols):
+                # Shift the starting position left/up by margin amount
+                grid_cells.append((row, col))
+
+        # Shuffle the grid cells for random placement
+        random.shuffle(grid_cells)
+
+        return cell_width, cell_height, grid_cells
