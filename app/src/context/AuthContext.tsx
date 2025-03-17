@@ -19,7 +19,8 @@ const AUTH_REDIRECT_URI = AuthSession.makeRedirectUri({
   scheme: "memento",
   path: "auth/redirect",
 });
-const AUTH_URI = `https://epqxqhjetxflplibxhwp.supabase.co/auth/v1/authorize?provider=google&redirect_to=${encodeURIComponent(AUTH_REDIRECT_URI)}`;
+const AUTH_URI = `${process.env.EXPO_PUBLIC_SUPABASE_URL}/
+  auth/v1/authorize?provider=google&redirect_to=${encodeURIComponent(AUTH_REDIRECT_URI)}`;
 
 export interface UserSession {
   session: Session | null;
