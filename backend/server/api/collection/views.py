@@ -24,7 +24,9 @@ from server.services.db.queries.collection import (
     get_collections,
     update_collection,
 )
-from server.services.process_image.collage import create_collage
+from server.services.process_image.collage.generator import (
+    CollageGenerator,
+)
 from server.services.process_image.converters import pil_to_png_bytes
 from server.services.storage.image import download_images
 
@@ -108,7 +110,10 @@ async def generate_collage(id: int) -> Response:
         collection = get_collection(id)
         image_filenames = get_collection_image_filenames(id)
         images = download_images(image_filenames)
-        output_image = await create_collage(collection, images)
+        output_image = await CollageGenerator().create_collage(
+            collection,
+            images,
+        )
         output_bytes = await pil_to_png_bytes(output_image)
         return Response(content=output_bytes, media_type="image/png")
     except Exception as e:
