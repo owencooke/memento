@@ -11,13 +11,13 @@ class CollageGenerator:
 
     def __init__(
         self,
-        canvas_size=(1170, 2532),  # iPhone 13 aspect ratio / reasonable resolution
+        canvas_size=(1170, 2532),  # iPhone 13 aspect ratio
         canvas_color=(255, 255, 255),
-        min_image_size=(300, 300),
-        max_image_size=(500, 500),
+        min_image_size=(300, 500),
+        max_image_size=(500, 700),
         max_images_used=15,
+        image_radius=20,
         margin=40,
-        corner_radius=15,
         text_padding=10,
         text_color=(80, 80, 80),
         text_bg_color=(0, 255, 255, 180),
@@ -36,7 +36,7 @@ class CollageGenerator:
         self.min_image_size = min_image_size
         self.max_image_size = max_image_size
         self.margin = margin
-        self.corner_radius = corner_radius
+        self.image_radius = image_radius
         self.text_padding = text_padding
         self.text_color = text_color
         self.text_bg_color = text_bg_color
@@ -128,7 +128,7 @@ class CollageGenerator:
 
                 # Prepare the image (resize and round corners)
                 rounded_img = self.image_processor.prepare_image(
-                    image, (img_width, img_height), self.corner_radius
+                    image, (img_width, img_height), self.image_radius
                 )
 
                 # Apply random rotation (-15 to 15 degrees)
@@ -140,7 +140,8 @@ class CollageGenerator:
                     rotated_img.size, used_areas, bounds
                 )
                 if not position:
-                    raise Exception(f"Could not find suitable position for image {idx}")
+                    logger.warn(f"Could not find suitable position for image {idx}")
+                    continue
 
                 # Add the processed image to the canvas
                 x_offset, y_offset = position

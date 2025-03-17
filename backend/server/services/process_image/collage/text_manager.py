@@ -70,7 +70,7 @@ class TextManager:
         return bg_bottom + self.margin
 
     def get_text_dimensions(
-        draw: ImageDraw.Draw, text: str, font: ImageFont.FreeTypeFont
+        self, draw: ImageDraw.Draw, text: str, font: ImageFont.FreeTypeFont
     ) -> tuple[int, int]:
         """Calculate text dimensions using textbbox for accurate sizing."""
         bbox = draw.textbbox((0, 0), text, font=font)
