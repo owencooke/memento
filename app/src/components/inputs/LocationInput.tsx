@@ -20,9 +20,14 @@ export interface BoundingBox {
   };
 }
 
+export interface BoundingBoxLocation {
+  text: string;
+  bbox?: BoundingBox;
+}
+
 interface LocationInputProps {
   value: GeoLocation | null;
-  onChange?: (value: GeoLocation | BoundingBox) => void;
+  onChange?: (value: GeoLocation | BoundingBoxLocation) => void;
   queryType?: string;
   returnBoundingBox?: boolean;
 }
@@ -62,11 +67,11 @@ const LocationInput = ({
         const lat = details?.geometry.location.lat;
         const long = details?.geometry.location.lng;
         const text = data.description || "";
-        const bounds = details?.geometry.viewport; // This is how the bounding box is accessed
+        const bbox = details?.geometry.viewport; // This is how the bounding box is accessed
         prevTextRef.current = text;
 
-        if (returnBoundingBox && bounds) {
-          onChange(bounds);
+        if (returnBoundingBox && bbox) {
+          onChange({ text, bbox });
         } else {
           onChange({ text, lat, long });
         }

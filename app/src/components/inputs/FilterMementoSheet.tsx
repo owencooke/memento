@@ -19,13 +19,16 @@ import { useForm, Controller } from "react-hook-form";
 import { Box } from "../ui/box";
 import { Button, ButtonGroup, ButtonText } from "../ui/button";
 import { AlertCircleIcon } from "../ui/icon";
-import LocationInput, { GeoLocation } from "./LocationInput";
+import LocationInput, {
+  BoundingBoxLocation,
+  GeoLocation,
+} from "./LocationInput";
 import { useCallback } from "react";
 
 export interface FilterMementoFormData {
   start_date: Date | null;
   end_date: Date | null;
-  location: GeoLocation;
+  location: BoundingBoxLocation;
 }
 
 interface FilterMementoSheetProps {
@@ -62,14 +65,13 @@ export default function FilterMementoSheet({
   // Prevent re-rendering location input when Geolocation changes
   const locationValue = watch("location");
   const handleLocationChange = useCallback(
-    (location: GeoLocation) => {
+    (value: BoundingBoxLocation) => {
       const hasChanged =
-        locationValue.text !== location.text ||
-        locationValue.lat !== location.lat ||
-        locationValue.long !== location.long;
+        locationValue.text !== value.text ||
+        JSON.stringify(locationValue.bbox) !== JSON.stringify(value.bbox);
 
       if (hasChanged) {
-        setValue("location", location);
+        setValue("location", value);
       }
     },
     [locationValue, setValue],
@@ -146,8 +148,10 @@ export default function FilterMementoSheet({
                     <LocationInput
                       value={field.value}
                       onChange={(value) =>
-                        handleLocationChange(value as GeoLocation)
+                        handleLocationChange(value as BoundingBoxLocation)
                       }
+                      returnBoundingBox={true}
+                      queryType="(regions)"
                     />
                   )}
                 />
