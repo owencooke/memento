@@ -135,7 +135,6 @@ export default function usePhotos({ initialPhotos = [] }: UsePhotosProps) {
       prev.filter((p) => p.assetId !== processedPhoto.assetId),
     );
   };
-  console.log(photos.map((photo) => photo.assetId));
 
   return {
     hasPermission,
