@@ -1,249 +1,330 @@
 import os
 import random
 from datetime import datetime
-from PIL import Image, ImageDraw, ImageFont, ImageOps, ImageFilter
+from typing import Optional
+from PIL import Image, ImageDraw, ImageFont, ImageOps
 from loguru import logger
 from server.config.settings import ROOT_DIR
 from server.services.db.models.schema_public_latest import Collection
 
 
-def load_font(font_name: str, size: int):
-    """Attempts to load a font; falls back to default with detailed logging."""
-    font_path = os.path.join(ROOT_DIR, "assets/fonts", font_name)
-    logger.info(f"Attempting to load font: {font_name} from {font_path}")
+class FontManager:
+    """Manages font loading and text operations."""
 
-    try:
-        if os.path.exists(font_path):
-            font = ImageFont.truetype(font_path, size)
-            logger.info(f"Successfully loaded font: {font_name} at size {size}")
-            return font
-        else:
-            logger.warning(
-                f"Font file not found at {font_path}, falling back to default"
-            )
-            default_font = ImageFont.load_default()
-            return default_font
-    except Exception as e:
-        logger.error(f"Error loading font {font_name}: {str(e)}")
+    @staticmethod
+    def load_font(font_name: str, size: int) -> ImageFont.FreeTypeFont:
+        """Attempts to load a font; falls back to default with detailed logging."""
+        font_path = os.path.join(ROOT_DIR, "assets/fonts", font_name)
+        try:
+            if os.path.exists(font_path):
+                font = ImageFont.truetype(font_path, size)
+                return font
+            else:
+                logger.warning(
+                    f"Font file not found at {font_path}, falling back to default"
+                )
+        except Exception as e:
+            logger.error(f"Error loading font {font_name}: {str(e)}")
         return ImageFont.load_default()
 
+    @staticmethod
+    def get_text_dimensions(
+        draw: ImageDraw.Draw, text: str, font: ImageFont.FreeTypeFont
+    ) -> tuple[int, int]:
+        """Calculate text dimensions using textbbox for accurate sizing."""
+        bbox = draw.textbbox((0, 0), text, font=font)
+        width = bbox[2] - bbox[0]
+        height = bbox[3] - bbox[1]
+        return width, height
 
-async def create_collage(
-    collection: Collection,
-    images: list[Image.Image],
-    canvas_size=(1000, 800),  # Larger fixed canvas for collage
-    min_image_size=(150, 150),
-    max_image_size=(300, 300),
-    margin=20,
-    title_height=80,
-    corner_radius=10,
-) -> Image.Image:
-    """Creates an artistic collage with scattered/rotated/overlapping images and proper text."""
-    logger.info(f"Creating collage for collection: {collection.title}")
-    logger.info(f"Collection details: {collection.__dict__}")
-    logger.info(f"Number of images: {len(images)}")
+    @staticmethod
+    def center_text(
+        draw: ImageDraw.Draw,
+        text: str,
+        font: ImageFont.FreeTypeFont,
+        y_position: int,
+        canvas_width: int,
+        fill_color: tuple[int, int, int],
+    ) -> None:
+        """Center text horizontally on the canvas at the specified y-position."""
+        text_width, _ = FontManager.get_text_dimensions(draw, text, font)
+        x_position = (canvas_width - text_width) // 2
+        draw.text((x_position, y_position), text, fill=fill_color, font=font)
+        return y_position + FontManager.get_text_dimensions(draw, text, font)[1]
 
-    # Create canvas with fixed dimensions
-    collage_width, collage_height = canvas_size
 
-    # Calculate areas
-    text_area_height = title_height + margin
-    images_area_height = collage_height - text_area_height - (margin * 3)
+class ImageProcessor:
+    """Handles image processing operations for the collage."""
 
-    if collection.caption:
-        caption_height = 60
-        images_area_height -= caption_height + margin
-    else:
-        caption_height = 0
-
-    # Create blank white collage
-    collage = Image.new("RGB", (collage_width, collage_height), (255, 255, 255))
-    draw = ImageDraw.Draw(collage)
-
-    # Load fonts with extensive logging
-    logger.info("Loading fonts...")
-    title_font = load_font("Pacifico-Regular.ttf", 40)
-    caption_font = load_font("Quicksand-Regular.ttf", 24)
-    metadata_font = load_font("Quicksand-Regular.ttf", 18)
-
-    # Get actual font sizes using getbbox for better positioning
-    logger.info("Calculating text dimensions...")
-    title_bbox = draw.textbbox((0, 0), collection.title, font=title_font)
-    title_width = title_bbox[2] - title_bbox[0]
-    title_height = title_bbox[3] - title_bbox[1]
-
-    # Center title horizontally
-    title_x = (collage_width - title_width) // 2
-    title_y = margin
-
-    # Draw title
-    logger.info(f"Drawing title at position ({title_x}, {title_y})")
-    draw.text((title_x, title_y), collection.title, fill=(50, 50, 50), font=title_font)
-
-    # Calculate image area boundaries
-    image_area_top = title_y + title_height + margin
-    image_area_bottom = (
-        collage_height - (caption_height + margin * 2)
-        if collection.caption
-        else collage_height - margin
-    )
-
-    # Randomize and place images on canvas
-    logger.info("Placing images on canvas with artistic layout...")
-    used_areas = []
-    max_attempts = 100
-
-    # Limit to a reasonable number of images to avoid excessive overlap
-    images_to_use = images[: min(15, len(images))]
-    logger.info(f"Using {len(images_to_use)} images for the collage")
-
-    for idx, image in enumerate(images_to_use):
+    @staticmethod
+    def prepare_image(
+        image: Image.Image, target_size: tuple[int, int], corner_radius: int
+    ) -> Image.Image:
+        """Resize image and apply rounded corners."""
         try:
-            # Randomly determine image size within constraints
-            img_width = random.randint(min_image_size[0], max_image_size[0])
-            img_height = random.randint(min_image_size[1], max_image_size[1])
-
-            # Resize the image
-            resized_img = ImageOps.fit(
-                image, (img_width, img_height), Image.Resampling.LANCZOS
-            )
-            logger.info(f"Resized image {idx} to ({img_width}, {img_height})")
+            # Resize the image maintaining aspect ratio
+            resized_img = ImageOps.fit(image, target_size, Image.Resampling.LANCZOS)
 
             # Apply rounded corners
-            rounded_mask = Image.new("L", (img_width, img_height), 0)
-            mask_draw = ImageDraw.Draw(rounded_mask)
+            rounded_img = Image.new("RGBA", target_size, (0, 0, 0, 0))
+            mask = Image.new("L", target_size, 0)
+            mask_draw = ImageDraw.Draw(mask)
             mask_draw.rounded_rectangle(
-                (0, 0, img_width, img_height), corner_radius, fill=255
+                (0, 0, target_size[0], target_size[1]), corner_radius, fill=255
             )
 
-            # Add a slight border/shadow effect
-            bordered_img = Image.new("RGBA", (img_width, img_height), (0, 0, 0, 0))
-            bordered_img.paste(resized_img, (0, 0), rounded_mask)
+            # Apply mask to create rounded corners
+            rounded_img.paste(resized_img, (0, 0), mask)
 
-            # Apply random rotation (-20 to 20 degrees)
-            rotation = random.randint(-20, 20)
-            rotated_img = bordered_img.rotate(
-                rotation, expand=True, resample=Image.Resampling.BICUBIC
+            return rounded_img
+
+        except Exception as e:
+            logger.error(f"Error preparing image: {str(e)}")
+            raise
+
+    @staticmethod
+    def rotate_image(image: Image.Image, angle: int) -> Image.Image:
+        """Rotate an image by the specified angle."""
+        try:
+            # Use RGBA mode to preserve transparency during rotation
+            if image.mode != "RGBA":
+                image = image.convert("RGBA")
+
+            # Rotate the image
+            rotated = image.rotate(
+                angle, expand=True, resample=Image.Resampling.BICUBIC
+            )
+            return rotated
+
+        except Exception as e:
+            logger.error(f"Error rotating image: {str(e)}")
+            raise
+
+    @staticmethod
+    def find_placement_position(
+        image_size: tuple[int, int],
+        used_areas: list[tuple[int, int, int, int]],
+        bounds: tuple[int, int, int, int],
+        max_attempts: int = 100,
+        max_overlap_percent: float = 0.3,
+    ) -> Optional[tuple[int, int]]:
+        """Find a suitable position for an image with limited overlap."""
+        margin, top, canvas_width, bottom = bounds
+        img_width, img_height = image_size
+
+        for _ in range(max_attempts):
+            x_offset = random.randint(margin, canvas_width - img_width - margin)
+            y_offset = random.randint(top, bottom - img_height)
+
+            # Check overlap with other images
+            overlap_too_much = False
+            current_rect = (
+                x_offset,
+                y_offset,
+                x_offset + img_width,
+                y_offset + img_height,
             )
 
-            # Find a suitable position (with some overlap allowed)
-            placed = False
-            attempts = 0
+            for used_rect in used_areas:
+                # Calculate overlap area
+                overlap_x = max(
+                    0,
+                    min(current_rect[2], used_rect[2])
+                    - max(current_rect[0], used_rect[0]),
+                )
+                overlap_y = max(
+                    0,
+                    min(current_rect[3], used_rect[3])
+                    - max(current_rect[1], used_rect[1]),
+                )
+                overlap_area = overlap_x * overlap_y
+                current_area = img_width * img_height
 
-            while not placed and attempts < max_attempts:
-                x_offset = random.randint(margin, collage_width - img_width - margin)
-                y_offset = random.randint(
-                    image_area_top, image_area_bottom - img_height
+                # If overlap is more than the threshold, try another position
+                if overlap_area > (current_area * max_overlap_percent):
+                    overlap_too_much = True
+                    break
+
+            if not overlap_too_much:
+                return x_offset, y_offset
+
+        return None  # Could not find suitable position
+
+
+class CollageGenerator:
+    """Main class for generating artistic collages."""
+
+    def __init__(self):
+        self.font_manager = FontManager()
+        self.image_processor = ImageProcessor()
+
+    async def create_collage(
+        self,
+        collection: Collection,
+        images: list[Image.Image],
+        # Phone-optimized dimensions (iPhone 13 aspect ratio at reasonable resolution)
+        canvas_size: tuple[int, int] = (1170, 2532),
+        min_image_size: tuple[int, int] = (300, 300),
+        max_image_size: tuple[int, int] = (500, 500),
+        margin: int = 40,
+        title_height: int = 100,
+        corner_radius: int = 15,
+    ) -> Image.Image:
+        """Creates an artistic collage optimized for mobile phone display."""
+        logger.info(f"Creating collage for collection: {collection.title}")
+        logger.debug(f"Number of images: {len(images)}")
+
+        # Create canvas with phone-optimized dimensions
+        collage_width, collage_height = canvas_size
+
+        # Create blank white collage
+        collage = Image.new("RGB", canvas_size, (255, 255, 255))
+        draw = ImageDraw.Draw(collage)
+
+        # Load fonts
+        logger.info("Loading fonts...")
+        title_font = self.font_manager.load_font("Pacifico-Regular.ttf", 60)
+        caption_font = self.font_manager.load_font("Quicksand-Regular.ttf", 36)
+        metadata_font = self.font_manager.load_font("Quicksand-Regular.ttf", 24)
+
+        # Draw title
+        logger.debug("Drawing title")
+        next_y = self.font_manager.center_text(
+            draw, collection.title, title_font, margin, collage_width, (50, 50, 50)
+        )
+
+        # Calculate image area boundaries
+        image_area_top = next_y + margin
+        image_area_bottom = collage_height - margin * 3
+
+        if collection.caption or collection.location or collection.date:
+            image_area_bottom -= 100  # Reserve space for caption and metadata
+
+        # Render images section
+        used_areas = self._render_images_section(
+            collage,
+            images,
+            (margin, image_area_top, collage_width, image_area_bottom),
+            min_image_size,
+            max_image_size,
+            corner_radius,
+        )
+
+        # Render caption if available
+        next_y = image_area_bottom + margin
+        if collection.caption:
+            logger.debug("Drawing caption")
+            next_y = (
+                self.font_manager.center_text(
+                    draw,
+                    collection.caption,
+                    caption_font,
+                    next_y,
+                    collage_width,
+                    (50, 50, 50),
+                )
+                + margin
+            )
+
+        # Render metadata (location & date)
+        metadata_text = self._format_metadata(collection)
+        if metadata_text:
+            logger.debug("Drawing metadata")
+            self.font_manager.center_text(
+                draw, metadata_text, metadata_font, next_y, collage_width, (80, 80, 80)
+            )
+
+        logger.success("Collage created successfully")
+        return collage
+
+    def _render_images_section(
+        self,
+        collage: Image.Image,
+        images: list[Image.Image],
+        bounds: tuple[int, int, int, int],
+        min_image_size: tuple[int, int],
+        max_image_size: tuple[int, int],
+        corner_radius: int,
+    ) -> list[tuple[int, int, int, int]]:
+        """Render images in a scattered, overlapping arrangement."""
+        logger.info("Placing images on canvas with artistic layout...")
+        draw = ImageDraw.Draw(collage)
+        used_areas = []
+
+        # Limit to a reasonable number of images to avoid excessive overlap
+        images_to_use = images[: min(15, len(images))]
+        logger.info(f"Using {len(images_to_use)} images for the collage")
+
+        for idx, image in enumerate(images_to_use):
+            try:
+                # Randomly determine image size within constraints
+                img_width = random.randint(min_image_size[0], max_image_size[0])
+                img_height = random.randint(min_image_size[1], max_image_size[1])
+
+                # Prepare the image (resize and round corners)
+                rounded_img = self.image_processor.prepare_image(
+                    image, (img_width, img_height), corner_radius
                 )
 
-                # Check overlap with other images - allow some overlap but not too much
-                overlap_too_much = False
-                current_rect = (
-                    x_offset,
-                    y_offset,
-                    x_offset + img_width,
-                    y_offset + img_height,
+                # Apply random rotation (-15 to 15 degrees)
+                rotation = random.randint(-15, 15)
+                rotated_img = self.image_processor.rotate_image(rounded_img, rotation)
+
+                # Find a suitable position
+                position = self.image_processor.find_placement_position(
+                    rotated_img.size, used_areas, bounds
                 )
 
-                for used_rect in used_areas:
-                    # Calculate overlap area
-                    overlap_x = max(
-                        0,
-                        min(current_rect[2], used_rect[2])
-                        - max(current_rect[0], used_rect[0]),
+                if position:
+                    x_offset, y_offset = position
+
+                    # Record the position of the actual image, not the rotated bounds
+                    # This prevents the "grey square" problem
+                    img_rect = (
+                        x_offset,
+                        y_offset,
+                        x_offset + rotated_img.width,
+                        y_offset + rotated_img.height,
                     )
-                    overlap_y = max(
-                        0,
-                        min(current_rect[3], used_rect[3])
-                        - max(current_rect[1], used_rect[1]),
-                    )
-                    overlap_area = overlap_x * overlap_y
-                    current_area = img_width * img_height
+                    used_areas.append(img_rect)
 
-                    # If overlap is more than 40% of the image area, try another position
-                    if overlap_area > (current_area * 0.4):
-                        overlap_too_much = True
-                        break
-
-                if not overlap_too_much:
-                    placed = True
-                    used_areas.append(current_rect)
-
-                    # Add a subtle drop shadow
-                    shadow_offset = 3
-                    shadow = Image.new("RGBA", rotated_img.size, (0, 0, 0, 0))
-                    shadow_draw = ImageDraw.Draw(shadow)
-                    shadow_draw.rectangle(
-                        (
-                            shadow_offset,
-                            shadow_offset,
-                            rotated_img.width,
-                            rotated_img.height,
-                        ),
-                        fill=(20, 20, 20, 100),
-                    )
-                    shadow = shadow.filter(ImageFilter.GaussianBlur(5))
-
-                    # Paste shadow first, then image
-                    collage.paste(shadow, (x_offset, y_offset), shadow)
+                    # Paste the rotated image with transparency
                     collage.paste(rotated_img, (x_offset, y_offset), rotated_img)
 
-                    logger.info(
+                    logger.debug(
                         f"Placed image {idx} at position ({x_offset}, {y_offset}) with rotation {rotation}°"
                     )
                 else:
-                    attempts += 1
+                    logger.warning(f"Could not find suitable position for image {idx}")
 
-            if not placed:
-                logger.warning(
-                    f"Could not find suitable position for image {idx} after {max_attempts} attempts"
-                )
+            except Exception as e:
+                logger.error(f"Error processing image {idx}: {str(e)}")
+                continue  # Skip problematic images
 
-        except Exception as e:
-            logger.error(f"Error processing image {idx}: {str(e)}")
-            continue  # Skip problematic images
+        return used_areas
 
-    # Add caption if available - centered below images
-    if collection.caption:
-        caption_bbox = draw.textbbox((0, 0), collection.caption, font=caption_font)
-        caption_width = caption_bbox[2] - caption_bbox[0]
-        caption_x = (collage_width - caption_width) // 2
-        caption_y = image_area_bottom + margin
+    def _format_metadata(self, collection: Collection) -> str:
+        """Format metadata text without emojis."""
+        metadata_parts = []
 
-        logger.info(f"Drawing caption at position ({caption_x}, {caption_y})")
-        draw.text(
-            (caption_x, caption_y),
-            collection.caption,
-            fill=(50, 50, 50),
-            font=caption_font,
-        )
+        if collection.location:
+            metadata_parts.append(f"{collection.location}")
 
-    # Add metadata (location & date) at the bottom
-    metadata_parts = []
-    if collection.location:
-        metadata_parts.append(f"📍 {collection.location}")
-    if collection.date:
-        try:
-            date = datetime.fromisoformat(collection.date)
-            metadata_parts.append(f"📅 {date.strftime('%B %d, %Y')}")
-        except Exception as e:
-            logger.warning(f"Error formatting date: {str(e)}")
-            metadata_parts.append(f"📅 {collection.date}")
+        if collection.date:
+            try:
+                metadata_parts.append(f"{collection.date.strftime('%B %d, %Y')}")
+            except Exception as e:
+                logger.warning(f"Error formatting date: {str(e)}")
+                metadata_parts.append(f"{collection.date}")
+        if len(metadata_parts) == 1:
+            return metadata_parts[0]
+        return " • ".join(metadata_parts) if metadata_parts else ""
 
-    if metadata_parts:
-        metadata_text = " • ".join(metadata_parts)
-        metadata_bbox = draw.textbbox((0, 0), metadata_text, font=metadata_font)
-        metadata_width = metadata_bbox[2] - metadata_bbox[0]
-        metadata_x = (collage_width - metadata_width) // 2
-        metadata_y = collage_height - margin - metadata_bbox[3]
 
-        logger.info(f"Drawing metadata at position ({metadata_x}, {metadata_y})")
-        draw.text(
-            (metadata_x, metadata_y),
-            metadata_text,
-            fill=(80, 80, 80),
-            font=metadata_font,
-        )
-
-    logger.info("Collage created successfully")
-    return collage
+# Main function to use the CollageGenerator
+async def create_collage(
+    collection: Collection, images: list[Image.Image], **kwargs
+) -> Image.Image:
+    """Creates a collage from images with title, caption, location, and date."""
+    generator = CollageGenerator()
+    return await generator.create_collage(collection, images, **kwargs)
