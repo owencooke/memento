@@ -4,6 +4,7 @@ import {
   ActionsheetContent,
   ActionsheetDragIndicatorWrapper,
   ActionsheetDragIndicator,
+  ActionsheetFlatList,
 } from "../ui/actionsheet";
 import {
   FormControl,
@@ -18,10 +19,13 @@ import { useForm, Controller } from "react-hook-form";
 import { Box } from "../ui/box";
 import { Button, ButtonGroup, ButtonText } from "../ui/button";
 import { AlertCircleIcon } from "../ui/icon";
+import LocationInput, { GeoLocation } from "./LocationInput";
+import { useCallback } from "react";
 
 export interface FilterMementoFormData {
   start_date: Date | null;
   end_date: Date | null;
+  location: GeoLocation;
 }
 
 interface FilterMementoSheetProps {
@@ -40,10 +44,12 @@ export default function FilterMementoSheet({
   const defaultValues: FilterMementoFormData = {
     start_date: null,
     end_date: null,
+    location: { text: "" },
   };
   const {
     control,
     handleSubmit,
+    setValue,
     watch,
     reset,
     formState: { errors },
@@ -53,6 +59,22 @@ export default function FilterMementoSheet({
 
   const startDate = watch("start_date");
 
+  // Prevent re-rendering location input when Geolocation changes
+  const locationValue = watch("location");
+  const handleLocationChange = useCallback(
+    (location: GeoLocation) => {
+      const hasChanged =
+        locationValue.text !== location.text ||
+        locationValue.lat !== location.lat ||
+        locationValue.long !== location.long;
+
+      if (hasChanged) {
+        setValue("location", location);
+      }
+    },
+    [locationValue, setValue],
+  );
+
   return (
     <Actionsheet isOpen={visible} onClose={handleClose}>
       <ActionsheetBackdrop />
@@ -60,67 +82,92 @@ export default function FilterMementoSheet({
         <ActionsheetDragIndicatorWrapper>
           <ActionsheetDragIndicator />
         </ActionsheetDragIndicatorWrapper>
-        <Box className="w-full gap-y-4">
-          <FormControl size={"lg"}>
-            <FormControlLabel>
-              <FormControlLabelText>Start Date</FormControlLabelText>
-            </FormControlLabel>
-            <Controller
-              name="start_date"
-              control={control}
-              render={({ field }) => (
-                <DatePickerInput
-                  value={field.value}
-                  onChange={(date) => field.onChange(date)}
+        <ActionsheetFlatList
+          data={[]}
+          renderItem={() => <></>}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          ListHeaderComponent={
+            <Box className="w-full flex justify-center gap-6">
+              <FormControl size={"lg"}>
+                <FormControlLabel>
+                  <FormControlLabelText>Start Date</FormControlLabelText>
+                </FormControlLabel>
+                <Controller
+                  name="start_date"
+                  control={control}
+                  render={({ field }) => (
+                    <DatePickerInput
+                      value={field.value}
+                      onChange={(date) => field.onChange(date)}
+                    />
+                  )}
                 />
-              )}
-            />
-          </FormControl>
-          <FormControl size={"lg"} isInvalid={!!errors.end_date}>
-            <FormControlLabel>
-              <FormControlLabelText>End Date</FormControlLabelText>
-            </FormControlLabel>
-            <Controller
-              // FIXME: If start and end date are the same then submit button doesn't work
-              name="end_date"
-              control={control}
-              render={({ field }) => (
-                <DatePickerInput
-                  value={field.value}
-                  onChange={(date) => field.onChange(date)}
+              </FormControl>
+              <FormControl size={"lg"} isInvalid={!!errors.end_date}>
+                <FormControlLabel>
+                  <FormControlLabelText>End Date</FormControlLabelText>
+                </FormControlLabel>
+                <Controller
+                  // FIXME: If start and end date are the same then submit button doesn't work
+                  name="end_date"
+                  control={control}
+                  render={({ field }) => (
+                    <DatePickerInput
+                      value={field.value}
+                      onChange={(date) => field.onChange(date)}
+                    />
+                  )}
+                  rules={{
+                    validate: {
+                      required: (value) =>
+                        !value ||
+                        !startDate ||
+                        value >= startDate ||
+                        "End date cannot be before start date.",
+                    },
+                  }}
                 />
-              )}
-              rules={{
-                validate: {
-                  required: (value) =>
-                    !value ||
-                    !startDate ||
-                    value >= startDate ||
-                    "End date cannot be before start date.",
-                },
-              }}
-            />
-            <FormControlError>
-              <FormControlErrorIcon as={AlertCircleIcon} />
-              <FormControlErrorText>
-                {errors?.end_date?.message}
-              </FormControlErrorText>
-            </FormControlError>
-          </FormControl>
-          <ButtonGroup>
-            <Button
-              size={"lg"}
-              onPress={() => reset()}
-              action="negative"
-              variant="outline"
-            >
-              <ButtonText className="text-error-500">Clear All</ButtonText>
-            </Button>
-            <Button size={"lg"} onPress={handleSubmit(onSubmit)}>
-              <ButtonText>Apply Filters</ButtonText>
-            </Button>
-          </ButtonGroup>
-        </Box>
+                <FormControlError>
+                  <FormControlErrorIcon as={AlertCircleIcon} />
+                  <FormControlErrorText>
+                    {errors?.end_date?.message}
+                  </FormControlErrorText>
+                </FormControlError>
+              </FormControl>
+              <FormControl size={"lg"}>
+                <FormControlLabel>
+                  <FormControlLabelText>Location</FormControlLabelText>
+                </FormControlLabel>
+                <Controller
+                  name="location"
+                  control={control}
+                  render={({ field }) => (
+                    <LocationInput
+                      value={field.value}
+                      onChange={(value) =>
+                        handleLocationChange(value as GeoLocation)
+                      }
+                    />
+                  )}
+                />
+              </FormControl>
+              <ButtonGroup className="mt-5">
+                <Button
+                  size={"lg"}
+                  onPress={() => reset()}
+                  action="negative"
+                  variant="outline"
+                >
+                  <ButtonText className="text-error-500">Clear All</ButtonText>
+                </Button>
+                <Button size={"lg"} onPress={handleSubmit(onSubmit)}>
+                  <ButtonText>Apply Filters</ButtonText>
+                </Button>
+              </ButtonGroup>
+            </Box>
+          }
+        />
       </ActionsheetContent>
     </Actionsheet>
   );
