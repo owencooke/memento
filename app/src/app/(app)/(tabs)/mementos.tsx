@@ -6,7 +6,7 @@ import { useSession } from "@/src/context/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { View, Text, FlatList, Pressable, RefreshControl } from "react-native";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useColors } from "@/src/hooks/useColors";
 import {
   Input,
@@ -81,6 +81,13 @@ export default function Mementos() {
     router.push(`/(app)/(screens)/(memento)/${id}`);
   };
 
+  useEffect(() => {
+    const debouncedRefetch = debounce(refetch, 300);
+    debouncedRefetch();
+
+    return () => debouncedRefetch.cancel();
+  }, [searchText, filterParams]);
+
   const handleApplyFilters = (data: FilterMementoFormData) => {
     setFilterParams({
       start_date: data.start_date?.toISOString().split("T")[0] ?? null,
@@ -89,13 +96,11 @@ export default function Mementos() {
     });
     console.log(data.location.bbox);
     setShowActionsheet(false);
-    refetch();
   };
 
-  const handleTextChange = debounce((text: string) => {
+  const handleTextChange = (text: string) => {
     setSearchText(text);
-    refetch();
-  }, 300);
+  };
 
   return (
     <View className="flex-1 bg-background-100 py-4 px-6">
