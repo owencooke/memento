@@ -34,6 +34,13 @@ interface FilterMementoSheetProps {
   onSubmit: (data: FilterMementoFormData) => void;
 }
 
+/**
+ * @description Actionsheet displaying options for filtering mementos
+ *
+ * @requirements FR-12, FR-13
+ *
+ * @return {JSX.Element} The rendered filters actionsheet
+ */
 export default function FilterMementoSheet({
   visible,
   setVisible,
@@ -59,7 +66,7 @@ export default function FilterMementoSheet({
 
   const startDate = watch("start_date");
 
-  // Prevent re-rendering location input when Geolocation changes
+  // Prevent re-rendering location input when BoundingBoxLocation changes
   const locationValue = watch("location");
   const handleLocationChange = useCallback(
     (value: BoundingBoxLocation) => {
