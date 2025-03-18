@@ -61,11 +61,15 @@ class MementoFilterParams(BaseModel):
         # replace multiple spaces with single space
         cleaned_text = re.sub(r"\s+", " ", cleaned_text)
 
-        if " " in cleaned_text:
-            words = cleaned_text.split()
+        # enable partial matching for each word
+        cleaned_text = cleaned_text.split()
+        words = [f"{word}:*" for word in cleaned_text]
+
+        # combine words using '&' for full text match
+        if " " in words:
             return " & ".join(words)
 
-        return cleaned_text
+        return "".join(words)
 
     @model_validator(mode="before")
     @classmethod
