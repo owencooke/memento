@@ -62,8 +62,7 @@ class MementoFilterParams(BaseModel):
         cleaned_text = re.sub(r"\s+", " ", cleaned_text)
 
         # enable partial matching for each word
-        cleaned_text = cleaned_text.split()
-        words = [f"{word}:*" for word in cleaned_text]
+        words = [f"{word}:*" for word in cleaned_text.split()]
 
         # combine words using '&' for full text match
         if " " in words:
