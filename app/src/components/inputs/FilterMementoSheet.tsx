@@ -168,7 +168,11 @@ export default function FilterMementoSheet({
               <ButtonGroup>
                 <Button
                   size={"lg"}
-                  onPress={() => reset()}
+                  onPress={() => {
+                    reset();
+                    onSubmit(defaultValues);
+                    handleClose();
+                  }}
                   action="negative"
                   variant="outline"
                 >
