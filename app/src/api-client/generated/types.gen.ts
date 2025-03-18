@@ -99,6 +99,7 @@ export type Image = {
     detected_text?: string | null;
     filename: string;
     image_label?: string | null;
+    mime_type: string;
     order_index: number;
     memento_ids?: Array<Memento> | null;
 };
@@ -111,6 +112,7 @@ export type ImageWithUrl = {
     detected_text?: string | null;
     filename: string;
     image_label?: string | null;
+    mime_type: string;
     order_index: number;
     url?: string;
 };
@@ -430,6 +432,31 @@ export type UpdateCollectionAndMementosApiUserUserIdCollectionIdPutResponses = {
 };
 
 export type UpdateCollectionAndMementosApiUserUserIdCollectionIdPutResponse = UpdateCollectionAndMementosApiUserUserIdCollectionIdPutResponses[keyof UpdateCollectionAndMementosApiUserUserIdCollectionIdPutResponses];
+
+export type GenerateCollageApiUserUserIdCollectionIdCollagePostData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/api/user/{user_id}/collection/{id}/collage';
+};
+
+export type GenerateCollageApiUserUserIdCollectionIdCollagePostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GenerateCollageApiUserUserIdCollectionIdCollagePostError = GenerateCollageApiUserUserIdCollectionIdCollagePostErrors[keyof GenerateCollageApiUserUserIdCollectionIdCollagePostErrors];
+
+export type GenerateCollageApiUserUserIdCollectionIdCollagePostResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
 
 export type ClientOptions = {
     baseUrl: `${string}://${string}` | (string & {});
