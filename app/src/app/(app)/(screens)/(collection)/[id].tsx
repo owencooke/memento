@@ -77,7 +77,9 @@ export default function ViewCollection() {
   };
 
   const handleShareCollection = () =>
-    router.push(`/(app)/(screens)/(collection)/collage/${collection?.id}`);
+    router.push(
+      `/(app)/(screens)/(collection)/collage/${collection?.id}?title=${collection?.title}`,
+    );
 
   // Delete collection
   const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
@@ -85,7 +87,6 @@ export default function ViewCollection() {
     setDeleteModalVisible(true);
   };
   const handleConfirmDelete = () => {
-    console.log("Deleting collection...");
     onDelete(Number(id)); // FIXME: collection?.id is number | undefined
   };
   const onDelete = async (id: number) => {

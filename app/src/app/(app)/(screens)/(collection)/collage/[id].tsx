@@ -10,11 +10,12 @@ import { useColors } from "@/src/hooks/useColors";
 import { Spinner } from "@/src/components/ui/spinner";
 import { convertBlobToBase64 } from "@/src/libs/blob";
 import { useEffect, useState } from "react";
-import { Text, View } from "react-native"; // Use React Native components
+import { View } from "react-native"; // Use React Native components
+import { Text } from "@/src/components/ui/text";
 
 export default function ViewCollection() {
   const { getColor } = useColors();
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, title } = useLocalSearchParams<{ id: string; title: string }>();
 
   // Generate a collage for collection
   const {
@@ -28,6 +29,7 @@ export default function ViewCollection() {
         id: Number(id),
       },
     }),
+    refetchOnMount: false,
   });
 
   // Get base64 image string for collage
@@ -43,39 +45,57 @@ export default function ViewCollection() {
   }, [collageImageBlob]);
 
   return (
-    <SafeAreaView className="max-h-full flex-1 flex p-5 gap-6">
+    <SafeAreaView
+      className="max-h-full flex-1 flex p-5 gap-6"
+      edges={["bottom"]}
+    >
       <Heading className="block" size="2xl">
-        Collage Generator
+        {title} Collage
       </Heading>
 
       {isLoading && (
         <View className="flex flex-1 justify-center items-center gap-2">
-          <Spinner color={getColor("tertiary-500")} />
-          <Text>Generating collage for id: {id}</Text>
+          <View className="flex-row justify-center items-center gap-2">
+            <Spinner size="small" color={getColor("tertiary-500")} />
+            <Text size="2xl" className="font-medium">
+              Just a sec!
+            </Text>
+          </View>
+          <Text className="font-normal" size="xl">
+            Putting together the perfect collage 🖼️
+          </Text>
         </View>
       )}
 
       {isError && (
-        <View className="flex flex-1 justify-center items-center gap-2">
-          <Text className="text-error-500">
-            An error occurred. Please try again.
-          </Text>
-          <Button size="xl" onPress={refetch}>
-            Try Again
+        <>
+          <View className="flex flex-1 justify-center items-center gap-2">
+            <Text size="3xl" className="font-medium">
+              Oops!
+            </Text>
+            <Text size="xl">
+              Something went wrong while making your collage...
+            </Text>
+          </View>
+          <Button action="secondary" size="xl" onPress={refetch}>
+            <ButtonText>Try Again</ButtonText>
           </Button>
-        </View>
+        </>
       )}
 
       {!isLoading && !isError && collageImageString && (
-        <Image
-          className="flex-1 rounded-sm"
-          source={{ uri: collageImageString }}
-        />
+        <>
+          <Image
+            resizeMode="contain"
+            className="flex-1 w-full"
+            source={{ uri: collageImageString }}
+          />
+          <Button className="mt-auto" size="xl">
+            <ButtonIcon as={ShareIcon} />
+            <ButtonText>Export Collage</ButtonText>
+          </Button>
+        </>
       )}
-      <Button className="mt-auto" size="xl">
-        <ButtonIcon as={ShareIcon} />
-        <ButtonText>Export Collage</ButtonText>
-      </Button>
     </SafeAreaView>
   );
 }
