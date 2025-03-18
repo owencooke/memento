@@ -11,6 +11,15 @@ export type BodyCreateNewMementoApiUserUserIdMementoPost = {
     images: Array<Blob | File>;
 };
 
+export type BodyRemoveImageBackgroundApiImageRemoveBackgroundPost = {
+    image_file: Blob | File;
+};
+
+export type BodyUpdateCollectionAndMementosApiUserUserIdCollectionIdPut = {
+    collection: UpdateCollection;
+    mementos: Array<number>;
+};
+
 export type BodyUpdateMementoAndImagesApiUserUserIdMementoIdPut = {
     memento_str: string;
     image_metadata_str: string;
@@ -53,6 +62,9 @@ export type Coordinates = {
     long: number;
 };
 
+/**
+ * Successful response model for the Create Memento route.
+ */
 export type CreateMementoSuccessResponse = {
     new_memento_id: number;
     message?: string;
@@ -151,6 +163,18 @@ export type NewCollection = {
 };
 
 /**
+ * Updating an existing Collection record in the DB.
+ */
+export type UpdateCollection = {
+    caption?: string | null;
+    coordinates?: Coordinates | null;
+    date?: string | null;
+    location?: string | null;
+    title?: string | null;
+    user_id?: string | null;
+};
+
+/**
  * UserInfo Schema for Pydantic.
  *
  * Inherits from UserInfoBaseSchema. Add any customization here.
@@ -206,6 +230,29 @@ export type UserInfoApiUserIdGetResponses = {
 };
 
 export type UserInfoApiUserIdGetResponse = UserInfoApiUserIdGetResponses[keyof UserInfoApiUserIdGetResponses];
+
+export type RemoveImageBackgroundApiImageRemoveBackgroundPostData = {
+    body: BodyRemoveImageBackgroundApiImageRemoveBackgroundPost;
+    path?: never;
+    query?: never;
+    url: '/api/image/remove-background';
+};
+
+export type RemoveImageBackgroundApiImageRemoveBackgroundPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type RemoveImageBackgroundApiImageRemoveBackgroundPostError = RemoveImageBackgroundApiImageRemoveBackgroundPostErrors[keyof RemoveImageBackgroundApiImageRemoveBackgroundPostErrors];
+
+export type RemoveImageBackgroundApiImageRemoveBackgroundPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
 
 export type GetUsersMementosApiUserUserIdMementoGetData = {
     body?: never;
@@ -339,6 +386,60 @@ export type CreateNewCollectionApiUserUserIdCollectionPostResponses = {
 };
 
 export type CreateNewCollectionApiUserUserIdCollectionPostResponse = CreateNewCollectionApiUserUserIdCollectionPostResponses[keyof CreateNewCollectionApiUserUserIdCollectionPostResponses];
+
+export type DeleteCollectionApiUserUserIdCollectionIdDeleteData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/api/user/{user_id}/collection/{id}';
+};
+
+export type DeleteCollectionApiUserUserIdCollectionIdDeleteErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type DeleteCollectionApiUserUserIdCollectionIdDeleteError = DeleteCollectionApiUserUserIdCollectionIdDeleteErrors[keyof DeleteCollectionApiUserUserIdCollectionIdDeleteErrors];
+
+export type DeleteCollectionApiUserUserIdCollectionIdDeleteResponses = {
+    /**
+     * Successful Response
+     */
+    200: Collection;
+};
+
+export type DeleteCollectionApiUserUserIdCollectionIdDeleteResponse = DeleteCollectionApiUserUserIdCollectionIdDeleteResponses[keyof DeleteCollectionApiUserUserIdCollectionIdDeleteResponses];
+
+export type UpdateCollectionAndMementosApiUserUserIdCollectionIdPutData = {
+    body: BodyUpdateCollectionAndMementosApiUserUserIdCollectionIdPut;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/api/user/{user_id}/collection/{id}';
+};
+
+export type UpdateCollectionAndMementosApiUserUserIdCollectionIdPutErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type UpdateCollectionAndMementosApiUserUserIdCollectionIdPutError = UpdateCollectionAndMementosApiUserUserIdCollectionIdPutErrors[keyof UpdateCollectionAndMementosApiUserUserIdCollectionIdPutErrors];
+
+export type UpdateCollectionAndMementosApiUserUserIdCollectionIdPutResponses = {
+    /**
+     * Successful Response
+     */
+    200: Collection;
+};
+
+export type UpdateCollectionAndMementosApiUserUserIdCollectionIdPutResponse = UpdateCollectionAndMementosApiUserUserIdCollectionIdPutResponses[keyof UpdateCollectionAndMementosApiUserUserIdCollectionIdPutResponses];
 
 export type ClientOptions = {
     baseUrl: `${string}://${string}` | (string & {});

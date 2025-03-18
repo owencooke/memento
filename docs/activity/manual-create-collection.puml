@@ -1,0 +1,83 @@
+@startuml
+title Manually Create a Collection (FRs 35-37)
+
+|user| User
+|mobile| Mobile App
+|backend| Backend
+|db| Supabase
+
+|user|
+start
+:Opens app;
+:Navigates to "Create Collection" page;
+
+|mobile|
+:Display "Create Collection" form;
+
+|user|
+:Enters collection title;
+
+|mobile|
+:Validate title field;
+if (Title valid?) is (no) then
+  :Show "Title is required" error;
+  :Prompt user to correct input;
+  stop
+else (yes)
+endif
+
+|user|
+partition "Optional Fields" {
+  :Add caption;
+  :Add location;
+  :Add date;
+}
+
+|user|
+:Clicks "Add Keepsakes" button;
+
+|mobile|
+:Display keepsake selection screen;
+
+|user|
+:Selects keepsakes to include;
+:Clicks "Confirm Selection";
+
+|mobile|
+:Return to form;
+:Show selected keepsakes in form;
+
+|user|
+:Clicks "Create Collection" button;
+
+|mobile|
+:Validate form data;
+if (Form valid?) is (no) then
+  :Show validation errors;
+  |user|
+  :User corrects input;
+  :Clicks "Save Changes" again;
+|mobile|
+else (yes)
+endif
+
+:Prepare POST request payload;
+:Make POST request to Create Collection API;
+
+|backend|
+:Insert collection record in relational DB;
+|db|
+:Store keepsake references in join table;
+|backend|
+:Prepare success response;
+
+|mobile|
+if (Request successful?) is (yes) then
+  :Show success message;
+  :Navigate to View Collection page;
+else (no)
+  :Show error message;
+endif
+
+stop
+@enduml

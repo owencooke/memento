@@ -1,0 +1,36 @@
+@startuml
+title Share Collages to Social Media (FR-55)
+
+|user| User
+|mobile| Mobile App
+
+|user|
+start
+:Opens app;
+:Navigates to "Collections" page;
+:Selects a collection;
+
+|mobile|
+:Opens collection details;
+
+|user|
+:Generates collage (see activity diagram for collage creation);
+
+|mobile|
+:Display collage;
+
+|user|
+:Clicks "Share" button;
+
+|mobile|
+:Display window with list of social media sites;
+
+|user|
+:Clicks on a social media site;
+
+|mobile|
+:Make request to share collage API for the selected social media site;
+:Return to collage;
+
+stop
+@enduml

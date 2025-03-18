@@ -1,0 +1,49 @@
+@startuml
+title Delete a Collection (FR-46)
+
+|user| User
+|mobile| Mobile App
+|backend| Backend
+|db| Supabase
+
+|user|
+start
+:Opens app;
+:Selects a collection from the grid view;
+
+|mobile|
+:Display collection details and stored keepsakes;
+:Show "Delete" button;
+
+|user|
+:Clicks "Delete" button;
+
+|mobile|
+:Show confirmation dialog;
+if (Confirm deletion?) is (yes) then
+  :Make DELETE request to Delete Collection API;
+else (no)
+  :Close confirmation dialog;
+  :Return to collection view;
+  stop
+endif
+
+|backend|
+:Delete collection record from relational DB;
+|db|
+:Remove associated memento records from the has_memento table;
+:Delete collection record from collection table;
+
+|backend|
+:Prepare success response;
+
+|mobile|
+if (Request successful?) is (yes) then
+  :Show success message;
+  :Navigate back to grid view;
+else (no)
+  :Show error message;
+endif
+
+stop
+@enduml

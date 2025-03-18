@@ -1,0 +1,107 @@
+@startuml 
+
+' Include relevant FRs covered 
+title Bulk Create Mementos (FRs 22-24)
+
+' Swimlanes
+' format: | optional color | var name | lane title
+|user| User
+|mobile| Mobile App
+|backend| Backend
+|db| Supabase
+
+
+|user|
+start
+:Navigate to Mementos tab;
+:Clicks add button;
+
+|mobile|
+:Display options for individual or bulk create;
+
+|user|
+:Select bulk create option;
+
+|mobile|
+:Display Bulk Create Memento form;
+
+|user|
+:Clicks "Select photos from libary" button;
+
+|mobile|
+:Access photo library;
+
+|user|
+:Select from existing photos;
+
+|mobile|
+:Display selected photos (1 per group to start);
+
+while (Photos in proper groups?) is (no)
+  |user|
+  :Drag a photo card into a different group;
+  |mobile|
+  :Update assigned group number for photo;
+endwhile (yes)
+
+while (Groups edited?) is (no)
+  |user|
+  :Tap the edit icon next to a memento group;
+  |mobile|
+  :Display Create Memento form fields for caption, location, date;
+  |user|
+  :Edit caption;
+  :Modify date;
+  :Edit location;
+  :Click save changes;
+  |mobile|
+    :Validate form data;
+    if (Form valid?) is (no) then
+    :Show validation errors;
+    |user|
+    :User corrects input;
+    :Click submit button again;
+    |mobile|
+    else (yes)
+    endif 
+  |mobile|
+  :Update form state with new fields for group;
+endwhile (yes)
+
+|mobile|
+:Prepare upload payload for groups (memento details/photos);
+:Make POST call to Bulk Create Memento API;
+
+|backend|
+repeat
+    fork
+    :Remove background from images;
+    |db|
+    :Store images in Storage bucket;
+    :Return stored file path;
+    |backend|
+    fork again
+    :Extract text from images;
+    fork again
+    :Generate image classification labels;
+    fork again 
+    |db|
+    :Create memento record in relational DB;
+    end fork
+    |db|
+    :Create image metadata records in relational DB;
+repeat while (More mementos to process?) is (yes) not (no);
+
+
+|backend|
+:Prepare response with new created memento ids;
+
+|mobile|
+if (Request successful?) is (yes) then
+  :Navigate to Mementos tab;
+else (no)
+  :Display error message;
+endif
+
+stop
+@enduml

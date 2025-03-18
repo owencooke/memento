@@ -6,6 +6,7 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import DraggableGrid from "@/src/components/draggable-grid";
 import PhotoSourceSheet from "./PhotoSourceSheet";
 import InteractivePhotoCard from "../cards/InteractivePhotoCard";
+import BackgroundRemovalModal from "../forms/BackgroundRemovalModal";
 
 interface GridItem {
   key: number;
@@ -26,13 +27,23 @@ export default function PhotoSelectGrid({
   setScrollEnabled,
 }: PhotoSelectGridProps) {
   const [showActionsheet, setShowActionsheet] = useState(false);
-  const { hasPermission, addPhotos, photos, removePhoto, setPhotos } =
-    usePhotos({ initialPhotos });
+  const {
+    hasPermission,
+    addPhotos,
+    photos,
+    deletePhoto,
+    setPhotos,
+    pendingProcessedPhotos,
+    acceptProcessedPhoto,
+    rejectProcessedPhoto,
+  } = usePhotos({ initialPhotos });
 
+  // When photos change, send updated state to parent component
   useEffect(() => {
     onChange(photos).catch((e) => console.error(e));
   }, [onChange, photos]);
 
+  // Include non-draggable add button at end of photo grid
   const gridData = useMemo(
     () => [
       ...photos.map((photo, index) => ({
@@ -50,6 +61,7 @@ export default function PhotoSelectGrid({
     [editable, photos],
   );
 
+  // Executed when user releases a dragged photo
   const handleReorderPhotos = useCallback(
     (data: GridItem[]) => {
       const newPhotos = data
@@ -104,6 +116,15 @@ export default function PhotoSelectGrid({
           );
         }}
       />
+      {/* Accept/reject background removal result */}
+      {pendingProcessedPhotos.map((backgroundFreePhoto, idx) => (
+        <BackgroundRemovalModal
+          key={idx}
+          photo={backgroundFreePhoto}
+          accept={() => acceptProcessedPhoto(backgroundFreePhoto)}
+          reject={() => rejectProcessedPhoto(backgroundFreePhoto)}
+        />
+      ))}
     </View>
   );
 }
