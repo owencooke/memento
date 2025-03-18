@@ -45,7 +45,8 @@ class MementoFilterParams(BaseModel):
     max_lat: Optional[float] = Field(default=None)
     max_long: Optional[float] = Field(default=None)
     text: Optional[str] = Field(
-        default=None, description="Text to search in memento caption and detected text"
+        default=None,
+        description="Text to search in memento caption and detected text",
     )
 
     @field_validator("text")
@@ -88,7 +89,8 @@ class MementoFilterParams(BaseModel):
         bbox_values = [data.get(field) for field in bbox_fields]
         if any(bbox_values) and not all(bbox_values):
             raise ValueError(
-                "All bounding box coordinates (min_lat, min_long, max_lat, max_long) must be provided"
+                "All bounding box coordinates \
+                        (min_lat, min_long, max_lat, max_long) must be provided",
             )
 
         return data

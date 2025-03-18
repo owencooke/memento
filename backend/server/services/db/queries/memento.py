@@ -3,7 +3,6 @@
 @requirements FR-17, FR-19, FR-26, FR-27, FR30, FR33
 """
 
-from loguru import logger
 from pydantic import UUID4
 
 from server.api.memento.models import MementoFilterParams, NewMemento, UpdateMemento
@@ -23,7 +22,8 @@ def create_memento(new_memento: NewMemento, user_id: UUID4) -> Memento:
 
 
 def get_mementos(
-    user_id: UUID4, filter_query: MementoFilterParams | None
+    user_id: UUID4,
+    filter_query: MementoFilterParams | None,
 ) -> list[MementoWithImages]:
     """Gets all the mementos belonging to a user."""
     query = (
@@ -47,15 +47,15 @@ def get_mementos(
                 filter_query.min_long,
                 filter_query.max_lat,
                 filter_query.max_long,
-            ]
+            ],
         ):
             bbox_response = supabase.rpc(
                 "mementos_in_bounds",
                 {
-                    "min_lat": float(filter_query.min_lat),
-                    "min_long": float(filter_query.min_long),
-                    "max_lat": float(filter_query.max_lat),
-                    "max_long": float(filter_query.max_long),
+                    "min_lat": filter_query.min_lat,
+                    "min_long": filter_query.min_long,
+                    "max_lat": filter_query.max_lat,
+                    "max_long": filter_query.max_long,
                 },
             ).execute()
 

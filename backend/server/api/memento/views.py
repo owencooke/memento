@@ -6,7 +6,7 @@
 import json
 from typing import Annotated, Optional
 
-from fastapi import APIRouter, Depends, Form, Query, UploadFile
+from fastapi import APIRouter, Depends, Form, UploadFile
 from fastapi.responses import JSONResponse
 from loguru import logger
 from pydantic import UUID4
