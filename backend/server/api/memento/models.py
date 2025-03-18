@@ -65,7 +65,7 @@ class MementoFilterParams(BaseModel):
         words = [f"{word}:*" for word in cleaned_text.split()]
 
         # combine words using '&' for full text match
-        if " " in words:
+        if " " in cleaned_text:
             return " & ".join(words)
 
         return "".join(words)
