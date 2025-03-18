@@ -35,6 +35,7 @@ import {
 import { formDataBodySerializer } from "@/src/api-client/formData";
 import { useSession } from "@/src/context/AuthContext";
 import BulkCreateCollectionModal from "@/src/components/forms/BulkCreateCollectionModal";
+import BackgroundRemovalModal from "@/src/components/forms/BackgroundRemovalModal";
 
 type BulkMementoGroup = MementoFormData["memento"] & {
   groupId: number;
@@ -45,7 +46,13 @@ export default function BulkCreateMemento() {
   const { session } = useSession();
 
   const [scrollEnabled, setScrollEnabled] = useState(true);
-  const { hasPermission, addPhotos } = usePhotos({
+  const {
+    hasPermission,
+    addPhotos,
+    pendingProcessedPhotos,
+    acceptProcessedPhoto,
+    rejectProcessedPhoto,
+  } = usePhotos({
     initialPhotos: [],
   });
   const createMutation = useMutation(
@@ -61,6 +68,11 @@ export default function BulkCreateMemento() {
 
   const [editingGroup, setEditingGroup] = useState<BulkMementoGroup | null>(
     null,
+  );
+  const photoIdsInEditingGroup = useMemo(
+    () =>
+      editingGroup ? editingGroup.photos.map((photo) => photo.assetId) : [],
+    [editingGroup],
   );
 
   const [createdMementoIds, setCreatedMementoIds] = useState<number[]>([]);
@@ -171,7 +183,7 @@ export default function BulkCreateMemento() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         ListHeaderComponent={
-          <View className="flex-1 p-4">
+          <View className="flex-1">
             <Heading className="block mb-2" size="2xl">
               Create Multiple
             </Heading>
@@ -213,40 +225,55 @@ export default function BulkCreateMemento() {
           </View>
         }
       />
-      {/* Actionsheet for editing a memento group's details */}
       {editingGroup && (
-        <Actionsheet isOpen onClose={handleCloseGroupForm}>
-          <ActionsheetBackdrop />
-          <ActionsheetContent>
-            <ActionsheetDragIndicatorWrapper className="h-8">
-              <ActionsheetDragIndicator />
-            </ActionsheetDragIndicatorWrapper>
-            <View className="w-full">
-              <Pressable className="self-end" onPress={handleCloseGroupForm}>
-                <Icon
-                  as={CloseIcon}
-                  size="xl"
-                  className="stroke-background-500"
+        <>
+          {/* Actionsheet for editing a memento group's details */}
+          <Actionsheet isOpen onClose={handleCloseGroupForm}>
+            <ActionsheetBackdrop />
+            <ActionsheetContent>
+              <ActionsheetDragIndicatorWrapper className="h-8">
+                <ActionsheetDragIndicator />
+              </ActionsheetDragIndicatorWrapper>
+              <View className="w-full">
+                <Pressable className="self-end" onPress={handleCloseGroupForm}>
+                  <Icon
+                    as={CloseIcon}
+                    size="xl"
+                    className="stroke-background-500"
+                  />
+                </Pressable>
+                <MementoForm
+                  initialValues={{
+                    memento: {
+                      caption: editingGroup.caption,
+                      date: editingGroup.date,
+                      location: editingGroup.location,
+                    },
+                    photos: editingGroup.photos,
+                  }}
+                  submitButtonText="Save Changes"
+                  isSubmitting={false}
+                  photosEditable={false}
+                  onSubmit={handleSaveGroupDetails}
+                  FormHeader={`Memento #${editingGroup.groupId + 1}`}
                 />
-              </Pressable>
-              <MementoForm
-                initialValues={{
-                  memento: {
-                    caption: editingGroup.caption,
-                    date: editingGroup.date,
-                    location: editingGroup.location,
-                  },
-                  photos: editingGroup.photos,
-                }}
-                submitButtonText="Save Changes"
-                isSubmitting={false}
-                photosEditable={false}
-                onSubmit={handleSaveGroupDetails}
-                FormHeader={`Memento #${editingGroup.groupId + 1}`}
+              </View>
+            </ActionsheetContent>
+          </Actionsheet>
+          {/* Accept/reject background removal result when group opened */}
+          {pendingProcessedPhotos
+            .filter((backgroundFreePhoto) =>
+              photoIdsInEditingGroup.includes(backgroundFreePhoto.assetId),
+            )
+            .map((backgroundFreePhoto, idx) => (
+              <BackgroundRemovalModal
+                key={idx}
+                photo={backgroundFreePhoto}
+                accept={() => acceptProcessedPhoto(backgroundFreePhoto)}
+                reject={() => rejectProcessedPhoto(backgroundFreePhoto)}
               />
-            </View>
-          </ActionsheetContent>
-        </Actionsheet>
+            ))}
+        </>
       )}
 
       {/* Modal for optional creation of new collection */}

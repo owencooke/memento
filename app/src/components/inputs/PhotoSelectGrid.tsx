@@ -96,7 +96,7 @@ export default function PhotoSelectGrid({
               {photo ? (
                 <InteractivePhotoCard
                   photo={photo}
-                  onDelete={editable ? () => removePhoto(photo) : undefined}
+                  onDelete={editable ? () => deletePhoto(photo) : undefined}
                   showThumbnailBadge={item.key === 0}
                 />
               ) : (
