@@ -1,3 +1,8 @@
+/**
+ * @description Screen for generating a collage representation of a collection of mementos.
+ * @requirements FR-53, FR-55
+ */
+
 import { generateCollageApiUserUserIdCollectionIdCollageGetOptions } from "@/src/api-client/generated/@tanstack/react-query.gen";
 import { ButtonIcon, Button, ButtonText } from "@/src/components/ui/button";
 import { ShareIcon } from "@/src/components/ui/icon";
@@ -8,10 +13,14 @@ import { Heading } from "@/src/components/ui/heading";
 import { Image } from "@/src/components/ui/image";
 import { useColors } from "@/src/hooks/useColors";
 import { Spinner } from "@/src/components/ui/spinner";
-import { convertBlobToBase64 } from "@/src/libs/blob";
+import { convertBlobToBase64Uri } from "@/src/libs/blob";
 import { useEffect, useState } from "react";
-import { View } from "react-native"; // Use React Native components
+import { View } from "react-native";
 import { Text } from "@/src/components/ui/text";
+import { shareAsync, isAvailableAsync } from "expo-sharing";
+import * as FileSystem from "expo-file-system";
+
+const pngMimeType = "image/png";
 
 export default function ViewCollection() {
   const { getColor } = useColors();
@@ -33,16 +42,41 @@ export default function ViewCollection() {
   });
 
   // Get base64 image string for collage
-  const [collageImageString, setCollageImageString] = useState<string | null>(
+  const [collageImageUri, setCollageImageString] = useState<string | null>(
     null,
   );
   useEffect(() => {
     if (collageImageBlob) {
-      convertBlobToBase64(collageImageBlob as Blob)
+      convertBlobToBase64Uri(collageImageBlob as Blob)
         .then(setCollageImageString)
         .catch(console.error);
     }
   }, [collageImageBlob]);
+
+  const handleShareCollage = async () => {
+    try {
+      if (collageImageUri) {
+        // Download the collage blob to a temp file
+        const localUri = `${FileSystem.cacheDirectory}${title} Collage.png`;
+        const imageContent = collageImageUri.split(",")[1];
+        await FileSystem.writeAsStringAsync(localUri, imageContent, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+
+        // Share the collage temp file
+        if (await isAvailableAsync()) {
+          await shareAsync(localUri, {
+            mimeType: pngMimeType,
+            UTI: pngMimeType,
+          });
+        } else {
+          console.log("Sharing is not available on this device");
+        }
+      }
+    } catch (error) {
+      console.error("Error sharing collage:", error);
+    }
+  };
 
   return (
     <SafeAreaView
@@ -83,14 +117,15 @@ export default function ViewCollection() {
         </>
       )}
 
-      {!isLoading && !isError && collageImageString && (
+      {!isLoading && !isError && collageImageUri && (
         <>
           <Image
             resizeMode="contain"
             className="flex-1 w-full"
-            source={{ uri: collageImageString }}
+            source={{ uri: collageImageUri }}
+            alt="Collage"
           />
-          <Button className="mt-auto" size="xl">
+          <Button className="mt-auto" size="xl" onPress={handleShareCollage}>
             <ButtonIcon as={ShareIcon} />
             <ButtonText>Export Collage</ButtonText>
           </Button>

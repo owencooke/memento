@@ -61,7 +61,7 @@ export default function ViewMemento() {
     try {
       const image = memento?.images[currentImageIndex];
       if (image?.url) {
-        // Download the image content from url
+        // Download the image content to a temp file
         const localUri = `${FileSystem.cacheDirectory}Memento.${mimeTypeToExtension(image.mime_type)}`;
         await FileSystem.downloadAsync(image.url, localUri);
 
