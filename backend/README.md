@@ -112,10 +112,15 @@ This project uses Supabase's PostgreSQL relational database for storing data. Th
 
      ```bash
      psql postgres://your_user:your_password@your_host:5432/your_new_database < schema.sql
-
      ```
 
    - Supabase SQL Editor (copy/paste file and then run the query)
+
+To update the SQL schema file with any new changes (not necessary unless backup needed for a future project)
+
+```bash
+pg_dump --schema=public --no-owner --dbname="postgres://your_user:your_password@your_host:5432/your_database" > schema.sql
+```
 
 ### Authentication
 
