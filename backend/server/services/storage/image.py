@@ -5,9 +5,10 @@
 
 import io
 import uuid
-from PIL import Image
+
 from fastapi import UploadFile
 from loguru import logger
+from PIL import Image
 
 from server.services.db.config import supabase
 
@@ -46,6 +47,6 @@ def download_images(filenames: list[str]) -> list[Image.Image]:
             images.append(image)
         except Exception as e:
             logger.info(
-                f"Failed to convert image {file} from Supabase to PIL with error: {e}"
+                f"Failed to convert image {file} from Supabase to PIL with error: {e}",
             )
     return images

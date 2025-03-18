@@ -1,9 +1,12 @@
 import random
-from PIL import Image
+
 from loguru import logger
+from PIL import Image
+
+from server.config.types import RGB, RGBA, IntPair
 from server.services.db.models.schema_public_latest import Collection
-from server.services.process_image.collage.text_manager import TextManager
 from server.services.process_image.collage.image_processor import ImageProcessor
+from server.services.process_image.collage.text_manager import TextManager
 
 
 class CollageGenerator:
@@ -11,17 +14,17 @@ class CollageGenerator:
 
     def __init__(
         self,
-        canvas_size=(1170, 2532),  # iPhone 13 aspect ratio
-        canvas_color=(255, 255, 255),
-        min_image_size=(700, 900),
-        max_image_size=(900, 1500),
-        max_images_used=15,
-        image_radius=20,
-        margin=40,
-        text_padding=10,
-        text_color=(80, 80, 80),
-        text_bg_color=(0, 255, 255, 180),
-    ):
+        canvas_size: IntPair = (1170, 2532),  # iPhone 13 aspect ratio
+        canvas_color: RGB = (255, 255, 255),
+        min_image_size: IntPair = (700, 900),
+        max_image_size: IntPair = (900, 1500),
+        max_images_used: int = 15,
+        image_radius: int = 20,
+        margin: int = 40,
+        text_padding: int = 10,
+        text_color: RGB = (80, 80, 80),
+        text_bg_color: RGBA = (0, 255, 255, 180),
+    ) -> None:
         """Initialize the CollageGenerator parameters."""
         self.font_manager = TextManager(
             text_color=text_color,
@@ -43,7 +46,9 @@ class CollageGenerator:
         self.max_images_used = max_images_used
 
     async def create_collage(
-        self, collection: Collection, images: list[Image.Image]
+        self,
+        collection: Collection,
+        images: list[Image.Image],
     ) -> Image.Image:
         """Main method for generating a new collage for a collection."""
 
@@ -101,7 +106,7 @@ class CollageGenerator:
         collage: Image.Image,
         images: list[Image.Image],
     ) -> None:
-        """Render images in a grid-based scattered arrangement with complete canvas coverage."""
+        """Render images in a scattered grid in attempt to completely cover canvas."""
 
         # Limit number of images to avoid excessive overlap
         images_to_use = images[: min(self.max_images_used, len(images))]
@@ -136,7 +141,9 @@ class CollageGenerator:
 
                 # Prepare the image (resize and round corners)
                 rounded_img = self.image_processor.prepare_image(
-                    image, (img_width, img_height), self.image_radius
+                    image,
+                    (img_width, img_height),
+                    self.image_radius,
                 )
 
                 # Apply random rotation
@@ -158,7 +165,8 @@ class CollageGenerator:
                 collage.paste(rotated_img, (x_offset, y_offset), rotated_img)
 
                 logger.info(
-                    f"Placed image {idx} at cell ({row}, {col}) position ({x_offset}, {y_offset}) with rotation {rotation}°"
+                    f"""Placed image {idx} at cell ({row}, {col}) position
+                    ({x_offset}, {y_offset}) with rotation {rotation}°""",
                 )
 
                 # Store the area covered by this image
@@ -171,7 +179,7 @@ class CollageGenerator:
                 used_areas.append(img_rect)
 
             except Exception as e:
-                logger.error(f"Error processing image {idx}: {str(e)}")
+                logger.error(f"Error processing image {idx}: {e!s}")
                 continue
 
     def _format_metadata_string(self, collection: Collection) -> str:
@@ -186,8 +194,9 @@ class CollageGenerator:
         return " • ".join(metadata_parts) if metadata_parts else ""
 
     def _initialize_grid(
-        self, num_images: int
-    ) -> tuple[int, int, list[tuple[int, int]]]:
+        self,
+        num_images: int,
+    ) -> tuple[int, int, list[IntPair]]:
         """Initialize a grid for image placement based on number of images."""
         grid_cols = 2
         grid_rows = 2

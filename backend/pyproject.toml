@@ -132,6 +132,7 @@ lint.ignore = [
     "PLR0913", # Too many arguments for function call
     "D106",    # Missing docstring in public nested class
     "S104",    # Possible binding to all interfaces
+    "S311",    # Standard pseudo-random generators are not suitable for cryptographic purposes
 ]
 exclude = [
     ".venv/",

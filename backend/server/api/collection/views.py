@@ -105,9 +105,11 @@ async def delete_collection(
 
 @router.get("/{id}/collage")
 async def generate_collage(id: int) -> Response:
-    """Post route that generates an image representation of a collection as a collage."""
+    """Generates an image representation of a collection as a collage."""
+    collection = get_collection(id)
+    if not collection:
+        raise HTTPException(status_code=404, detail=f"No collection found for id={id}")
     try:
-        collection = get_collection(id)
         image_filenames = get_collection_image_filenames(id)
         images = download_images(image_filenames)
         output_image = await CollageGenerator().create_collage(

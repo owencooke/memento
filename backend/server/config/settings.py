@@ -6,7 +6,7 @@ from tempfile import gettempdir
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 TEMP_DIR = Path(gettempdir())
-ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+ROOT_DIR = Path(__file__).resolve().parent.parent
 
 
 class LogLevel(str, enum.Enum):

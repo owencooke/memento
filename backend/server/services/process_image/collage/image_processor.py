@@ -1,7 +1,5 @@
-import random
-from typing import Optional
-from PIL import Image, ImageDraw, ImageOps
 from loguru import logger
+from PIL import Image, ImageDraw, ImageOps
 
 
 class ImageProcessor:
@@ -9,7 +7,9 @@ class ImageProcessor:
 
     @staticmethod
     def prepare_image(
-        image: Image.Image, target_size: tuple[int, int], corner_radius: int
+        image: Image.Image,
+        target_size: tuple[int, int],
+        corner_radius: int,
     ) -> Image.Image:
         """Resize image and apply rounded corners."""
         try:
@@ -21,14 +21,16 @@ class ImageProcessor:
             mask = Image.new("L", target_size, 0)
             mask_draw = ImageDraw.Draw(mask)
             mask_draw.rounded_rectangle(
-                (0, 0, target_size[0], target_size[1]), corner_radius, fill=255
+                (0, 0, target_size[0], target_size[1]),
+                corner_radius,
+                fill=255,
             )
 
             # Apply mask to create rounded corners
             rounded_img.paste(resized_img, (0, 0), mask)
             return rounded_img
         except Exception as e:
-            logger.error(f"Error preparing image: {str(e)}")
+            logger.error(f"Error preparing image: {e!s}")
             raise
 
     @staticmethod
@@ -40,10 +42,11 @@ class ImageProcessor:
                 image = image.convert("RGBA")
 
             # Rotate the image
-            rotated = image.rotate(
-                angle, expand=True, resample=Image.Resampling.BICUBIC
+            return image.rotate(
+                angle,
+                expand=True,
+                resample=Image.Resampling.BICUBIC,
             )
-            return rotated
         except Exception as e:
-            logger.error(f"Error rotating image: {str(e)}")
+            logger.error(f"Error rotating image: {e!s}")
             raise

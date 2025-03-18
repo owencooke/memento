@@ -136,7 +136,7 @@ Supabase Auth makes it easy to support multiple types of authentication. In this
 
 3. Navigate to the Auth > URL Configuration section in the Supabase dashboard and add the following authorized redirect URLs:
    - `memento://auth/redirect` (deep link into actual app build)
-   - `exp://*.*.*.*:19000/--/auth/redirect` (for Expo Go development)
+   - `exp://*.*.*.*:*/--/auth/redirect` (for Expo Go development)
 
 ### Storage
 
