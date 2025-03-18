@@ -19,8 +19,10 @@ import { useForm, Controller } from "react-hook-form";
 import { Box } from "../ui/box";
 import { Button, ButtonGroup, ButtonText } from "../ui/button";
 import { AlertCircleIcon } from "../ui/icon";
+import { Heading } from "../ui/heading";
 import LocationInput, { BoundingBoxLocation } from "./LocationInput";
 import { useCallback } from "react";
+import { Divider } from "../ui/divider";
 
 export interface FilterMementoFormData {
   start_date: Date | null;
@@ -95,6 +97,8 @@ export default function FilterMementoSheet({
           keyboardShouldPersistTaps="handled"
           ListHeaderComponent={
             <Box className="w-full flex justify-center gap-6">
+              <Heading>Filter Mementos</Heading>
+              <Divider />
               <FormControl size={"lg"}>
                 <FormControlLabel>
                   <FormControlLabelText>Start Date</FormControlLabelText>
@@ -160,7 +164,8 @@ export default function FilterMementoSheet({
                   )}
                 />
               </FormControl>
-              <ButtonGroup className="mt-5">
+              <Divider />
+              <ButtonGroup>
                 <Button
                   size={"lg"}
                   onPress={() => reset()}
