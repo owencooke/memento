@@ -24,6 +24,7 @@ import PagerView, {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { shareAsync, isAvailableAsync } from "expo-sharing";
 import * as FileSystem from "expo-file-system";
+import { mimeTypeToExtension } from "@/src/libs/string";
 
 const buttonClasses = "flex-1";
 const iconClasses = "w-6 h-6";
@@ -61,12 +62,15 @@ export default function ViewMemento() {
       const image = memento?.images[currentImageIndex];
       if (image?.url) {
         // Download the image content from url
-        const localUri = `${FileSystem.cacheDirectory}Memento.png`;
+        const localUri = `${FileSystem.cacheDirectory}Memento.${mimeTypeToExtension(image.mime_type)}`;
         await FileSystem.downloadAsync(image.url, localUri);
 
         // Share the downloaded content
         if (await isAvailableAsync()) {
-          await shareAsync(localUri, { mimeType: "", UTI: "" });
+          await shareAsync(localUri, {
+            mimeType: image.mime_type,
+            UTI: image.mime_type,
+          });
         } else {
           console.log("Sharing is not available on this device");
         }

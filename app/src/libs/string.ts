@@ -5,3 +5,11 @@ export const toTitleCase = (str: string) =>
   );
 
 export const removeUnderscores = (str: string) => str.replace(/_/g, " ");
+
+export const mimeTypeToExtension = (mimeType: string) => {
+  const parts = mimeType.split("/");
+  if (parts.length >= 2) {
+    return parts[1];
+  }
+  return "png";
+};
