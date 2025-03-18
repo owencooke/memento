@@ -106,7 +106,7 @@ export default function Mementos() {
 
   return (
     <View className="flex-1 bg-background-100 py-4 px-6">
-      <View className="flex-row items-center gap-x-2 py-2">
+      <View className="flex-row items-center gap-x-2 mb-4">
         <Input className="flex-1 bg-background-0">
           <InputSlot className="pl-3">
             <InputIcon as={SearchIcon} />
