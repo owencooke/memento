@@ -4,7 +4,7 @@
  * @requirements FR-22, FR-23, FR-24
  */
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { Pressable, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FlatList } from "react-native";
@@ -47,6 +47,7 @@ export default function BulkCreateMemento() {
 
   const [scrollEnabled, setScrollEnabled] = useState(true);
   const {
+    photos,
     hasPermission,
     addPhotos,
     pendingProcessedPhotos,
@@ -78,18 +79,40 @@ export default function BulkCreateMemento() {
   const [createdMementoIds, setCreatedMementoIds] = useState<number[]>([]);
 
   // Add more photos (each new photo starts as a new group)
-  const handleAddPhotos = useCallback(async () => {
-    const newPhotos = await addPhotos("picker");
-    const newMementoGroups = newPhotos.map((photo, index) => {
-      const groupId = mementoGroups.length + index;
-      return {
-        ...defaultMementoFormValues.memento,
-        groupId,
-        photos: [{ ...photo, group: groupId }],
-      };
+  const handleAddPhotos = async () => addPhotos("picker");
+
+  useEffect(() => {
+    setMementoGroups((prevGroups) => {
+      let lastGroupId = prevGroups.length;
+      const prevPhotos = prevGroups.flatMap((group) => group.photos);
+      return photos.map((newPhoto) => {
+        const matchingGroupedPhoto = prevPhotos.find(
+          (p) => p.assetId === newPhoto.assetId,
+        );
+        if (!matchingGroupedPhoto) {
+          // New photo -> assigned to new group
+          lastGroupId += 1;
+          return {
+            ...defaultMementoFormValues.memento,
+            groupId: lastGroupId,
+            photos: [{ ...newPhoto, group: lastGroupId }],
+          };
+        }
+        // Get previous group and update the specific photo (in case it had bg removed)
+        const prevGroup = prevGroups.find(
+          (group) => matchingGroupedPhoto.group === group.groupId,
+        )!;
+        return {
+          ...prevGroup,
+          photos: prevGroup.photos.map((oldPhoto) =>
+            oldPhoto.group === matchingGroupedPhoto.group
+              ? { ...newPhoto, group: oldPhoto.group }
+              : oldPhoto,
+          ),
+        };
+      });
     });
-    setMementoGroups((prev) => [...prev, ...newMementoGroups]);
-  }, [addPhotos, mementoGroups.length]);
+  }, [photos]);
 
   // Update memento groups when user drags/reorders a photo
   const handlePhotosReordered = useCallback(
