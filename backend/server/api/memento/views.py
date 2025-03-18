@@ -29,7 +29,11 @@ from server.services.db.queries.memento import (
     get_mementos,
     update_memento,
 )
-from server.services.storage.image import delete_images, get_image_url, upload_image
+from server.services.storage.image import (
+    delete_images,
+    get_bulk_image_urls,
+    upload_image,
+)
 
 router = APIRouter()
 
@@ -41,12 +45,17 @@ def get_users_mementos(
     """Gets all the mementos belonging to a user."""
     mementos = get_mementos(user_id)
 
+    # Get all image URLs
+    image_urls = get_bulk_image_urls(
+        [image.filename for memento in mementos for image in memento.images]
+    )
+
+    # Assign URLs to images and sort in proper order for UI
     for memento in mementos:
-        # Get private URLs for each image
         for image in memento.images:
-            image.url = get_image_url(image.filename)
-        # Sort images by order index
-        memento.images.sort(key=lambda image: image.order_index)
+            image.url = image_urls.get(image.filename, "")
+        memento.images = sorted(memento.images, key=lambda img: img.order_index)
+
     return mementos
 
 

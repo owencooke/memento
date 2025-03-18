@@ -52,7 +52,7 @@ export default function ViewMemento() {
   const handleShowMoreDetails = () => setShowImageMetadata((prev) => !prev);
 
   const handleEditMemento = () =>
-    router.push(`/(app)/(screens)/(memento)/edit/${memento?.id}`);
+    router.push(`/(app)/(screens)/memento/edit/${memento?.id}`);
 
   return (
     <SafeAreaView className="flex-1 bg-primary-500" edges={["bottom"]}>

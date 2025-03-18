@@ -70,11 +70,11 @@ export default function ViewCollection() {
   );
 
   const handleEditCollection = () => {
-    router.push(`/(app)/(screens)/(collection)/edit/${collection?.id}`);
+    router.push(`/(app)/(screens)/collection/edit/${collection?.id}`);
   };
 
   const handleViewMemento = (id: number) => {
-    router.push(`/(app)/(screens)/(memento)/${id}`);
+    router.push(`/(app)/(screens)/memento/${id}`);
   };
 
   // Delete collection

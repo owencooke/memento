@@ -39,8 +39,8 @@ def sync_db_pydantic():
             db_url,
             "--schema",
             "public",
-            "--schema",
-            "auth",
+            # "--schema",
+            # "auth",
             "--dir",
             output_dir,
         ]

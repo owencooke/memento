@@ -63,11 +63,11 @@ export default function Collections() {
    * Navigates the user to the collection creation screen
    */
   const handleAddCollection = () => {
-    router.push("/(app)/(screens)/(collection)/create");
+    router.push("/(app)/(screens)/collection/create");
   };
 
   const handleViewCollection = (id: number) => {
-    router.push(`/(app)/(screens)/(collection)/${id}`);
+    router.push(`/(app)/(screens)/collection/${id}`);
   };
 
   return (
