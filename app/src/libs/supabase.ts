@@ -2,13 +2,20 @@ import "react-native-url-polyfill/auto";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = "https://epqxqhjetxflplibxhwp.supabase.co";
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+const supabasePublicKey = process.env.EXPO_PUBLIC_SUPABASE_PUBLIC_KEY;
 
-// Anon public key, safe to expose to client (protected by RLS)
-const supabaseAnonKey =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcXhxaGpldHhmbHBsaWJ4aHdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg4ODM5NzgsImV4cCI6MjA1NDQ1OTk3OH0.QeebA2SQcfzCvFyWeAC9Hikoqje9R3DvNOR7ggZN5wM";
+if (!supabaseUrl) {
+  throw new Error("Missing EXPO_PUBLIC_SUPABASE_URL in environment variables.");
+}
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+if (!supabasePublicKey) {
+  throw new Error(
+    "Missing EXPO_PUBLIC_SUPABASE_PUBLIC_KEY in environment variables.",
+  );
+}
+
+export const supabase = createClient(supabaseUrl, supabasePublicKey, {
   auth: {
     storage: AsyncStorage,
     autoRefreshToken: true,
