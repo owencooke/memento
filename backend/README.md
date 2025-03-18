@@ -99,6 +99,44 @@ For running tests on your local machine:
 poetry run test
 ```
 
+## Supabase Configuration
+
+### Database
+
+This project uses Supabase's PostgreSQL relational database for storing data. The SQL definitions for the public schema and its tables are defined in `/server/services/db/models/schema_public.sql`. To initialize a new Supabase database with this schema:
+
+1. Enable the PostGIS extension through [Supabase dashboard](https://supabase.com/docs/guides/database/extensions/postgis?queryGroups=language&language=sql#enable-the-extension).
+2. Add the tables to the public schema using either:
+
+   - [psql](https://www.postgresql.org/docs/current/app-psql.html), the Postgres CLI
+
+     ```bash
+     psql postgres://your_user:your_password@your_host:5432/your_new_database < schema.sql
+
+     ```
+
+   - Supabase SQL Editor (copy/paste file and then run the query)
+
+### Authentication
+
+Supabase Auth makes it easy to support multiple types of authentication. In this project, we integrate Google OAuth with Supabase Auth to enable social sign in via Google Workspace.
+
+1. Follow the Google Cloud documentation for creating a GCP project and [creating a web application OAuth 2.0 Client ID](https://developers.google.com/identity/gsi/web/guides/get-google-api-clientid).
+
+   - Be sure to add the authorized redirect URI for Supabase Auth: `https://<your-project-id>.supabase.co/auth/v1/callback`
+
+2. Navigate to the Auth > Sign In / Up section in the Supabase dashboard for your project and enable "Sign in with Google".
+
+   - Enter the client ID and secret obtained from Step 1 in GCP dashboard.
+
+3. Navigate to the Auth > URL Configuration section in the Supabase dashboard and add the following authorized redirect URLs:
+   - `memento://auth/redirect` (deep link into actual app build)
+   - `exp://*.*.*.*:19000/--/auth/redirect` (for Expo Go development)
+
+### Storage
+
+Used for storing the images associated with each memento. Navigate to the Storage section of the Supabase dashboard and be sure to create a private bucket called `images` that supports `image/*` MIME types.
+
 ## References
 
 - the initial FastAPI boilerplate was created with the help of the [fastapi_template](https://github.com/s3rius/FastAPI-template) package.
