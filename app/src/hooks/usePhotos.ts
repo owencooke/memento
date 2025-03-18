@@ -155,7 +155,7 @@ const getPhotosFromDevice = async (source: DeviceSource): Promise<Photo[]> => {
 };
 
 // Repeatedly compress the image until the size is small enough
-const MAX_IMAGE_SIZE_BYTES = 500 * 1024; // 750KB
+const MAX_IMAGE_SIZE_BYTES = 500 * 1024; // 500KB
 const INITIAL_COMPRESSION = 0.8;
 const COMPRESSION_STEP = 0.2;
 
