@@ -433,7 +433,7 @@ export type UpdateCollectionAndMementosApiUserUserIdCollectionIdPutResponses = {
 
 export type UpdateCollectionAndMementosApiUserUserIdCollectionIdPutResponse = UpdateCollectionAndMementosApiUserUserIdCollectionIdPutResponses[keyof UpdateCollectionAndMementosApiUserUserIdCollectionIdPutResponses];
 
-export type GenerateCollageApiUserUserIdCollectionIdCollagePostData = {
+export type GenerateCollageApiUserUserIdCollectionIdCollageGetData = {
     body?: never;
     path: {
         id: number;
@@ -442,16 +442,16 @@ export type GenerateCollageApiUserUserIdCollectionIdCollagePostData = {
     url: '/api/user/{user_id}/collection/{id}/collage';
 };
 
-export type GenerateCollageApiUserUserIdCollectionIdCollagePostErrors = {
+export type GenerateCollageApiUserUserIdCollectionIdCollageGetErrors = {
     /**
      * Validation Error
      */
     422: HttpValidationError;
 };
 
-export type GenerateCollageApiUserUserIdCollectionIdCollagePostError = GenerateCollageApiUserUserIdCollectionIdCollagePostErrors[keyof GenerateCollageApiUserUserIdCollectionIdCollagePostErrors];
+export type GenerateCollageApiUserUserIdCollectionIdCollageGetError = GenerateCollageApiUserUserIdCollectionIdCollageGetErrors[keyof GenerateCollageApiUserUserIdCollectionIdCollageGetErrors];
 
-export type GenerateCollageApiUserUserIdCollectionIdCollagePostResponses = {
+export type GenerateCollageApiUserUserIdCollectionIdCollageGetResponses = {
     /**
      * Successful Response
      */

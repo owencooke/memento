@@ -17,7 +17,6 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useMemo, useState } from "react";
 import { Box } from "@/src/components/ui/box";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Heading } from "@/src/components/ui/heading";
 import { FlatList, Pressable } from "react-native";
 import MementoCard from "@/src/components/cards/MementoCard";
 import DeleteCollectionModal from "@/src/components/modals/DeleteModal";
@@ -76,6 +75,9 @@ export default function ViewCollection() {
   const handleViewMemento = (id: number) => {
     router.push(`/(app)/(screens)/(memento)/${id}`);
   };
+
+  const handleShareCollection = () =>
+    router.push(`/(app)/(screens)/(collection)/collage/${collection?.id}`);
 
   // Delete collection
   const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
@@ -163,8 +165,11 @@ export default function ViewCollection() {
       </Box>
       {/* Options bar (info, edit, delete, share) */}
       <Box className="flex flex-row justify-between items-center bg-primary-500">
-        {/* TODO: open Share options */}
-        <Button size="xl" className={buttonClasses}>
+        <Button
+          size="xl"
+          className={buttonClasses}
+          onPress={handleShareCollection}
+        >
           <ButtonIcon as={ShareIcon} className={iconClasses} />
         </Button>
         <Button
