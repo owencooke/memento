@@ -19,10 +19,7 @@ import { useForm, Controller } from "react-hook-form";
 import { Box } from "../ui/box";
 import { Button, ButtonGroup, ButtonText } from "../ui/button";
 import { AlertCircleIcon } from "../ui/icon";
-import LocationInput, {
-  BoundingBoxLocation,
-  GeoLocation,
-} from "./LocationInput";
+import LocationInput, { BoundingBoxLocation } from "./LocationInput";
 import { useCallback } from "react";
 
 export interface FilterMementoFormData {
