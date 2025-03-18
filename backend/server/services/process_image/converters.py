@@ -1,7 +1,8 @@
 from io import BytesIO
+
 from fastapi import UploadFile
-from PIL import Image
 from loguru import logger
+from PIL import Image
 
 
 async def upload_file_to_pil(image: UploadFile) -> Image.Image:
@@ -11,7 +12,9 @@ async def upload_file_to_pil(image: UploadFile) -> Image.Image:
 
 
 async def pil_to_png_bytes(
-    image: Image.Image, max_size_kb: int = 500, compress_level: int = 6
+    image: Image.Image,
+    max_size_kb: int = 500,
+    compress_level: int = 6,
 ) -> bytes:
     """Converts a PIL Image to a compressed PNG."""
     buffer = BytesIO()
@@ -32,6 +35,6 @@ async def pil_to_png_bytes(
         # Scale down by 90% and try again
         width = int(width * 0.9)
         height = int(height * 0.9)
-        image = image.resize((width, height), Image.LANCZOS)
+        image = image.resize((width, height), Image.Resampling.LANCZOS)
 
     return buffer.getvalue()
