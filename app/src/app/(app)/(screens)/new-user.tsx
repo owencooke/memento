@@ -22,6 +22,7 @@ import { toISODateString } from "@/src/libs/date";
 import { ArrowRightIcon } from "@/src/components/ui/icon";
 import { View } from "react-native";
 import { Image } from "@/src/components/ui/image";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface NewUserInfo {
   birthday: Date;
@@ -44,7 +45,10 @@ export default function NewUserForm() {
         },
       },
       {
-        onSuccess: () => router.push("/(app)/(tabs)/mementos"),
+        onSuccess: async () => {
+          await AsyncStorage.setItem("isNewUser", JSON.stringify(false));
+          router.push("/(app)/(tabs)/mementos");
+        },
         onError: (error: any) =>
           console.error("Failed to create new user info", error),
       },

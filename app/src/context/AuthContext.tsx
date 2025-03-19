@@ -1,7 +1,3 @@
-/**
- * @description App context/hook for managing user authentication via Supabase Auth + Google OAuth
- * @requirements FR-1, FR-2
- */
 import React, {
   createContext,
   useContext,
@@ -13,27 +9,18 @@ import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/src/libs/supabase";
 import * as WebBrowser from "expo-web-browser";
 import * as AuthSession from "expo-auth-session";
-
-const AUTH_REDIRECT_URI = AuthSession.makeRedirectUri({
-  scheme: "memento",
-  path: "auth/redirect",
-});
-const AUTH_URI = `${process.env.EXPO_PUBLIC_SUPABASE_URL}/auth/v1/authorize?provider=google&redirect_to=${encodeURIComponent(AUTH_REDIRECT_URI)}`;
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export interface UserSession {
   session: Session | null;
   isLoading: boolean;
-  isNewUser: boolean;
+  isNewUser: boolean | null;
   signIn: () => Promise<void>;
   signOut: () => Promise<void>;
 }
 
 export const AuthContext = createContext<UserSession | undefined>(undefined);
 
-/**
- * Hook that allows other components to access the current {@link UserSession}.
- * Includes user details and sign in/out methods for managing Supabase auth flow.
- */
 export const useSession = (): UserSession => {
   const context = useContext(AuthContext);
   if (context === undefined) {
@@ -47,7 +34,33 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isNewUser, setIsNewUser] = useState(false);
+  const [isNewUser, setIsNewUser] = useState<boolean | null>(null);
+
+  const handleLoadSession = async (session: Session | null) => {
+    setSession(session);
+    setIsLoading(false);
+
+    // Fetch the isNewUser flag from AsyncStorage
+    const storedIsNewUser = await AsyncStorage.getItem("isNewUser");
+    setIsNewUser(storedIsNewUser ? JSON.parse(storedIsNewUser) : null);
+  };
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      handleLoadSession(session);
+    };
+
+    checkSession();
+
+    // Subscribe to Supabase Auth changes
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (_, session) => handleLoadSession(session),
+    );
+    return () => authListener.subscription?.unsubscribe();
+  }, []);
 
   /**
    * Opens the OAuth URL in an external web browser. Once the user completes
@@ -67,7 +80,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         const user = await handleOAuthCallback(result.url);
         // Check if this is a new user / first time signing in
         if (user) {
-          setIsNewUser(await checkIfNewUser(user));
+          const isNew = await checkIfNewUser(user);
+          setIsNewUser(isNew);
+          await AsyncStorage.setItem("isNewUser", JSON.stringify(isNew));
         }
       }
     } catch (error) {
@@ -81,29 +96,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const signOut = async () => {
     await supabase.auth.signOut();
     setSession(null);
+    setIsNewUser(null);
+    await AsyncStorage.removeItem("isNewUser");
   };
-
-  useEffect(() => {
-    // Check async storage for a valid session from previous app use
-    const checkSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      setSession(session);
-      setIsLoading(false);
-    };
-
-    checkSession();
-
-    // Subscribe to Supabase Auth changes
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (_, session) => {
-        setSession(session);
-        setIsLoading(false);
-      },
-    );
-    return () => authListener.subscription?.unsubscribe();
-  }, []);
 
   return (
     <AuthContext.Provider
@@ -113,6 +108,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     </AuthContext.Provider>
   );
 };
+
+// Global variables
+
+const AUTH_REDIRECT_URI = AuthSession.makeRedirectUri({
+  scheme: "memento",
+  path: "auth/redirect",
+});
+const AUTH_URI = `${process.env.EXPO_PUBLIC_SUPABASE_URL}/auth/v1/authorize?provider=google&redirect_to=${encodeURIComponent(AUTH_REDIRECT_URI)}`;
+
+// Helpers
 
 const handleOAuthCallback = async (url: string): Promise<User | null> => {
   try {
@@ -143,8 +148,8 @@ const handleOAuthCallback = async (url: string): Promise<User | null> => {
   }
 };
 
-// Note: ensure RLS policy enabled for user_info table to allow user to access their own data
 const checkIfNewUser = async (user: User) => {
+  // Note: ensure RLS policy enabled for user_info table to allow user to access their own data
   const { data: userInfo, error } = await supabase
     .from("user_info")
     .select("id")

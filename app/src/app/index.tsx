@@ -10,13 +10,15 @@ import { Image } from "../components/ui/image";
 export default function SignIn() {
   const { session, isLoading, signIn, isNewUser } = useSession();
 
-  if (isLoading) {
+  if (isLoading || (session && isNewUser === null)) {
     return (
       <Center className="w-full h-full">
         <Spinner />
       </Center>
     );
   }
+
+  console.log({ session, isLoading, isNewUser });
 
   if (session) {
     if (isNewUser) {
