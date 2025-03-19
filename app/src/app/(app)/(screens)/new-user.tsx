@@ -1,9 +1,3 @@
-/**
- * @description Screen shown to a new user on first time sign-up,
- *    to add addiitonal user info needed for sending birthday push notifications.
- * @requirements FR-56
- */
-
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   Button,
@@ -26,6 +20,8 @@ import { userInfoApiUserPostMutation } from "@/src/api-client/generated/@tanstac
 import { router } from "expo-router";
 import { toISODateString } from "@/src/libs/date";
 import { ArrowRightIcon } from "@/src/components/ui/icon";
+import { View } from "react-native";
+import { Image } from "@/src/components/ui/image";
 
 interface NewUserInfo {
   birthday: Date;
@@ -37,7 +33,6 @@ export default function NewUserForm() {
     defaultValues: { birthday: new Date() },
   });
 
-  // Delete collection query
   const createUserInfoMutation = useMutation(userInfoApiUserPostMutation());
 
   const onSubmit = async (form: NewUserInfo) => {
@@ -50,7 +45,6 @@ export default function NewUserForm() {
       },
       {
         onSuccess: () => router.push("/(app)/(tabs)/collections"),
-
         onError: (error: any) =>
           console.error("Failed to delete collection", error),
       },
@@ -58,19 +52,29 @@ export default function NewUserForm() {
   };
 
   return (
-    <SafeAreaView className="flex-1 p-5 justify-center" edges={["bottom"]}>
-      <Heading className="block mb-2" size="2xl">
-        Welcome to Memento 👋
-      </Heading>
-      <Text size="lg" className="text-left font-light mb-4">
+    <SafeAreaView className="flex-1 p-6 justify-center" edges={["bottom"]}>
+      <View className="flex items-center gap-2 mb-4">
+        <Image
+          size="lg"
+          // TODO: replace with our logo!
+          source={require("@/src/assets/images/react-logo.png")}
+          alt="Memento Logo"
+        />
+        <Heading className="block" size="2xl">
+          Welcome to Memento 👋
+        </Heading>
+      </View>
+
+      <Text size="lg" className="text-left font-light mb-6">
         We're excited to help you preserve your favorite memories, souvenirs,
         thoughtful cards, and more!
       </Text>
-      <Text size="lg" className="text-left font-light mb-4">
+      <Text size="lg" className="text-left font-light mb-8">
         If you'd like reminders to save your cards and other mementos within the
         app, enable push notifications and enter your birthday below!
       </Text>
-      <FormControl size={"lg"}>
+
+      <FormControl size={"lg"} className="mb-6">
         <FormControlLabel>
           <FormControlLabelText>Your Birthday 🎂</FormControlLabelText>
         </FormControlLabel>
@@ -87,7 +91,7 @@ export default function NewUserForm() {
       </FormControl>
 
       <Button
-        className="mt-6"
+        className="mt-8"
         size="lg"
         onPress={handleSubmit(onSubmit)}
         disabled={createUserInfoMutation.isPending}
