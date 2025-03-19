@@ -1,4 +1,5 @@
 import random
+from typing import Sequence
 
 from loguru import logger
 from PIL import Image
@@ -46,7 +47,7 @@ class CollageGenerator:
     async def create_collage(
         self,
         collection: Collection,
-        images: list[Image.Image],
+        images: Sequence[Image.Image],
     ) -> Image.Image:
         """Main method for generating a new collage for a collection."""
 
@@ -67,7 +68,7 @@ class CollageGenerator:
 
         # Add title
         logger.info("Drawing title")
-        text_y = (collage_height // 2) - 100
+        text_y = collage_height / 2 - 100
         text_y = self.font_manager.draw_text_with_background(
             collage,
             collection.title,
@@ -102,7 +103,7 @@ class CollageGenerator:
     def _render_scattered_images(
         self,
         collage: Image.Image,
-        images: list[Image.Image],
+        images: Sequence[Image.Image],
     ) -> None:
         """Render images in a scattered grid in attempt to completely cover canvas."""
 

@@ -4,7 +4,7 @@ from loguru import logger
 from PIL import Image, ImageDraw, ImageFont
 
 from server.config.settings import ROOT_DIR
-from server.config.types import RGB, RGBA, Font, IntPair
+from server.config.types import RGB, RGBA, Font
 
 
 class TextManager:
@@ -47,8 +47,8 @@ class TextManager:
         image: Image.Image,
         text: str,
         font: Font,
-        y_position: int,
-    ) -> int:
+        y_position: float,
+    ) -> float:
         """Draw text with a semi-transparent background for better readability."""
         draw = ImageDraw.Draw(image, "RGBA")
         canvas_width = image.width
@@ -74,6 +74,9 @@ class TextManager:
 
         # Add text, adjusting for the left and top offsets
         draw.text(
-            (x_position - left, y_position - top), text, fill=self.text_color, font=font
+            (x_position - left, y_position - top),
+            text,
+            fill=self.text_color,
+            font=font,
         )
         return bg_bottom + self.margin

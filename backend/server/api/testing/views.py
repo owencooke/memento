@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
@@ -23,9 +24,7 @@ async def test_collage(
     caption: Optional[str] = Query(None, description="Collection caption"),
     location: Optional[str] = Query(None, description="Collection location"),
 ) -> Response:
-    """
-    TEST ENDPOINT to generate a collage from a directory containing local images.
-    """
+    """Test endpoint to generate a collage from a local directory containing images."""
     logger.info(f"Testing collage generation with folder: {folder_path}")
 
     try:
@@ -33,7 +32,7 @@ async def test_collage(
         folder = Path(folder_path)
         if not folder.exists() or not folder.is_dir():
             raise Exception("Folder not found or is not a directory")
-        image_files = [file for file in folder.iterdir()]
+        image_files = list(folder.iterdir())
         if not image_files:
             raise Exception("No image files found in the specified folder")
 
@@ -55,7 +54,7 @@ async def test_collage(
             caption=caption,
             location=location,
             date=datetime.now().date(),
-            user_id="8a111e4b-8727-4ab6-a19a-6177657e6b35",
+            user_id=uuid.uuid4(),
         )
 
         # Generate collage
@@ -65,4 +64,4 @@ async def test_collage(
         output_bytes = await pil_to_png_bytes(collage)
         return Response(content=output_bytes, media_type="image/png")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
