@@ -15,7 +15,7 @@ class CollageGenerator:
     def __init__(
         self,
         canvas_size: IntPair = (1200, 1600),  # 4:3 aspect ratio
-        canvas_color: RGB = (240, 249, 255),
+        canvas_color: RGB = (231, 246, 255),
         max_images_used: int = 15,
         image_radius: int = 20,
         image_coverage: float = 1.35,  # relative to size of "grid cell"
@@ -58,7 +58,7 @@ class CollageGenerator:
 
         # Load fonts
         logger.info("Loading fonts")
-        title_font = self.font_manager.load_font("Pacifico-Regular.ttf", 60)
+        title_font = self.font_manager.load_font("Pacifico-Regular.ttf", 96)
         caption_font = self.font_manager.load_font("Quicksand-Regular.ttf", 36)
         metadata_font = self.font_manager.load_font("Quicksand-Regular.ttf", 24)
 
@@ -69,7 +69,10 @@ class CollageGenerator:
         logger.info("Drawing title")
         text_y = (collage_height // 2) - 100
         text_y = self.font_manager.draw_text_with_background(
-            collage, collection.title, title_font, text_y,
+            collage,
+            collection.title,
+            title_font,
+            text_y,
         )
 
         # Add caption

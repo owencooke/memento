@@ -53,8 +53,12 @@ class TextManager:
         draw = ImageDraw.Draw(image, "RGBA")
         canvas_width = image.width
 
-        # Calculate dimensions
-        text_width, text_height = self.get_text_dimensions(draw, text, font)
+        # Get the full bounding box
+        left, top, right, bottom = draw.textbbox((0, 0), text, font=font)
+        text_width = right - left
+        text_height = bottom - top
+
+        # Calculate positions accounting for the offsets
         x_position = (canvas_width - text_width) // 2
         bg_left = x_position - self.text_padding
         bg_top = y_position - self.text_padding
@@ -68,18 +72,8 @@ class TextManager:
             fill=self.bg_color,
         )
 
-        # Add text
-        draw.text((x_position, y_position), text, fill=self.text_color, font=font)
+        # Add text, adjusting for the left and top offsets
+        draw.text(
+            (x_position - left, y_position - top), text, fill=self.text_color, font=font
+        )
         return bg_bottom + self.margin
-
-    def get_text_dimensions(
-        self,
-        draw: ImageDraw.ImageDraw,
-        text: str,
-        font: Font,
-    ) -> IntPair:
-        """Calculate text dimensions using textbbox for accurate sizing."""
-        bbox = draw.textbbox((0, 0), text, font=font)
-        width = int(bbox[2] - bbox[0])
-        height = int(bbox[3] - bbox[1])
-        return width, height
