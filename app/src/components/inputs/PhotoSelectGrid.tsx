@@ -117,14 +117,13 @@ export default function PhotoSelectGrid({
         }}
       />
       {/* Accept/reject background removal result */}
-      {pendingProcessedPhotos.map((backgroundFreePhoto, idx) => (
+      {pendingProcessedPhotos.length > 0 && (
         <BackgroundRemovalModal
-          key={idx}
-          photo={backgroundFreePhoto}
-          accept={() => acceptProcessedPhoto(backgroundFreePhoto)}
-          reject={() => rejectProcessedPhoto(backgroundFreePhoto)}
+          photo={pendingProcessedPhotos[0]}
+          accept={() => acceptProcessedPhoto(pendingProcessedPhotos[0])}
+          reject={() => rejectProcessedPhoto(pendingProcessedPhotos[0])}
         />
-      ))}
+      )}
     </View>
   );
 }
