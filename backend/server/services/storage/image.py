@@ -43,7 +43,7 @@ def download_images(filenames: list[str]) -> list[Image.Image]:
     for file in filenames:
         try:
             response = supabase.storage.from_("images").download(file)
-            image = Image.open(io.BytesIO(response)).convert("RGB")
+            image = Image.open(io.BytesIO(response)).convert("RGBA")
             images.append(image)
         except Exception as e:
             logger.info(
