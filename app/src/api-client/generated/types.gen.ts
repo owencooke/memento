@@ -99,7 +99,7 @@ export type Image = {
     detected_text?: string | null;
     filename: string;
     image_label?: string | null;
-    mime_type: string;
+    mime_type?: string | null;
     order_index: number;
     memento_ids?: Array<Memento> | null;
 };
@@ -112,7 +112,7 @@ export type ImageWithUrl = {
     detected_text?: string | null;
     filename: string;
     image_label?: string | null;
-    mime_type: string;
+    mime_type?: string | null;
     order_index: number;
     url?: string;
 };
@@ -452,6 +452,46 @@ export type GenerateCollageApiUserUserIdCollectionIdCollageGetErrors = {
 export type GenerateCollageApiUserUserIdCollectionIdCollageGetError = GenerateCollageApiUserUserIdCollectionIdCollageGetErrors[keyof GenerateCollageApiUserUserIdCollectionIdCollageGetErrors];
 
 export type GenerateCollageApiUserUserIdCollectionIdCollageGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
+export type TestCollageApiTestingCollageGetData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * Local folder path containing test image files
+         */
+        folder_path: string;
+        /**
+         * Collection title
+         */
+        title?: string;
+        /**
+         * Collection caption
+         */
+        caption?: string | null;
+        /**
+         * Collection location
+         */
+        location?: string | null;
+    };
+    url: '/api/testing/collage';
+};
+
+export type TestCollageApiTestingCollageGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type TestCollageApiTestingCollageGetError = TestCollageApiTestingCollageGetErrors[keyof TestCollageApiTestingCollageGetErrors];
+
+export type TestCollageApiTestingCollageGetResponses = {
     /**
      * Successful Response
      */

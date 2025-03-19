@@ -64,7 +64,7 @@ class ImageBaseSchema(CustomModel):
 	detected_text: str | None = Field(default=None)
 	filename: str
 	image_label: str | None = Field(default=None)
-	mime_type: str
+	mime_type: str | None = Field(default=None)
 	order_index: int
 
 
@@ -152,10 +152,10 @@ class ImageInsert(CustomModelInsert):
 	# date: nullable
 	# detected_text: nullable
 	# image_label: nullable
+	# mime_type: nullable
 
 	# Required fields
 	filename: str
-	mime_type: str
 	order_index: int
 
 		# Optional fields
@@ -163,6 +163,7 @@ class ImageInsert(CustomModelInsert):
 	date: datetime.date | None = Field(default=None)
 	detected_text: str | None = Field(default=None)
 	image_label: str | None = Field(default=None)
+	mime_type: str | None = Field(default=None)
 
 
 class MementoInsert(CustomModelInsert):
@@ -265,6 +266,7 @@ class ImageUpdate(CustomModelUpdate):
 	# date: nullable
 	# detected_text: nullable
 	# image_label: nullable
+	# mime_type: nullable
 
 		# Optional fields
 	coordinates: str | None = Field(default=None)
