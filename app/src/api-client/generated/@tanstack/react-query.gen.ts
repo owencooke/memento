@@ -2,7 +2,7 @@
 
 import { type Options, healthCheckApiGet, userInfoApiUserIdGet, removeImageBackgroundApiImageRemoveBackgroundPost, getUsersMementosApiUserUserIdMementoGet, createNewMementoApiUserUserIdMementoPost, updateMementoAndImagesApiUserUserIdMementoIdPut, getUsersCollectionsApiUserUserIdCollectionGet, createNewCollectionApiUserUserIdCollectionPost, deleteCollectionApiUserUserIdCollectionIdDelete, updateCollectionAndMementosApiUserUserIdCollectionIdPut } from '../sdk.gen';
 import { queryOptions, type UseMutationOptions } from '@tanstack/react-query';
-import type { HealthCheckApiGetData, UserInfoApiUserIdGetData, RemoveImageBackgroundApiImageRemoveBackgroundPostData, RemoveImageBackgroundApiImageRemoveBackgroundPostError, GetUsersMementosApiUserUserIdMementoGetData, CreateNewMementoApiUserUserIdMementoPostData, CreateNewMementoApiUserUserIdMementoPostError, UpdateMementoAndImagesApiUserUserIdMementoIdPutData, UpdateMementoAndImagesApiUserUserIdMementoIdPutError, GetUsersCollectionsApiUserUserIdCollectionGetData, CreateNewCollectionApiUserUserIdCollectionPostData, CreateNewCollectionApiUserUserIdCollectionPostError, CreateNewCollectionApiUserUserIdCollectionPostResponse, DeleteCollectionApiUserUserIdCollectionIdDeleteData, DeleteCollectionApiUserUserIdCollectionIdDeleteError, DeleteCollectionApiUserUserIdCollectionIdDeleteResponse, UpdateCollectionAndMementosApiUserUserIdCollectionIdPutData, UpdateCollectionAndMementosApiUserUserIdCollectionIdPutError, UpdateCollectionAndMementosApiUserUserIdCollectionIdPutResponse } from '../types.gen';
+import type { HealthCheckApiGetData, UserInfoApiUserIdGetData, RemoveImageBackgroundApiImageRemoveBackgroundPostData, RemoveImageBackgroundApiImageRemoveBackgroundPostError, GetUsersMementosApiUserUserIdMementoGetData, CreateNewMementoApiUserUserIdMementoPostData, CreateNewMementoApiUserUserIdMementoPostError, CreateNewMementoApiUserUserIdMementoPostResponse, UpdateMementoAndImagesApiUserUserIdMementoIdPutData, UpdateMementoAndImagesApiUserUserIdMementoIdPutError, GetUsersCollectionsApiUserUserIdCollectionGetData, CreateNewCollectionApiUserUserIdCollectionPostData, CreateNewCollectionApiUserUserIdCollectionPostError, CreateNewCollectionApiUserUserIdCollectionPostResponse, DeleteCollectionApiUserUserIdCollectionIdDeleteData, DeleteCollectionApiUserUserIdCollectionIdDeleteError, DeleteCollectionApiUserUserIdCollectionIdDeleteResponse, UpdateCollectionAndMementosApiUserUserIdCollectionIdPutData, UpdateCollectionAndMementosApiUserUserIdCollectionIdPutError, UpdateCollectionAndMementosApiUserUserIdCollectionIdPutResponse } from '../types.gen';
 import { client as _heyApiClient } from '../client.gen';
 
 export type QueryKey<TOptions extends Options> = [
@@ -136,7 +136,7 @@ export const createNewMementoApiUserUserIdMementoPostOptions = (options: Options
 };
 
 export const createNewMementoApiUserUserIdMementoPostMutation = (options?: Partial<Options<CreateNewMementoApiUserUserIdMementoPostData>>) => {
-    const mutationOptions: UseMutationOptions<unknown, CreateNewMementoApiUserUserIdMementoPostError, Options<CreateNewMementoApiUserUserIdMementoPostData>> = {
+    const mutationOptions: UseMutationOptions<CreateNewMementoApiUserUserIdMementoPostResponse, CreateNewMementoApiUserUserIdMementoPostError, Options<CreateNewMementoApiUserUserIdMementoPostData>> = {
         mutationFn: async (localOptions) => {
             const { data } = await createNewMementoApiUserUserIdMementoPost({
                 ...options,
