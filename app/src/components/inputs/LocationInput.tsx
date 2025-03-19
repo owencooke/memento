@@ -35,7 +35,7 @@ interface LocationInputProps {
 const LocationInput = ({
   value = { text: "", lat: 0, long: 0 },
   onChange = (_) => {},
-  queryType = "(cities)",
+  queryType = "(cities)", // queryType defaults to cities
   returnBoundingBox = false,
 }: LocationInputProps) => {
   const { getColor } = useColors();
@@ -70,6 +70,7 @@ const LocationInput = ({
         const bbox = details?.geometry.viewport; // This is how the bounding box is accessed
         prevTextRef.current = text;
 
+        // FIXME: This feels wrong but so does creating another component just for bbox
         if (returnBoundingBox && bbox) {
           onChange({ text, bbox });
         } else {

@@ -1,7 +1,7 @@
 import { getUsersMementosApiUserUserIdMementoGetOptions } from "@/src/api-client/generated/@tanstack/react-query.gen";
 import MementoCard from "@/src/components/cards/MementoCard";
 import { Fab, FabIcon } from "@/src/components/ui/fab";
-import { AddIcon, EditIcon } from "@/src/components/ui/icon";
+import { AddIcon } from "@/src/components/ui/icon";
 import { useSession } from "@/src/context/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
@@ -27,10 +27,10 @@ export default function Mementos() {
   const { session } = useSession();
   const { getColor } = useColors();
   const [refreshing, setRefreshing] = useState(false);
-  const [searchText, setSearchText] = useState("");
-  const [showActionsheet, setShowActionsheet] = useState(false);
   const refreshColor = getColor("tertiary-500");
 
+  // States for search bar text and filter parameters from filter actionsheet
+  const [searchText, setSearchText] = useState("");
   const [filterParams, setFilterParams] = useState<{
     start_date: string | null;
     end_date: string | null;
@@ -58,6 +58,14 @@ export default function Mementos() {
     }),
   });
 
+  // debounces the refetch when search text or filter params change
+  useEffect(() => {
+    const debouncedRefetch = debounce(refetch, 300);
+    debouncedRefetch();
+
+    return () => debouncedRefetch.cancel();
+  }, [searchText, filterParams]);
+
   // For odd number of mementos, add a spacer for last grid element
   const gridData = useMemo(
     () =>
@@ -81,20 +89,14 @@ export default function Mementos() {
     router.push(`/(app)/(screens)/(memento)/${id}`);
   };
 
-  useEffect(() => {
-    const debouncedRefetch = debounce(refetch, 300);
-    debouncedRefetch();
-
-    return () => debouncedRefetch.cancel();
-  }, [searchText, filterParams]);
-
+  // Passes teh filter actionsheet form data back to memento tab state
+  const [showActionsheet, setShowActionsheet] = useState(false);
   const handleApplyFilters = (data: FilterMementoFormData) => {
     setFilterParams({
       start_date: data.start_date?.toISOString().split("T")[0] ?? null,
       end_date: data.end_date?.toISOString().split("T")[0] ?? null,
       bbox: data.location.bbox ?? null,
     });
-    console.log(data.location.bbox);
     setShowActionsheet(false);
   };
 
@@ -104,7 +106,7 @@ export default function Mementos() {
 
   return (
     <View className="flex-1 bg-background-100 py-4 px-6">
-      <View className="flex-row items-center gap-x-2 py-2">
+      <View className="flex-row items-center gap-x-2 mb-4">
         <Input className="flex-1 bg-background-0">
           <InputSlot className="pl-3">
             <InputIcon as={SearchIcon} />

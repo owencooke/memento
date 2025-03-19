@@ -45,7 +45,8 @@ class MementoFilterParams(BaseModel):
     max_lat: Optional[float] = Field(default=None)
     max_long: Optional[float] = Field(default=None)
     text: Optional[str] = Field(
-        default=None, description="Text to search in memento caption and detected text"
+        default=None,
+        description="Text to search in memento caption and detected text",
     )
 
     @field_validator("text")
@@ -60,11 +61,14 @@ class MementoFilterParams(BaseModel):
         # replace multiple spaces with single space
         cleaned_text = re.sub(r"\s+", " ", cleaned_text)
 
+        # enable partial matching for each word
+        words = [f"{word}:*" for word in cleaned_text.split()]
+
+        # combine words using '&' for full text match
         if " " in cleaned_text:
-            words = cleaned_text.split()
             return " & ".join(words)
 
-        return cleaned_text
+        return "".join(words)
 
     @model_validator(mode="before")
     @classmethod
@@ -88,7 +92,8 @@ class MementoFilterParams(BaseModel):
         bbox_values = [data.get(field) for field in bbox_fields]
         if any(bbox_values) and not all(bbox_values):
             raise ValueError(
-                "All bounding box coordinates (min_lat, min_long, max_lat, max_long) must be provided"
+                "All bounding box coordinates \
+                        (min_lat, min_long, max_lat, max_long) must be provided",
             )
 
         return data
