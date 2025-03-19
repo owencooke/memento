@@ -47,7 +47,7 @@ def get_users_mementos(
 
     # Get all image URLs
     image_urls = get_bulk_image_urls(
-        [image.filename for memento in mementos for image in memento.images]
+        [image.filename for memento in mementos for image in memento.images],
     )
 
     # Assign URLs to images and sort in proper order for UI
