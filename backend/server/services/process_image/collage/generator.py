@@ -14,10 +14,8 @@ class CollageGenerator:
 
     def __init__(
         self,
-        canvas_size: IntPair = (1170, 2532),  # iPhone 13 aspect ratio
+        canvas_size: IntPair = (1200, 1600),  # 4:3 aspect ratio
         canvas_color: RGB = (255, 255, 255),
-        min_image_size: IntPair = (700, 900),
-        max_image_size: IntPair = (900, 1500),
         max_images_used: int = 15,
         image_radius: int = 20,
         image_coverage: float = 1.0,  # relative to size of "grid cell"
@@ -37,8 +35,6 @@ class CollageGenerator:
         self.image_processor = ImageProcessor()
         self.canvas_size = canvas_size
         self.canvas_color = canvas_color
-        self.min_image_size = min_image_size
-        self.max_image_size = max_image_size
         self.image_coverage = image_coverage
         self.margin = margin
         self.image_radius = image_radius
@@ -116,11 +112,9 @@ class CollageGenerator:
         cell_width, cell_height, grid_cells = self._initialize_grid(len(images_to_use))
 
         used_areas = []
-        for idx, image in enumerate(images_to_use):
-            if not grid_cells:
-                break
+        for idx, grid_cell in enumerate(grid_cells):
             try:
-                row, col = grid_cells.pop(0)
+                row, col = grid_cell
 
                 # Get image and dimensions
                 coverage = random.uniform(
@@ -130,7 +124,8 @@ class CollageGenerator:
                 img_width = int(cell_width * coverage)
                 img_height = int(cell_height * coverage)
                 rounded_img = self.image_processor.prepare_image(
-                    image,
+                    # Repeat images until all grid cells full
+                    images_to_use[idx % len(images_to_use)],
                     (img_width, img_height),
                     self.image_radius,
                 )
@@ -188,9 +183,9 @@ class CollageGenerator:
         """Initialize a grid for image placement based on number of images."""
         grid_cols = 2
         grid_rows = 2
-        if num_images > 4:
-            grid_cols = min(4, max(2, int(num_images**0.5)))
-            grid_rows = min(4, max(2, (num_images + grid_cols - 1) // grid_cols))
+        if num_images > grid_cols * grid_cols:
+            grid_cols = min(6, max(2, int(num_images**0.5)))
+            grid_rows = min(6, max(2, (num_images + grid_cols - 1) // grid_cols))
 
         logger.info(f"Using grid of {grid_cols}x{grid_rows} for {num_images} images")
 
