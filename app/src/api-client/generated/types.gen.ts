@@ -176,6 +176,14 @@ export type UserInfo = {
     birthday?: string | null;
 };
 
+/**
+ * UserInfo Insert Schema.
+ */
+export type UserInfoInsert = {
+    id?: string | null;
+    birthday?: string | null;
+};
+
 export type ValidationError = {
     loc: Array<string | number>;
     msg: string;
@@ -222,6 +230,31 @@ export type UserInfoApiUserIdGetResponses = {
 };
 
 export type UserInfoApiUserIdGetResponse = UserInfoApiUserIdGetResponses[keyof UserInfoApiUserIdGetResponses];
+
+export type UserInfoApiUserPostData = {
+    body: UserInfoInsert;
+    path?: never;
+    query?: never;
+    url: '/api/user/';
+};
+
+export type UserInfoApiUserPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type UserInfoApiUserPostError = UserInfoApiUserPostErrors[keyof UserInfoApiUserPostErrors];
+
+export type UserInfoApiUserPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: UserInfo;
+};
+
+export type UserInfoApiUserPostResponse = UserInfoApiUserPostResponses[keyof UserInfoApiUserPostResponses];
 
 export type RemoveImageBackgroundApiImageRemoveBackgroundPostData = {
     body: BodyRemoveImageBackgroundApiImageRemoveBackgroundPost;

@@ -23,7 +23,7 @@ def user_info(id: UUID4) -> UserInfo:
 
 
 @router.post("/")
-def user_info(body: UserInfoInsert) -> UserInfo:
+def post_user_info(body: UserInfoInsert) -> UserInfo:
     """Creates a new user info record for a first time user.
 
     User should have already been registered via Supabase Auth on client.
