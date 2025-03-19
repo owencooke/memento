@@ -18,8 +18,6 @@ export default function SignIn() {
     );
   }
 
-  console.log({ session, isLoading, isNewUser });
-
   if (session) {
     if (isNewUser) {
       return <Redirect href="/(app)/(screens)/new-user" />;

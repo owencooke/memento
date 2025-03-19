@@ -150,10 +150,9 @@ const handleOAuthCallback = async (url: string): Promise<User | null> => {
 
 const checkIfNewUser = async (user: User) => {
   // Note: ensure RLS policy enabled for user_info table to allow user to access their own data
-  const { data: userInfo, error } = await supabase
+  const { data: userInfo } = await supabase
     .from("user_info")
     .select("id")
     .eq("id", user.id);
-  console.log({ userInfo, error });
   return !userInfo || userInfo.length === 0;
 };
