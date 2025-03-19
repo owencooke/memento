@@ -8,6 +8,8 @@
 import { useState, useEffect } from "react";
 import { Camera } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
+import * as FileSystem from "expo-file-system";
+import * as ImageManipulator from "expo-image-manipulator";
 import { useMutation } from "@tanstack/react-query";
 import { removeImageBackgroundApiImageRemoveBackgroundPostMutation } from "../api-client/generated/@tanstack/react-query.gen";
 import { formDataBodySerializer } from "../api-client/formData";
@@ -19,23 +21,6 @@ export type Photo = Omit<
   "width" | "height" | "pairedVideoAsset"
 > & {
   storedInCloud?: boolean;
-};
-
-const getPhotosFromDevice = async (source: DeviceSource): Promise<Photo[]> => {
-  const pickFunction =
-    source === "camera"
-      ? ImagePicker.launchCameraAsync
-      : ImagePicker.launchImageLibraryAsync;
-
-  const result = await pickFunction({
-    mediaTypes: ["images"],
-    quality: 1,
-    exif: true,
-    allowsMultipleSelection: source === "picker",
-  });
-
-  if (result.canceled) return [];
-  return result.assets;
 };
 
 interface UsePhotosProps {
@@ -142,3 +127,67 @@ export default function usePhotos({ initialPhotos = [] }: UsePhotosProps) {
     rejectProcessedPhoto,
   };
 }
+
+// HELPER FUNCTIONS
+
+// Get photos from device (via either camera or library)
+const getPhotosFromDevice = async (source: DeviceSource): Promise<Photo[]> => {
+  const pickFunction =
+    source === "camera"
+      ? ImagePicker.launchCameraAsync
+      : ImagePicker.launchImageLibraryAsync;
+
+  const result = await pickFunction({
+    mediaTypes: ["images"],
+    quality: 1,
+    exif: true,
+    allowsMultipleSelection: source === "picker",
+  });
+
+  if (result.canceled) return [];
+  return await Promise.all(
+    result.assets.map(async (photo) => {
+      const { uri, mimeType } = await compressImage(photo);
+      return {
+        ...photo,
+        uri,
+        mimeType,
+      };
+    }),
+  );
+};
+
+// Repeatedly compress the image until the size is small enough
+const MAX_IMAGE_SIZE_BYTES = 500 * 1024; // 500KB
+const INITIAL_COMPRESSION = 0.8;
+const COMPRESSION_STEP = 0.2;
+
+const compressImage = async (photo: Photo) => {
+  let { uri, mimeType } = photo;
+  let fileSize = await getFileSize(uri);
+  let quality = INITIAL_COMPRESSION;
+
+  while (fileSize > MAX_IMAGE_SIZE_BYTES && quality > 0.1) {
+    const compressedImage = await ImageManipulator.manipulateAsync(uri, [], {
+      compress: quality,
+      format: ImageManipulator.SaveFormat.JPEG,
+    });
+    fileSize = await getFileSize(compressedImage.uri);
+    uri = compressedImage.uri;
+    quality -= COMPRESSION_STEP;
+  }
+  return {
+    uri,
+    mimeType: quality !== INITIAL_COMPRESSION ? "image/jpeg" : mimeType,
+  };
+};
+
+const getFileSize = async (uri: string) => {
+  try {
+    const info = await FileSystem.getInfoAsync(uri);
+    return info.exists ? info.size : 0;
+  } catch (error) {
+    console.error("Error getting file size:", error);
+    return 0;
+  }
+};
