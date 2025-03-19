@@ -8,8 +8,7 @@ import { Heading } from "../components/ui/heading";
 import { Image } from "../components/ui/image";
 
 export default function SignIn() {
-  const { session, isLoading, signIn } = useSession();
-  // const isNewUser = true;
+  const { session, isLoading, signIn, isNewUser } = useSession();
 
   if (isLoading) {
     return (
@@ -19,12 +18,12 @@ export default function SignIn() {
     );
   }
 
-  // if (isNewUser) {
-  //   return <Redirect href="/(app)/(screens)/new-user" />;
-  // }
-
   if (session) {
-    return <Redirect href="/(app)/(tabs)/mementos" />;
+    if (isNewUser) {
+      return <Redirect href="/(app)/(screens)/new-user" />;
+    } else {
+      return <Redirect href="/(app)/(tabs)/mementos" />;
+    }
   }
 
   return (
@@ -43,7 +42,6 @@ export default function SignIn() {
         <Button
           size="lg"
           action="secondary"
-          // variant="link"
           onPress={signIn}
           className="bg-background-0 flex items-center justify-center rounded-lg border"
         >
