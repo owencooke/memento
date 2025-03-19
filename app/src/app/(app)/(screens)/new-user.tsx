@@ -44,9 +44,9 @@ export default function NewUserForm() {
         },
       },
       {
-        onSuccess: () => router.push("/(app)/(tabs)/collections"),
+        onSuccess: () => router.push("/(app)/(tabs)/mementos"),
         onError: (error: any) =>
-          console.error("Failed to delete collection", error),
+          console.error("Failed to create new user info", error),
       },
     );
   };
