@@ -15,14 +15,14 @@ class CollageGenerator:
     def __init__(
         self,
         canvas_size: IntPair = (1200, 1600),  # 4:3 aspect ratio
-        canvas_color: RGB = (255, 255, 255),
+        canvas_color: RGB = (240, 249, 255),
         max_images_used: int = 15,
         image_radius: int = 20,
-        image_coverage: float = 1.0,  # relative to size of "grid cell"
+        image_coverage: float = 1.35,  # relative to size of "grid cell"
         margin: int = 40,
-        text_padding: int = 10,
-        text_color: RGB = (80, 80, 80),
-        text_bg_color: RGBA = (0, 255, 255, 180),
+        text_color: RGB = (51, 51, 51),
+        text_bg_color: RGBA = (189, 219, 255, 215),
+        text_padding: int = 20,
     ) -> None:
         """Initialize the CollageGenerator parameters."""
         self.font_manager = TextManager(
@@ -54,7 +54,6 @@ class CollageGenerator:
 
         # Create blank canvas
         collage_width, collage_height = self.canvas_size
-        footer_y = collage_height - self.margin * 3
         collage = Image.new("RGB", self.canvas_size, self.canvas_color)
 
         # Load fonts
@@ -68,21 +67,19 @@ class CollageGenerator:
 
         # Add title
         logger.info("Drawing title")
-        self.font_manager.draw_text_with_background(
-            collage,
-            collection.title,
-            title_font,
-            self.margin,
+        text_y = (collage_height // 2) - 100
+        text_y = self.font_manager.draw_text_with_background(
+            collage, collection.title, title_font, text_y,
         )
 
         # Add caption
         if collection.caption:
             logger.info("Drawing caption")
-            footer_y = self.font_manager.draw_text_with_background(
+            text_y = self.font_manager.draw_text_with_background(
                 collage,
                 collection.caption,
                 caption_font,
-                footer_y,
+                text_y,
             )
 
         # Add collection metadata
@@ -93,7 +90,7 @@ class CollageGenerator:
                 collage,
                 metadata_text,
                 metadata_font,
-                footer_y - self.text_padding * 2,
+                text_y - self.margin // 2,
             )
 
         logger.success("Collage created successfully")
