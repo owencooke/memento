@@ -70,20 +70,13 @@ export default function BulkCreateMemento() {
   const [editingGroup, setEditingGroup] = useState<BulkMementoGroup | null>(
     null,
   );
-  const photoIdsInEditingGroup = useMemo(
-    () =>
-      editingGroup ? editingGroup.photos.map((photo) => photo.assetId) : [],
-    [editingGroup],
-  );
 
   const [createdMementoIds, setCreatedMementoIds] = useState<number[]>([]);
 
-  // Add more photos (each new photo starts as a new group)
-  const handleAddPhotos = async () => addPhotos("picker");
-
+  // Updated groups when photos change
   useEffect(() => {
     setMementoGroups((prevGroups) => {
-      let lastGroupId = prevGroups.length;
+      let lastGroupId = prevGroups.length - 1;
       const prevPhotos = prevGroups.flatMap((group) => group.photos);
       return photos.map((newPhoto) => {
         const matchingGroupedPhoto = prevPhotos.find(
@@ -98,7 +91,7 @@ export default function BulkCreateMemento() {
             photos: [{ ...newPhoto, group: lastGroupId }],
           };
         }
-        // Get previous group and update the specific photo (in case it had bg removed)
+        // Get previous group and update the specific photo (i.e. bg removed)
         const prevGroup = prevGroups.find(
           (group) => matchingGroupedPhoto.group === group.groupId,
         )!;
@@ -216,7 +209,7 @@ export default function BulkCreateMemento() {
             </Text>
             <Button
               action="secondary"
-              onPress={handleAddPhotos}
+              onPress={() => addPhotos("picker")}
               size="lg"
               className="mb-4"
             >
@@ -248,56 +241,51 @@ export default function BulkCreateMemento() {
           </View>
         }
       />
+      {/* Actionsheet for editing a memento group's details */}
       {editingGroup && (
-        <>
-          {/* Actionsheet for editing a memento group's details */}
-          <Actionsheet isOpen onClose={handleCloseGroupForm}>
-            <ActionsheetBackdrop />
-            <ActionsheetContent>
-              <ActionsheetDragIndicatorWrapper className="h-8">
-                <ActionsheetDragIndicator />
-              </ActionsheetDragIndicatorWrapper>
-              <View className="w-full">
-                <Pressable className="self-end" onPress={handleCloseGroupForm}>
-                  <Icon
-                    as={CloseIcon}
-                    size="xl"
-                    className="stroke-background-500"
-                  />
-                </Pressable>
-                <MementoForm
-                  initialValues={{
-                    memento: {
-                      caption: editingGroup.caption,
-                      date: editingGroup.date,
-                      location: editingGroup.location,
-                    },
-                    photos: editingGroup.photos,
-                  }}
-                  submitButtonText="Save Changes"
-                  isSubmitting={false}
-                  photosEditable={false}
-                  onSubmit={handleSaveGroupDetails}
-                  FormHeader={`Memento #${editingGroup.groupId + 1}`}
+        <Actionsheet isOpen onClose={handleCloseGroupForm}>
+          <ActionsheetBackdrop />
+          <ActionsheetContent>
+            <ActionsheetDragIndicatorWrapper className="h-8">
+              <ActionsheetDragIndicator />
+            </ActionsheetDragIndicatorWrapper>
+            <View className="w-full">
+              <Pressable className="self-end" onPress={handleCloseGroupForm}>
+                <Icon
+                  as={CloseIcon}
+                  size="xl"
+                  className="stroke-background-500"
                 />
-              </View>
-            </ActionsheetContent>
-          </Actionsheet>
-          {/* Accept/reject background removal result when group opened */}
-          {pendingProcessedPhotos
-            .filter((backgroundFreePhoto) =>
-              photoIdsInEditingGroup.includes(backgroundFreePhoto.assetId),
-            )
-            .map((backgroundFreePhoto, idx) => (
-              <BackgroundRemovalModal
-                key={idx}
-                photo={backgroundFreePhoto}
-                accept={() => acceptProcessedPhoto(backgroundFreePhoto)}
-                reject={() => rejectProcessedPhoto(backgroundFreePhoto)}
+              </Pressable>
+              <MementoForm
+                initialValues={{
+                  memento: {
+                    caption: editingGroup.caption,
+                    date: editingGroup.date,
+                    location: editingGroup.location,
+                  },
+                  photos: editingGroup.photos,
+                }}
+                submitButtonText="Save Changes"
+                isSubmitting={false}
+                photosEditable={false}
+                onSubmit={handleSaveGroupDetails}
+                FormHeader={`Memento #${editingGroup.groupId + 1}`}
               />
-            ))}
-        </>
+            </View>
+          </ActionsheetContent>
+        </Actionsheet>
       )}
+
+      {/* Accept/reject background removal results once they're ready */}
+      {pendingProcessedPhotos.map((backgroundFreePhoto, idx) => (
+        <BackgroundRemovalModal
+          key={idx}
+          photo={backgroundFreePhoto}
+          accept={() => acceptProcessedPhoto(backgroundFreePhoto)}
+          reject={() => rejectProcessedPhoto(backgroundFreePhoto)}
+        />
+      ))}
 
       {/* Modal for optional creation of new collection */}
       {createdMementoIds.length > 0 && (
