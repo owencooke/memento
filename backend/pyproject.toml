@@ -37,6 +37,7 @@ onnxruntime = "^1.20.1"
 numba = "0.61.0"
 rembg = {version = "2.0.61", extras = ["cpu"]}
 python-multipart = "^0.0.20"
+shapely = "^2.0.7"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -131,6 +132,7 @@ lint.ignore = [
     "PLR0913", # Too many arguments for function call
     "D106",    # Missing docstring in public nested class
     "S104",    # Possible binding to all interfaces
+    "S311",    # Standard pseudo-random generators are not suitable for cryptographic purposes
 ]
 exclude = [
     ".venv/",

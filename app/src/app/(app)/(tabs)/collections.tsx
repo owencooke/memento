@@ -5,11 +5,14 @@ import { useColors } from "@/src/hooks/useColors";
 import { useSession } from "@/src/context/AuthContext";
 import { getUsersCollectionsApiUserUserIdCollectionGetOptions } from "@/src/api-client/generated/@tanstack/react-query.gen";
 import { Box } from "@/src/components/ui/box";
-import { Fab, FabIcon } from "@/src/components/ui/fab";
-import { AddIcon } from "@/src/components/ui/icon";
-import { FlatList, Pressable, RefreshControl } from "react-native";
+import { Fab, FabIcon, FabLabel } from "@/src/components/ui/fab";
+import { AddIcon, GlobeIcon, MenuIcon } from "@/src/components/ui/icon";
+import { FlatList, Pressable, RefreshControl, View } from "react-native";
 import { router } from "expo-router";
 import CollectionCard from "@/src/components/cards/CollectionCard";
+import { Switch } from "@/src/components/ui/switch";
+import MapView, { Marker } from "react-native-maps";
+import { StyleSheet } from "react-native";
 
 /**
  * @description Screen displaying a list of user created collections
@@ -23,6 +26,8 @@ export default function Collections() {
   const { getColor } = useColors();
   const [refreshing, setRefreshing] = useState(false);
   const refreshColor = getColor("tertiary-500");
+
+  const [showMapView, setShowMapView] = useState(false);
 
   // Get collections from backend
   const { data: collections, refetch } = useQuery({
@@ -52,6 +57,8 @@ export default function Collections() {
     setRefreshing(false);
   };
 
+  const handleToggleMapView = () => setShowMapView((prev) => !prev);
+
   /**
    * Navigates the user to the collection creation screen
    */
@@ -64,38 +71,64 @@ export default function Collections() {
   };
 
   return (
-    <Box className="flex-1 py-4 px-6 bg-background-100">
+    <Box className="flex-1 bg-background-100">
       {collections && collections.length > 0 ? (
-        <FlatList
-          numColumns={2}
-          columnWrapperStyle={{ gap: 12 }}
-          contentContainerStyle={{ gap: 12 }}
-          showsVerticalScrollIndicator={false}
-          data={gridData}
-          keyExtractor={(item, index) =>
-            "spacer" in item ? `spacer-${index}` : String(item.id)
-          }
-          renderItem={({ item }) =>
-            "spacer" in item ? (
-              <Box className="flex-1" />
-            ) : (
-              <Pressable
-                className="flex-1"
-                onPress={() => handleViewCollection(item.id)}
-              >
-                <CollectionCard {...item} />
-              </Pressable>
-            )
-          }
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={handleRefresh}
-              colors={[refreshColor]}
-              tintColor={refreshColor}
-            />
-          }
-        />
+        showMapView ? (
+          <MapView style={styles.mapView} initialRegion={initialMapRegion}>
+            {collections
+              .filter((collection) => collection.coordinates)
+              .map((collection) => (
+                <Marker
+                  key={collection.id}
+                  coordinate={{
+                    latitude: collection.coordinates?.lat!,
+                    longitude: collection.coordinates?.long!,
+                  }}
+                >
+                  <Pressable
+                    onPress={() => handleViewCollection(collection.id)}
+                  >
+                    <CollectionCard {...collection} variant="marker" />
+                  </Pressable>
+                </Marker>
+              ))}
+          </MapView>
+        ) : (
+          <FlatList
+            numColumns={2}
+            columnWrapperStyle={{ gap: 12 }}
+            contentContainerStyle={{
+              gap: 12,
+              paddingHorizontal: 24,
+              paddingVertical: 24,
+            }}
+            showsVerticalScrollIndicator={false}
+            data={gridData}
+            keyExtractor={(item, index) =>
+              "spacer" in item ? `spacer-${index}` : String(item.id)
+            }
+            renderItem={({ item }) =>
+              "spacer" in item ? (
+                <Box className="flex-1" />
+              ) : (
+                <Pressable
+                  className="flex-1"
+                  onPress={() => handleViewCollection(item.id)}
+                >
+                  <CollectionCard {...item} />
+                </Pressable>
+              )
+            }
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={handleRefresh}
+                colors={[refreshColor]}
+                tintColor={refreshColor}
+              />
+            }
+          />
+        )
       ) : (
         <Box className="flex-1 items-center justify-center">
           <Text>No collections yet!</Text>
@@ -104,6 +137,34 @@ export default function Collections() {
       <Fab size="lg" onPress={handleAddCollection}>
         <FabIcon as={AddIcon} />
       </Fab>
+      <Fab
+        className="bg-secondary-500 border-secondary-300 data-[hover=true]:bg-secondary-600 data-[hover=true]:border-secondary-400 data-[active=true]:bg-secondary-700 data-[active=true]:border-secondary-700 data-[focus-visible=true]:web:ring-indicator-info"
+        placement="bottom left"
+        size="lg"
+        onPress={handleToggleMapView}
+      >
+        {/* TODO: replace with better icons once Lucide added; maybe remove label */}
+        <FabIcon
+          className="text-typography-800 data-[hover=true]:text-typography-800 data-[active=true]:text-typography-800"
+          as={showMapView ? MenuIcon : GlobeIcon}
+        />
+        <FabLabel className="text-typography-800 data-[hover=true]:text-typography-800 data-[active=true]:text-typography-800">
+          {showMapView ? "Grid" : "Map"}
+        </FabLabel>
+      </Fab>
     </Box>
   );
 }
+
+// Map View Configurations
+
+const initialMapRegion = {
+  latitude: 52.2681,
+  longitude: -113.8112,
+  latitudeDelta: 5,
+  longitudeDelta: 5,
+};
+
+const styles = StyleSheet.create({
+  mapView: { width: "100%", height: "100%" },
+});
