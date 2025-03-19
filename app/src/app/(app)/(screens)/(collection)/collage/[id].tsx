@@ -19,6 +19,7 @@ import { View } from "react-native";
 import { Text } from "@/src/components/ui/text";
 import { shareAsync, isAvailableAsync } from "expo-sharing";
 import * as FileSystem from "expo-file-system";
+import { fileNameSafeString } from "@/src/libs/string";
 
 const pngMimeType = "image/png";
 
@@ -57,7 +58,7 @@ export default function ViewCollection() {
     try {
       if (collageImageUri) {
         // Download the collage blob to a temp file
-        const localUri = `${FileSystem.cacheDirectory}${title} Collage.png`;
+        const localUri = `${FileSystem.cacheDirectory}${fileNameSafeString(title)}_Collage.png`;
         const imageContent = collageImageUri.split(",")[1];
         await FileSystem.writeAsStringAsync(localUri, imageContent, {
           encoding: FileSystem.EncodingType.Base64,

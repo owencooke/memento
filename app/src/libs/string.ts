@@ -13,3 +13,5 @@ export const mimeTypeToExtension = (mimeType: string) => {
   }
   return "png";
 };
+
+export const fileNameSafeString = (str: string) => str.replace(/[^\w\s]/gi, "");
