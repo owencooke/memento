@@ -123,40 +123,38 @@ export default function Mementos() {
           <ButtonIcon as={ListFilter} />
         </Button>
       </View>
-      {mementos && mementos.length > 0 ? (
-        <FlatList
-          columnWrapperStyle={{ gap: 12 }}
-          contentContainerStyle={{ gap: 12 }}
-          numColumns={2}
-          showsVerticalScrollIndicator={false}
-          data={gridData}
-          renderItem={({ item }) =>
-            "spacer" in item ? (
-              <View className="flex-1" />
-            ) : (
-              <Pressable
-                className="flex-1"
-                onPress={() => handleViewMemento(item.id)}
-              >
-                <MementoCard {...item} />
-              </Pressable>
-            )
-          }
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={handleRefresh}
-              colors={[refreshColor]}
-              tintColor={refreshColor}
-            />
-          }
-        />
-      ) : (
-        <View className="flex-1 items-center justify-center">
-          <Text>No mementos yet!</Text>
-        </View>
-      )}
-
+      <FlatList
+        columnWrapperStyle={{ gap: 12 }}
+        contentContainerStyle={{ gap: 12, flexGrow: 1 }}
+        numColumns={2}
+        showsVerticalScrollIndicator={false}
+        data={gridData}
+        renderItem={({ item }) =>
+          "spacer" in item ? (
+            <View className="flex-1" />
+          ) : (
+            <Pressable
+              className="flex-1"
+              onPress={() => handleViewMemento(item.id)}
+            >
+              <MementoCard {...item} />
+            </Pressable>
+          )
+        }
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            colors={[refreshColor]}
+            tintColor={refreshColor}
+          />
+        }
+        ListEmptyComponent={
+          <View className="flex-1 items-center justify-center">
+            <Text>No mementos yet!</Text>
+          </View>
+        }
+      />
       <Fab size="lg" onPress={handleAddMemento}>
         <FabIcon as={AddIcon} />
       </Fab>
