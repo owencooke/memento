@@ -16,7 +16,7 @@ class ImageProcessor:
             # Resize the image maintaining aspect ratio
             resized_img = ImageOps.fit(image, target_size, Image.Resampling.LANCZOS)
 
-            # Apply rounded corners
+            # Add rounded corners
             rounded_img = Image.new("RGBA", target_size, (0, 0, 0, 0))
             mask = Image.new("L", target_size, 0)
             mask_draw = ImageDraw.Draw(mask)
@@ -25,8 +25,6 @@ class ImageProcessor:
                 corner_radius,
                 fill=255,
             )
-
-            # Apply mask to create rounded corners
             rounded_img.paste(resized_img, (0, 0), mask)
             return rounded_img
         except Exception as e:
@@ -37,7 +35,7 @@ class ImageProcessor:
     def rotate_image(image: Image.Image, angle: int) -> Image.Image:
         """Rotate an image by the specified angle."""
         try:
-            # Use RGBA mode to preserve transparency during rotation
+            # Preserve transparency
             if image.mode != "RGBA":
                 image = image.convert("RGBA")
 

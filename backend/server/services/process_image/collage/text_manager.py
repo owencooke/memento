@@ -61,17 +61,15 @@ class TextManager:
         bg_right = x_position + text_width + self.text_padding
         bg_bottom = y_position + text_height + self.text_padding
 
-        # Draw text background
+        # Add background
         draw.rounded_rectangle(
             [bg_left, bg_top, bg_right, bg_bottom],
             radius=self.bg_radius,
             fill=self.bg_color,
         )
 
-        # Draw the text
+        # Add text
         draw.text((x_position, y_position), text, fill=self.text_color, font=font)
-
-        # Return the Y position for the next element
         return bg_bottom + self.margin
 
     def get_text_dimensions(
