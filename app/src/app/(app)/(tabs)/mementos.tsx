@@ -23,6 +23,8 @@ import FilterMementoSheet, {
 import { BoundingBox } from "@/src/components/inputs/LocationInput";
 import { useDebounce } from "@/src/hooks/useDebounce";
 
+const tenMinutesInMs = 10 * 60 * 1000;
+
 interface FilterParams {
   start_date: string | null;
   end_date: string | null;
@@ -53,7 +55,7 @@ export default function Mementos() {
       max_long: filterParams.bbox?.northeast.lng ?? undefined,
       text: searchText.trim() || undefined,
     },
-    1000,
+    600,
   );
 
   const { data: mementos, refetch } = useQuery({
@@ -63,8 +65,11 @@ export default function Mementos() {
       },
       query: debouncedQueryParams,
     }),
-    staleTime: Infinity,
-    gcTime: Infinity,
+    // Keep previous results in cache for certain time period
+    staleTime: tenMinutesInMs,
+    gcTime: tenMinutesInMs,
+    // Keep showing previous data while loading new result
+    placeholderData: (previousData) => previousData,
   });
 
   // For odd number of mementos, add a spacer for last grid element
