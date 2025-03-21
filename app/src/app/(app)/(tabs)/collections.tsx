@@ -1,3 +1,9 @@
+/**
+ * @description Screen for displaying a list of user created collections.
+ *    User can see collections displayed in a grid view or on a map using their location.
+ * @requirements FR-3, FR-51, FR-52
+ */
+
 import { Text } from "@/src/components/ui/text";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -7,22 +13,14 @@ import { getUsersCollectionsApiUserUserIdCollectionGetOptions } from "@/src/api-
 import { Box } from "@/src/components/ui/box";
 import { Fab, FabIcon, FabLabel } from "@/src/components/ui/fab";
 import { AddIcon, GlobeIcon, MenuIcon } from "@/src/components/ui/icon";
-import { FlatList, Pressable, RefreshControl, View } from "react-native";
+import { FlatList, Platform, Pressable, RefreshControl } from "react-native";
 import { router } from "expo-router";
 import CollectionCard from "@/src/components/cards/CollectionCard";
-import { Switch } from "@/src/components/ui/switch";
 import MapView, { Marker } from "react-native-maps";
 import { StyleSheet } from "react-native";
 import { useMementos } from "@/src/hooks/useMementos";
 import { Image } from "@/src/components/ui/image";
 
-/**
- * @description Screen displaying a list of user created collections
- *
- * @requirements FR-3
- *
- * @return {JSX.Element} The rendered collections tab
- */
 export default function Collections() {
   const { session } = useSession();
   const { getColor } = useColors();
@@ -32,7 +30,7 @@ export default function Collections() {
   const [showMapView, setShowMapView] = useState(false);
 
   // Get collections from backend
-  const { data: collections, refetch } = useQuery({
+  const { data, refetch } = useQuery({
     ...getUsersCollectionsApiUserUserIdCollectionGetOptions({
       path: {
         user_id: session?.user.id ?? "",
@@ -40,6 +38,18 @@ export default function Collections() {
     }),
   });
   const { mementos } = useMementos();
+  const collections = useMemo(
+    () =>
+      data
+        ? data.map((collection) => ({
+            ...collection,
+            thumbnailUri: mementos.find(
+              (m) => m.id === collection.mementos[0].memento_id,
+            )?.images[0].url!,
+          }))
+        : [],
+    [data, mementos],
+  );
 
   /**
    * transforms collections list to ensure an even grid layout
@@ -90,36 +100,25 @@ export default function Collections() {
                   title={collection.title}
                   description={collection.caption || undefined}
                   onCalloutPress={() => handleViewCollection(collection.id)}
-                  // image={
-                  //   collection.mementos.length > 0
-                  //     ? {
-                  //         // width: 100,
-                  //         scale: 0.5,
-                  //         height: 50,
-                  //         width: 50,
-                  //         uri: mementos.find(
-                  //           (m) => m.id === collection.mementos[0].memento_id,
-                  //         )?.images[0].url,
-                  //       }
-                  //     : undefined
-                  // }
                 >
-                  {/* <Callout></Callout> */}
-                  {/* <Pressable
-                    onPress={() => handleViewCollection(collection.id)}
-                  >
-                    <CollectionCard {...collection} variant="marker" />
-                  </Pressable> */}
-                  <Image
-                    className="max-w-10 max-h-10"
-                    resizeMode="cover"
-                    source={{
-                      uri: mementos.find(
-                        (m) => m.id === collection.mementos[0].memento_id,
-                      )?.images[0].url,
-                    }}
-                    alt=""
-                  />
+                  {Platform.OS === "android" ? (
+                    //NOTE: Android does not support rendering custom views with size larger than 40x40px.
+                    //   So we render just the thumbnail image as a marker, instead of complex card.
+                    <Image
+                      className="max-w-10 max-h-10"
+                      resizeMode="cover"
+                      source={{
+                        uri: collection.thumbnailUri,
+                      }}
+                      alt="Thumbnail for Collection"
+                    />
+                  ) : (
+                    <Pressable
+                      onPress={() => handleViewCollection(collection.id)}
+                    >
+                      <CollectionCard {...collection} variant="marker" />
+                    </Pressable>
+                  )}
                 </Marker>
               ))}
           </MapView>
