@@ -12,6 +12,7 @@ from loguru import logger
 from pydantic import UUID4
 
 from server.api.memento.models import (
+    CreateMementoSuccessResponse,
     NewImageMetadata,
     NewMemento,
     UpdateMemento,
@@ -47,7 +48,7 @@ def get_users_mementos(
 
     # Get all image URLs
     image_urls = get_bulk_image_urls(
-        [image.filename for memento in mementos for image in memento.images]
+        [image.filename for memento in mementos for image in memento.images],
     )
 
     # Assign URLs to images and sort in proper order for UI
@@ -65,7 +66,7 @@ async def create_new_memento(
     image_metadata_str: Annotated[str, Form()],
     images: list[UploadFile],
     user_id: UUID4 = Depends(get_user_id),
-) -> JSONResponse:
+) -> CreateMementoSuccessResponse:
     """Post route for creating a new memento.
 
     Three main steps:
@@ -92,9 +93,7 @@ async def create_new_memento(
         image_metadata[i].filename = path
         create_image_metadata(image_metadata[i], new_memento.id)
 
-    return JSONResponse(
-        content={"message": f"Successfully created new Memento[{new_memento.id}]"},
-    )
+    return CreateMementoSuccessResponse(new_memento_id=new_memento.id)
 
 
 @router.put("/{id}")

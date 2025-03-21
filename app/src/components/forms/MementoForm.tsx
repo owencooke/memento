@@ -10,50 +10,48 @@ import {
   FormControlLabel,
   FormControlLabelText,
 } from "@/src/components/ui/form-control";
-import { Heading } from "@/src/components/ui/heading";
 import { View } from "react-native";
 import { Textarea, TextareaInput } from "@/src/components/ui/textarea";
 import { AlertCircleIcon } from "@/src/components/ui/icon";
 import PhotoSelectGrid from "@/src/components/inputs/PhotoSelectGrid";
 import { FlatList } from "react-native";
-import { useCallback, useState } from "react";
+import { ReactElement, useCallback, useState } from "react";
 import { Photo } from "@/src/hooks/usePhotos";
 import DatePickerInput from "@/src/components/inputs/DatePickerInput";
 import LocationInput, {
   GeoLocation,
 } from "@/src/components/inputs/LocationInput";
 import { aggregateMetadata } from "@/src/libs/metadata";
+import { Heading } from "../ui/heading";
+import { MementoFormData } from "@/src/api-client/memento";
 
-export interface MementoFormData {
-  memento: { date: Date | null; location: GeoLocation; caption: string };
-  photos: Photo[];
-}
+export const defaultMementoFormValues: MementoFormData = {
+  memento: {
+    caption: "",
+    date: null,
+    location: { text: "" },
+  },
+  photos: [],
+};
 
 export interface MementoFormProps {
   initialValues?: MementoFormData;
-  title: string;
   submitButtonText: string;
   isSubmitting: boolean;
+  photosEditable?: boolean;
   onSubmit: (data: MementoFormData) => Promise<void>;
+  FormHeader?: ReactElement | string;
 }
 
 export default function MementoForm({
   initialValues,
-  title,
   submitButtonText,
   isSubmitting,
   onSubmit,
+  FormHeader,
+  photosEditable = true,
 }: MementoFormProps) {
   const [scrollEnabled, setScrollEnabled] = useState(true);
-
-  const defaultValues: MementoFormData = {
-    memento: {
-      caption: "",
-      date: null,
-      location: { text: "" },
-    },
-    photos: [],
-  };
 
   const {
     control,
@@ -64,7 +62,7 @@ export default function MementoForm({
     clearErrors,
     formState: { errors },
   } = useForm<MementoFormData>({
-    defaultValues: initialValues || defaultValues,
+    defaultValues: initialValues || defaultMementoFormValues,
   });
 
   // When more photos added, populate date/location fields from image data
@@ -104,12 +102,18 @@ export default function MementoForm({
       keyboardShouldPersistTaps="handled"
       ListHeaderComponent={
         <View className="flex justify-center gap-6 pb-32">
-          <Heading className="block" size="2xl">
-            {title}
-          </Heading>
+          {typeof FormHeader === "string" ? (
+            <Heading className="block" size="2xl">
+              {FormHeader}
+            </Heading>
+          ) : (
+            FormHeader
+          )}
           <FormControl size={"lg"} isInvalid={!!errors.photos}>
             <FormControlLabel>
-              <FormControlLabelText>Add Photos</FormControlLabelText>
+              <FormControlLabelText>
+                {photosEditable && "Add"} Photos
+              </FormControlLabelText>
             </FormControlLabel>
             <Controller
               name="photos"
@@ -117,6 +121,7 @@ export default function MementoForm({
               render={() => (
                 <PhotoSelectGrid
                   initialPhotos={getValues("photos")}
+                  editable={photosEditable}
                   onChange={handlePhotosChanged}
                   setScrollEnabled={setScrollEnabled}
                 />
@@ -132,17 +137,21 @@ export default function MementoForm({
                 },
               }}
             />
-            <FormControlHelper>
-              <FormControlHelperText>
-                Drag to rearrange photos.
-              </FormControlHelperText>
-            </FormControlHelper>
-            <FormControlError className="mt-4">
-              <FormControlErrorIcon as={AlertCircleIcon} />
-              <FormControlErrorText>
-                {errors?.photos?.message}
-              </FormControlErrorText>
-            </FormControlError>
+            {photosEditable && (
+              <>
+                <FormControlHelper>
+                  <FormControlHelperText>
+                    Drag to rearrange photos.
+                  </FormControlHelperText>
+                </FormControlHelper>
+                <FormControlError className="mt-4">
+                  <FormControlErrorIcon as={AlertCircleIcon} />
+                  <FormControlErrorText>
+                    {errors?.photos?.message}
+                  </FormControlErrorText>
+                </FormControlError>
+              </>
+            )}
           </FormControl>
           <FormControl size={"lg"}>
             <FormControlLabel>

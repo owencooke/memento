@@ -35,7 +35,8 @@ def get_image_url(filename: str, expires_in: int = 86400) -> str:
 
 
 def get_bulk_image_urls(
-    filenames: list[str], expires_in: int = 86400
+    filenames: list[str],
+    expires_in: int = 86400,
 ) -> dict[str, str]:
     """Uses Supabase Storage API to create multiple signed urls in a single request.
 
@@ -44,6 +45,7 @@ def get_bulk_image_urls(
     if not filenames:
         return {}
     response = supabase.storage.from_("images").create_signed_urls(
-        filenames, expires_in
+        filenames,
+        expires_in,
     )
     return {item["path"]: item["signedUrl"] for item in response}
