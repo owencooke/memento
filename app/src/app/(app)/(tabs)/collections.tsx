@@ -14,6 +14,7 @@ import { Switch } from "@/src/components/ui/switch";
 import MapView, { Marker } from "react-native-maps";
 import { StyleSheet } from "react-native";
 import { useMementos } from "@/src/hooks/useMementos";
+import { Image } from "@/src/components/ui/image";
 
 /**
  * @description Screen displaying a list of user created collections
@@ -89,19 +90,19 @@ export default function Collections() {
                   title={collection.title}
                   description={collection.caption || undefined}
                   onCalloutPress={() => handleViewCollection(collection.id)}
-                  image={
-                    collection.mementos.length > 0
-                      ? {
-                          // width: 100,
-                          scale: 0.5,
-                          height: 50,
-                          width: 50,
-                          uri: mementos.find(
-                            (m) => m.id === collection.mementos[0].memento_id,
-                          )?.images[0].url,
-                        }
-                      : undefined
-                  }
+                  // image={
+                  //   collection.mementos.length > 0
+                  //     ? {
+                  //         // width: 100,
+                  //         scale: 0.5,
+                  //         height: 50,
+                  //         width: 50,
+                  //         uri: mementos.find(
+                  //           (m) => m.id === collection.mementos[0].memento_id,
+                  //         )?.images[0].url,
+                  //       }
+                  //     : undefined
+                  // }
                 >
                   {/* <Callout></Callout> */}
                   {/* <Pressable
@@ -109,6 +110,16 @@ export default function Collections() {
                   >
                     <CollectionCard {...collection} variant="marker" />
                   </Pressable> */}
+                  <Image
+                    className="max-w-10 max-h-10"
+                    resizeMode="cover"
+                    source={{
+                      uri: mementos.find(
+                        (m) => m.id === collection.mementos[0].memento_id,
+                      )?.images[0].url,
+                    }}
+                    alt=""
+                  />
                 </Marker>
               ))}
           </MapView>
