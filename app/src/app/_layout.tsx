@@ -17,6 +17,7 @@ import { ThemeProvider, useTheme } from "@/src/context/ThemeContext";
 import { AuthProvider } from "@/src/context/AuthContext";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { CameraProvider } from "../context/PhotoContext";
 
 export const queryClient = new QueryClient();
 
@@ -62,7 +63,9 @@ export default function RootLayout() {
         <ThemeProvider>
           <SafeAreaProvider>
             <GestureHandlerRootView>
-              <RootContent />
+              <CameraProvider>
+                <RootContent />
+              </CameraProvider>
             </GestureHandlerRootView>
           </SafeAreaProvider>
         </ThemeProvider>

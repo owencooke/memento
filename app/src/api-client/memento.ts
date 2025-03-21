@@ -1,5 +1,5 @@
 import { GeoLocation } from "../components/inputs/LocationInput";
-import { Photo } from "../hooks/usePhotos";
+import { Photo } from "@/src/context/PhotoContext";
 import { toISODateString } from "../libs/date";
 import { getRelevantImageMetadata } from "../libs/metadata";
 

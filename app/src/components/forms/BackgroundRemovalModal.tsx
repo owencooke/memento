@@ -11,7 +11,7 @@ import {
   Modal,
 } from "../ui/modal";
 import { Image } from "../ui/image";
-import { Photo } from "@/src/hooks/usePhotos";
+import { Photo } from "@/src/context/PhotoContext";
 
 interface BackgroundRemovalModalProps {
   photo: Photo;

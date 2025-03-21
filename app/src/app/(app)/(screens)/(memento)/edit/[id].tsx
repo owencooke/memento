@@ -17,7 +17,7 @@ import { formDataBodySerializer } from "@/src/api-client/formData";
 import { queryClient } from "@/src/app/_layout";
 import MementoForm from "@/src/components/forms/MementoForm";
 import { GeoLocation } from "@/src/components/inputs/LocationInput";
-import { Photo } from "@/src/hooks/usePhotos";
+import { Photo } from "@/src/context/PhotoContext";
 import { MementoWithImages } from "@/src/api-client/generated";
 import { isEqual } from "lodash";
 import { useMemo } from "react";

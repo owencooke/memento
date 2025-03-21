@@ -1,4 +1,4 @@
-import { DeviceSource, Photo } from "@/src/hooks/usePhotos";
+import { DeviceSource, Photo } from "@/src/context/PhotoContext";
 import {
   Actionsheet,
   ActionsheetBackdrop,

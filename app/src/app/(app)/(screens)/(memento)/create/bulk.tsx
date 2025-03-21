@@ -14,7 +14,7 @@ import { Text } from "@/src/components/ui/text";
 import GroupedPhotoGrid, {
   PhotoWithGroup,
 } from "@/src/components/inputs/GroupedPhotoGrid";
-import usePhotos from "@/src/hooks/usePhotos";
+import { usePhotos } from "@/src/context/PhotoContext";
 import MementoForm, {
   defaultMementoFormValues,
 } from "@/src/components/forms/MementoForm";
@@ -53,9 +53,7 @@ export default function BulkCreateMemento() {
     pendingProcessedPhotos,
     acceptProcessedPhoto,
     rejectProcessedPhoto,
-  } = usePhotos({
-    initialPhotos: [],
-  });
+  } = usePhotos([]);
   const createMutation = useMutation(
     createNewMementoApiUserUserIdMementoPostMutation(),
   );
