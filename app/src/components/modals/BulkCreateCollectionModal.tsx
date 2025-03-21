@@ -84,9 +84,7 @@ export default function BulkCreateCollectionModal({
               path,
             }),
           });
-          // TODO: replace with redirect to View Collection tab for new Collection id
-          //   `/(app)/(screens)/(collection)/${collection.id}`
-          handleCloseModal(`/(app)/(tabs)/collections`);
+          handleCloseModal(`/(app)/(screens)/collection/${collection.id}`);
         },
         onError: (error: any) =>
           console.error("Failed to create new collection", error),

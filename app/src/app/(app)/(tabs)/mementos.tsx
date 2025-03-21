@@ -43,16 +43,16 @@ export default function Mementos() {
   };
 
   const handleViewMemento = (id: number) =>
-    router.push(`/(app)/(screens)/(memento)/${id}`);
+    router.push(`/(app)/(screens)/memento/${id}`);
 
   const handleAddMemento = () => {
     handleCloseModal();
-    router.push("/(app)/(screens)/(memento)/create");
+    router.push("/(app)/(screens)/memento/create");
   };
 
   const handleBulkCreate = () => {
     handleCloseModal();
-    router.push("/(app)/(screens)/(memento)/create/bulk");
+    router.push("/(app)/(screens)/memento/create/bulk");
   };
 
   const handleCloseModal = () => setShowCreateOptions(false);
