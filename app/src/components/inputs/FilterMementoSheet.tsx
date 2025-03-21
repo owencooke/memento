@@ -20,14 +20,14 @@ import { Box } from "../ui/box";
 import { Button, ButtonGroup, ButtonText } from "../ui/button";
 import { AlertCircleIcon } from "../ui/icon";
 import { Heading } from "../ui/heading";
-import LocationInput, { BoundingBoxLocation } from "./LocationInput";
+import LocationInput, { GeoLocation } from "./LocationInput";
 import { useCallback } from "react";
 import { Divider } from "../ui/divider";
 
 export interface FilterMementoFormData {
   start_date: Date | null;
   end_date: Date | null;
-  location: BoundingBoxLocation;
+  location: GeoLocation;
 }
 
 interface FilterMementoSheetProps {
@@ -71,7 +71,7 @@ export default function FilterMementoSheet({
   // Prevent re-rendering location input when BoundingBoxLocation changes
   const locationValue = watch("location");
   const handleLocationChange = useCallback(
-    (value: BoundingBoxLocation) => {
+    (value: GeoLocation) => {
       const hasChanged =
         locationValue.text !== value.text ||
         JSON.stringify(locationValue.bbox) !== JSON.stringify(value.bbox);
@@ -155,10 +155,7 @@ export default function FilterMementoSheet({
                   render={({ field }) => (
                     <LocationInput
                       value={field.value}
-                      onChange={(value) =>
-                        handleLocationChange(value as BoundingBoxLocation)
-                      }
-                      returnBoundingBox={true}
+                      onChange={handleLocationChange}
                       queryType="(regions)"
                     />
                   )}

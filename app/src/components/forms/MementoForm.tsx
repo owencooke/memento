@@ -187,9 +187,7 @@ export default function MementoForm({
               render={({ field }) => (
                 <LocationInput
                   value={field.value}
-                  onChange={(value) =>
-                    handleLocationChange(value as GeoLocation)
-                  }
+                  onChange={handleLocationChange}
                 />
               )}
             />

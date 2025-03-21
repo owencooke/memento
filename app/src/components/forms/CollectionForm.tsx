@@ -168,9 +168,7 @@ export default function CollectionForm({
               control={control}
               render={({ field }) => (
                 <LocationInput
-                  onChange={(value) =>
-                    handleLocationChange(value as GeoLocation)
-                  }
+                  onChange={handleLocationChange}
                   value={field.value}
                 />
               )}
