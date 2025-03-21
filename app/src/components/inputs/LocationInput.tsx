@@ -6,6 +6,7 @@ export interface GeoLocation {
   text: string;
   lat?: number;
   long?: number;
+  bbox?: BoundingBox;
 }
 
 // This is the type that represents the bounding box received from places api
@@ -20,23 +21,16 @@ export interface BoundingBox {
   };
 }
 
-export interface BoundingBoxLocation {
-  text: string;
-  bbox?: BoundingBox;
-}
-
 interface LocationInputProps {
   value: GeoLocation | null;
-  onChange?: (value: GeoLocation | BoundingBoxLocation) => void;
+  onChange?: (value: GeoLocation) => void;
   queryType?: string;
-  returnBoundingBox?: boolean;
 }
 
 const LocationInput = ({
   value = { text: "", lat: 0, long: 0 },
   onChange = (_) => {},
   queryType = "(cities)", // queryType defaults to cities
-  returnBoundingBox = false,
 }: LocationInputProps) => {
   const { getColor } = useColors();
   const autocompleteRef = useRef<any>(null);
@@ -70,12 +64,7 @@ const LocationInput = ({
         const bbox = details?.geometry.viewport; // This is how the bounding box is accessed
         prevTextRef.current = text;
 
-        // FIXME: This feels wrong but so does creating another component just for bbox
-        if (returnBoundingBox && bbox) {
-          onChange({ text, bbox });
-        } else {
-          onChange({ text, lat, long });
-        }
+        onChange({ text, lat, long, bbox });
       }}
       textInputProps={{
         onChangeText: (text) => {
