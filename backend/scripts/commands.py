@@ -7,7 +7,8 @@ load_dotenv()  # Load environment variables from .env file
 
 
 def start():
-    subprocess.run(["python", "-m", "server"])
+    python_path = shutil.which("python")
+    subprocess.run([python_path, "-m", "server"])
 
 
 def lint():

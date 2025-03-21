@@ -1,9 +1,6 @@
-import { getUsersMementosApiUserUserIdMementoGetOptions } from "@/src/api-client/generated/@tanstack/react-query.gen";
 import MementoCard from "@/src/components/cards/MementoCard";
 import { Fab, FabIcon } from "@/src/components/ui/fab";
-import { AddIcon, EditIcon, EyeOffIcon } from "@/src/components/ui/icon";
-import { useSession } from "@/src/context/AuthContext";
-import { useQuery } from "@tanstack/react-query";
+import { AddIcon } from "@/src/components/ui/icon";
 import { router } from "expo-router";
 import { View, Text, FlatList, Pressable, RefreshControl } from "react-native";
 import { useMemo, useState } from "react";
@@ -19,23 +16,16 @@ import {
   ActionsheetItemText,
 } from "@/src/components/ui/actionsheet";
 import { Grid2x2Plus } from "lucide-react-native";
+import { useMementos } from "@/src/hooks/useMementos";
 
 export default function Mementos() {
-  const { session } = useSession();
-
   const { getColor } = useColors();
   const [refreshing, setRefreshing] = useState(false);
   const refreshColor = getColor("tertiary-500");
 
   const [showCreateOptions, setShowCreateOptions] = useState(false);
 
-  const { data: mementos, refetch } = useQuery({
-    ...getUsersMementosApiUserUserIdMementoGetOptions({
-      path: {
-        user_id: session?.user.id ?? "",
-      },
-    }),
-  });
+  const { mementos, refetch } = useMementos();
 
   // For odd number of mementos, add a spacer for last grid element
   const gridData = useMemo(
@@ -53,16 +43,16 @@ export default function Mementos() {
   };
 
   const handleViewMemento = (id: number) =>
-    router.push(`/(app)/(screens)/(memento)/${id}`);
+    router.push(`/(app)/(screens)/memento/${id}`);
 
   const handleAddMemento = () => {
     handleCloseModal();
-    router.push("/(app)/(screens)/(memento)/create");
+    router.push("/(app)/(screens)/memento/create");
   };
 
   const handleBulkCreate = () => {
     handleCloseModal();
-    router.push("/(app)/(screens)/(memento)/create/bulk");
+    router.push("/(app)/(screens)/memento/create/bulk");
   };
 
   const handleCloseModal = () => setShowCreateOptions(false);

@@ -4,7 +4,14 @@ This mobile application is an [Expo](https://expo.dev) project that was created 
 
 ## Get Started
 
-### Environment Variables
+### Prerequisites
+
+- Install [nvm (Node Version Manager)](https://github.com/nvm-sh/nvm)
+- Use nvm to install Node.js (v20+)
+- Install [npm (Node's package manager).](https://www.npmjs.com/)
+- Use npm to install [pnpm (faster and more efficient package manager)](https://pnpm.io/installation#using-npm)
+
+#### Environment Variables
 
 In the `/app/.env` file, ensure the following variables and credentials exist:
 
@@ -24,7 +31,7 @@ EXPO_PUBLIC_GOOGLE_PLACES_API_KEY=<API_KEY> # for Place Autocomplete and Place D
 2. Start the app
 
    ```bash
-    pnpm start
+    pnpm start [--port <PORT_NUMBER>]
    ```
 
 In the output, you'll find options to open the app in a
@@ -146,7 +153,15 @@ It is recommended to follow official documentation for installing/running emulat
 
 Follow the [Android Developer documentation](https://developer.android.com/tools) for installing the Android SDK command-line tools (for `avdmanager`, `adb` and `emulator`). Alternatively, it is possible to use [Android Studio ](https://developer.android.com/tools/sdkmanager) to create devices and manage the Android SDK.
 
-Some helpful commands are provided below for reference
+#### Building app for Android
+
+Building the app and its dependencies can be quite memory intensive thanks to Gradle. Running `pnpm android` requires the emulator to be launched, but will kickoff the full Gradle build process if it hasn't been done yet. The combo of the running emulator + Gradle can overwhelm your system. It is recommended to build the dependencies first before running `pnpm android`. To do this:
+
+1. Run `npx expo prebuild` (generates the `/android` directory for creating a native build via Gradle)
+2. `cd android`
+3. `./gradlew assembleDebug` to kickoff the Gradle build for the project's dependencies
+
+Some other helpful commands are provided below for reference:
 
 #### Running a specific AVD
 

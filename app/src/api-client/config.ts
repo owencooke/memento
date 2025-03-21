@@ -7,8 +7,9 @@ const getBaseUrl = () => {
     return `https://${tunnelHost}`;
   }
   // Use machine's host IP as host for backend
-  const hostname = process.env.EXPO_PUBLIC_API_HOST ?? "127.0.0.1";
-  return `http://${hostname}:8000/`;
+  const host = process.env.EXPO_PUBLIC_API_HOST ?? "127.0.0.1";
+  const port = process.env.EXPO_PUBLIC_API_PORT ?? "8000";
+  return `http://${host}:${port}/`;
 };
 
 export const createClientConfig: CreateClientConfig = (config) => ({

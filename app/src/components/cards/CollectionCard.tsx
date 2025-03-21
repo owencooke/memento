@@ -3,58 +3,70 @@ import { Image } from "@/src/components/ui/image";
 import { CollectionWithMementos } from "@/src/api-client/generated";
 import { Text } from "@/src/components/ui/text";
 import { useMemo } from "react";
-import { Box } from "@/src/components/ui/box";
 
-/**
- * @description A card component for displaying a collection with its metadata.
- *
- * @requirements FR-3
- *
- * @component
- * @param {CollectionCardProps} props - Component props.
- * @returns {JSX.Element} The rendered collection card component.
- */
+type CollectionCardProps = CollectionWithMementos & {
+  variant?: "default" | "marker";
+  thumbnailUri: string;
+};
+
 export default function CollectionCard({
-  id,
   title,
   date,
   location,
-  mementos,
-}: CollectionWithMementos): JSX.Element {
-  // Get thumbnail from first memento
-  const thumbnail = null;
-
+  thumbnailUri,
+  variant = "default",
+}: CollectionCardProps) {
   // Extract city from whole location
   const city = useMemo(
     () => (location ? location.split(",")[0].trim() : location),
     [location],
   );
 
+  const isMarker = variant === "marker";
+
   return (
-    <Box
-      className={"flex-1 gap-4 p-3 rounded-xl shadow-hard-3 bg-background-0"}
-    >
-      <Box className="aspect-square">
-        <Image
-          source={{ uri: "https://placehold.co/400.png" }}
-          className="w-full h-full"
-          alt=""
-          resizeMode="cover"
+    <View className="p-4">
+      <View className="relative">
+        {/* Background Stacked Cards */}
+        <View
+          className={`absolute w-full h-full rounded-xl bg-background-0 shadow-hard-3 -rotate-3
+            ${isMarker ? "top-1 -left-1" : "top-2 -left-2"}`}
         />
-      </Box>
-      <Box className="flex flex-1 justify-between gap-1">
-        <Text size="lg" className="font-bold text-center flex-1">
-          {title}
-        </Text>
-        <View className="flex flex-row justify-between items-center mt-auto font-medium">
-          <Text className="flex-1 text-left" size="sm">
-            {date}
+        <View
+          className={`absolute w-full h-full rounded-xl bg-background-0 shadow-hard-3 rotate-3
+            ${isMarker ? "-top-1 left-1" : "-top-2 left-2"}`}
+        />
+        {/* Actual Card with Contents */}
+        <View
+          className={`relative flex flex-col rounded-xl shadow-hard-3 bg-background-0 
+            ${isMarker ? "w-[80px] p-[6px]" : "flex-1 gap-1 p-3"}`}
+        >
+          <View className="aspect-square flex-1">
+            <Image
+              source={{ uri: thumbnailUri }}
+              className="h-full w-full"
+              alt=""
+              resizeMode="cover"
+            />
+          </View>
+          <Text
+            size={isMarker ? "sm" : "lg"}
+            className="font-bold text-center mt-1"
+          >
+            {title}
           </Text>
-          <Text className="flex-1 text-right" size="sm">
-            {city}
-          </Text>
+          {!isMarker && (
+            <View className="flex flex-col justify-between items-center">
+              <Text className="font-light" size="sm">
+                {city || ""}
+              </Text>
+              <Text className="font-extralight" size="sm">
+                {date || ""}
+              </Text>
+            </View>
+          )}
         </View>
-      </Box>
-    </Box>
+      </View>
+    </View>
   );
 }

@@ -1,8 +1,10 @@
 # Backend
 
-## Installation
+## Get Started
 
-This project uses [poetry](https://python-poetry.org/), a modern dependency management
+### Prerequisites
+
+This project uses [poetry](https://python-poetry.org/docs/), a modern dependency management
 tool.
 
 To install Poetry
@@ -33,7 +35,7 @@ Lastly, install the project's Python dependencies via Poetry:
 poetry install
 ```
 
-## Setting Environment Variables
+#### Setting Environment Variables
 
 The Supabase URL, Key, and Database URL must be declared in the .env file:
 
@@ -47,7 +49,7 @@ DB_URL = ""
 **SUPABASE_KEY**: Project Settings -> Configuration -> Data API and are under the **Project URL** and **Project API Keys** respectively
 **DB_URL** can be found by clicking _Connect_ in the top bar of the Project Dashboard and under the **Session Pooler** section. The DB password must be substituted into the URL.
 
-## Running
+### Running
 
 To run the backend server:
 
