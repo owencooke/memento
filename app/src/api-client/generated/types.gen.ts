@@ -62,6 +62,14 @@ export type Coordinates = {
     long: number;
 };
 
+/**
+ * Successful response model for the Create Memento route.
+ */
+export type CreateMementoSuccessResponse = {
+    new_memento_id: number;
+    message?: string;
+};
+
 export type HttpValidationError = {
     detail?: Array<ValidationError>;
 };
@@ -303,8 +311,10 @@ export type CreateNewMementoApiUserUserIdMementoPostResponses = {
     /**
      * Successful Response
      */
-    200: unknown;
+    200: CreateMementoSuccessResponse;
 };
+
+export type CreateNewMementoApiUserUserIdMementoPostResponse = CreateNewMementoApiUserUserIdMementoPostResponses[keyof CreateNewMementoApiUserUserIdMementoPostResponses];
 
 export type UpdateMementoAndImagesApiUserUserIdMementoIdPutData = {
     body: BodyUpdateMementoAndImagesApiUserUserIdMementoIdPut;

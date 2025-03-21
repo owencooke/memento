@@ -97,3 +97,10 @@ class MementoFilterParams(BaseModel):
             )
 
         return data
+
+
+class CreateMementoSuccessResponse(BaseModel):
+    """Successful response model for the Create Memento route."""
+
+    new_memento_id: int
+    message: str = "Successfully created new Memento"

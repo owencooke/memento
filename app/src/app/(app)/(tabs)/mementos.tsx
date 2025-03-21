@@ -1,7 +1,7 @@
 import { getUsersMementosApiUserUserIdMementoGetOptions } from "@/src/api-client/generated/@tanstack/react-query.gen";
 import MementoCard from "@/src/components/cards/MementoCard";
 import { Fab, FabIcon } from "@/src/components/ui/fab";
-import { AddIcon } from "@/src/components/ui/icon";
+import { AddIcon, EditIcon, EyeOffIcon } from "@/src/components/ui/icon";
 import { useSession } from "@/src/context/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
@@ -22,6 +22,17 @@ import FilterMementoSheet, {
 } from "@/src/components/inputs/FilterMementoSheet";
 import { BoundingBox } from "@/src/components/inputs/LocationInput";
 import { useDebounce } from "@/src/hooks/useDebounce";
+import {
+  Actionsheet,
+  ActionsheetBackdrop,
+  ActionsheetContent,
+  ActionsheetDragIndicator,
+  ActionsheetDragIndicatorWrapper,
+  ActionsheetIcon,
+  ActionsheetItem,
+  ActionsheetItemText,
+} from "@/src/components/ui/actionsheet";
+import { Grid2x2Plus } from "lucide-react-native";
 
 const tenMinutesInMs = 10 * 60 * 1000;
 
@@ -33,6 +44,10 @@ interface FilterParams {
 
 export default function Mementos() {
   const { session } = useSession();
+
+  const [showCreateOptions, setShowCreateOptions] = useState(false);
+  const handleCloseModal = () => setShowCreateOptions(false);
+
   const { getColor } = useColors();
   const [refreshing, setRefreshing] = useState(false);
   const refreshColor = getColor("tertiary-500");
@@ -87,12 +102,17 @@ export default function Mementos() {
     setRefreshing(false);
   };
 
+  const handleViewMemento = (id: number) =>
+    router.push(`/(app)/(screens)/(memento)/${id}`);
+
   const handleAddMemento = () => {
+    handleCloseModal();
     router.push("/(app)/(screens)/(memento)/create");
   };
 
-  const handleViewMemento = (id: number) => {
-    router.push(`/(app)/(screens)/(memento)/${id}`);
+  const handleBulkCreate = () => {
+    handleCloseModal();
+    router.push("/(app)/(screens)/(memento)/create/bulk");
   };
 
   // Passes the filter actionsheet form data back to memento tab state
@@ -160,8 +180,36 @@ export default function Mementos() {
           </View>
         }
       />
-      <Fab size="lg" onPress={handleAddMemento}>
+      <Fab size="lg" onPress={() => setShowCreateOptions(true)}>
         <FabIcon as={AddIcon} />
+        <Actionsheet isOpen={showCreateOptions} onClose={handleCloseModal}>
+          <ActionsheetBackdrop />
+          <ActionsheetContent>
+            <ActionsheetDragIndicatorWrapper>
+              <ActionsheetDragIndicator />
+            </ActionsheetDragIndicatorWrapper>
+            <ActionsheetItem onPress={handleAddMemento}>
+              <ActionsheetIcon
+                size="lg"
+                className="stroke-background-700"
+                as={AddIcon}
+              />
+              <ActionsheetItemText size="xl">
+                Create a single memento
+              </ActionsheetItemText>
+            </ActionsheetItem>
+            <ActionsheetItem onPress={handleBulkCreate}>
+              <ActionsheetIcon
+                size="lg"
+                className="stroke-background-700"
+                as={Grid2x2Plus}
+              />
+              <ActionsheetItemText size="xl">
+                Create multiple mementos
+              </ActionsheetItemText>
+            </ActionsheetItem>
+          </ActionsheetContent>
+        </Actionsheet>
       </Fab>
       <FilterMementoSheet
         visible={showActionsheet}
