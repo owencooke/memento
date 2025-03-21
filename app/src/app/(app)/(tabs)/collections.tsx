@@ -13,6 +13,7 @@ import CollectionCard from "@/src/components/cards/CollectionCard";
 import { Switch } from "@/src/components/ui/switch";
 import MapView, { Marker } from "react-native-maps";
 import { StyleSheet } from "react-native";
+import { useMementos } from "@/src/hooks/useMementos";
 
 /**
  * @description Screen displaying a list of user created collections
@@ -37,6 +38,7 @@ export default function Collections() {
       },
     }),
   });
+  const { mementos } = useMementos();
 
   /**
    * transforms collections list to ensure an even grid layout
@@ -84,12 +86,29 @@ export default function Collections() {
                     latitude: collection.coordinates?.lat!,
                     longitude: collection.coordinates?.long!,
                   }}
+                  title={collection.title}
+                  description={collection.caption || undefined}
+                  onCalloutPress={() => handleViewCollection(collection.id)}
+                  image={
+                    collection.mementos.length > 0
+                      ? {
+                          // width: 100,
+                          scale: 0.5,
+                          height: 50,
+                          width: 50,
+                          uri: mementos.find(
+                            (m) => m.id === collection.mementos[0].memento_id,
+                          )?.images[0].url,
+                        }
+                      : undefined
+                  }
                 >
-                  <Pressable
+                  {/* <Callout></Callout> */}
+                  {/* <Pressable
                     onPress={() => handleViewCollection(collection.id)}
                   >
                     <CollectionCard {...collection} variant="marker" />
-                  </Pressable>
+                  </Pressable> */}
                 </Marker>
               ))}
           </MapView>
@@ -134,9 +153,11 @@ export default function Collections() {
           <Text>No collections yet!</Text>
         </Box>
       )}
-      <Fab size="lg" onPress={handleAddCollection}>
-        <FabIcon as={AddIcon} />
-      </Fab>
+      {!showMapView && (
+        <Fab size="lg" onPress={handleAddCollection}>
+          <FabIcon as={AddIcon} />
+        </Fab>
+      )}
       <Fab
         className="bg-secondary-500 border-secondary-300 data-[hover=true]:bg-secondary-600 data-[hover=true]:border-secondary-400 data-[active=true]:bg-secondary-700 data-[active=true]:border-secondary-700 data-[focus-visible=true]:web:ring-indicator-info"
         placement="bottom left"
