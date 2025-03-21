@@ -6,7 +6,7 @@ import { useSession } from "@/src/context/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { View, Text, FlatList, Pressable, RefreshControl } from "react-native";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useColors } from "@/src/hooks/useColors";
 import {
   Input,
@@ -21,7 +21,15 @@ import FilterMementoSheet, {
   FilterMementoFormData,
 } from "@/src/components/inputs/FilterMementoSheet";
 import { BoundingBox } from "@/src/components/inputs/LocationInput";
-import { debounce } from "lodash";
+import { useDebounce } from "@/src/hooks/useDebounce";
+
+const tenMinutesInMs = 10 * 60 * 1000;
+
+interface FilterParams {
+  start_date: string | null;
+  end_date: string | null;
+  bbox: BoundingBox | null;
+}
 
 export default function Mementos() {
   const { session } = useSession();
@@ -31,40 +39,38 @@ export default function Mementos() {
 
   // States for search bar text and filter parameters from filter actionsheet
   const [searchText, setSearchText] = useState("");
-  const [filterParams, setFilterParams] = useState<{
-    start_date: string | null;
-    end_date: string | null;
-    bbox: BoundingBox | null;
-  }>({
+  const [filterParams, setFilterParams] = useState<FilterParams>({
     start_date: null,
     end_date: null,
     bbox: null,
   });
+
+  const debouncedQueryParams = useDebounce(
+    {
+      start_date: filterParams.start_date ?? undefined,
+      end_date: filterParams.end_date ?? undefined,
+      min_lat: filterParams.bbox?.southwest.lat ?? undefined,
+      min_long: filterParams.bbox?.southwest.lng ?? undefined,
+      max_lat: filterParams.bbox?.northeast.lat ?? undefined,
+      max_long: filterParams.bbox?.northeast.lng ?? undefined,
+      text: searchText.trim() || undefined,
+    },
+    600,
+  );
 
   const { data: mementos, refetch } = useQuery({
     ...getUsersMementosApiUserUserIdMementoGetOptions({
       path: {
         user_id: session?.user.id ?? "",
       },
-      query: {
-        start_date: filterParams.start_date ?? undefined,
-        end_date: filterParams.end_date ?? undefined,
-        min_lat: filterParams.bbox?.southwest.lat ?? undefined,
-        min_long: filterParams.bbox?.southwest.lng ?? undefined,
-        max_lat: filterParams.bbox?.northeast.lat ?? undefined,
-        max_long: filterParams.bbox?.northeast.lng ?? undefined,
-        text: searchText.trim() || undefined,
-      },
+      query: debouncedQueryParams,
     }),
+    // Keep previous results in cache for certain time period
+    staleTime: tenMinutesInMs,
+    gcTime: tenMinutesInMs,
+    // Keep showing previous data while loading new result
+    placeholderData: (previousData) => previousData,
   });
-
-  // debounces the refetch when search text or filter params change
-  useEffect(() => {
-    const debouncedRefetch = debounce(refetch, 300);
-    debouncedRefetch();
-
-    return () => debouncedRefetch.cancel();
-  }, [searchText, filterParams]);
 
   // For odd number of mementos, add a spacer for last grid element
   const gridData = useMemo(
@@ -89,7 +95,7 @@ export default function Mementos() {
     router.push(`/(app)/(screens)/(memento)/${id}`);
   };
 
-  // Passes teh filter actionsheet form data back to memento tab state
+  // Passes the filter actionsheet form data back to memento tab state
   const [showActionsheet, setShowActionsheet] = useState(false);
   const handleApplyFilters = (data: FilterMementoFormData) => {
     setFilterParams({
@@ -98,10 +104,6 @@ export default function Mementos() {
       bbox: data.location.bbox ?? null,
     });
     setShowActionsheet(false);
-  };
-
-  const handleTextChange = (text: string) => {
-    setSearchText(text);
   };
 
   return (
@@ -114,7 +116,7 @@ export default function Mementos() {
           <InputField
             placeholder="Search..."
             value={searchText}
-            onChangeText={handleTextChange}
+            onChangeText={setSearchText}
           />
         </Input>
         <Button
@@ -126,40 +128,38 @@ export default function Mementos() {
           <ButtonIcon as={ListFilter} />
         </Button>
       </View>
-      {mementos && mementos.length > 0 ? (
-        <FlatList
-          columnWrapperStyle={{ gap: 12 }}
-          contentContainerStyle={{ gap: 12 }}
-          numColumns={2}
-          showsVerticalScrollIndicator={false}
-          data={gridData}
-          renderItem={({ item }) =>
-            "spacer" in item ? (
-              <View className="flex-1" />
-            ) : (
-              <Pressable
-                className="flex-1"
-                onPress={() => handleViewMemento(item.id)}
-              >
-                <MementoCard {...item} />
-              </Pressable>
-            )
-          }
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={handleRefresh}
-              colors={[refreshColor]}
-              tintColor={refreshColor}
-            />
-          }
-        />
-      ) : (
-        <View className="flex-1 items-center justify-center">
-          <Text>No mementos yet!</Text>
-        </View>
-      )}
-
+      <FlatList
+        columnWrapperStyle={{ gap: 12 }}
+        contentContainerStyle={{ gap: 12, flexGrow: 1 }}
+        numColumns={2}
+        showsVerticalScrollIndicator={false}
+        data={gridData}
+        renderItem={({ item }) =>
+          "spacer" in item ? (
+            <View className="flex-1" />
+          ) : (
+            <Pressable
+              className="flex-1"
+              onPress={() => handleViewMemento(item.id)}
+            >
+              <MementoCard {...item} />
+            </Pressable>
+          )
+        }
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            colors={[refreshColor]}
+            tintColor={refreshColor}
+          />
+        }
+        ListEmptyComponent={
+          <View className="flex-1 items-center justify-center">
+            <Text>No mementos yet!</Text>
+          </View>
+        }
+      />
       <Fab size="lg" onPress={handleAddMemento}>
         <FabIcon as={AddIcon} />
       </Fab>
