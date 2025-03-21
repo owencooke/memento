@@ -149,10 +149,15 @@ const getPhotosFromDevice = async (source: DeviceSource): Promise<Photo[]> => {
   return await Promise.all(
     result.assets.map(async (photo) => {
       const { uri, mimeType } = await compressImage(photo);
+      const uniqueFilename = uniqueId("photo_");
       return {
         ...photo,
         uri,
         mimeType,
+        // Image uploads to server require a filename to pass validation
+        fileName: photo.fileName ?? `${uniqueFilename}.jpg`,
+        // Captured images may not have id (required for internal state management)
+        assetId: photo.assetId ?? uniqueFilename,
       };
     }),
   );
