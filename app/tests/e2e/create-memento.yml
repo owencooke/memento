@@ -2,34 +2,63 @@ appId: com.memento.app
 ---
 # Open app
 # - launchApp
-- assertVisible: "Mementos"
+- assertVisible: Mementos
 
 # Navigate to Create Memento page
 - tapOn:
     id: fab-create-memento
-- tapOn: "Create a single memento"
-- assertVisible: "Create Memento"
+- tapOn: Create a single memento
+- assertVisible: Create Memento
 
 # Take a photo
 - tapOn:
     id: photo-grid-add-button
-- tapOn: "Take a Photo"
+- tapOn: Take a Photo
 - tapOn:
     id: com.android.camera2:id/shutter_button
 - tapOn:
     id: com.android.camera2:id/done_button
-# # Select photos from device library
+#
+# Select photos from device library
 # # NOTE: requires 2 photos to be on device
 # - tapOn:
 #     id: photo-grid-add-button
-# - tapOn: "Select from Library"
+# - tapOn: Select from Library
 # - waitForAnimationToEnd
 # - tapOn:
 #     id: com.google.android.apps.photos:id/image
 # - tapOn:
 #     id: com.google.android.apps.photos:id/image
-# - tapOn: "Done"
-# - assertVisible: "Selected Photos"
+# - tapOn: Done
+# - assertVisible: Selected Photos
 
-# # Fill out other form fields
+# Fill out other form fields
+- tapOn:
+    id: memento-form-caption
+- inputText: Single made by Maestro
+- hideKeyboard
 
+- tapOn:
+    id: memento-form-date
+- tapOn: 1
+- tapOn: OK
+- assertVisible: ^\d{4}-\d{2}-01$ # the 1st day of current year/month
+
+- tapOn:
+    id: memento-form-location
+- inputText: Edmon
+- hideKeyboard
+- scrollUntilVisible:
+    element: Edmonton, AB, Canada
+    direction: DOWN
+- tapOn: Edmonton, AB, Canada
+
+# Submit the form
+- tapOn:
+    id: memento-form-submit-button
+
+# Verify new memento added to grid view
+- assertVisible: Mementos
+- assertVisible: Single made by Maestro
+- assertVisible: ^\d{4}-\d{2}-01$
+- assertVisible: Edmonton
