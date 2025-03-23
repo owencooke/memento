@@ -24,7 +24,7 @@ appId: com.memento.app
     id: interactive-photo-card
 
 # Select photos from device library
-# NOTE: requires at least 2 photos to have been added to device library
+# NOTE: requires at least 1 photo to have been added to device library
 # TODO: create test fixture that uses https://docs.maestro.dev/api-reference/commands/addmedia
 - tapOn:
     id: photo-grid-add-button
@@ -32,10 +32,7 @@ appId: com.memento.app
 - tapOn:
     text: ".*Photo taken on.*" # default "accessibilityText" value identified for photos downloaded from Chrome on emulator
     index: 0
-- tapOn:
-    text: ".*Photo taken on.*"
-    index: 1
-- tapOn: Add (2)
+- tapOn: Add (1)
 
 # Fill out other form fields
 - tapOn:
