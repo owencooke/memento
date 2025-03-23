@@ -5,12 +5,12 @@
   "scripts": {
     "start": "expo start",
     "start:tunnel": "expo start --tunnel",
-    "android": "DARK_MODE=media expo run:android",
+    "android": "expo run:android",
     "android:prod": "DARK_MODE=media expo run:android --variant release",
     "ios": "DARK_MODE=media expo run:ios",
     "web": "DARK_MODE=media expo start --web",
     "test": "jest",
-    "test:e2e": "maestro test",
+    "test:e2e": "cd ./tests/e2e && maestro test *",
     "lint": "expo lint",
     "sync-api": "./scripts/sync-api.sh && openapi-ts",
     "tunnel-api": "./scripts/tunnel-api.sh"

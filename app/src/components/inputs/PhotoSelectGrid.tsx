@@ -103,6 +103,7 @@ export default function PhotoSelectGrid({
                 editable && (
                   // Render the add button
                   <Button
+                    testID="photo-grid-add-button"
                     size="lg"
                     className="mt-2 mr-2 h-full"
                     action="secondary"

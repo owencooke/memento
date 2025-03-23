@@ -1,0 +1,35 @@
+appId: com.memento.app
+---
+# Open app
+# - launchApp
+- assertVisible: "Mementos"
+
+# Navigate to Create Memento page
+- tapOn:
+    id: fab-create-memento
+- tapOn: "Create a single memento"
+- assertVisible: "Create Memento"
+
+# Take a photo
+- tapOn:
+    id: photo-grid-add-button
+- tapOn: "Take a Photo"
+- tapOn:
+    id: com.android.camera2:id/shutter_button
+- tapOn:
+    id: com.android.camera2:id/done_button
+# # Select photos from device library
+# # NOTE: requires 2 photos to be on device
+# - tapOn:
+#     id: photo-grid-add-button
+# - tapOn: "Select from Library"
+# - waitForAnimationToEnd
+# - tapOn:
+#     id: com.google.android.apps.photos:id/image
+# - tapOn:
+#     id: com.google.android.apps.photos:id/image
+# - tapOn: "Done"
+# - assertVisible: "Selected Photos"
+
+# # Fill out other form fields
+

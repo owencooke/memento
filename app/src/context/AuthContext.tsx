@@ -108,6 +108,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   useEffect(() => {
+    if (true) {
+      signInTestUser();
+    }
+
     // Check async storage for a valid session from previous app use
     const checkSession = async () => {
       const {
@@ -135,3 +139,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     </AuthContext.Provider>
   );
 };
+
+const signInTestUser = async () =>
+  supabase.auth.signInWithPassword({
+    email: "e2e-test@example.com",
+    password: "memento123",
+  });
