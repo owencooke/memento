@@ -1,7 +1,7 @@
 appId: com.memento.app
 ---
 # Open app
-# - launchApp
+# TODO: use test fixture for navigating to memento page
 - assertVisible: Mementos
 
 # Navigate to Create Memento page
@@ -11,6 +11,8 @@ appId: com.memento.app
 - assertVisible: Create Memento
 
 # Take a photo
+- assertNotVisible:
+    id: interactive-photo-card
 - tapOn:
     id: photo-grid-add-button
 - tapOn: Take a Photo
@@ -18,19 +20,22 @@ appId: com.memento.app
     id: com.android.camera2:id/shutter_button
 - tapOn:
     id: com.android.camera2:id/done_button
-#
+- assertVisible:
+    id: interactive-photo-card
+
 # Select photos from device library
-# # NOTE: requires 2 photos to be on device
-# - tapOn:
-#     id: photo-grid-add-button
-# - tapOn: Select from Library
-# - waitForAnimationToEnd
-# - tapOn:
-#     id: com.google.android.apps.photos:id/image
-# - tapOn:
-#     id: com.google.android.apps.photos:id/image
-# - tapOn: Done
-# - assertVisible: Selected Photos
+# NOTE: requires at least 2 photos to have been added to device library
+# TODO: create test fixture that uses https://docs.maestro.dev/api-reference/commands/addmedia
+- tapOn:
+    id: photo-grid-add-button
+- tapOn: Select from Library
+- tapOn:
+    text: ".*Photo taken on.*" # default "accessibilityText" value identified for photos downloaded from Chrome on emulator
+    index: 0
+- tapOn:
+    text: ".*Photo taken on.*"
+    index: 1
+- tapOn: Add (2)
 
 # Fill out other form fields
 - tapOn:
