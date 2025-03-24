@@ -10,7 +10,7 @@
     "ios": "DARK_MODE=media expo run:ios",
     "web": "DARK_MODE=media expo start --web",
     "test": "jest",
-    "test:e2e": "cd ./tests/e2e && maestro test *",
+    "test:e2e": "maestro test tests/e2e/*",
     "lint": "expo lint",
     "sync-api": "./scripts/sync-api.sh && openapi-ts",
     "tunnel-api": "./scripts/tunnel-api.sh"

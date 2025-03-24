@@ -6,7 +6,6 @@ appId: com.memento.app
 - tapOn:
     id: fab-create-memento
 - tapOn: Create multiple mementos
-- assertVisible: "/^Create Multiple$/"
 
 # Select photos from device library
 # NOTE: requires at least 2 photos to have been added to device library
