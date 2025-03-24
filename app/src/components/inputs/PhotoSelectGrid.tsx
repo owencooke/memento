@@ -1,12 +1,12 @@
 import { View, Text } from "react-native";
 import usePhotos, { Photo } from "../../hooks/usePhotos";
-import { Image } from "../ui/image";
 import { Button, ButtonIcon } from "../ui/button";
-import { AddIcon, CloseIcon, StarIcon } from "../ui/icon";
+import { AddIcon } from "../ui/icon";
 import { useEffect, useState, useMemo, useCallback } from "react";
-import DraggableGrid from "react-native-draggable-grid";
+import DraggableGrid from "@/src/components/draggable-grid";
 import PhotoSourceSheet from "./PhotoSourceSheet";
-import { Badge, BadgeIcon } from "../ui/badge";
+import InteractivePhotoCard from "../cards/InteractivePhotoCard";
+import BackgroundRemovalModal from "../forms/BackgroundRemovalModal";
 
 interface GridItem {
   key: number;
@@ -17,26 +17,39 @@ interface PhotoSelectGridProps {
   initialPhotos: Photo[];
   onChange: (photos: Photo[]) => Promise<void>;
   setScrollEnabled: (enabled: boolean) => void;
+  editable?: boolean;
 }
 
 export default function PhotoSelectGrid({
   initialPhotos,
+  editable = true,
   onChange,
   setScrollEnabled,
 }: PhotoSelectGridProps) {
   const [showActionsheet, setShowActionsheet] = useState(false);
-  const { hasPermission, addPhotos, photos, removePhoto, setPhotos } =
-    usePhotos({ initialPhotos });
+  const {
+    hasPermission,
+    addPhotos,
+    photos,
+    deletePhoto,
+    setPhotos,
+    pendingProcessedPhotos,
+    acceptProcessedPhoto,
+    rejectProcessedPhoto,
+  } = usePhotos({ initialPhotos });
 
+  // When photos change, send updated state to parent component
   useEffect(() => {
     onChange(photos).catch((e) => console.error(e));
   }, [onChange, photos]);
 
+  // Include non-draggable add button at end of photo grid
   const gridData = useMemo(
     () => [
       ...photos.map((photo, index) => ({
         key: index,
         photo,
+        disabledDrag: !editable,
       })),
       {
         key: -1,
@@ -45,9 +58,10 @@ export default function PhotoSelectGrid({
         disabledReSorted: true,
       },
     ],
-    [photos],
+    [editable, photos],
   );
 
+  // Executed when user releases a dragged photo
   const handleReorderPhotos = useCallback(
     (data: GridItem[]) => {
       const newPhotos = data
@@ -75,48 +89,41 @@ export default function PhotoSelectGrid({
         data={gridData}
         onDragStart={() => setScrollEnabled(false)}
         onDragRelease={handleReorderPhotos}
-        renderItem={(item: GridItem) => (
-          <View className="px-1 py-2 flex-1 aspect-square">
-            {item.photo ? (
-              // Render a photo
-              <View className="relative overflow-hidden rounded-md">
-                <Image
-                  source={{ uri: item.photo.uri }}
-                  className="w-auto h-full mt-2 mr-2"
-                  alt=""
-                  resizeMode="cover"
+        renderItem={(item: GridItem) => {
+          const { photo } = item;
+          return (
+            <View className="px-1 py-2 flex-1 aspect-square">
+              {photo ? (
+                <InteractivePhotoCard
+                  photo={photo}
+                  onDelete={editable ? () => deletePhoto(photo) : undefined}
+                  showThumbnailBadge={item.key === 0}
                 />
-                {/* Thumbnail badge for first photo */}
-                {item.key === 0 && (
-                  <Badge
-                    className="absolute bottom-0 left-0 p-1 bg-tertiary-500"
-                    size="sm"
+              ) : (
+                editable && (
+                  // Render the add button
+                  <Button
+                    size="lg"
+                    className="mt-2 mr-2 h-full"
+                    action="secondary"
+                    onPress={() => setShowActionsheet(true)}
                   >
-                    <BadgeIcon as={StarIcon} className="text-typography-900" />
-                  </Badge>
-                )}
-                <Button
-                  onPress={() => item.photo && removePhoto(item.photo)}
-                  className="absolute p-2 rounded-full top-0 right-0"
-                  size="sm"
-                >
-                  <ButtonIcon className="m-0 p-0" as={CloseIcon} />
-                </Button>
-              </View>
-            ) : (
-              // Render the add button
-              <Button
-                size="lg"
-                className="mt-2 mr-2 h-full"
-                action="secondary"
-                onPress={() => setShowActionsheet(true)}
-              >
-                <ButtonIcon as={AddIcon} />
-              </Button>
-            )}
-          </View>
-        )}
+                    <ButtonIcon as={AddIcon} />
+                  </Button>
+                )
+              )}
+            </View>
+          );
+        }}
       />
+      {/* Accept/reject background removal result */}
+      {pendingProcessedPhotos.length > 0 && (
+        <BackgroundRemovalModal
+          photo={pendingProcessedPhotos[0]}
+          accept={() => acceptProcessedPhoto(pendingProcessedPhotos[0])}
+          reject={() => rejectProcessedPhoto(pendingProcessedPhotos[0])}
+        />
+      )}
     </View>
   );
 }

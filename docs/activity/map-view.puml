@@ -1,0 +1,35 @@
+@startuml
+title View Collections on a Map (FRs 51-52)
+
+|user| User
+|mobile| Mobile App
+|backend| Backend
+|db| Supabase
+
+|user|
+start
+:Opens app;
+:Navigates to "Map" page;
+
+|mobile|
+:Make call to Get Collections API;
+
+|backend|
+:Retrieve collections from database;
+
+|db|
+:Retrieve collections;
+
+|mobile|
+:Display map view;
+:Extract locations of collections;
+:Overlay map with collections from their locations;
+
+|user|
+:Clicks on a collection marker;
+
+|mobile|
+:Open collection details;
+
+stop
+@enduml

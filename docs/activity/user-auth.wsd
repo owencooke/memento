@@ -1,0 +1,87 @@
+@startuml 
+title User Authentication (FRs 1-2)
+
+' Swimlanes
+|user| User
+|mobile| Mobile App
+|db| Supabase
+|google| Google OAuth
+|backend| Backend
+
+|user|
+start
+:Opens app;
+
+|mobile|
+:Checks async storage for a previous session;
+
+if (Valid session?) then (yes)
+  :Navigate to home screen;
+  stop
+else (no)
+endif
+
+|user|
+:Clicks sign in button;
+
+|mobile|
+:Open auth link in-app browser;
+
+|db|
+:Redirect to SSO provider;
+
+|google|
+:Show Google account selection for app;
+
+|user|
+:Select Google account;
+
+|google|
+:Display password prompt;
+
+|user|
+:Enter password;
+
+|google|
+:Authenticate user;
+:Redirect back to Supabase with OAuth token;
+
+|db|
+:Create new user record for SSO provider;
+:Redirect to app deep link with OAuth token;
+
+|mobile|
+:Receive OAuth token;
+:Create new Supabase session;
+:Store session in async storage;
+
+if (New user?) then (yes)
+  :Navigate to first-time user form;
+  
+  |user|
+  :Enter birthday;
+  :Submit form;
+  
+  |mobile|
+  :Prepare upload payload;
+  :Make POST call to Create User Info API;
+  
+  |backend|
+  :Validate new user data;
+  
+  |db|
+  :Create new record for additional user info in relational DB;
+  
+  |backend|
+  :Prepare success response;
+else (no)
+  |mobile|
+  :Navigate to home screen;
+  stop
+endif
+
+|mobile|
+:Navigate to home screen;
+
+stop
+@enduml

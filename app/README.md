@@ -56,7 +56,8 @@ A bash script has been written to handle the tunnel setup for the backend and co
 
 #### Prerequisites
 
-1. Ensure the script has permission to be ran using `chmod +x ./scripts/tunnel-api.sh`.
+1. Requires `npx` to be installed
+2. Ensure the script has permission to be ran using `chmod +x ./scripts/tunnel-api.sh`.
 
 #### Running
 

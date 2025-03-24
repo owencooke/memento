@@ -1,0 +1,72 @@
+@startuml
+title Edit Collection (FRs 41-45)
+
+|user| User
+|mobile| Mobile App
+|backend| Backend
+|db| Supabase
+
+|user|
+start
+:Navigate to View Collection screen;
+:Click "Edit" button;
+
+|mobile|
+:Display Edit Collection form;
+:Show existing details and keepsakes;
+
+partition "Optional Editing Actions" {
+  |user|
+  :Modify title;
+  :Edit caption;
+  :Change metadata (date/location);
+  :Add new keepsakes;
+  :Remove existing keepsakes;
+}
+|mobile|
+:Update tracked form field values;
+
+|user|
+:Click "Save" button;
+
+|mobile|
+:Validate form data;
+if (Form valid?) is (no) then
+  :Show validation errors;
+  |user|
+  :Correct input;
+  :Click "Save" button again;
+|mobile|
+else (yes)
+endif
+
+:Prepare PUT request with updated details;
+:Make API call to Update Collection endpoint;
+
+|backend|
+:Update collection record in relational DB;
+
+if (Keepsake changes?) is (yes) then
+  |db|
+  fork
+    :Add new keepsakes to join table;
+  fork again
+    :Remove deselected keepsakes from join table;
+  end fork
+else (no)
+endif
+
+|backend|
+:Prepare success response;
+
+|mobile|
+if (Request successful?) is (yes) then
+  :Show success message;
+  :Navigate back to View Collection page;
+else (no)
+  :Show error message;
+endif
+
+stop
+@enduml
+

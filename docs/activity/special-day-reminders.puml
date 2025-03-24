@@ -1,0 +1,30 @@
+@startuml
+title Special Day Reminders (FR-56)
+
+|user| User
+|mobile| Mobile App
+|backend| Backend
+|db| Supabase
+
+|backend|
+start
+:Checks if today is special;
+
+|db|
+:Retrieves special days;
+
+|backend|
+if (Today special?) is (yes) then
+  |mobile|
+  :Push notification to remind user;
+else (no)
+  |backend|
+  stop
+endif
+
+|user|
+:View notification;
+
+stop
+@enduml
+

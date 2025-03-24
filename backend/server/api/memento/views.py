@@ -1,6 +1,7 @@
 """
 @description CRUD API routes for Keepsakes/Mementos.
-@requirements FR-17, FR-19, FR-20, FR-21, FR-26, FR-27, FR-28, FR-30, FR31, FR-32, FR-33
+@requirements FR-12, FR-13, FR-14, FR-15, FR-17, FR-19, FR-20, FR-21, FR-26, FR-27,\
+        FR-28, FR-30, FR31, FR-32, FR-33
 """
 
 import json
@@ -12,6 +13,8 @@ from loguru import logger
 from pydantic import UUID4
 
 from server.api.memento.models import (
+    CreateMementoSuccessResponse,
+    MementoFilterParams,
     NewImageMetadata,
     NewMemento,
     UpdateMemento,
@@ -37,16 +40,17 @@ router = APIRouter()
 @router.get("/")
 def get_users_mementos(
     user_id: UUID4 = Depends(get_user_id),
+    filter_query: MementoFilterParams = Depends(),
 ) -> list[MementoWithImages]:
     """Gets all the mementos belonging to a user."""
-    mementos = get_mementos(user_id)
-
+    mementos = get_mementos(user_id, filter_query)
     for memento in mementos:
         # Get private URLs for each image
         for image in memento.images:
             image.url = get_image_url(image.filename)
         # Sort images by order index
         memento.images.sort(key=lambda image: image.order_index)
+
     return mementos
 
 
@@ -56,7 +60,7 @@ async def create_new_memento(
     image_metadata_str: Annotated[str, Form()],
     images: list[UploadFile],
     user_id: UUID4 = Depends(get_user_id),
-) -> JSONResponse:
+) -> CreateMementoSuccessResponse:
     """Post route for creating a new memento.
 
     Three main steps:
@@ -83,9 +87,7 @@ async def create_new_memento(
         image_metadata[i].filename = path
         create_image_metadata(image_metadata[i], new_memento.id)
 
-    return JSONResponse(
-        content={"message": f"Successfully created new Memento[{new_memento.id}]"},
-    )
+    return CreateMementoSuccessResponse(new_memento_id=new_memento.id)
 
 
 @router.put("/{id}")

@@ -1,0 +1,70 @@
+@startuml
+title System Recommended Collection (FRs 38-40)
+
+|user| User
+|mobile| Mobile App
+|backend| Backend
+|db| Supabase
+
+|backend|
+start
+:Periodically analyze keepsakes for patterns;
+:Identify potential collection groupings;
+:Generate collection metadata;
+
+|db|
+:Retrieve relevant keepsakes for recommendation;
+
+|backend|
+:Store recommendation in DB;
+:Trigger push notification;
+
+|mobile|
+:Receive "Recommended Collection" notification;
+
+|user|
+:Clicks notification;
+
+|mobile|
+:Navigate to "Recommended Collection" page;
+:Display recommended collection details;
+:Show "Accept" and "Reject" options;
+
+|user|
+if (User choice?) is (Accept) then
+  :Click "Accept";
+
+  |mobile|
+  :Make POST request to Create Collection API;
+
+  |backend|
+  :Insert collection record in relational DB;
+  |db|
+  :Store keepsake references in join table;
+  |backend|
+  :Prepare success response;
+
+  |mobile|
+  if (Request successful?) is (yes) then
+    :Show success message;
+    :Navigate to View Collection page;
+  else (no)
+    :Show error message;
+  endif
+
+else (Reject)
+  :Click "Reject";
+
+  |mobile|
+  :Make DELETE request to Recommendation API;
+
+  |backend|
+  :Remove recommendation record from DB;
+  |mobile|
+  :Show "Recommendation dismissed" message;
+endif
+
+stop
+@enduml
+
+

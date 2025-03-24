@@ -12,6 +12,7 @@ export default function SignIn() {
 
   useEffect(() => {
     const checkSession = async () => {
+      console.log();
       if (!isLoading) {
         if (session) {
           router.replace("/(app)/(tabs)/mementos");
