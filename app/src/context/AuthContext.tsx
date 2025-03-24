@@ -108,6 +108,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   useEffect(() => {
+    // TODO: fixme (use node_env or env var)
     if (true) {
       signInTestUser();
     }

@@ -1,0 +1,11 @@
+appId: com.memento.app
+tags:
+  - util
+---
+- launchApp:
+    appId: com.memento.app
+    clearState: true # clear app state
+    stopApp: false # but keep app open between runs (opening is slow)
+- extendedWaitUntil:
+    visible: "Mementos"
+    timeout: 30000

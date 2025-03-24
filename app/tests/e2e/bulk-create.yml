@@ -1,0 +1,62 @@
+appId: com.memento.app
+---
+- runFlow: ./util/launch.yml
+
+# Navigate to Bulk Create page
+- tapOn:
+    id: fab-create-memento
+- tapOn: Create multiple mementos
+- assertVisible: /^Create Multiple$/
+
+# Select photos from device library
+# NOTE: requires at least 2 photos to have been added to device library
+- tapOn: Add photos from library
+- tapOn:
+    text: ".*Photo taken on.*" # default "accessibilityText" value identified for photos downloaded from Chrome on emulator
+    index: 0
+- tapOn:
+    text: ".*Photo taken on.*"
+    index: 1
+- tapOn: Add (2)
+
+- assertVisible: "Memento #1"
+- assertVisible: "Memento #2"
+- assertVisible:
+    id: interactive-photo-card
+
+# Accept background removal
+- assertVisible:
+    id: modal-background-removal
+- tapOn:
+    id: modal-background-removal-confirm
+
+# Reject background removal
+- assertVisible:
+    id: modal-background-removal
+- tapOn:
+    id: modal-background-removal-decline
+
+# Fill out each group's details
+- tapOn: "Memento #1"
+- runFlow:
+    file: ./util/memento-form.yml
+    env:
+      CAPTION: "Group number one"
+      LOCATION_PARTIAL: "San Fr"
+      LOCATION_FULL: "San Francisco, CA, USA"
+
+- tapOn: "Memento #2"
+- runFlow:
+    file: ./util/memento-form.yml
+    env:
+      CAPTION: "Group number two"
+      LOCATION_PARTIAL: "Tor"
+      LOCATION_FULL: "Toronto, ON, Canada"
+
+# Submit the form
+- tapOn: Create 2 Mementos
+# TODO: Verify new mementos added to grid view
+# - assertVisible: Mementos
+# - assertVisible: Single made by Maestro
+# - assertVisible: ^\d{4}-\d{2}-01$
+# - assertVisible: Edmonton

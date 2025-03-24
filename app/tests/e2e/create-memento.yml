@@ -1,8 +1,6 @@
 appId: com.memento.app
 ---
-# Open app
-# TODO: use test fixture for navigating to memento page
-- assertVisible: Mementos
+- runFlow: ./util/launch.yml
 
 # Navigate to Create Memento page
 - tapOn:
@@ -23,9 +21,14 @@ appId: com.memento.app
 - assertVisible:
     id: interactive-photo-card
 
+# Accept background removal
+- assertVisible:
+    id: modal-background-removal
+- tapOn:
+    id: modal-background-removal-confirm
+
 # Select photos from device library
 # NOTE: requires at least 1 photo to have been added to device library
-# TODO: create test fixture that uses https://docs.maestro.dev/api-reference/commands/addmedia
 - tapOn:
     id: photo-grid-add-button
 - tapOn: Select from Library
@@ -34,26 +37,19 @@ appId: com.memento.app
     index: 0
 - tapOn: Add (1)
 
+# Reject background removal
+- assertVisible:
+    id: modal-background-removal
+- tapOn:
+    id: modal-background-removal-decline
+
 # Fill out other form fields
-- tapOn:
-    id: memento-form-caption
-- inputText: Single made by Maestro
-- hideKeyboard
-
-- tapOn:
-    id: memento-form-date
-- tapOn: 1
-- tapOn: OK
-- assertVisible: ^\d{4}-\d{2}-01$ # the 1st day of current year/month
-
-- tapOn:
-    id: memento-form-location
-- inputText: Edmon
-- hideKeyboard
-- scrollUntilVisible:
-    element: Edmonton, AB, Canada
-    direction: DOWN
-- tapOn: Edmonton, AB, Canada
+- runFlow:
+    file: ./util/memento-form.yml
+    env:
+      CAPTION: "Single made by Maestro"
+      LOCATION_PARTIAL: "Edmon"
+      LOCATION_FULL: "Edmonton, AB, Canada"
 
 # Submit the form
 - tapOn:
