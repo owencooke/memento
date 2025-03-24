@@ -59,6 +59,8 @@ appId: com.memento.app
 # Submit the form
 - tapOn: Create 2 Mementos
 
+# FIXME: add mementos to a new collection
+
 # Verify new mementos added to grid view
 - assertVisible: Mementos
 
