@@ -37,6 +37,7 @@ const Header: React.FC<HeaderProps> = ({ title, mode = "avatar" }) => {
             className="p-0"
             variant="link"
             onPress={() => router.dismiss()}
+            testID="header-back-button"
           >
             <ButtonIcon className="w-8 h-8" as={ChevronLeftIcon} />
           </Button>

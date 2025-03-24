@@ -2,10 +2,27 @@ appId: com.memento.app
 tags:
   - util
 ---
+# Launch app if not open already
 - launchApp:
     appId: com.memento.app
-    clearState: true # clear app state
-    stopApp: false # but keep app open between runs (opening is slow)
+    clearState: false
+    stopApp: false
+
+# Navigate back to start state (Mementos tab)
+- repeat:
+    while:
+      visible:
+        id: header-back-button
+    commands:
+      - tapOn:
+          id: header-back-button
+- runFlow:
+    when:
+      visible: Collections
+    commands:
+      - tapOn: Mementos
+
+# Extend timeout (app can take a while to launch)
 - extendedWaitUntil:
     visible: "Mementos"
     timeout: 30000

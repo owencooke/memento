@@ -6,7 +6,7 @@ appId: com.memento.app
 - tapOn:
     id: fab-create-memento
 - tapOn: Create multiple mementos
-- assertVisible: /^Create Multiple$/
+- assertVisible: "/^Create Multiple$/"
 
 # Select photos from device library
 # NOTE: requires at least 2 photos to have been added to device library
@@ -41,22 +41,32 @@ appId: com.memento.app
 - runFlow:
     file: ./util/memento-form.yml
     env:
-      CAPTION: "Group number one"
-      LOCATION_PARTIAL: "San Fr"
-      LOCATION_FULL: "San Francisco, CA, USA"
+      CAPTION: Group number one
+      LOCATION_PARTIAL: San Fr
+      LOCATION_FULL: San Francisco, CA, USA
+- tapOn:
+    id: memento-form-submit-button
 
 - tapOn: "Memento #2"
 - runFlow:
     file: ./util/memento-form.yml
     env:
-      CAPTION: "Group number two"
-      LOCATION_PARTIAL: "Tor"
-      LOCATION_FULL: "Toronto, ON, Canada"
+      CAPTION: Group number two
+      LOCATION_PARTIAL: Tor
+      LOCATION_FULL: Toronto, ON, Canada
+- tapOn:
+    id: memento-form-submit-button
 
 # Submit the form
 - tapOn: Create 2 Mementos
-# TODO: Verify new mementos added to grid view
-# - assertVisible: Mementos
-# - assertVisible: Single made by Maestro
-# - assertVisible: ^\d{4}-\d{2}-01$
-# - assertVisible: Edmonton
+
+# Verify new mementos added to grid view
+- assertVisible: Mementos
+
+- assertVisible: Group number one
+- assertVisible: ^\d{4}-\d{2}-01$
+- assertVisible: San Francisco
+
+- assertVisible: Group number two
+- assertVisible: ^\d{4}-\d{2}-01$
+- assertVisible: Toronto

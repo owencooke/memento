@@ -21,11 +21,11 @@ appId: com.memento.app
 - assertVisible:
     id: interactive-photo-card
 
-# Accept background removal
+# Reject background removal
 - assertVisible:
     id: modal-background-removal
 - tapOn:
-    id: modal-background-removal-confirm
+    id: modal-background-removal-decline
 
 # Select photos from device library
 # NOTE: requires at least 1 photo to have been added to device library
@@ -37,11 +37,11 @@ appId: com.memento.app
     index: 0
 - tapOn: Add (1)
 
-# Reject background removal
+# Accept background removal
 - assertVisible:
     id: modal-background-removal
 - tapOn:
-    id: modal-background-removal-decline
+    id: modal-background-removal-confirm
 
 # Fill out other form fields
 - runFlow:
