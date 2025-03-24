@@ -9,7 +9,6 @@ export default function MementoCard({
   date,
   images,
   location,
-  style,
 }: MementoWithImages) {
   // Get thumbnail
   const thumbnail = useMemo(
@@ -24,14 +23,13 @@ export default function MementoCard({
   );
 
   return (
-    <View className="flex-1 bg-background-0 rounded-xl shadow-hard-3 p-3 gap-4" style={style}>
+    <View className="flex-1 bg-background-0 rounded-xl shadow-hard-3 p-3 gap-4">
       <View className="aspect-square">
         <Image
           source={{ uri: thumbnail.url }}
           className="w-full h-full"
           alt=""
           resizeMode="cover"
-          
         />
       </View>
       <View className="flex flex-1 justify-between gap-1">
