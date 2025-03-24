@@ -38,10 +38,6 @@ export default function CreateCollection() {
     ? params.ids.map(Number)
     : params.ids.split(",").map(Number);
 
-  useEffect(() => {
-    console.log("Selected IDs:", ids);
-  }, [ids]);
-
   /**
    * Handles form submission by creating a new collection.
    *
