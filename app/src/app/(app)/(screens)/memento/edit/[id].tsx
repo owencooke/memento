@@ -73,8 +73,7 @@ export default function EditMemento() {
     };
   }, [memento]);
 
-  const handleRedirect = () =>
-    router.dismissTo(`/(app)/(screens)/memento/${memento.id}`);
+  const handleRedirect = () => router.back();
 
   // Call PUT Edit Memento endpoint with custom serializer for multi-part form data
   const onSubmit = async (form: MementoFormData) => {
