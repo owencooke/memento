@@ -27,6 +27,8 @@ export const useMementos = () => {
     bbox: null,
   });
 
+  const activeFilterCount = Object.values(filters).filter(Boolean).length;
+
   const debouncedQueryParams = useDebounce(
     {
       start_date: filters.start_date ?? undefined,
@@ -58,7 +60,7 @@ export const useMementos = () => {
     mementos: data || [],
     refetch,
     isLoading,
-    filters,
+    activeFilterCount,
     setFilters,
     searchText,
     setSearchText,

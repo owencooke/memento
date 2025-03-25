@@ -30,6 +30,7 @@ import {
 import { Grid2x2Plus } from "lucide-react-native";
 import { useMementos } from "@/src/hooks/useMementos";
 import { toISODateString } from "@/src/libs/date";
+import { Badge, BadgeText } from "@/src/components/ui/badge";
 
 export default function Mementos() {
   const [showActionsheet, setShowActionsheet] = useState(false);
@@ -39,8 +40,14 @@ export default function Mementos() {
   const [refreshing, setRefreshing] = useState(false);
   const refreshColor = getColor("tertiary-500");
 
-  const { mementos, refetch, setFilters, searchText, setSearchText } =
-    useMementos();
+  const {
+    mementos,
+    refetch,
+    setFilters,
+    activeFilterCount,
+    searchText,
+    setSearchText,
+  } = useMementos();
 
   // For odd number of mementos, add a spacer for last grid element
   const gridData = useMemo(
@@ -95,13 +102,22 @@ export default function Mementos() {
             onChangeText={setSearchText}
           />
         </Input>
+
         <Button
           size="md"
           variant="link"
-          className="rounded-full p-3.5"
+          className="rounded-full p-3.5 relative"
           onPress={() => setShowActionsheet(true)}
         >
           <ButtonIcon as={ListFilter} />
+          {activeFilterCount > 0 && (
+            <Badge
+              className="absolute -top-1 -right-1 z-10 h-[18px] w-[18px] p-0 bg-tertiary-600 rounded-full flex items-center justify-center"
+              variant="solid"
+            >
+              <BadgeText className="text-white">{activeFilterCount}</BadgeText>
+            </Badge>
+          )}
         </Button>
       </View>
       <FlatList
