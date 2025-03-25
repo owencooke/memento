@@ -6,7 +6,6 @@
  *      - calling background removal API and handling accept/reject result actions
  * @requirements FR-4, FR-5, FR-6, FR-7, FR-10
  */
-
 import React, {
   createContext,
   useContext,
@@ -14,18 +13,24 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
-import { View } from "react-native";
+import { Dimensions, Modal, View } from "react-native";
 import { Camera, CameraView } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 import { useMutation } from "@tanstack/react-query";
 import { removeImageBackgroundApiImageRemoveBackgroundPostMutation } from "@/src/api-client/generated/@tanstack/react-query.gen";
 import { formDataBodySerializer } from "@/src/api-client/formData";
-import { Button, ButtonText } from "../components/ui/button";
+import { Button, ButtonIcon } from "../components/ui/button";
 import {
   getPhotosFromLibrary,
   createPhotoObject,
   convertBlobToBase64,
 } from "@/src/libs/photos";
+import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  ChevronLeft,
+  CircleIcon,
+  RectangleVerticalIcon,
+} from "lucide-react-native";
 
 export type Photo = Omit<
   ImagePicker.ImagePickerAsset,
@@ -59,6 +64,8 @@ export const CameraProvider: React.FC<CameraProviderProps> = ({
   initialPhotos = [],
 }) => {
   const [hasPermission, setHasPermission] = useState(false);
+  const { height } = Dimensions.get("window");
+
   const [photos, setPhotos] = useState<Photo[]>(initialPhotos);
   const [pendingProcessedPhotos, setPendingProcessedPhotos] = useState<Photo[]>(
     [],
@@ -206,32 +213,61 @@ export const CameraProvider: React.FC<CameraProviderProps> = ({
   return (
     <PhotoContext.Provider value={context}>
       {children}
-
-      {isCameraVisible && (
-        <View className="absolute inset-0">
+      <Modal
+        animationType="slide"
+        transparent={false}
+        visible={isCameraVisible}
+        onRequestClose={hideCamera}
+      >
+        <SafeAreaView className="flex-1 relative">
           <CameraView
+            style={{ flex: 1 }}
             ref={(ref) => setCameraRef(ref)}
-            // type={CameraType.back}
-            className="absolute inset-0"
-            ratio="16:9"
-          >
-            <View className="flex-1 justify-end mb-8">
-              <View className="flex-row justify-between px-5">
-                <View className="flex-1 mr-2">
-                  <Button action="secondary" onPress={hideCamera}>
-                    <ButtonText>Cancel</ButtonText>
-                  </Button>
-                </View>
-                <View className="flex-1 ml-2">
-                  <Button action="primary" onPress={takePicture}>
-                    <ButtonText>Take Photo</ButtonText>
-                  </Button>
-                </View>
-              </View>
+            ratio="4:3"
+          />
+          {/* Rectangle reference overlay */}
+          <View className="absolute inset-0 justify-center items-center z-50">
+            <RectangleVerticalIcon
+              size={height * 0.6}
+              strokeWidth={0.15}
+              color="#BBBBBB"
+            />
+          </View>
+
+          <View className="absolute bottom-0 left-0 right-0 pb-6 z-20">
+            <View className="flex-row items-center justify-between px-6">
+              {/* Back Button */}
+              <Button
+                action="secondary"
+                variant="link"
+                onPress={hideCamera}
+                testID="camera-back-button"
+              >
+                <ButtonIcon as={ChevronLeft} color="white" size="xl" />
+              </Button>
+
+              {/* Capture Button */}
+              <Button
+                onPress={takePicture}
+                variant="solid"
+                className="bg-transparent"
+                testID="camera-capture-button"
+              >
+                <ButtonIcon
+                  as={CircleIcon}
+                  color="white"
+                  size="xl"
+                  fill="white"
+                  className="rounded-full border-4 border-white"
+                />
+              </Button>
+
+              {/* Placeholder for symmetry */}
+              <View className="w-12" />
             </View>
-          </CameraView>
-        </View>
-      )}
+          </View>
+        </SafeAreaView>
+      </Modal>
     </PhotoContext.Provider>
   );
 };
