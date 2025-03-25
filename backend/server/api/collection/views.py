@@ -14,12 +14,15 @@ from server.services.db.models.joins import CollectionWithMementos
 from server.services.db.models.schema_public_latest import (
     Collection,
     HasMementoInsert,
+    HasMementoUpdate,
 )
 from server.services.db.queries.collection import (
     associate_memento,
     create_collection,
     db_delete_collection,
+    db_delete_has_memento,
     get_collections,
+    get_has_mementos,
     update_collection,
 )
 
@@ -78,8 +81,28 @@ async def update_collection_and_mementos(
     if not updated_collection:
         raise HTTPException(status_code=400, detail="Update collection failed")
 
-    # FIXME: Updating what mementos are on a collection is more difficult than adding
+    memento_ids_current = get_has_mementos(id)
 
+    # Add mementos to collection
+    for memento_id in mementos:
+        if memento_id not in memento_ids_current:
+            has_memento = HasMementoInsert(
+                collection_id=id,
+                memento_id=memento_id,
+            )
+            if not associate_memento(has_memento):
+                raise HTTPException(
+                    status_code=400,
+                    detail="Associate Memento to Collection Failed.",
+                )
+    
+    # Remove deleted mementos from collection
+    for memento_id in memento_ids_current:
+        if memento_id not in mementos:
+            removed_memento = db_delete_has_memento(id, memento_id)
+            if not removed_memento:
+                raise HTTPException(status_code=400, detail="Delete collection failed")
+            
     return updated_collection
 
 

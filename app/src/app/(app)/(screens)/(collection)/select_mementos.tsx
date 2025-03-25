@@ -44,6 +44,7 @@ export default function SelectMementos() {
         user_id: session?.user.id ?? "",
       },
     }),
+    refetchOnMount: false,
   });
 
   // Convert fetched mementos to extended type

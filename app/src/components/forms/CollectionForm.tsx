@@ -97,6 +97,7 @@ export default function CollectionForm({
         user_id: session?.user.id ?? "",
       },
     }),
+    refetchOnMount: false,
   });
 
   const handleAddMementosPress = () => {
@@ -120,8 +121,6 @@ export default function CollectionForm({
     : Array.isArray(params.ids)
       ? params.ids.map(Number)
       : params.ids.split(",").map(Number);
-
-  console.log(ids);
 
   // Filter for mementos selected by the user
   const mementos_filtered = mementos?.filter((memento) =>
