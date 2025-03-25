@@ -12,7 +12,7 @@ import { Heading } from "@/src/components/ui/heading";
 import { Input, InputField } from "@/src/components/ui/input";
 import { Textarea, TextareaInput } from "@/src/components/ui/textarea";
 import { Button, ButtonSpinner, ButtonText } from "@/src/components/ui/button";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AlertCircleIcon, TrashIcon } from "@/src/components/ui/icon";
 import LocationInput, {
   GeoLocation,
@@ -34,6 +34,7 @@ export interface CollectionFormData {
   date: Date | null;
   location: GeoLocation;
   caption: string;
+  mementos: number[];
 }
 
 export interface CollectionFormProps {
@@ -56,6 +57,7 @@ export default function CollectionForm({
     caption: "",
     date: null,
     location: { text: "" },
+    mementos: [],
   };
 
   const {
@@ -104,7 +106,7 @@ export default function CollectionForm({
   };
 
   const handleRemoveSelection = (id: number) => {
-    const updatedIds = ids.filter((_id) => _id !== id);
+    const updatedIds = selectedMementoIds.filter((_id) => _id !== id);
 
     router.setParams({
       ids: updatedIds.length ? updatedIds.join(",") : "",
@@ -115,17 +117,15 @@ export default function CollectionForm({
   const params = useLocalSearchParams();
 
   // Array of memento IDs selected by the user
-  const ids: Number[] = !params.ids
+  const selectedMementoIds: number[] = !params.ids
     ? []
     : Array.isArray(params.ids)
       ? params.ids.map(Number)
       : params.ids.split(",").map(Number);
 
-  console.log(ids);
-
   // Filter for mementos selected by the user
   const mementos_filtered = mementos?.filter((memento) =>
-    ids.includes(memento.id),
+    selectedMementoIds.includes(memento.id),
   );
 
   // For odd number of mementos, add a spacer for last grid element
@@ -133,6 +133,10 @@ export default function CollectionForm({
     mementos_filtered?.length && mementos_filtered.length % 2
       ? [...mementos_filtered, { spacer: true }]
       : mementos_filtered;
+
+  useEffect(() => {
+    setValue("mementos", selectedMementoIds);
+  }, [selectedMementoIds, setValue]);
 
   return (
     <FlatList
@@ -229,39 +233,57 @@ export default function CollectionForm({
             <FormControlLabel>
               <FormControlLabelText>Mementos</FormControlLabelText>
             </FormControlLabel>
-            {ids.length > 0 && (
-              <View className="flex-1 bg-background-100 py-4">
-                <ScrollView
-                  horizontal={true}
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={{ gap: 12, flexDirection: "row" }}
-                >
-                  {gridData?.map((item, index) =>
-                    "spacer" in item ? (
-                      <View key={index} className="flex-1" />
-                    ) : (
-                      <View key={index}>
-                        <MementoCard key={index} {...item} />
-                        <Fab
-                          size="lg"
-                          onPress={() => handleRemoveSelection(item.id)}
-                        >
-                          <FabIcon as={TrashIcon} />
-                        </Fab>
-                      </View>
-                    ),
+            <Controller
+              control={control}
+              name="mementos"
+              defaultValue={selectedMementoIds}
+              render={({ field: { value, onChange } }) => (
+                <>
+                  {value.length > 0 && (
+                    <View className="flex-1 bg-background-100 py-4">
+                      <ScrollView
+                        horizontal={true}
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={{
+                          gap: 12,
+                          flexDirection: "row",
+                        }}
+                      >
+                        {value?.map((id) => {
+                          const memento = mementos?.find((m) => m.id === id);
+                          return memento ? (
+                            <View key={id}>
+                              <MementoCard {...memento} />
+                              <Fab
+                                size="lg"
+                                onPress={() =>
+                                  onChange(
+                                    value.filter((value) => value !== id),
+                                  )
+                                }
+                              >
+                                <FabIcon as={TrashIcon} />
+                              </Fab>
+                            </View>
+                          ) : (
+                            <View className="flex-1" />
+                          );
+                        })}
+                      </ScrollView>
+                    </View>
                   )}
-                </ScrollView>
-              </View>
-            )}
-            <Button
-              className="mt-auto"
-              action="secondary"
-              size={"lg"}
-              onPress={handleAddMementosPress}
-            >
-              <ButtonText>Select Mementos</ButtonText>
-            </Button>
+
+                  <Button
+                    className="mt-auto"
+                    action="secondary"
+                    size={"lg"}
+                    onPress={handleAddMementosPress}
+                  >
+                    <ButtonText>Select Mementos</ButtonText>
+                  </Button>
+                </>
+              )}
+            />
           </FormControl>
           <Button
             className="mt-auto"
