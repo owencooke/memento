@@ -1,0 +1,43 @@
+appId: com.memento.app
+---
+# - runFlow: ./util/launch.yml
+
+# Navigate to Edit Memento page
+- tapOn:
+    id: memento-card
+- tapOn:
+    id: view-memento-edit-button
+
+# Check that cancelling doesn't save changes/edits
+- copyTextFrom:
+    id: memento-form-caption
+- evalScript: ${output.prevCaption = maestro.copiedText}
+- tapOn:
+    id: memento-form-caption
+- inputText: garbage text
+- hideKeyboard
+- tapOn:
+    id: header-back-button
+- tapOn:
+    id: view-memento-edit-button
+- copyTextFrom:
+    id: memento-form-caption
+- assertTrue: ${output.prevCaption == maestro.copiedText}
+
+# Edit the memento fields
+- runFlow:
+    file: ./util/memento-form.yml
+    env:
+      CAPTION: Edited caption
+      LOCATION_PARTIAL: Edit
+      LOCATION_FULL: Edithvale VIC, Australia
+- tapOn: Save Changes
+
+# Verify changes updated on view page
+- assertVisible:
+    id: view-memento-caption
+    text: Edited caption
+
+- assertVisible:
+    id: view-memento-location
+    text: Edithvale VIC, Australia
