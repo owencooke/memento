@@ -2,7 +2,7 @@ import { getUsersMementosApiUserUserIdMementoGetOptions } from "@/src/api-client
 import MementoCard from "@/src/components/cards/MementoCard";
 import { useSession } from "@/src/context/AuthContext";
 import { useQuery } from "@tanstack/react-query";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import {
   View,
   Text,
@@ -11,7 +11,7 @@ import {
   StyleProp,
   ViewStyle,
 } from "react-native";
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { Button, ButtonText } from "@/src/components/ui/button";
 import { MementoWithImages } from "@/src/api-client/generated";
 import { Fab, FabIcon } from "@/src/components/ui/fab";
@@ -61,8 +61,47 @@ export default function SelectMementos() {
       ? [...mementosWithUI, { spacer: true }]
       : mementosWithUI;
 
+  // Receive already selected mementos from form screen
+  const params = useLocalSearchParams()
+  
+  // Array of memento IDs selected by the user
+  const ids_received: Number[] = !params.ids
+    ? []
+    : Array.isArray(params.ids)
+      ? params.ids.map(Number)
+      : params.ids.split(",").map(Number);
+  
   const [ids, setIds] = useState({}); // IDs of mementos selected
   const [selectedCount, setSelectedCount] = useState(0); // Number of mementos selected
+  
+  const hasInitializedRef = useRef(false);
+
+  // Select the mementos that were already selected on the form
+  useLayoutEffect(() => {
+    if (!hasInitializedRef.current) {
+      const updatedMementos = mementosWithUI.map((memento) => ({
+        ...memento,
+        selected: ids_received.includes(memento.id),  // Select if ID is in the list
+      }));
+
+      // Update state once with all selections
+      setMementosWithUIState(updatedMementos);
+
+      // Update selected count
+      const initialCount = updatedMementos.filter((m) => m.selected).length;
+      setSelectedCount(initialCount);
+
+      // Store the selected IDs
+      const initialIds = Object.fromEntries(
+        updatedMementos
+          .filter((m) => m.selected)
+          .map((m) => [m.id, m.id])
+      );
+      setIds(initialIds);
+
+      hasInitializedRef.current = true;  // Prevent further calls
+    }
+  }, [mementosWithUI, ids_received]);
 
   const [mementosWithUIState, setMementosWithUIState] = useState(gridData);
 

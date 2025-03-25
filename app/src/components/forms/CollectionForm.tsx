@@ -12,7 +12,7 @@ import { Heading } from "@/src/components/ui/heading";
 import { Input, InputField } from "@/src/components/ui/input";
 import { Textarea, TextareaInput } from "@/src/components/ui/textarea";
 import { Button, ButtonSpinner, ButtonText } from "@/src/components/ui/button";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { AlertCircleIcon, TrashIcon } from "@/src/components/ui/icon";
 import LocationInput, {
   GeoLocation,
@@ -101,7 +101,7 @@ export default function CollectionForm({
   });
 
   const handleAddMementosPress = () => {
-    router.push("/(app)/(screens)/(collection)/select_mementos");
+    router.push(`/(app)/(screens)/(collection)/select_mementos?ids=${ids}`);
   };
 
   const handleRemoveSelection = (id: number) => {
