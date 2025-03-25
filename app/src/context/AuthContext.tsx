@@ -104,11 +104,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   useEffect(() => {
-    // TODO: fixme (use node_env or env var)
-    if (true) {
-      signInTestUser();
-    }
-
     // Check async storage for a valid session from previous app use
     const checkSession = async () => {
       const {
@@ -119,6 +114,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     };
 
     checkSession();
+
+    // For E2E tests, sign in a test user to skip sign-up page
+    if (process.env.EXPO_PUBLIC_E2E_TESTING === "true") {
+      signInTestUser();
+    }
 
     // Subscribe to Supabase Auth changes
     const { data: authListener } = supabase.auth.onAuthStateChange(

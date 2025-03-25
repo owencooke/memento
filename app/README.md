@@ -110,6 +110,7 @@ Powered by [Maestro](https://maestro.mobile.dev/), the simplest and most effecti
   export MAESTRO_VERSION=1.39.0; curl -Ls "https://get.maestro.mobile.dev" | bash
   ```
   - for Windows, follow the instructions in link above
+- set the `EXPO_PUBLIC_E2E_TESTING=true` environment variable in `app/.env` to enable test user login
 - Memento app running on simulator/device (via Expo Go or Development Build)
 
 ### Run Locally
