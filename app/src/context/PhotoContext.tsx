@@ -228,9 +228,9 @@ export const CameraProvider: React.FC<CameraProviderProps> = ({
           {/* Rectangle reference overlay */}
           <View className="absolute inset-0 justify-center items-center z-50">
             <RectangleVerticalIcon
-              size={height * 0.6}
+              size={height * 0.7}
               strokeWidth={0.15}
-              color="#BBBBBB"
+              color="#DADADA"
             />
           </View>
           <View className="absolute bottom-0 left-0 right-0 z-20">
@@ -260,7 +260,7 @@ export const CameraProvider: React.FC<CameraProviderProps> = ({
               </View>
               <View className="flex-1" />
             </View>
-            <View className="h-12" />
+            <View className="h-12 opacity-0" />
           </View>
         </SafeAreaView>
       </Modal>
