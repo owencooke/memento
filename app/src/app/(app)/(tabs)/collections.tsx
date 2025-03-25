@@ -12,7 +12,7 @@ import { useSession } from "@/src/context/AuthContext";
 import { getUsersCollectionsApiUserUserIdCollectionGetOptions } from "@/src/api-client/generated/@tanstack/react-query.gen";
 import { Box } from "@/src/components/ui/box";
 import { Fab, FabIcon, FabLabel } from "@/src/components/ui/fab";
-import { AddIcon, GlobeIcon, MenuIcon } from "@/src/components/ui/icon";
+import { AddIcon } from "@/src/components/ui/icon";
 import { FlatList, Platform, Pressable, RefreshControl } from "react-native";
 import { router } from "expo-router";
 import CollectionCard from "@/src/components/cards/CollectionCard";
@@ -20,6 +20,7 @@ import MapView, { Marker } from "react-native-maps";
 import { StyleSheet } from "react-native";
 import { useMementos } from "@/src/hooks/useMementos";
 import { Image } from "@/src/components/ui/image";
+import { LayoutGridIcon, MapIcon } from "lucide-react-native";
 
 export default function Collections() {
   const { session } = useSession();
@@ -41,12 +42,17 @@ export default function Collections() {
   const collections = useMemo(
     () =>
       data
-        ? data.map((collection) => ({
-            ...collection,
-            thumbnailUri: mementos.find(
-              (m) => m.id === collection.mementos[0].memento_id,
-            )?.images[0].url!,
-          }))
+        ? data.map((collection) => {
+            const thumbnailUri = mementos.find(
+              (m) => m.id === collection.mementos[0]?.memento_id,
+            )?.images[0]?.url;
+            return {
+              ...collection,
+              thumbnailUri: thumbnailUri
+                ? thumbnailUri
+                : `https://placehold.co/400x400.png?text=${collection.title.replace(" ", "+")}`,
+            };
+          })
         : [],
     [data, mementos],
   );
@@ -174,10 +180,9 @@ export default function Collections() {
         size="lg"
         onPress={handleToggleMapView}
       >
-        {/* TODO: replace with better icons once Lucide added; maybe remove label */}
         <FabIcon
           className="text-typography-800 data-[hover=true]:text-typography-800 data-[active=true]:text-typography-800"
-          as={showMapView ? MenuIcon : GlobeIcon}
+          as={showMapView ? LayoutGridIcon : MapIcon}
         />
         <FabLabel className="text-typography-800 data-[hover=true]:text-typography-800 data-[active=true]:text-typography-800">
           {showMapView ? "Grid" : "Map"}
