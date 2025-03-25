@@ -276,23 +276,20 @@ export const usePhotos = (initialPhotos?: Photo[]) => {
   }
   const { setPhotos } = context;
 
-  // Local state to store initial photos temporarily
   const [pendingInitialPhotos, setPendingInitialPhotos] = useState<
     Photo[] | undefined
   >(initialPhotos);
 
   useEffect(() => {
-    console.log({ pendingInitialPhotos });
     if (pendingInitialPhotos && pendingInitialPhotos.length > 0) {
       setPhotos([...pendingInitialPhotos]);
-      setPendingInitialPhotos([]); // Clear initial photos after setting
+      setPendingInitialPhotos([]);
     }
-
-    // // Cleanup function to reset photos when the component unmounts or if initialPhotos change
-    return () => {
-      setPhotos([]); // Reset photos if the component unmounts
-    };
   }, [pendingInitialPhotos, setPhotos]);
+
+  useEffect(() => {
+    return () => setPhotos([]);
+  }, [setPhotos]);
 
   return context;
 };
