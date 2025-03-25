@@ -100,15 +100,15 @@ export default function CollectionForm({
   });
 
   const handleAddMementosPress = () => {
-    router.push("/(app)/(screens)/(select_mementos)/select_mementos");
+    router.push("/(app)/(screens)/(collection)/select_mementos");
   };
 
   const handleRemoveSelection = (id: number) => {
-    const updatedIds = ids.filter(_id => _id !== id);
+    const updatedIds = ids.filter((_id) => _id !== id);
 
     router.setParams({
       ids: updatedIds.length ? updatedIds.join(",") : "",
-    }); 
+    });
   };
 
   // Receive selected mementos from select_mementos page
@@ -118,16 +118,21 @@ export default function CollectionForm({
   const ids: Number[] = !params.ids
     ? []
     : Array.isArray(params.ids)
-    ? params.ids.map(Number)
-    : params.ids.split(",").map(Number);
+      ? params.ids.map(Number)
+      : params.ids.split(",").map(Number);
+
+  console.log(ids);
 
   // Filter for mementos selected by the user
-  const mementos_filtered = mementos?.filter(memento => ids.includes(memento.id));
+  const mementos_filtered = mementos?.filter((memento) =>
+    ids.includes(memento.id),
+  );
 
   // For odd number of mementos, add a spacer for last grid element
-  const gridData = mementos_filtered?.length && mementos_filtered.length % 2
-    ? [...mementos_filtered, { spacer: true }]
-    : mementos_filtered;
+  const gridData =
+    mementos_filtered?.length && mementos_filtered.length % 2
+      ? [...mementos_filtered, { spacer: true }]
+      : mementos_filtered;
 
   return (
     <FlatList
@@ -222,14 +227,14 @@ export default function CollectionForm({
           </FormControl>
           <FormControl size={"lg"}>
             <FormControlLabel>
-                <FormControlLabelText>Mementos</FormControlLabelText>
+              <FormControlLabelText>Mementos</FormControlLabelText>
             </FormControlLabel>
-            {ids.length > 0 &&
+            {ids.length > 0 && (
               <View className="flex-1 bg-background-100 py-4">
                 <ScrollView
                   horizontal={true}
                   showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={{ gap: 12, flexDirection: "row" }} 
+                  contentContainerStyle={{ gap: 12, flexDirection: "row" }}
                 >
                   {gridData?.map((item, index) =>
                     "spacer" in item ? (
@@ -237,15 +242,18 @@ export default function CollectionForm({
                     ) : (
                       <View key={index}>
                         <MementoCard key={index} {...item} />
-                        <Fab size="lg" onPress={() => handleRemoveSelection(item.id)}>
+                        <Fab
+                          size="lg"
+                          onPress={() => handleRemoveSelection(item.id)}
+                        >
                           <FabIcon as={TrashIcon} />
                         </Fab>
                       </View>
-                    )
+                    ),
                   )}
                 </ScrollView>
               </View>
-            }
+            )}
             <Button
               className="mt-auto"
               action="secondary"
