@@ -271,20 +271,28 @@ export const CameraProvider: React.FC<CameraProviderProps> = ({
 // Hook to use the photo context
 export const usePhotos = (initialPhotos?: Photo[]) => {
   const context = useContext(PhotoContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error("usePhotos must be used within a CameraProvider");
   }
   const { setPhotos } = context;
 
-  // If initialPhotos are provided, reset the photos state
+  // Local state to store initial photos temporarily
+  const [pendingInitialPhotos, setPendingInitialPhotos] = useState<
+    Photo[] | undefined
+  >(initialPhotos);
+
   useEffect(() => {
-    if (initialPhotos && initialPhotos.length > 0) {
-      setPhotos(initialPhotos);
+    console.log({ pendingInitialPhotos });
+    if (pendingInitialPhotos && pendingInitialPhotos.length > 0) {
+      setPhotos([...pendingInitialPhotos]);
+      setPendingInitialPhotos([]); // Clear initial photos after setting
     }
+
+    // // Cleanup function to reset photos when the component unmounts or if initialPhotos change
     return () => {
-      setPhotos([]);
+      setPhotos([]); // Reset photos if the component unmounts
     };
-  }, [initialPhotos, setPhotos]);
+  }, [pendingInitialPhotos, setPhotos]);
 
   return context;
 };
