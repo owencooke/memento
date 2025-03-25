@@ -59,7 +59,18 @@ appId: com.memento.app
 # Submit the form
 - tapOn: Create 2 Mementos
 
-# FIXME: add mementos to a new collection
+# Accept option to add the mementos to a new collection
+- tapOn: Collection title
+- inputText: Bulk Created Collection
+- hideKeyboard
+
+- tapOn: Add a caption
+- inputText: Maestro created this collection via bulk create
+- hideKeyboard
+
+- tapOn: Create Collection
+
+# Verify new collection created with mementos showing
 
 # Verify new mementos added to grid view
 - assertVisible: Mementos
