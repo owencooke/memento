@@ -64,6 +64,7 @@ class ImageBaseSchema(CustomModel):
 	detected_text: str | None = Field(default=None)
 	filename: str
 	image_label: str | None = Field(default=None)
+	mime_type: str | None = Field(default=None)
 	order_index: int
 
 
@@ -79,6 +80,19 @@ class MementoBaseSchema(CustomModel):
 	date: datetime.date | None = Field(default=None)
 	location: str | None = Field(default=None)
 	user_id: UUID4
+
+
+class MementosWithImagesBaseSchema(CustomModel):
+	"""MementosWithImages Base Schema."""
+
+	# Columns
+	caption: str | None = Field(default=None)
+	coordinates: str | None = Field(default=None)
+	date: datetime.date | None = Field(default=None)
+	detected_text: str | None = Field(default=None)
+	id: int | None = Field(default=None)
+	location: str | None = Field(default=None)
+	user_id: UUID4 | None = Field(default=None)
 
 
 class UserInfoBaseSchema(CustomModel):
@@ -138,6 +152,7 @@ class ImageInsert(CustomModelInsert):
 	# date: nullable
 	# detected_text: nullable
 	# image_label: nullable
+	# mime_type: nullable
 
 	# Required fields
 	filename: str
@@ -148,6 +163,7 @@ class ImageInsert(CustomModelInsert):
 	date: datetime.date | None = Field(default=None)
 	detected_text: str | None = Field(default=None)
 	image_label: str | None = Field(default=None)
+	mime_type: str | None = Field(default=None)
 
 
 class MementoInsert(CustomModelInsert):
@@ -167,6 +183,28 @@ class MementoInsert(CustomModelInsert):
 	caption: str | None = Field(default=None)
 	coordinates: str | None = Field(default=None)
 	date: datetime.date | None = Field(default=None)
+	location: str | None = Field(default=None)
+	user_id: UUID4 | None = Field(default=None)
+
+
+class MementosWithImagesInsert(CustomModelInsert):
+	"""MementosWithImages Insert Schema."""
+
+	# Field properties:
+	# caption: nullable
+	# coordinates: nullable
+	# date: nullable
+	# detected_text: nullable
+	# id: nullable
+	# location: nullable
+	# user_id: nullable
+
+		# Optional fields
+	caption: str | None = Field(default=None)
+	coordinates: str | None = Field(default=None)
+	date: datetime.date | None = Field(default=None)
+	detected_text: str | None = Field(default=None)
+	id: int | None = Field(default=None)
 	location: str | None = Field(default=None)
 	user_id: UUID4 | None = Field(default=None)
 
@@ -228,6 +266,7 @@ class ImageUpdate(CustomModelUpdate):
 	# date: nullable
 	# detected_text: nullable
 	# image_label: nullable
+	# mime_type: nullable
 
 		# Optional fields
 	coordinates: str | None = Field(default=None)
@@ -235,6 +274,7 @@ class ImageUpdate(CustomModelUpdate):
 	detected_text: str | None = Field(default=None)
 	filename: str | None = Field(default=None)
 	image_label: str | None = Field(default=None)
+	mime_type: str | None = Field(default=None)
 	order_index: int | None = Field(default=None)
 
 
@@ -255,6 +295,28 @@ class MementoUpdate(CustomModelUpdate):
 	caption: str | None = Field(default=None)
 	coordinates: str | None = Field(default=None)
 	date: datetime.date | None = Field(default=None)
+	location: str | None = Field(default=None)
+	user_id: UUID4 | None = Field(default=None)
+
+
+class MementosWithImagesUpdate(CustomModelUpdate):
+	"""MementosWithImages Update Schema."""
+
+	# Field properties:
+	# caption: nullable
+	# coordinates: nullable
+	# date: nullable
+	# detected_text: nullable
+	# id: nullable
+	# location: nullable
+	# user_id: nullable
+
+		# Optional fields
+	caption: str | None = Field(default=None)
+	coordinates: str | None = Field(default=None)
+	date: datetime.date | None = Field(default=None)
+	detected_text: str | None = Field(default=None)
+	id: int | None = Field(default=None)
 	location: str | None = Field(default=None)
 	user_id: UUID4 | None = Field(default=None)
 
@@ -315,6 +377,14 @@ class Memento(MementoBaseSchema):
 	# Foreign Keys
 	ids: list[HasMemento] | None = Field(default=None)
 	ids: list[Image] | None = Field(default=None)
+
+
+class MementosWithImages(MementosWithImagesBaseSchema):
+	"""MementosWithImages Schema for Pydantic.
+
+	Inherits from MementosWithImagesBaseSchema. Add any customization here.
+	"""
+
 
 
 class UserInfo(UserInfoBaseSchema):
