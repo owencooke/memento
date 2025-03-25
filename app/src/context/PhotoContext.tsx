@@ -84,30 +84,19 @@ export const CameraProvider: React.FC<React.PropsWithChildren> = ({
   };
 
   // Take a new photo using the camera view
-  const takePicture = async (): Promise<Photo[]> => {
-    if (!cameraRef) return [];
-
+  const takePicture = async () => {
+    if (!cameraRef) return;
     try {
       const capturedPicture = await cameraRef.takePictureAsync({ exif: true });
       if (!capturedPicture) {
-        return [];
+        throw Error("takePictureAsync returned undefined");
       }
-
+      hideCamera();
       const newPhoto = await createPhotoObject(capturedPicture);
-
-      setPhotos((prevPhotos) => [...prevPhotos, newPhoto]);
-      setIsCameraVisible(false);
-
-      // Process for background removal if enabled
-      if (process.env.EXPO_PUBLIC_DISABLE_BG_REMOVAL !== "true") {
-        processPhotos([newPhoto]);
-      }
-
-      return [newPhoto];
+      processPhotos([newPhoto]);
     } catch (error) {
       console.error("Error taking picture:", error);
-      setIsCameraVisible(false);
-      return [];
+      hideCamera();
     }
   };
 
