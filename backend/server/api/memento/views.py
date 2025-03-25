@@ -1,6 +1,7 @@
 """
 @description CRUD API routes for Keepsakes/Mementos.
-@requirements FR-17, FR-19, FR-20, FR-21, FR-26, FR-27, FR-28, FR-30, FR31, FR-32, FR-33
+@requirements FR-12, FR-13, FR-14, FR-15, FR-17, FR-19, FR-20, FR-21, FR-26, FR-27,\
+        FR-28, FR-30, FR31, FR-32, FR-33
 """
 
 import json
@@ -13,6 +14,7 @@ from pydantic import UUID4
 
 from server.api.memento.models import (
     CreateMementoSuccessResponse,
+    MementoFilterParams,
     NewImageMetadata,
     NewMemento,
     UpdateMemento,
@@ -42,10 +44,10 @@ router = APIRouter()
 @router.get("/")
 def get_users_mementos(
     user_id: UUID4 = Depends(get_user_id),
+    filter_query: MementoFilterParams = Depends(),
 ) -> list[MementoWithImages]:
     """Gets all the mementos belonging to a user."""
-    mementos = get_mementos(user_id)
-
+    mementos = get_mementos(user_id, filter_query)
     # Get all image URLs
     image_urls = get_bulk_image_urls(
         [image.filename for memento in mementos for image in memento.images],
@@ -55,7 +57,8 @@ def get_users_mementos(
     for memento in mementos:
         for image in memento.images:
             image.url = image_urls.get(image.filename, "")
-        memento.images = sorted(memento.images, key=lambda img: img.order_index)
+        # Sort images by order index
+        memento.images.sort(key=lambda image: image.order_index)
 
     return mementos
 

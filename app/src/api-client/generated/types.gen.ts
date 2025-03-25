@@ -259,7 +259,15 @@ export type GetUsersMementosApiUserUserIdMementoGetData = {
     path: {
         user_id: string;
     };
-    query?: never;
+    query?: {
+        start_date?: string | null;
+        end_date?: string | null;
+        min_lat?: number | null;
+        min_long?: number | null;
+        max_lat?: number | null;
+        max_long?: number | null;
+        text?: string | null;
+    };
     url: '/api/user/{user_id}/memento/';
 };
 
