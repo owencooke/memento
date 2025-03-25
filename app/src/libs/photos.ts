@@ -10,59 +10,23 @@ export type Photo = Omit<
   storedInCloud?: boolean;
 };
 
-// Constants
-export const MAX_IMAGE_SIZE_BYTES = 500 * 1024; // 500KB
-export const INITIAL_COMPRESSION = 0.8;
-export const COMPRESSION_STEP = 0.2;
-
 /**
- * Repeatedly compress the image until the size is small enough
- */
-export const compressImage = async (photo: Photo) => {
-  let { uri, mimeType } = photo;
-  let fileSize = await getFileSize(uri);
-  let quality = INITIAL_COMPRESSION;
-
-  while (fileSize > MAX_IMAGE_SIZE_BYTES && quality > 0.1) {
-    const compressedImage = await ImageManipulator.manipulateAsync(uri, [], {
-      compress: quality,
-      format: ImageManipulator.SaveFormat.JPEG,
-    });
-    fileSize = await getFileSize(compressedImage.uri);
-    uri = compressedImage.uri;
-    quality -= COMPRESSION_STEP;
-  }
-  return {
-    uri,
-    mimeType: quality !== INITIAL_COMPRESSION ? "image/jpeg" : mimeType,
-  };
-};
-
-/**
- * Generate a unique ID for a photo with an optional prefix
- */
-export const generatePhotoId = (prefix: string = "photo_"): string => {
-  return uniqueId(prefix);
-};
-
-/**
- * Create a standardized photo object with required properties
+ * Create a standardized photo object (compressed and with necessary fields)
  */
 export const createPhotoObject = async (photo: Photo): Promise<Photo> => {
-  const { uri, mimeType } = await compressImage(photo as Photo);
-  const uniqueFilename = generatePhotoId();
-
+  const { uri, mimeType } = await compressImage(photo);
+  const uniqueFilename = uniqueId("photo_");
   return {
     ...photo,
     uri,
     mimeType,
-    fileName: (photo as any).fileName ?? `${uniqueFilename}.jpg`,
+    fileName: photo.fileName ?? `${uniqueFilename}.jpg`,
     assetId: photo.assetId ?? uniqueFilename,
   };
 };
 
 /**
- * Get photo(s) from the device's built-in photo libraary
+ * Get photo(s) from the device's built-in libraary
  */
 export const getPhotosFromLibrary = async (): Promise<Photo[]> => {
   const result = await ImagePicker.launchImageLibraryAsync({
@@ -93,9 +57,38 @@ export const convertBlobToBase64 = (blob: Blob): Promise<string> =>
   });
 
 /**
- * Get file size of an image from its URI
+ * Repeatedly compress the image until the size is small enough
  */
-export const getFileSize = async (uri: string): Promise<number> => {
+const compressImage = async (
+  photo: Photo,
+  maxSizeBytes: number = 500 * 1024, // 500KB
+  initialCompression: number = 0.8,
+  compressionStep: number = 0.2,
+) => {
+  let { uri, mimeType } = photo;
+  let fileSize = await getFileSize(uri);
+  let quality = initialCompression;
+
+  while (fileSize > maxSizeBytes && quality > 0.1) {
+    const compressedImage = await ImageManipulator.manipulateAsync(uri, [], {
+      compress: quality,
+      format: ImageManipulator.SaveFormat.JPEG,
+    });
+    fileSize = await getFileSize(compressedImage.uri);
+    uri = compressedImage.uri;
+    quality -= compressionStep;
+  }
+
+  return {
+    uri,
+    mimeType: quality !== initialCompression ? "image/jpeg" : mimeType,
+  };
+};
+
+/**
+ * Get file size of an image on device
+ */
+const getFileSize = async (uri: string): Promise<number> => {
   try {
     const info = await FileSystem.getInfoAsync(uri);
     return info.exists ? info.size : 0;

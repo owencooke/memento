@@ -32,12 +32,13 @@ import {
   RectangleVerticalIcon,
 } from "lucide-react-native";
 
+export { Photo } from "@/src/libs/photos";
 export type DeviceSource = "picker" | "camera";
 
 interface PhotoContextType {
   hasPermission: boolean;
   photos: Photo[];
-  addPhotos: (source: DeviceSource) => Promise<Photo[]>;
+  addPhotos: (source: DeviceSource) => void;
   deletePhoto: (photoToRemove: Photo) => void;
   setPhotos: React.Dispatch<React.SetStateAction<Photo[]>>;
   pendingProcessedPhotos: Photo[];
@@ -45,14 +46,11 @@ interface PhotoContextType {
   rejectProcessedPhoto: (processedPhoto: Photo) => void;
   resetState: () => void;
 }
-
 const PhotoContext = createContext<PhotoContextType | undefined>(undefined);
 
-interface CameraProviderProps {
-  children: React.ReactNode;
-}
-
-export const CameraProvider: React.FC<CameraProviderProps> = ({ children }) => {
+export const CameraProvider: React.FC<React.PropsWithChildren> = ({
+  children,
+}) => {
   const [hasPermission, setHasPermission] = useState(false);
   const { height } = Dimensions.get("window");
 
@@ -76,12 +74,14 @@ export const CameraProvider: React.FC<CameraProviderProps> = ({ children }) => {
     })();
   }, []);
 
-  // Remove a specific photo
-  const deletePhoto = useCallback((photoToRemove: Photo) => {
-    setPhotos((prevPhotos) =>
-      prevPhotos.filter((photo) => photo.assetId !== photoToRemove.assetId),
-    );
-  }, []);
+  // Show the camera view or select images from library
+  const addPhotos = async (source: DeviceSource) => {
+    if (source === "camera") {
+      showCamera();
+    } else {
+      getPhotosFromLibrary().then(processPhotos);
+    }
+  };
 
   // Take a new photo using the camera view
   const takePicture = async (): Promise<Photo[]> => {
@@ -111,25 +111,15 @@ export const CameraProvider: React.FC<CameraProviderProps> = ({ children }) => {
     }
   };
 
-  // Show the camera view or kickoff flow for selecting from library
-  const addPhotos = async (source: DeviceSource): Promise<Photo[]> => {
-    if (source === "camera") {
-      showCamera();
-      return [];
-    } else {
-      const newPhotos = await getPhotosFromLibrary();
-      setPhotos((prevPhotos) => [...prevPhotos, ...newPhotos]);
+  // Remove a specific photo
+  const deletePhoto = useCallback((photoToRemove: Photo) => {
+    setPhotos((prevPhotos) =>
+      prevPhotos.filter((photo) => photo.assetId !== photoToRemove.assetId),
+    );
+  }, []);
 
-      if (process.env.EXPO_PUBLIC_DISABLE_BG_REMOVAL !== "true") {
-        processPhotos(newPhotos);
-      }
-
-      return newPhotos;
-    }
-  };
-
-  // Remove background from image
-  const removeBackground = async (photo: Photo): Promise<string> => {
+  // Remove background from an image
+  const removeBackground = async (photo: Photo): Promise<string | null> => {
     try {
       const body: any = {
         image_file: {
@@ -144,27 +134,33 @@ export const CameraProvider: React.FC<CameraProviderProps> = ({ children }) => {
       });
       return convertBlobToBase64(response as Blob);
     } catch (error) {
-      console.error("Failed to remove image background:", error);
-      return "";
+      console.log("Failed to remove image background:", error);
+      return null;
     }
   };
 
-  // Process photos for background removal
-  const processPhotos = async (photosToProcess: Photo[]) => {
-    photosToProcess.forEach(async (photo) => {
-      try {
-        const photoString = await removeBackground(photo);
-        setPendingProcessedPhotos((prev) => [
-          ...prev,
-          {
-            ...photo,
-            uri: photoString,
-          },
-        ]);
-      } catch (error) {
-        console.error(`Failed to process photo ${photo.assetId}:`, error);
-      }
-    });
+  // Process the new photos added from camera/library
+  const processPhotos = async (newPhotos: Photo[]) => {
+    setPhotos((prevPhotos) => [...prevPhotos, ...newPhotos]);
+
+    if (process.env.EXPO_PUBLIC_DISABLE_BG_REMOVAL !== "true") {
+      newPhotos.forEach(async (photo) => {
+        try {
+          const photoString = await removeBackground(photo);
+          if (photoString) {
+            setPendingProcessedPhotos((prev) => [
+              ...prev,
+              {
+                ...photo,
+                uri: photoString,
+              },
+            ]);
+          }
+        } catch (error) {
+          console.error(`Failed to process photo ${photo.assetId}:`, error);
+        }
+      });
+    }
   };
 
   // Reject processed photo
