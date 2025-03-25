@@ -6,7 +6,22 @@ import pytest
 
 @pytest.fixture
 def mock_supabase() -> Generator[MagicMock, MagicMock, Any]:
-    """Create a mock supabase client that returns predetermined responses."""
+    """
+    Create a mock Supabase DB client.
+
+    Example usage:
+    ```python
+        def test_create_memento(mock_supabase: Tuple[MagicMock, MagicMock]) -> None:
+            mock_supabase_client, mock_query_response = mock_supabase
+
+            # Set the response of Supabase query to some mocked data
+            mock_query_response.data = [mock_row_1, mock_row_2, ...]
+
+            # Assert specific methods of the Supabase client were called
+            mock_supabase_client.table.assert_called_once_with("memento")
+            mock_supabase_client.table().insert.assert_called_once()
+    ```
+    """
     with patch("server.services.db.queries.memento.supabase") as mock_supabase:
         # Create a mock response object that can be configured in each test
         mock_query_response = MagicMock()
@@ -15,8 +30,6 @@ def mock_supabase() -> Generator[MagicMock, MagicMock, Any]:
         def create_chain_builder() -> MagicMock:
             chain_builder = MagicMock()
             chain_builder.execute.return_value = mock_query_response
-
-            # Make chain methods return themselves to allow method chaining
             chain_methods = [
                 "select",
                 "insert",
