@@ -25,7 +25,6 @@ import {
   convertBlobToBase64,
   Photo,
 } from "@/src/libs/photos";
-import { SafeAreaView } from "react-native-safe-area-context";
 import {
   ChevronLeftIcon,
   CircleIcon,
@@ -200,7 +199,7 @@ export const CameraProvider: React.FC<React.PropsWithChildren> = ({
         visible={isCameraVisible}
         onRequestClose={hideCamera}
       >
-        <SafeAreaView className="flex-1 relative">
+        <View className="flex-1 relative">
           <CameraView
             style={{ flex: 1 }}
             ref={(ref) => setCameraRef(ref)}
@@ -243,7 +242,7 @@ export const CameraProvider: React.FC<React.PropsWithChildren> = ({
             </View>
             <View className="h-12 opacity-0" />
           </View>
-        </SafeAreaView>
+        </View>
       </Modal>
     </PhotoContext.Provider>
   );
