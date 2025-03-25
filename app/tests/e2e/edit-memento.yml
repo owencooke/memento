@@ -11,20 +11,23 @@ appId: com.memento.app
 # Check that cancelling doesn't save changes/edits
 - copyTextFrom:
     id: memento-form-caption
-- evalScript: ${output.prevCaption = maestro.copiedText}
 - tapOn:
     id: memento-form-caption
 - inputText: garbage text
 - hideKeyboard
 - tapOn:
     id: header-back-button
+- assertVisible:
+    id: view-memento-caption
+    text: ${maestro.copiedText}
 - tapOn:
     id: view-memento-edit-button
-- copyTextFrom:
+- assertVisible:
     id: memento-form-caption
-- assertTrue: ${output.prevCaption == maestro.copiedText}
+    text: ${maestro.copiedText}
 
 # Edit the memento fields
+# TODO: edit images? thumbnail?
 - runFlow:
     file: ./util/memento-form.yml
     env:
