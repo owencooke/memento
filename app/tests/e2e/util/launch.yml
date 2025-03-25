@@ -2,11 +2,16 @@ appId: com.memento.app
 tags:
   - util
 ---
-# Launch app if not open already
-- launchApp:
-    appId: com.memento.app
-    clearState: false
-    stopApp: false
+# NOTE: by commenting this out:
+#   PRO: we can run the tests on EITHER Expo Go or a Dev Build
+#   CON: the app will no longer automatically launch if not open.
+#         therefore make sure you have the app open before running any E2E tests
+
+# # Launch app if not open already
+# - launchApp:
+#     appId: com.memento.app
+#     clearState: false
+#     stopApp: false
 
 # Navigate back to start state (Mementos tab)
 - repeat:
@@ -21,8 +26,7 @@ tags:
       visible: Collections
     commands:
       - tapOn: Mementos
-
-# Extend timeout (app can take a while to launch)
-- extendedWaitUntil:
-    visible: "Mementos"
-    timeout: 30000
+# # Extend timeout (app can take a while to launch)
+# - extendedWaitUntil:
+#     visible: "Mementos"
+#     timeout: 30000

@@ -110,14 +110,15 @@ Powered by [Maestro](https://maestro.mobile.dev/), the simplest and most effecti
   export MAESTRO_VERSION=1.39.0; curl -Ls "https://get.maestro.mobile.dev" | bash
   ```
   - for Windows, follow the instructions in link above
+- Memento app running on simulator/device (via Expo Go or Development Build)
 
 ### Run Locally
 
-Follow the instructions provided in the Maestro documentation for [running flows](https://maestro.mobile.dev/getting-started/writing-your-first-flow). You must have an emulator/simulator running with the app installed before running the commands below.
+Follow the instructions provided in the Maestro documentation for [running flows](https://maestro.mobile.dev/getting-started/writing-your-first-flow). You must have an Android simulator or physical device running the Memento app before using the commands below:
 
 - All test flows for project
   ```bash
-  pnpm test:e2e # or: maestro test
+  pnpm test:e2e
   ```
 - Specific/individual flows
   ```bash
