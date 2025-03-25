@@ -12,7 +12,7 @@ import { Heading } from "@/src/components/ui/heading";
 import { Input, InputField } from "@/src/components/ui/input";
 import { Textarea, TextareaInput } from "@/src/components/ui/textarea";
 import { Button, ButtonSpinner, ButtonText } from "@/src/components/ui/button";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AlertCircleIcon, TrashIcon } from "@/src/components/ui/icon";
 import LocationInput, {
   GeoLocation,
@@ -25,6 +25,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
 import { getUsersMementosApiUserUserIdMementoGetOptions } from "@/src/api-client/generated/@tanstack/react-query.gen";
 import { useSession } from "@/src/context/AuthContext";
+import { aggregateMetadata } from "@/src/libs/metadata";
 
 /**
  * Form values for the CreateCollection screen
@@ -34,7 +35,7 @@ export interface CollectionFormData {
   date: Date | null;
   location: GeoLocation;
   caption: string;
-  mementos: number[];
+  mementoIds: number[];
 }
 
 export interface CollectionFormProps {
@@ -57,7 +58,7 @@ export default function CollectionForm({
     caption: "",
     date: null,
     location: { text: "" },
-    mementos: [],
+    mementoIds: [],
   };
 
   const {
@@ -102,41 +103,33 @@ export default function CollectionForm({
   });
 
   const handleAddMementosPress = () => {
-    router.push("/(app)/(screens)/(collection)/select_mementos");
-  };
-
-  const handleRemoveSelection = (id: number) => {
-    const updatedIds = selectedMementoIds.filter((_id) => _id !== id);
-
-    router.setParams({
-      ids: updatedIds.length ? updatedIds.join(",") : "",
-    });
+    router.push("/(app)/(screens)/collection/select_mementos");
   };
 
   // Receive selected mementos from select_mementos page
   const params = useLocalSearchParams();
 
   // Array of memento IDs selected by the user
-  const selectedMementoIds: number[] = !params.ids
-    ? []
-    : Array.isArray(params.ids)
+  const selectedMementoIds = useMemo(() => {
+    if (!params.ids) return [];
+    return Array.isArray(params.ids)
       ? params.ids.map(Number)
       : params.ids.split(",").map(Number);
-
-  // Filter for mementos selected by the user
-  const mementos_filtered = mementos?.filter((memento) =>
-    selectedMementoIds.includes(memento.id),
-  );
-
-  // For odd number of mementos, add a spacer for last grid element
-  const gridData =
-    mementos_filtered?.length && mementos_filtered.length % 2
-      ? [...mementos_filtered, { spacer: true }]
-      : mementos_filtered;
+  }, [params.ids]);
 
   useEffect(() => {
-    setValue("mementos", selectedMementoIds);
-  }, [selectedMementoIds, setValue]);
+    const selectedMementos = mementos?.filter((memento) =>
+      selectedMementoIds.includes(memento.id),
+    );
+
+    if (selectedMementos && selectedMementos.length > 0) {
+      aggregateMetadata(selectedMementos).then(({ date, location }) => {
+        if (date) setValue("date", date);
+        if (location) setValue("location", location);
+      });
+    }
+    setValue("mementoIds", selectedMementoIds);
+  }, [selectedMementoIds, mementos, setValue]);
 
   return (
     <FlatList
@@ -235,7 +228,7 @@ export default function CollectionForm({
             </FormControlLabel>
             <Controller
               control={control}
-              name="mementos"
+              name="mementoIds"
               defaultValue={selectedMementoIds}
               render={({ field: { value, onChange } }) => (
                 <>
