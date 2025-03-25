@@ -1,5 +1,5 @@
 import { View } from "react-native";
-import { Photo } from "@/src/context/PhotoContext";
+import { Photo } from "@/src/libs/photos";
 import { Button, ButtonIcon } from "../ui/button";
 import { Image } from "../ui/image";
 import { Badge, BadgeIcon } from "../ui/badge";

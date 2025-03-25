@@ -15,7 +15,6 @@ import React, {
 } from "react";
 import { Dimensions, Modal, View } from "react-native";
 import { Camera, CameraView } from "expo-camera";
-import * as ImagePicker from "expo-image-picker";
 import { useMutation } from "@tanstack/react-query";
 import { removeImageBackgroundApiImageRemoveBackgroundPostMutation } from "@/src/api-client/generated/@tanstack/react-query.gen";
 import { formDataBodySerializer } from "@/src/api-client/formData";
@@ -24,6 +23,7 @@ import {
   getPhotosFromLibrary,
   createPhotoObject,
   convertBlobToBase64,
+  Photo,
 } from "@/src/libs/photos";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -31,13 +31,6 @@ import {
   CircleIcon,
   RectangleVerticalIcon,
 } from "lucide-react-native";
-
-export type Photo = Omit<
-  ImagePicker.ImagePickerAsset,
-  "width" | "height" | "pairedVideoAsset"
-> & {
-  storedInCloud?: boolean;
-};
 
 export type DeviceSource = "picker" | "camera";
 
@@ -57,20 +50,17 @@ const PhotoContext = createContext<PhotoContextType | undefined>(undefined);
 
 interface CameraProviderProps {
   children: React.ReactNode;
-  initialPhotos?: Photo[];
 }
 
-export const CameraProvider: React.FC<CameraProviderProps> = ({
-  children,
-  initialPhotos = [],
-}) => {
+export const CameraProvider: React.FC<CameraProviderProps> = ({ children }) => {
   const [hasPermission, setHasPermission] = useState(false);
   const { height } = Dimensions.get("window");
 
-  const [photos, setPhotos] = useState<Photo[]>(initialPhotos);
+  const [photos, setPhotos] = useState<Photo[]>([]);
   const [pendingProcessedPhotos, setPendingProcessedPhotos] = useState<Photo[]>(
     [],
   );
+
   const [isCameraVisible, setIsCameraVisible] = useState(false);
   const [cameraRef, setCameraRef] = useState<CameraView | null>(null);
 
@@ -86,14 +76,14 @@ export const CameraProvider: React.FC<CameraProviderProps> = ({
     })();
   }, []);
 
-  // Remove a specific photo from selection
+  // Remove a specific photo
   const deletePhoto = useCallback((photoToRemove: Photo) => {
     setPhotos((prevPhotos) =>
       prevPhotos.filter((photo) => photo.assetId !== photoToRemove.assetId),
     );
   }, []);
 
-  // Take photo using expo-camera
+  // Take a new photo using the camera view
   const takePicture = async (): Promise<Photo[]> => {
     if (!cameraRef) return [];
 
@@ -121,7 +111,7 @@ export const CameraProvider: React.FC<CameraProviderProps> = ({
     }
   };
 
-  // Add photos from either camera or image picker
+  // Show the camera view or kickoff flow for selecting from library
   const addPhotos = async (source: DeviceSource): Promise<Photo[]> => {
     if (source === "camera") {
       showCamera();
@@ -200,7 +190,6 @@ export const CameraProvider: React.FC<CameraProviderProps> = ({
     setPendingProcessedPhotos([]);
   }, []);
 
-  // Show/hide camera methods
   const showCamera = useCallback(() => setIsCameraVisible(true), []);
   const hideCamera = useCallback(() => setIsCameraVisible(false), []);
 
@@ -236,7 +225,7 @@ export const CameraProvider: React.FC<CameraProviderProps> = ({
           <View className="absolute inset-0 justify-center items-center z-50">
             <RectangleVerticalIcon
               size={height * 0.7}
-              strokeWidth={0.15}
+              strokeWidth={0.1}
               color="#DADADA"
             />
           </View>
@@ -275,7 +264,7 @@ export const CameraProvider: React.FC<CameraProviderProps> = ({
   );
 };
 
-// Hook to use the photo context
+// Hook to use the photo context in other components
 export const usePhotos = (initialPhotos?: Photo[]) => {
   const context = useContext(PhotoContext);
   if (!context) {
@@ -287,6 +276,7 @@ export const usePhotos = (initialPhotos?: Photo[]) => {
     Photo[] | undefined
   >(initialPhotos);
 
+  // Set initial photos provided via hook
   useEffect(() => {
     if (pendingInitialPhotos && pendingInitialPhotos.length > 0) {
       setPhotos([...pendingInitialPhotos]);
@@ -294,6 +284,7 @@ export const usePhotos = (initialPhotos?: Photo[]) => {
     }
   }, [pendingInitialPhotos, setPhotos]);
 
+  // Reset states when parent using hook unmounted
   useEffect(() => {
     return () => {
       resetState();

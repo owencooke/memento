@@ -1,6 +1,6 @@
 import { Coordinates, ImageWithUrl } from "../api-client/generated";
 import { GeoLocation } from "../components/inputs/LocationInput";
-import { Photo } from "@/src/context/PhotoContext";
+import { Photo } from "@/src/libs/photos";
 import { getDateFromISO, toISODateString } from "./date";
 
 type SelectedPhotoMetadata = Pick<
