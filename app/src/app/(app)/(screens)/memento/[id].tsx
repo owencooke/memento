@@ -27,7 +27,9 @@ const iconClasses = "w-6 h-6";
 export default function ViewMemento() {
   // Get memento
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { mementos } = useMementos();
+  const { mementos } = useMementos({
+    queryOptions: { refetchOnMount: false },
+  });
   const memento = mementos?.find((m) => m.id === Number(id));
 
   // State
@@ -137,7 +139,12 @@ export default function ViewMemento() {
             className={`${iconClasses} ${showImageMetadata && "text-tertiary-500"}`}
           />
         </Button>
-        <Button size="xl" className={buttonClasses} onPress={handleEditMemento}>
+        <Button
+          size="xl"
+          className={buttonClasses}
+          onPress={handleEditMemento}
+          testID="view-memento-edit-button"
+        >
           <ButtonIcon as={EditIcon} className={iconClasses} />
         </Button>
         {/* TODO: open Delete confirmation modal */}
