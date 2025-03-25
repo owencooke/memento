@@ -6,7 +6,7 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import DraggableGrid from "@/src/components/draggable-grid";
 import PhotoSourceSheet from "./PhotoSourceSheet";
 import InteractivePhotoCard from "../cards/InteractivePhotoCard";
-import BackgroundRemovalModal from "../forms/BackgroundRemovalModal";
+import BackgroundRemovalModal from "../modals/BackgroundRemovalModal";
 
 interface GridItem {
   key: number;

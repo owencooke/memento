@@ -1,9 +1,6 @@
-import { getUsersMementosApiUserUserIdMementoGetOptions } from "@/src/api-client/generated/@tanstack/react-query.gen";
 import MementoCard from "@/src/components/cards/MementoCard";
 import { Fab, FabIcon } from "@/src/components/ui/fab";
-import { AddIcon, EditIcon, EyeOffIcon } from "@/src/components/ui/icon";
-import { useSession } from "@/src/context/AuthContext";
-import { useQuery } from "@tanstack/react-query";
+import { AddIcon } from "@/src/components/ui/icon";
 import { router } from "expo-router";
 import { View, Text, FlatList, Pressable, RefreshControl } from "react-native";
 import { useMemo, useState } from "react";
@@ -20,8 +17,6 @@ import { ListFilter } from "lucide-react-native";
 import FilterMementoSheet, {
   FilterMementoFormData,
 } from "@/src/components/inputs/FilterMementoSheet";
-import { BoundingBox } from "@/src/components/inputs/LocationInput";
-import { useDebounce } from "@/src/hooks/useDebounce";
 import {
   Actionsheet,
   ActionsheetBackdrop,
@@ -33,59 +28,26 @@ import {
   ActionsheetItemText,
 } from "@/src/components/ui/actionsheet";
 import { Grid2x2Plus } from "lucide-react-native";
-
-const tenMinutesInMs = 10 * 60 * 1000;
-
-interface FilterParams {
-  start_date: string | null;
-  end_date: string | null;
-  bbox: BoundingBox | null;
-}
+import { useMementos } from "@/src/hooks/useMementos";
+import { toISODateString } from "@/src/libs/date";
+import { Badge, BadgeText } from "@/src/components/ui/badge";
 
 export default function Mementos() {
-  const { session } = useSession();
-
+  const [showActionsheet, setShowActionsheet] = useState(false);
   const [showCreateOptions, setShowCreateOptions] = useState(false);
-  const handleCloseModal = () => setShowCreateOptions(false);
 
   const { getColor } = useColors();
   const [refreshing, setRefreshing] = useState(false);
   const refreshColor = getColor("tertiary-500");
 
-  // States for search bar text and filter parameters from filter actionsheet
-  const [searchText, setSearchText] = useState("");
-  const [filterParams, setFilterParams] = useState<FilterParams>({
-    start_date: null,
-    end_date: null,
-    bbox: null,
-  });
-
-  const debouncedQueryParams = useDebounce(
-    {
-      start_date: filterParams.start_date ?? undefined,
-      end_date: filterParams.end_date ?? undefined,
-      min_lat: filterParams.bbox?.southwest.lat ?? undefined,
-      min_long: filterParams.bbox?.southwest.lng ?? undefined,
-      max_lat: filterParams.bbox?.northeast.lat ?? undefined,
-      max_long: filterParams.bbox?.northeast.lng ?? undefined,
-      text: searchText.trim() || undefined,
-    },
-    600,
-  );
-
-  const { data: mementos, refetch } = useQuery({
-    ...getUsersMementosApiUserUserIdMementoGetOptions({
-      path: {
-        user_id: session?.user.id ?? "",
-      },
-      query: debouncedQueryParams,
-    }),
-    // Keep previous results in cache for certain time period
-    staleTime: tenMinutesInMs,
-    gcTime: tenMinutesInMs,
-    // Keep showing previous data while loading new result
-    placeholderData: (previousData) => previousData,
-  });
+  const {
+    mementos,
+    refetch,
+    setFilters,
+    activeFilterCount,
+    searchText,
+    setSearchText,
+  } = useMementos();
 
   // For odd number of mementos, add a spacer for last grid element
   const gridData = useMemo(
@@ -96,6 +58,8 @@ export default function Mementos() {
     [mementos],
   );
 
+  const closeCreateOptions = () => setShowCreateOptions(false);
+
   const handleRefresh = async () => {
     setRefreshing(true);
     await refetch();
@@ -103,25 +67,24 @@ export default function Mementos() {
   };
 
   const handleViewMemento = (id: number) =>
-    router.push(`/(app)/(screens)/(memento)/${id}`);
+    router.push(`/(app)/(screens)/memento/${id}`);
 
   const handleAddMemento = () => {
-    handleCloseModal();
-    router.push("/(app)/(screens)/(memento)/create");
+    closeCreateOptions();
+    router.push("/(app)/(screens)/memento/create");
   };
 
   const handleBulkCreate = () => {
-    handleCloseModal();
-    router.push("/(app)/(screens)/(memento)/create/bulk");
+    closeCreateOptions();
+    router.push("/(app)/(screens)/memento/create/bulk");
   };
 
-  // Passes the filter actionsheet form data back to memento tab state
-  const [showActionsheet, setShowActionsheet] = useState(false);
   const handleApplyFilters = (data: FilterMementoFormData) => {
-    setFilterParams({
-      start_date: data.start_date?.toISOString().split("T")[0] ?? null,
-      end_date: data.end_date?.toISOString().split("T")[0] ?? null,
-      bbox: data.location.bbox ?? null,
+    const { start_date, end_date, location } = data;
+    setFilters({
+      start_date: start_date ? toISODateString(start_date) : null,
+      end_date: end_date ? toISODateString(end_date) : null,
+      bbox: location.bbox ?? null,
     });
     setShowActionsheet(false);
   };
@@ -139,13 +102,22 @@ export default function Mementos() {
             onChangeText={setSearchText}
           />
         </Input>
+
         <Button
           size="md"
           variant="link"
-          className="rounded-full p-3.5"
+          className="rounded-full p-3.5 relative"
           onPress={() => setShowActionsheet(true)}
         >
           <ButtonIcon as={ListFilter} />
+          {activeFilterCount > 0 && (
+            <Badge
+              className="absolute -top-1 -right-1 z-10 h-[18px] w-[18px] p-0 bg-tertiary-600 rounded-full flex items-center justify-center"
+              variant="solid"
+            >
+              <BadgeText className="text-white">{activeFilterCount}</BadgeText>
+            </Badge>
+          )}
         </Button>
       </View>
       <FlatList
@@ -182,7 +154,7 @@ export default function Mementos() {
       />
       <Fab size="lg" onPress={() => setShowCreateOptions(true)}>
         <FabIcon as={AddIcon} />
-        <Actionsheet isOpen={showCreateOptions} onClose={handleCloseModal}>
+        <Actionsheet isOpen={showCreateOptions} onClose={closeCreateOptions}>
           <ActionsheetBackdrop />
           <ActionsheetContent>
             <ActionsheetDragIndicatorWrapper>
