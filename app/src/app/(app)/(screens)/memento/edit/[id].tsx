@@ -98,9 +98,9 @@ export default function EditMemento() {
         bodySerializer: formDataBodySerializer.bodySerializer,
       },
       {
-        onSuccess: () => {
-          //   Invalidate cached GET mementos before redirecting
-          queryClient.invalidateQueries({
+        onSuccess: async () => {
+          // Invalidate cached GET mementos before redirecting
+          await queryClient.invalidateQueries({
             queryKey: getUsersMementosApiUserUserIdMementoGetQueryKey({
               path: { user_id: user_id },
             }),

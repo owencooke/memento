@@ -50,6 +50,7 @@ interface PhotoContextType {
   pendingProcessedPhotos: Photo[];
   acceptProcessedPhoto: (newPhoto: Photo) => void;
   rejectProcessedPhoto: (processedPhoto: Photo) => void;
+  resetState: () => void;
 }
 
 const PhotoContext = createContext<PhotoContextType | undefined>(undefined);
@@ -194,6 +195,11 @@ export const CameraProvider: React.FC<CameraProviderProps> = ({
     [rejectProcessedPhoto],
   );
 
+  const resetState = useCallback(() => {
+    setPhotos([]);
+    setPendingProcessedPhotos([]);
+  }, []);
+
   // Show/hide camera methods
   const showCamera = useCallback(() => setIsCameraVisible(true), []);
   const hideCamera = useCallback(() => setIsCameraVisible(false), []);
@@ -208,6 +214,7 @@ export const CameraProvider: React.FC<CameraProviderProps> = ({
     pendingProcessedPhotos,
     acceptProcessedPhoto,
     rejectProcessedPhoto,
+    resetState,
   };
 
   return (
@@ -274,7 +281,7 @@ export const usePhotos = (initialPhotos?: Photo[]) => {
   if (!context) {
     throw new Error("usePhotos must be used within a CameraProvider");
   }
-  const { setPhotos } = context;
+  const { setPhotos, resetState } = context;
 
   const [pendingInitialPhotos, setPendingInitialPhotos] = useState<
     Photo[] | undefined
@@ -288,8 +295,11 @@ export const usePhotos = (initialPhotos?: Photo[]) => {
   }, [pendingInitialPhotos, setPhotos]);
 
   useEffect(() => {
-    return () => setPhotos([]);
-  }, [setPhotos]);
+    return () => {
+      resetState();
+      setPendingInitialPhotos([]);
+    };
+  }, [resetState]);
 
   return context;
 };
