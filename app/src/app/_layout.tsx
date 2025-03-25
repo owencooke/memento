@@ -42,11 +42,13 @@ function RootContent() {
       <NavigationThemeProvider
         value={theme === "dark" ? DarkTheme : DefaultTheme}
       >
-        <Stack>
-          <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="(app)" options={{ headerShown: false }} />
-        </Stack>
-        <StatusBar style="auto" />
+        <CameraProvider>
+          <Stack>
+            <Stack.Screen name="index" options={{ headerShown: false }} />
+            <Stack.Screen name="(app)" options={{ headerShown: false }} />
+          </Stack>
+          <StatusBar style="auto" />
+        </CameraProvider>
       </NavigationThemeProvider>
     </GluestackUIProvider>
   );
@@ -59,9 +61,7 @@ export default function RootLayout() {
         <ThemeProvider>
           <SafeAreaProvider>
             <GestureHandlerRootView>
-              <CameraProvider>
-                <RootContent />
-              </CameraProvider>
+              <RootContent />
             </GestureHandlerRootView>
           </SafeAreaProvider>
         </ThemeProvider>

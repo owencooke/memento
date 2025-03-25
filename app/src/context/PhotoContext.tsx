@@ -19,7 +19,7 @@ import * as ImagePicker from "expo-image-picker";
 import { useMutation } from "@tanstack/react-query";
 import { removeImageBackgroundApiImageRemoveBackgroundPostMutation } from "@/src/api-client/generated/@tanstack/react-query.gen";
 import { formDataBodySerializer } from "@/src/api-client/formData";
-import { Button, ButtonIcon } from "../components/ui/button";
+import { Button } from "../components/ui/button";
 import {
   getPhotosFromLibrary,
   createPhotoObject,
@@ -27,7 +27,7 @@ import {
 } from "@/src/libs/photos";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
-  ChevronLeft,
+  ChevronLeftIcon,
   CircleIcon,
   RectangleVerticalIcon,
 } from "lucide-react-native";
@@ -233,38 +233,34 @@ export const CameraProvider: React.FC<CameraProviderProps> = ({
               color="#BBBBBB"
             />
           </View>
-
-          <View className="absolute bottom-0 left-0 right-0 pb-6 z-20">
+          <View className="absolute bottom-0 left-0 right-0 z-20">
             <View className="flex-row items-center justify-between px-6">
               {/* Back Button */}
-              <Button
-                action="secondary"
-                variant="link"
-                onPress={hideCamera}
-                testID="camera-back-button"
-              >
-                <ButtonIcon as={ChevronLeft} color="white" size="xl" />
-              </Button>
+              <View className="flex-1">
+                <Button
+                  variant="link"
+                  className="w-8 h-8 p-0"
+                  onPress={hideCamera}
+                  testID="camera-back-button"
+                >
+                  <ChevronLeftIcon size={32} color="white" />
+                </Button>
+              </View>
 
               {/* Capture Button */}
-              <Button
-                onPress={takePicture}
-                variant="solid"
-                className="bg-transparent"
-                testID="camera-capture-button"
-              >
-                <ButtonIcon
-                  as={CircleIcon}
-                  color="white"
-                  size="xl"
-                  fill="white"
-                  className="rounded-full border-4 border-white"
-                />
-              </Button>
-
-              {/* Placeholder for symmetry */}
-              <View className="w-12" />
+              <View className="flex-1 items-center flex">
+                <Button
+                  className="w-24 h-24 p-0 m-0"
+                  onPress={takePicture}
+                  variant="link"
+                  testID="camera-capture-button"
+                >
+                  <CircleIcon size={96} strokeWidth={1.5} color="white" />
+                </Button>
+              </View>
+              <View className="flex-1" />
             </View>
+            <View className="h-12" />
           </View>
         </SafeAreaView>
       </Modal>
