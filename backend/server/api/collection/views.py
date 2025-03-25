@@ -1,7 +1,7 @@
 """
 @description CRUD API routes for Collections.
-
-@requirements FR-3, FR-35, FR-36, FR-37
+    Also has the route for generating a collage representation for a collection.
+@requirements FR-3, FR-35, FR-36, FR-37, FR-53
 """
 
 from fastapi import APIRouter, Depends, HTTPException, Response

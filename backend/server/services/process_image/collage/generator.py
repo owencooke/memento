@@ -1,3 +1,8 @@
+"""
+@description Generator class for creating a collage-representation of a collection.
+@requirements FR-53
+"""
+
 import random
 from typing import Sequence
 

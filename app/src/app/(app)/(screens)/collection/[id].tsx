@@ -1,5 +1,5 @@
 /**
- * @description Screen for viewing an collection
+ * @description Screen for viewing a collection
  * @requirements FR-3 FR-46
  */
 import {
@@ -78,7 +78,7 @@ export default function ViewCollection() {
 
   const handleShareCollection = () =>
     router.push(
-      `/(app)/(screens)/(collection)/collage/${collection?.id}?title=${collection?.title}`,
+      `/(app)/(screens)/collection/collage/${collection?.id}?title=${collection?.title}`,
     );
 
   // Delete collection
