@@ -1,4 +1,9 @@
-import { Coordinates, ImageWithUrl, Memento } from "../api-client/generated";
+import {
+  Coordinates,
+  ImageWithUrl,
+  Memento,
+  MementoWithImages,
+} from "../api-client/generated";
 import { GeoLocation } from "../components/inputs/LocationInput";
 import { Photo } from "../hooks/usePhotos";
 import { getDateFromISO, toISODateString } from "./date";
@@ -8,7 +13,7 @@ type SelectedPhotoMetadata = Pick<
   "date" | "filename" | "coordinates"
 >;
 
-type Metadata = Pick<Memento | ImageWithUrl, "date" | "coordinates">;
+type Metadata = Pick<MementoWithImages | ImageWithUrl, "date" | "coordinates">;
 
 /**
  * Extracts "relevant" properties from EXIF metadata of an image for our application.
@@ -39,14 +44,16 @@ export const getRelevantImageMetadata = (
   };
 };
 
-const isPhoto = (item: Photo | Memento): item is Photo => {
+const isPhoto = (item: Photo | MementoWithImages): item is Photo => {
   return "exif" in item;
 };
 
 /**
  * Extracts relevant metadata from either a photo or memento.
  */
-export const getRelevantMetadata = (item: Photo | Memento): Metadata => {
+export const getRelevantMetadata = (
+  item: Photo | MementoWithImages,
+): Metadata => {
   if (isPhoto(item)) {
     const { exif, fileName } = item;
 
@@ -79,7 +86,9 @@ export const getRelevantMetadata = (item: Photo | Memento): Metadata => {
  *  - Date: uses the mode
  *  - Location: finds center of largest coordinate cluster and uses reverse geocoding
  */
-export const aggregateMetadata = async (items: (Photo | Memento)[]) => {
+export const aggregateMetadata = async (
+  items: (Photo | MementoWithImages)[],
+) => {
   const metadatas = items.map(getRelevantMetadata);
 
   const dateString = findMostCommonDate(metadatas);
