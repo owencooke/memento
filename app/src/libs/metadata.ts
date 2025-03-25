@@ -1,4 +1,4 @@
-import { Coordinates, ImageWithUrl } from "../api-client/generated";
+import { Coordinates, ImageWithUrl, Memento } from "../api-client/generated";
 import { GeoLocation } from "../components/inputs/LocationInput";
 import { Photo } from "../hooks/usePhotos";
 import { getDateFromISO, toISODateString } from "./date";
@@ -7,6 +7,8 @@ type SelectedPhotoMetadata = Pick<
   ImageWithUrl,
   "date" | "filename" | "coordinates"
 >;
+
+type Metadata = Pick<Memento | ImageWithUrl, "date" | "coordinates">;
 
 /**
  * Extracts "relevant" properties from EXIF metadata of an image for our application.
@@ -37,13 +39,48 @@ export const getRelevantImageMetadata = (
   };
 };
 
+const isPhoto = (item: Photo | Memento): item is Photo => {
+  return "exif" in item;
+};
+
+/**
+ * Extracts relevant metadata from either a photo or memento.
+ */
+export const getRelevantMetadata = (item: Photo | Memento): Metadata => {
+  if (isPhoto(item)) {
+    const { exif, fileName } = item;
+
+    // Date
+    let date =
+      exif?.DateTimeOriginal || exif?.DateTimeDigitized || exif?.DateTime;
+    date = date ? toISODateString(date) : null;
+
+    // Coordinates
+    let coordinates = null;
+    if (exif && "GPSLatitude" in exif) {
+      coordinates = {
+        lat: (exif.GPSLatitudeRef === "S" ? -1 : 1) * exif.GPSLatitude,
+        long: (exif.GPSLongitudeRef === "W" ? -1 : 1) * exif.GPSLongitude,
+      };
+    }
+
+    return { date, coordinates };
+  }
+
+  // Memento Metadata
+  return {
+    date: item.date ?? null,
+    coordinates: item.coordinates ?? null,
+  };
+};
+
 /**
  * Looks at the metadata for an array of images and tries to aggregate them into a final result.
  *  - Date: uses the mode
  *  - Location: finds center of largest coordinate cluster and uses reverse geocoding
  */
-export const aggregateMetadata = async (photos: Photo[]) => {
-  const metadatas = photos.map(getRelevantImageMetadata);
+export const aggregateMetadata = async (items: (Photo | Memento)[]) => {
+  const metadatas = items.map(getRelevantMetadata);
 
   const dateString = findMostCommonDate(metadatas);
   const geocenter = findLargestLocationCenter(metadatas);
@@ -57,9 +94,7 @@ export const aggregateMetadata = async (photos: Photo[]) => {
 /**
  * Get the most common date from list of metadata.
  */
-const findMostCommonDate = (
-  metadatas: SelectedPhotoMetadata[],
-): string | null => {
+const findMostCommonDate = (metadatas: Metadata[]): string | null => {
   const dateCounts: Record<string, number> = {};
 
   return metadatas
@@ -106,7 +141,7 @@ const reverseCityGeocode = async (
  * Threshold for clustering is ~10km, in attempt to cluster by city
  */
 const findLargestLocationCenter = (
-  metadatas: SelectedPhotoMetadata[],
+  metadatas: Metadata[],
   clusterThreshold = 0.1,
 ): Coordinates | null => {
   const locations = metadatas
