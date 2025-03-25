@@ -19,8 +19,6 @@ export const toISODateString = (date: string | Date): string => {
  * To convert an ISO date string into a Date object, preserving correct local time
  */
 export const getDateFromISO = (dateString: string) => {
-  const date = new Date(`${dateString}T00:00:00`);
-  const now = new Date();
-  date.setHours(now.getHours(), now.getMinutes(), now.getSeconds());
-  return date;
+  const [year, month, day] = dateString.split("-").map(Number);
+  return new Date(year, month - 1, day);
 };

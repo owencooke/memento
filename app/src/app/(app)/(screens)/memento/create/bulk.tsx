@@ -34,8 +34,8 @@ import {
 } from "@/src/api-client/memento";
 import { formDataBodySerializer } from "@/src/api-client/formData";
 import { useSession } from "@/src/context/AuthContext";
-import BulkCreateCollectionModal from "@/src/components/forms/BulkCreateCollectionModal";
-import BackgroundRemovalModal from "@/src/components/forms/BackgroundRemovalModal";
+import BulkCreateCollectionModal from "@/src/components/modals/BulkCreateCollectionModal";
+import BackgroundRemovalModal from "@/src/components/modals/BackgroundRemovalModal";
 
 type BulkMementoGroup = MementoFormData["memento"] & {
   groupId: number;
