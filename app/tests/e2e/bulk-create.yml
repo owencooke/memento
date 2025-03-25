@@ -71,9 +71,7 @@ appId: com.memento.app
 - tapOn: Create Collection
 
 # Verify new collection created with mementos showing
-
-# Verify new mementos added to grid view
-- assertVisible: Mementos
+- assertVisible: Bulk Created Collection
 
 - assertVisible: Group number one
 - assertVisible: ^\d{4}-\d{2}-01$

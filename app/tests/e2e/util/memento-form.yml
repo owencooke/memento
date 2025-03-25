@@ -21,6 +21,7 @@ tags:
 # Set the location
 - tapOn:
     id: memento-form-location
+- eraseText
 - inputText: ${LOCATION_PARTIAL}
 - hideKeyboard
 - scrollUntilVisible:
