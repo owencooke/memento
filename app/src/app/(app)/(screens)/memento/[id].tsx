@@ -2,7 +2,6 @@
  * @description Screen for viewing an individual keepsake/memento.
  * @requirements FR-26, FR-27, FR-28, FR-54
  */
-import { getUsersMementosApiUserUserIdMementoGetOptions } from "@/src/api-client/generated/@tanstack/react-query.gen";
 import ImageMetadataCard from "@/src/components/cards/ImageMetadataCard";
 import { ButtonIcon, Button } from "@/src/components/ui/button";
 import {
@@ -13,8 +12,7 @@ import {
 } from "@/src/components/ui/icon";
 import { Image } from "@/src/components/ui/image";
 import { Text } from "@/src/components/ui/text";
-import { useSession } from "@/src/context/AuthContext";
-import { useQuery } from "@tanstack/react-query";
+import { useMementos } from "@/src/hooks/useMementos";
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { View } from "react-native";
@@ -31,16 +29,8 @@ const iconClasses = "w-6 h-6";
 
 export default function ViewMemento() {
   // Get memento
-  const { session } = useSession();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { data: mementos } = useQuery({
-    ...getUsersMementosApiUserUserIdMementoGetOptions({
-      path: {
-        user_id: session?.user.id ?? "",
-      },
-    }),
-    refetchOnMount: false,
-  });
+  const { mementos } = useMementos();
   const memento = mementos?.find((m) => m.id === Number(id));
 
   // State
@@ -55,7 +45,7 @@ export default function ViewMemento() {
   const handleShowMoreDetails = () => setShowImageMetadata((prev) => !prev);
 
   const handleEditMemento = () =>
-    router.push(`/(app)/(screens)/(memento)/edit/${memento?.id}`);
+    router.push(`/(app)/(screens)/memento/edit/${memento?.id}`);
 
   const handleShareImage = async () => {
     try {

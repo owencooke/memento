@@ -1,3 +1,9 @@
+/**
+ * @description Screen for displaying a list of user created collections.
+ *    User can see collections displayed in a grid view or on a map using their location.
+ * @requirements FR-3, FR-51, FR-52
+ */
+
 import { Text } from "@/src/components/ui/text";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -6,21 +12,16 @@ import { useSession } from "@/src/context/AuthContext";
 import { getUsersCollectionsApiUserUserIdCollectionGetOptions } from "@/src/api-client/generated/@tanstack/react-query.gen";
 import { Box } from "@/src/components/ui/box";
 import { Fab, FabIcon, FabLabel } from "@/src/components/ui/fab";
-import { AddIcon, GlobeIcon, MenuIcon } from "@/src/components/ui/icon";
-import { FlatList, Pressable, RefreshControl, View } from "react-native";
+import { AddIcon } from "@/src/components/ui/icon";
+import { FlatList, Platform, Pressable, RefreshControl } from "react-native";
 import { router } from "expo-router";
 import CollectionCard from "@/src/components/cards/CollectionCard";
-import { Switch } from "@/src/components/ui/switch";
 import MapView, { Marker } from "react-native-maps";
 import { StyleSheet } from "react-native";
+import { useMementos } from "@/src/hooks/useMementos";
+import { Image } from "@/src/components/ui/image";
+import { LayoutGridIcon, MapIcon } from "lucide-react-native";
 
-/**
- * @description Screen displaying a list of user created collections
- *
- * @requirements FR-3
- *
- * @return {JSX.Element} The rendered collections tab
- */
 export default function Collections() {
   const { session } = useSession();
   const { getColor } = useColors();
@@ -30,13 +31,31 @@ export default function Collections() {
   const [showMapView, setShowMapView] = useState(false);
 
   // Get collections from backend
-  const { data: collections, refetch } = useQuery({
+  const { data, refetch } = useQuery({
     ...getUsersCollectionsApiUserUserIdCollectionGetOptions({
       path: {
         user_id: session?.user.id ?? "",
       },
     }),
   });
+  const { mementos } = useMementos();
+  const collections = useMemo(
+    () =>
+      data
+        ? data.map((collection) => {
+            const thumbnailUri = mementos.find(
+              (m) => m.id === collection.mementos[0]?.memento_id,
+            )?.images[0]?.url;
+            return {
+              ...collection,
+              thumbnailUri: thumbnailUri
+                ? thumbnailUri
+                : `https://placehold.co/400x400.png?text=${collection.title.replace(" ", "+")}`,
+            };
+          })
+        : [],
+    [data, mementos],
+  );
 
   /**
    * transforms collections list to ensure an even grid layout
@@ -63,11 +82,11 @@ export default function Collections() {
    * Navigates the user to the collection creation screen
    */
   const handleAddCollection = () => {
-    router.push("/(app)/(screens)/(collection)/create");
+    router.push("/(app)/(screens)/collection/create");
   };
 
   const handleViewCollection = (id: number) => {
-    router.push(`/(app)/(screens)/(collection)/${id}`);
+    router.push(`/(app)/(screens)/collection/${id}`);
   };
 
   return (
@@ -84,12 +103,28 @@ export default function Collections() {
                     latitude: collection.coordinates?.lat!,
                     longitude: collection.coordinates?.long!,
                   }}
+                  title={collection.title}
+                  description={collection.caption || undefined}
+                  onCalloutPress={() => handleViewCollection(collection.id)}
                 >
-                  <Pressable
-                    onPress={() => handleViewCollection(collection.id)}
-                  >
-                    <CollectionCard {...collection} variant="marker" />
-                  </Pressable>
+                  {Platform.OS === "android" ? (
+                    //NOTE: Android does not support rendering custom views with size larger than 40x40px.
+                    //   So we render just the thumbnail image as a marker, instead of complex card.
+                    <Image
+                      className="max-w-10 max-h-10"
+                      resizeMode="cover"
+                      source={{
+                        uri: collection.thumbnailUri,
+                      }}
+                      alt="Thumbnail for Collection"
+                    />
+                  ) : (
+                    <Pressable
+                      onPress={() => handleViewCollection(collection.id)}
+                    >
+                      <CollectionCard {...collection} variant="marker" />
+                    </Pressable>
+                  )}
                 </Marker>
               ))}
           </MapView>
@@ -134,19 +169,20 @@ export default function Collections() {
           <Text>No collections yet!</Text>
         </Box>
       )}
-      <Fab size="lg" onPress={handleAddCollection}>
-        <FabIcon as={AddIcon} />
-      </Fab>
+      {!showMapView && (
+        <Fab size="lg" onPress={handleAddCollection}>
+          <FabIcon as={AddIcon} />
+        </Fab>
+      )}
       <Fab
         className="bg-secondary-500 border-secondary-300 data-[hover=true]:bg-secondary-600 data-[hover=true]:border-secondary-400 data-[active=true]:bg-secondary-700 data-[active=true]:border-secondary-700 data-[focus-visible=true]:web:ring-indicator-info"
         placement="bottom left"
         size="lg"
         onPress={handleToggleMapView}
       >
-        {/* TODO: replace with better icons once Lucide added; maybe remove label */}
         <FabIcon
           className="text-typography-800 data-[hover=true]:text-typography-800 data-[active=true]:text-typography-800"
-          as={showMapView ? MenuIcon : GlobeIcon}
+          as={showMapView ? LayoutGridIcon : MapIcon}
         />
         <FabLabel className="text-typography-800 data-[hover=true]:text-typography-800 data-[active=true]:text-typography-800">
           {showMapView ? "Grid" : "Map"}

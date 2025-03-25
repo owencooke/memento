@@ -14,6 +14,7 @@ import { useMutation } from "@tanstack/react-query";
 import { removeImageBackgroundApiImageRemoveBackgroundPostMutation } from "../api-client/generated/@tanstack/react-query.gen";
 import { formDataBodySerializer } from "../api-client/formData";
 import { convertBlobToBase64Uri } from "../libs/blob";
+import { uniqueId } from "lodash";
 
 export type DeviceSource = "picker" | "camera";
 export type Photo = Omit<
@@ -53,12 +54,13 @@ export default function usePhotos({ initialPhotos = [] }: UsePhotosProps) {
   };
 
   // Add new photos
-  const addPhotos = async (source: DeviceSource) => {
+  const addPhotos = async (source: DeviceSource): Promise<Photo[]> => {
     const photos = await getPhotosFromDevice(source);
     setPhotos((prevPhotos) => [...prevPhotos, ...photos]);
     if (process.env.EXPO_PUBLIC_DISABLE_BG_REMOVAL !== "true") {
       processPhotos(photos);
     }
+    return photos;
   };
 
   // Remove background from an image
@@ -83,19 +85,21 @@ export default function usePhotos({ initialPhotos = [] }: UsePhotosProps) {
   };
 
   const processPhotos = async (photos: Photo[]) => {
-    // Get base64 images for each removed background
-    const processedPhotoStrings = await Promise.all(
-      photos.map(removeBackground),
-    );
-    const processedPhotos = processedPhotoStrings
-      // Include actual photo details with each base64 string
-      .map((photoString, idx) => ({
-        ...photos[idx],
-        uri: photoString,
-      }))
-      // Don't include empty base64 strings
-      .filter((p) => !!p.uri);
-    setPendingProcessedPhotos((prev) => [...prev, ...processedPhotos]);
+    photos.forEach(async (photo) => {
+      try {
+        // Get base64 image for each removed background and update state
+        const photoString = await removeBackground(photo);
+        setPendingProcessedPhotos((prev) => [
+          ...prev,
+          {
+            ...photo,
+            uri: photoString,
+          },
+        ]);
+      } catch (error) {
+        console.error(`Failed to process photo ${photo.assetId}:`, error);
+      }
+    });
   };
 
   // Accept removed background result
@@ -145,10 +149,15 @@ const getPhotosFromDevice = async (source: DeviceSource): Promise<Photo[]> => {
   return await Promise.all(
     result.assets.map(async (photo) => {
       const { uri, mimeType } = await compressImage(photo);
+      const uniqueFilename = uniqueId("photo_");
       return {
         ...photo,
         uri,
         mimeType,
+        // Image uploads to server require a filename to pass validation
+        fileName: photo.fileName ?? `${uniqueFilename}.jpg`,
+        // Captured images may not have id (required for internal state management)
+        assetId: photo.assetId ?? uniqueFilename,
       };
     }),
   );

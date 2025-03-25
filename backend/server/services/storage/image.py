@@ -25,16 +25,33 @@ async def upload_image(file: UploadFile) -> str:
     return response.path
 
 
-def get_image_url(filename: str) -> str:
-    """Uses Supabase Storage API to create signed url for a stored image."""
-    response = supabase.storage.from_("images").create_signed_url(filename, 86400)
-    return response["signedUrl"]
-
-
 def delete_images(filenames: list[str]) -> bool:
     """Uses Supabase Storage API to delete a file from /images bucket."""
     response = supabase.storage.from_("images").remove(filenames)
     return len(response) == 1
+
+
+def get_image_url(filename: str, expires_in: int = 86400) -> str:
+    """Uses Supabase Storage API to create signed url for a stored image."""
+    response = supabase.storage.from_("images").create_signed_url(filename, expires_in)
+    return response["signedUrl"]
+
+
+def get_bulk_image_urls(
+    filenames: list[str],
+    expires_in: int = 86400,
+) -> dict[str, str]:
+    """Uses Supabase Storage API to create multiple signed urls in a single request.
+
+    Returns a dictionary mapping filenames to their signed URLs
+    """
+    if not filenames:
+        return {}
+    response = supabase.storage.from_("images").create_signed_urls(
+        filenames,
+        expires_in,
+    )
+    return {item["path"]: item["signedUrl"] for item in response}
 
 
 def download_images(filenames: list[str]) -> list[Image.Image]:

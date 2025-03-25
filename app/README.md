@@ -45,7 +45,7 @@ The easiest, quickstart option is to download the Expo Go app on your physical d
 
 ### Connecting to Backend
 
-### On Local Netwrok
+### On Local Network
 
 To call the Backend APIs, the Expo app needs to know the IP address of the host the backend is running on. The app host and backend host should be on the same LAN. To specify the host IP, set the following environment variable in a `.env` file:
 
@@ -143,11 +143,21 @@ Alternatively, the tests can be ran using the EAS CLI.
 
 Refer to the Expo Docs for more information about [custom EAS builds](https://docs.expo.dev/custom-builds/schema/#easmaestro_test).
 
-## Emulated Devices
+## Development Devices
 
-By far the most configuration-heavy and tricky part of mobile development, many of the prerequisites required to run an Android Emulator or iOS Simulator will depend on your local machine.
+By far the most configuration-heavy and tricky part of mobile development, many of the prerequisites required to run an Android Emulator, iOS Simulator, or on a physical device will depend on your local machine/environments.
 
 It is recommended to follow official documentation for installing/running emulators.
+
+### Physical Android Device
+
+ECE 493 provided Samsung Galaxy A16 5G phones for testing in the lab. Instructions for running are below:
+
+1. Enable [USB debugging](https://www.rogers.com/support/device-guides/en/mobile/tutorial/galaxy-a16-5g/14.0.0/feature_settings_debugging-enabling-usb-debugging) for the Android device and connect to computer via USB.
+2. Run the command `adb -s R5CXC1A1JXV reverse tcp:8000 tcp:8000` to make the backend server accessible directly on the Android device (ex: go to `localhost:8000/docs` in phone browser to test) and ensure `EXPO_PUBLIC_API_HOST=127.0.0.1` in the `/app/.env` file.
+3. Start the Metro server for the app:
+   - `pnpm start` will allow you to open the app within Expo Go.
+   - `pnpm android` will build an Android development build and install it directly on the device.
 
 ### Android Emulator
 
