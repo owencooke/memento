@@ -281,6 +281,9 @@ export const usePhotos = (initialPhotos?: Photo[]) => {
     if (initialPhotos && initialPhotos.length > 0) {
       setPhotos(initialPhotos);
     }
+    return () => {
+      setPhotos([]);
+    };
   }, [initialPhotos, setPhotos]);
 
   return context;

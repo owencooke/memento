@@ -40,8 +40,12 @@ export default function PhotoSelectGrid({
 
   // When photos change, send updated state to parent component
   useEffect(() => {
-    onChange(photos).catch((e) => console.error(e));
-  }, [onChange, photos]);
+    const initialPhotoIds = initialPhotos.map((p) => p.assetId).join(",");
+    const currentPhotoIds = photos.map((p) => p.assetId).join(",");
+    if (initialPhotoIds !== currentPhotoIds) {
+      onChange(photos).catch((e) => console.error(e));
+    }
+  }, [onChange, photos, initialPhotos]);
 
   // Include non-draggable add button at end of photo grid
   const gridData = useMemo(
