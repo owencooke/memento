@@ -1,7 +1,5 @@
 import uuid
 from datetime import date
-from typing import Tuple
-from unittest.mock import MagicMock
 
 from server.api.memento.models import NewMemento, UpdateMemento
 from server.services.db.models.gis import Coordinates
@@ -10,9 +8,10 @@ from server.services.db.queries.memento import (
     create_memento,
     update_memento,
 )
+from tests.fixtures.supabase import MockSupabase
 
 
-def test_create_memento(mock_supabase: Tuple[MagicMock, MagicMock]) -> None:
+def test_create_memento(mock_supabase: MockSupabase) -> None:
     """Test inserting a new memento record with the create_memento function."""
     mock_supabase_client, mock_query_response = mock_supabase
 
@@ -44,9 +43,10 @@ def test_create_memento(mock_supabase: Tuple[MagicMock, MagicMock]) -> None:
     assert result.id == expected_response["id"]
     assert result.caption == expected_response["caption"]
     assert result.user_id == user_id
+    assert result.date == mock_memento.date
 
 
-def test_update_memento(mock_supabase: Tuple[MagicMock, MagicMock]) -> None:
+def test_update_memento(mock_supabase: MockSupabase) -> None:
     """Test inserting a new memento record with the create_memento function."""
     mock_supabase_client, mock_query_response = mock_supabase
 
@@ -79,3 +79,4 @@ def test_update_memento(mock_supabase: Tuple[MagicMock, MagicMock]) -> None:
     assert result.id == expected_response["id"]
     assert result.caption == expected_response["caption"]
     assert result.user_id == user_id
+    assert result.date == mock_memento.date
