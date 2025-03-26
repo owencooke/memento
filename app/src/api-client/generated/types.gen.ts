@@ -62,6 +62,14 @@ export type Coordinates = {
     long: number;
 };
 
+/**
+ * Successful response model for the Create Memento route.
+ */
+export type CreateMementoSuccessResponse = {
+    new_memento_id: number;
+    message?: string;
+};
+
 export type HttpValidationError = {
     detail?: Array<ValidationError>;
 };
@@ -99,6 +107,7 @@ export type Image = {
     detected_text?: string | null;
     filename: string;
     image_label?: string | null;
+    mime_type?: string | null;
     order_index: number;
     memento_ids?: Array<Memento> | null;
 };
@@ -111,6 +120,7 @@ export type ImageWithUrl = {
     detected_text?: string | null;
     filename: string;
     image_label?: string | null;
+    mime_type?: string | null;
     order_index: number;
     url?: string;
 };
@@ -284,7 +294,15 @@ export type GetUsersMementosApiUserUserIdMementoGetData = {
     path: {
         user_id: string;
     };
-    query?: never;
+    query?: {
+        start_date?: string | null;
+        end_date?: string | null;
+        min_lat?: number | null;
+        min_long?: number | null;
+        max_lat?: number | null;
+        max_long?: number | null;
+        text?: string | null;
+    };
     url: '/api/user/{user_id}/memento/';
 };
 
@@ -328,8 +346,10 @@ export type CreateNewMementoApiUserUserIdMementoPostResponses = {
     /**
      * Successful Response
      */
-    200: unknown;
+    200: CreateMementoSuccessResponse;
 };
+
+export type CreateNewMementoApiUserUserIdMementoPostResponse = CreateNewMementoApiUserUserIdMementoPostResponses[keyof CreateNewMementoApiUserUserIdMementoPostResponses];
 
 export type UpdateMementoAndImagesApiUserUserIdMementoIdPutData = {
     body: BodyUpdateMementoAndImagesApiUserUserIdMementoIdPut;
@@ -463,6 +483,71 @@ export type UpdateCollectionAndMementosApiUserUserIdCollectionIdPutResponses = {
 };
 
 export type UpdateCollectionAndMementosApiUserUserIdCollectionIdPutResponse = UpdateCollectionAndMementosApiUserUserIdCollectionIdPutResponses[keyof UpdateCollectionAndMementosApiUserUserIdCollectionIdPutResponses];
+
+export type GenerateCollageApiUserUserIdCollectionIdCollageGetData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/api/user/{user_id}/collection/{id}/collage';
+};
+
+export type GenerateCollageApiUserUserIdCollectionIdCollageGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GenerateCollageApiUserUserIdCollectionIdCollageGetError = GenerateCollageApiUserUserIdCollectionIdCollageGetErrors[keyof GenerateCollageApiUserUserIdCollectionIdCollageGetErrors];
+
+export type GenerateCollageApiUserUserIdCollectionIdCollageGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
+export type TestCollageApiTestingCollageGetData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * Local folder path containing test image files
+         */
+        folder_path: string;
+        /**
+         * Collection title
+         */
+        title?: string;
+        /**
+         * Collection caption
+         */
+        caption?: string | null;
+        /**
+         * Collection location
+         */
+        location?: string | null;
+    };
+    url: '/api/testing/collage';
+};
+
+export type TestCollageApiTestingCollageGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type TestCollageApiTestingCollageGetError = TestCollageApiTestingCollageGetErrors[keyof TestCollageApiTestingCollageGetErrors];
+
+export type TestCollageApiTestingCollageGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
 
 export type ClientOptions = {
     baseUrl: `${string}://${string}` | (string & {});

@@ -6,14 +6,14 @@ import { useMemo } from "react";
 
 type CollectionCardProps = CollectionWithMementos & {
   variant?: "default" | "marker";
+  thumbnailUri: string;
 };
 
 export default function CollectionCard({
-  id,
   title,
   date,
   location,
-  mementos,
+  thumbnailUri,
   variant = "default",
 }: CollectionCardProps) {
   // Extract city from whole location
@@ -43,7 +43,7 @@ export default function CollectionCard({
         >
           <View className="aspect-square flex-1">
             <Image
-              source={{ uri: "https://placehold.co/400.png" }}
+              source={{ uri: thumbnailUri }}
               className="h-full w-full"
               alt=""
               resizeMode="cover"

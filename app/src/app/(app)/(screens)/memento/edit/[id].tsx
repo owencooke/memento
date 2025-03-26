@@ -3,7 +3,6 @@
  * @requirements FR-30, FR31, FR-32, FR-33
  */
 
-import { KeyboardAvoidingView, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
@@ -13,18 +12,19 @@ import {
 } from "@/src/api-client/generated/@tanstack/react-query.gen";
 import { useSession } from "@/src/context/AuthContext";
 import { router, useLocalSearchParams } from "expo-router";
-import { getDateFromISO, toISODateString } from "@/src/libs/date";
+import { getDateFromISO } from "@/src/libs/date";
 import { formDataBodySerializer } from "@/src/api-client/formData";
-import { getRelevantImageMetadata } from "@/src/libs/metadata";
 import { queryClient } from "@/src/app/_layout";
-import MementoForm, {
-  MementoFormData,
-} from "@/src/components/forms/MementoForm";
+import MementoForm from "@/src/components/forms/MementoForm";
 import { GeoLocation } from "@/src/components/inputs/LocationInput";
-import { Photo } from "@/src/hooks/usePhotos";
+import { Photo } from "@/src/libs/photos";
 import { MementoWithImages } from "@/src/api-client/generated";
 import { isEqual } from "lodash";
 import { useMemo } from "react";
+import {
+  MementoFormData,
+  prepareMementoPayload,
+} from "@/src/api-client/memento";
 
 export default function EditMemento() {
   // Get user id
@@ -73,65 +73,33 @@ export default function EditMemento() {
     };
   }, [memento]);
 
-  const handleRedirect = () =>
-    router.dismissTo(`/(app)/(screens)/memento/${memento.id}`);
+  const handleRedirect = () => router.back();
 
-  // PUT Edit Memento Form
+  // Call PUT Edit Memento endpoint with custom serializer for multi-part form data
   const onSubmit = async (form: MementoFormData) => {
     // Skip form submission if no changes made
     if (isEqual(form, initialFormValues)) {
       handleRedirect();
       return;
     }
-
-    const {
-      location: { lat, long, text },
-      date,
-      ...restMemento
-    } = form.memento;
-
-    // Only include fields if explictly set
-    const updatedMemento = {
-      ...restMemento,
-      date: date ? toISODateString(date) : null,
-      location: text ? text : null,
-      coordinates: lat && long ? { lat, long } : null,
-    };
-
-    // Metadata for each image (with updated ordering)
-    const imageMetadata = form.photos.map((photo, idx) => ({
-      ...getRelevantImageMetadata(photo),
-      order_index: idx,
-    }));
-
-    // Filter out images already stored in cloud
-    const images = form.photos
-      .filter((photo) => !photo.storedInCloud)
-      .map((photo) => ({
-        uri: photo.uri,
-        type: photo.mimeType,
-        name: photo.fileName,
-      }));
-
     const path = {
       user_id,
       id: memento.id,
     };
-
+    const body: any = prepareMementoPayload({
+      ...form,
+      photos: form.photos.filter((photo) => !photo.storedInCloud),
+    });
     await updateMutation.mutateAsync(
       {
-        body: {
-          memento_str: updatedMemento,
-          image_metadata_str: imageMetadata,
-          images: images.length > 0 ? images : null,
-        } as any,
+        body,
         path,
         bodySerializer: formDataBodySerializer.bodySerializer,
       },
       {
-        onSuccess: () => {
-          //   Invalidate cached GET mementos before redirecting
-          queryClient.invalidateQueries({
+        onSuccess: async () => {
+          // Invalidate cached GET mementos before redirecting
+          await queryClient.invalidateQueries({
             queryKey: getUsersMementosApiUserUserIdMementoGetQueryKey({
               path: { user_id: user_id },
             }),
@@ -146,20 +114,15 @@ export default function EditMemento() {
 
   return (
     <SafeAreaView className="flex-1" edges={["bottom"]}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        className="flex-1"
-      >
-        {memento && (
-          <MementoForm
-            initialValues={initialFormValues}
-            title="Edit Memento"
-            submitButtonText="Save Changes"
-            isSubmitting={updateMutation.isPending}
-            onSubmit={onSubmit}
-          />
-        )}
-      </KeyboardAvoidingView>
+      {memento && (
+        <MementoForm
+          initialValues={initialFormValues}
+          submitButtonText="Save Changes"
+          isSubmitting={updateMutation.isPending}
+          onSubmit={onSubmit}
+          FormHeader="Edit Memento"
+        />
+      )}
     </SafeAreaView>
   );
 }

@@ -1,4 +1,4 @@
-import { DeviceSource } from "@/src/hooks/usePhotos";
+import { DeviceSource } from "@/src/context/PhotoContext";
 import {
   Actionsheet,
   ActionsheetBackdrop,
@@ -12,7 +12,7 @@ import {
 import { EditIcon, EyeOffIcon } from "../ui/icon";
 
 interface PhotoSourceSheetProps {
-  addPhotos: (source: DeviceSource) => Promise<void>;
+  addPhotos: (source: DeviceSource) => void;
   visible: boolean;
   setVisible: (open: boolean) => void;
 }
