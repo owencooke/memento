@@ -13,7 +13,7 @@ import * as ImageManipulator from "expo-image-manipulator";
 import { useMutation } from "@tanstack/react-query";
 import { removeImageBackgroundApiImageRemoveBackgroundPostMutation } from "../api-client/generated/@tanstack/react-query.gen";
 import { formDataBodySerializer } from "../api-client/formData";
-import { convertBlobToBase64 } from "../libs/blob";
+import { convertBlobToBase64Uri } from "../libs/blob";
 import { uniqueId } from "lodash";
 
 export type DeviceSource = "picker" | "camera";
@@ -77,7 +77,7 @@ export default function usePhotos({ initialPhotos = [] }: UsePhotosProps) {
         body,
         bodySerializer: formDataBodySerializer.bodySerializer,
       });
-      return convertBlobToBase64(response as Blob);
+      return convertBlobToBase64Uri(response as Blob);
     } catch (error) {
       console.error("Failed to remove image background:", error);
       return "";
