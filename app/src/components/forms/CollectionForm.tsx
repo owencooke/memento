@@ -111,7 +111,15 @@ export default function CollectionForm({
   });
 
   const handleAddMementosPress = () => {
-    router.push("/(app)/(screens)/collection/select_mementos");
+    router.push(`/(app)/(screens)/(collection)/select_mementos?ids=${ids}`);
+  };
+
+  const handleRemoveSelection = (id: number) => {
+    const updatedIds = ids.filter((_id) => _id !== id);
+
+    router.setParams({
+      ids: updatedIds.length ? updatedIds.join(",") : "",
+    });
   };
 
   // Receive selected mementos from select_mementos page

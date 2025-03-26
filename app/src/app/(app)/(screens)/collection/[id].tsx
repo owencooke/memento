@@ -70,7 +70,8 @@ export default function ViewCollection() {
   );
 
   const handleEditCollection = () => {
-    router.push(`/(app)/(screens)/collection/edit/${collection?.id}`);
+    const ids = mementos?.map(memento => memento.id);
+    router.push(`/(app)/(screens)/(collection)/edit/${collection?.id}?ids=${ids}`);
   };
 
   const handleViewMemento = (id: number) => {
