@@ -1,14 +1,16 @@
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
+import { getDateFromISO } from "./date";
 
 export async function scheduleAllNotifications(birthdayString: string) {
   scheduleBirthdayNotification(birthdayString);
   scheduleChristmasNotification();
   scheduleValentinesNotification();
+  //   testImmediateNotification();
 }
 
 async function scheduleBirthdayNotification(birthdayString: string) {
-  const date = new Date(birthdayString);
+  const date = getDateFromISO(birthdayString);
   await scheduleAnnualNotification(
     "Happy Birthday! 🎉",
     "Hope you have an amazing day! 🎂",
@@ -35,9 +37,17 @@ async function scheduleValentinesNotification() {
   );
 }
 
+// Use for debugging in-app notifications (fires imemdiately)
+async function testImmediateNotification() {
+  await Notifications.scheduleNotificationAsync({
+    content: { title: "Test Notification", body: "This is a testing message!" },
+    trigger: null,
+  });
+}
+
 /**
  * Schedules a repeating yearly notification.
- * If the month/day match the current date, notification should appear in 30s.
+ * Fires instantly if today matches the event date.
  */
 async function scheduleAnnualNotification(
   title: string,
@@ -46,22 +56,28 @@ async function scheduleAnnualNotification(
   day: number,
 ) {
   const now = new Date();
+  const isToday = now.getMonth() + 1 === month && now.getDate() === day;
+
+  const trigger = isToday
+    ? null
+    : {
+        type:
+          Platform.OS === "ios"
+            ? Notifications.SchedulableTriggerInputTypes.CALENDAR
+            : Notifications.SchedulableTriggerInputTypes.YEARLY,
+        month,
+        day,
+        hour: now.getHours(),
+        minute: now.getMinutes(),
+        repeats: true,
+      };
+
+  console.log(
+    `Scheduling: ${title} for ${isToday ? "NOW (5s)" : `${month}/${day}`}`,
+  );
+
   await Notifications.scheduleNotificationAsync({
-    content: {
-      title,
-      body,
-    },
-    trigger: {
-      type:
-        Platform.OS === "ios"
-          ? Notifications.SchedulableTriggerInputTypes.CALENDAR
-          : Notifications.SchedulableTriggerInputTypes.YEARLY,
-      month,
-      day,
-      hour: now.getHours(),
-      minute: now.getMinutes(),
-      seconds: now.getSeconds() + 10,
-      repeats: true,
-    },
+    content: { title, body },
+    trigger,
   });
 }
