@@ -16,7 +16,7 @@ import { AlertCircleIcon } from "@/src/components/ui/icon";
 import PhotoSelectGrid from "@/src/components/inputs/PhotoSelectGrid";
 import { FlatList } from "react-native";
 import { ReactElement, useCallback, useState } from "react";
-import { Photo } from "@/src/hooks/usePhotos";
+import { Photo } from "@/src/libs/photos";
 import DatePickerInput from "@/src/components/inputs/DatePickerInput";
 import LocationInput, {
   GeoLocation,
