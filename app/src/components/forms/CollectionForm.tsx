@@ -26,6 +26,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getUsersMementosApiUserUserIdMementoGetOptions } from "@/src/api-client/generated/@tanstack/react-query.gen";
 import { useSession } from "@/src/context/AuthContext";
 import { aggregateMetadata } from "@/src/libs/metadata";
+import AutofillFieldsModal from "../modals/AutofillFieldsModal";
 
 /**
  * Form values for the CreateCollection screen
@@ -73,6 +74,12 @@ export default function CollectionForm({
 
   const { session } = useSession();
 
+  const [showModal, setShowModal] = useState(false);
+  const [derivedMetadata, setDerivedMetadata] = useState<{
+    date: Date | null;
+    location: GeoLocation | null;
+  }>({ date: null, location: null });
+
   // Prevent re-rendering location input when Geolocation changes
   const locationValue = watch("location");
   /**
@@ -100,6 +107,7 @@ export default function CollectionForm({
         user_id: session?.user.id ?? "",
       },
     }),
+    refetchOnMount: false,
   });
 
   const handleAddMementosPress = () => {
@@ -123,175 +131,208 @@ export default function CollectionForm({
     );
 
     if (selectedMementos && selectedMementos.length > 0) {
+      setDerivedMetadata({ date: null, location: null });
       aggregateMetadata(selectedMementos).then(({ date, location }) => {
-        if (date) setValue("date", date);
-        if (location) setValue("location", location);
+        if (date || location) {
+          setDerivedMetadata({ date, location });
+          setShowModal(true);
+        }
       });
+    } else {
+      setDerivedMetadata({ date: null, location: null });
     }
     setValue("mementoIds", selectedMementoIds);
   }, [selectedMementoIds, mementos, setValue]);
 
-  return (
-    <FlatList
-      data={[]}
-      renderItem={() => <></>}
-      contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 20 }}
-      showsVerticalScrollIndicator={false}
-      keyboardShouldPersistTaps="handled"
-      ListHeaderComponent={
-        <View className="flex justify-center gap-6 pb-32">
-          <Heading className="block" size="2xl">
-            {title}
-          </Heading>
-          <FormControl size={"lg"} isInvalid={!!errors?.title}>
-            <FormControlLabel>
-              <FormControlLabelText>Title</FormControlLabelText>
-            </FormControlLabel>
-            <Controller
-              name="title"
-              control={control}
-              render={({ field }) => (
-                <Input className="bg-background-0">
-                  <InputField
-                    onChangeText={field.onChange}
-                    value={field.value}
-                    placeholder="Collection Title"
-                  />
-                </Input>
-              )}
-              rules={{
-                validate: {
-                  required: (value) => {
-                    return (value && value.length > 0) || "Title is required";
-                  },
-                },
-              }}
-            />
-            <FormControlError className="mt-4">
-              <FormControlErrorIcon as={AlertCircleIcon} />
-              <FormControlErrorText className="flex-1">
-                {errors?.title?.message}
-              </FormControlErrorText>
-            </FormControlError>
-          </FormControl>
-          <FormControl size={"lg"}>
-            <FormControlLabel>
-              <FormControlLabelText>Caption</FormControlLabelText>
-            </FormControlLabel>
-            <Controller
-              name="caption"
-              control={control}
-              render={({ field }) => (
-                <Textarea className="bg-background-0" size="md">
-                  <TextareaInput
-                    onChangeText={field.onChange}
-                    value={field.value ?? ""}
-                    placeholder="Add a caption"
-                  />
-                </Textarea>
-              )}
-            />
-          </FormControl>
-          <FormControl size={"lg"}>
-            <FormControlLabel>
-              <FormControlLabelText>Date</FormControlLabelText>
-            </FormControlLabel>
-            <Controller
-              name="date"
-              control={control}
-              render={({ field }) => (
-                <DatePickerInput
-                  value={field.value}
-                  onChange={(date) => field.onChange(date)}
-                />
-              )}
-            />
-          </FormControl>
-          <FormControl size={"lg"}>
-            <FormControlLabel>
-              <FormControlLabelText>Location</FormControlLabelText>
-            </FormControlLabel>
-            <Controller
-              name="location"
-              control={control}
-              render={({ field }) => (
-                <LocationInput
-                  onChange={handleLocationChange}
-                  value={field.value}
-                />
-              )}
-            />
-          </FormControl>
-          <FormControl size={"lg"}>
-            <FormControlLabel>
-              <FormControlLabelText>Mementos</FormControlLabelText>
-            </FormControlLabel>
-            <Controller
-              control={control}
-              name="mementoIds"
-              defaultValue={selectedMementoIds}
-              render={({ field: { value, onChange } }) => (
-                <>
-                  {value.length > 0 && (
-                    <View className="flex-1 bg-background-100 py-4">
-                      <ScrollView
-                        horizontal={true}
-                        showsHorizontalScrollIndicator={false}
-                        contentContainerStyle={{
-                          gap: 12,
-                          flexDirection: "row",
-                        }}
-                      >
-                        {value?.map((id) => {
-                          const memento = mementos?.find((m) => m.id === id);
-                          return memento ? (
-                            <View key={id}>
-                              <MementoCard {...memento} />
-                              <Fab
-                                size="lg"
-                                onPress={() =>
-                                  onChange(
-                                    value.filter((value) => value !== id),
-                                  )
-                                }
-                              >
-                                <FabIcon as={TrashIcon} />
-                              </Fab>
-                            </View>
-                          ) : (
-                            <View className="flex-1" />
-                          );
-                        })}
-                      </ScrollView>
-                    </View>
-                  )}
+  const handleAccept = ({
+    location,
+    date,
+  }: {
+    location: boolean;
+    date: boolean;
+  }) => {
+    if (location && derivedMetadata.location) {
+      setValue("location", derivedMetadata.location);
+    }
+    if (date && derivedMetadata.date) {
+      setValue("date", derivedMetadata.date);
+    }
+    setShowModal(false);
+  };
 
-                  <Button
-                    className="mt-auto"
-                    action="secondary"
-                    size={"lg"}
-                    onPress={handleAddMementosPress}
-                  >
-                    <ButtonText>Select Mementos</ButtonText>
-                  </Button>
-                </>
+  return (
+    <>
+      {showModal && derivedMetadata && (
+        <AutofillFieldsModal
+          location={derivedMetadata.location?.text || "Unknown"}
+          date={derivedMetadata.date || new Date()}
+          accept={handleAccept}
+          reject={() => {
+            setShowModal(false);
+          }}
+        />
+      )}
+      <FlatList
+        data={[]}
+        renderItem={() => <></>}
+        contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 20 }}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        ListHeaderComponent={
+          <View className="flex justify-center gap-6 pb-32">
+            <Heading className="block" size="2xl">
+              {title}
+            </Heading>
+            <FormControl size={"lg"} isInvalid={!!errors?.title}>
+              <FormControlLabel>
+                <FormControlLabelText>Title</FormControlLabelText>
+              </FormControlLabel>
+              <Controller
+                name="title"
+                control={control}
+                render={({ field }) => (
+                  <Input className="bg-background-0">
+                    <InputField
+                      onChangeText={field.onChange}
+                      value={field.value}
+                      placeholder="Collection Title"
+                    />
+                  </Input>
+                )}
+                rules={{
+                  validate: {
+                    required: (value) => {
+                      return (value && value.length > 0) || "Title is required";
+                    },
+                  },
+                }}
+              />
+              <FormControlError className="mt-4">
+                <FormControlErrorIcon as={AlertCircleIcon} />
+                <FormControlErrorText className="flex-1">
+                  {errors?.title?.message}
+                </FormControlErrorText>
+              </FormControlError>
+            </FormControl>
+            <FormControl size={"lg"}>
+              <FormControlLabel>
+                <FormControlLabelText>Caption</FormControlLabelText>
+              </FormControlLabel>
+              <Controller
+                name="caption"
+                control={control}
+                render={({ field }) => (
+                  <Textarea className="bg-background-0" size="md">
+                    <TextareaInput
+                      onChangeText={field.onChange}
+                      value={field.value ?? ""}
+                      placeholder="Add a caption"
+                    />
+                  </Textarea>
+                )}
+              />
+            </FormControl>
+            <FormControl size={"lg"}>
+              <FormControlLabel>
+                <FormControlLabelText>Date</FormControlLabelText>
+              </FormControlLabel>
+              <Controller
+                name="date"
+                control={control}
+                render={({ field }) => (
+                  <DatePickerInput
+                    value={field.value}
+                    onChange={(date) => field.onChange(date)}
+                  />
+                )}
+              />
+            </FormControl>
+            <FormControl size={"lg"}>
+              <FormControlLabel>
+                <FormControlLabelText>Location</FormControlLabelText>
+              </FormControlLabel>
+              <Controller
+                name="location"
+                control={control}
+                render={({ field }) => (
+                  <LocationInput
+                    onChange={handleLocationChange}
+                    value={field.value}
+                  />
+                )}
+              />
+            </FormControl>
+            <FormControl size={"lg"}>
+              <FormControlLabel>
+                <FormControlLabelText>Mementos</FormControlLabelText>
+              </FormControlLabel>
+              <Controller
+                control={control}
+                name="mementoIds"
+                defaultValue={selectedMementoIds}
+                render={({ field: { value, onChange } }) => (
+                  <>
+                    {value.length > 0 && (
+                      <View className="flex-1 bg-background-100 py-4">
+                        <ScrollView
+                          horizontal={true}
+                          showsHorizontalScrollIndicator={false}
+                          contentContainerStyle={{
+                            gap: 12,
+                            flexDirection: "row",
+                          }}
+                        >
+                          {value?.map((id) => {
+                            const memento = mementos?.find((m) => m.id === id);
+                            return memento ? (
+                              <View key={id}>
+                                <MementoCard {...memento} />
+                                <Fab
+                                  size="lg"
+                                  onPress={() =>
+                                    onChange(
+                                      value.filter((value) => value !== id),
+                                    )
+                                  }
+                                >
+                                  <FabIcon as={TrashIcon} />
+                                </Fab>
+                              </View>
+                            ) : (
+                              <View className="flex-1" />
+                            );
+                          })}
+                        </ScrollView>
+                      </View>
+                    )}
+
+                    <Button
+                      className="mt-auto"
+                      action="secondary"
+                      size={"lg"}
+                      onPress={handleAddMementosPress}
+                    >
+                      <ButtonText>Select Mementos</ButtonText>
+                    </Button>
+                  </>
+                )}
+              />
+            </FormControl>
+            <Button
+              className="mt-auto"
+              size={"lg"}
+              onPress={handleSubmit(onSubmit)}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <ButtonSpinner />
+              ) : (
+                <ButtonText>{submitButtonText}</ButtonText>
               )}
-            />
-          </FormControl>
-          <Button
-            className="mt-auto"
-            size={"lg"}
-            onPress={handleSubmit(onSubmit)}
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? (
-              <ButtonSpinner />
-            ) : (
-              <ButtonText>{submitButtonText}</ButtonText>
-            )}
-          </Button>
-        </View>
-      }
-    />
+            </Button>
+          </View>
+        }
+      />
+    </>
   );
 }
