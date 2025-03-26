@@ -11,6 +11,7 @@ import Header from "@/src/components/navigation/Header";
 import * as Notifications from "expo-notifications";
 import { useEffect } from "react";
 import { userInfoApiUserIdGet } from "@/src/api-client/generated";
+import { scheduleAllNotifications } from "@/src/libs/notifications";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -28,6 +29,9 @@ export default function AppLayout() {
       const { data: userInfo } = await userInfoApiUserIdGet({
         path: { id: String(session?.user.id) },
       });
+      if (userInfo) {
+        scheduleAllNotifications(userInfo.birthday);
+      }
     };
 
     if (session && !isLoading) {
