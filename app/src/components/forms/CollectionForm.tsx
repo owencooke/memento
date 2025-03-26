@@ -111,15 +111,8 @@ export default function CollectionForm({
   });
 
   const handleAddMementosPress = () => {
-    router.push(`/(app)/(screens)/(collection)/select_mementos?ids=${ids}`);
-  };
-
-  const handleRemoveSelection = (id: number) => {
-    const updatedIds = ids.filter((_id) => _id !== id);
-
-    router.setParams({
-      ids: updatedIds.length ? updatedIds.join(",") : "",
-    });
+    const ids = selectedMementoIds.join(",");
+    router.push(`/(app)/(screens)/collection/select_mementos?ids=${ids}`);
   };
 
   // Receive selected mementos from select_mementos page
@@ -278,7 +271,7 @@ export default function CollectionForm({
                 control={control}
                 name="mementoIds"
                 defaultValue={selectedMementoIds}
-                render={({ field: { value, onChange } }) => (
+                render={({ field: { value } }) => (
                   <>
                     {value.length > 0 && (
                       <View className="flex-1 bg-background-100 py-4">
@@ -297,11 +290,17 @@ export default function CollectionForm({
                                 <MementoCard {...memento} />
                                 <Fab
                                   size="lg"
-                                  onPress={() =>
-                                    onChange(
-                                      value.filter((value) => value !== id),
-                                    )
-                                  }
+                                  onPress={() => {
+                                    const updatedIds = value.filter(
+                                      (value) => value !== id,
+                                    );
+                                    setValue("mementoIds", updatedIds);
+                                    router.setParams({
+                                      ids: updatedIds.length
+                                        ? updatedIds.join(",")
+                                        : "",
+                                    });
+                                  }}
                                 >
                                   <FabIcon as={TrashIcon} />
                                 </Fab>

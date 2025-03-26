@@ -17,7 +17,6 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useMemo, useState } from "react";
 import { Box } from "@/src/components/ui/box";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Heading } from "@/src/components/ui/heading";
 import { FlatList, Pressable } from "react-native";
 import MementoCard from "@/src/components/cards/MementoCard";
 import DeleteCollectionModal from "@/src/components/modals/DeleteModal";
@@ -70,8 +69,10 @@ export default function ViewCollection() {
   );
 
   const handleEditCollection = () => {
-    const ids = mementos?.map(memento => memento.id);
-    router.push(`/(app)/(screens)/(collection)/edit/${collection?.id}?ids=${ids}`);
+    const ids = mementos?.map((memento) => memento.id);
+    router.push(
+      `/(app)/(screens)/collection/edit/${collection?.id}?ids=${ids}`,
+    );
   };
 
   const handleViewMemento = (id: number) => {
