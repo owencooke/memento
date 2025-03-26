@@ -1,3 +1,8 @@
+/**
+ * @description Defines the messages and dates for "special days" to send notifications on.
+ * @requirements FR-56
+ */
+
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
 import { getDateFromISO } from "./date";
@@ -6,7 +11,11 @@ export async function scheduleAllNotifications(birthdayString: string) {
   scheduleBirthdayNotification(birthdayString);
   scheduleChristmasNotification();
   scheduleValentinesNotification();
+
+  // Uncomment to debug
   //   testImmediateNotification();
+  //   clearAllScheduledNotifications();
+  //   logScheduledNotifications();
 }
 
 async function scheduleBirthdayNotification(birthdayString: string) {
@@ -37,17 +46,9 @@ async function scheduleValentinesNotification() {
   );
 }
 
-// Use for debugging in-app notifications (fires imemdiately)
-async function testImmediateNotification() {
-  await Notifications.scheduleNotificationAsync({
-    content: { title: "Test Notification", body: "This is a testing message!" },
-    trigger: null,
-  });
-}
-
 /**
  * Schedules a repeating yearly notification for a given month/day.
- * If current day matches, (ex: birthday) notification should appear in 1 minute.
+ * If current day matches, (ex: birthday) notification should appear in 15 seconds.
  */
 async function scheduleAnnualNotification(
   title: string,
@@ -56,6 +57,7 @@ async function scheduleAnnualNotification(
   day: number,
 ) {
   const now = new Date();
+  const isToday = now.getMonth() + 1 === month && now.getDate() === day;
   console.log(`Scheduling: ${title} for: ${month}/${day}`);
 
   const trigger: Notifications.NotificationTriggerInput = {
@@ -72,6 +74,31 @@ async function scheduleAnnualNotification(
 
   await Notifications.scheduleNotificationAsync({
     content: { title, body },
-    trigger,
+    trigger: !isToday
+      ? trigger
+      : {
+          type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+          seconds: 15,
+        },
   });
+}
+
+// Helper functions for testing/debuggng notifications
+
+async function testImmediateNotification() {
+  await Notifications.scheduleNotificationAsync({
+    content: { title: "Test Notification", body: "This is a testing message!" },
+    trigger: null,
+  });
+}
+
+async function logScheduledNotifications() {
+  const scheduledNotifications =
+    await Notifications.getAllScheduledNotificationsAsync();
+  console.log(JSON.stringify(scheduledNotifications, undefined, 2));
+}
+
+async function clearAllScheduledNotifications() {
+  await Notifications.cancelAllScheduledNotificationsAsync();
+  console.log("✅ All scheduled notifications have been cleared.");
 }
