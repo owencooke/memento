@@ -46,8 +46,8 @@ async function testImmediateNotification() {
 }
 
 /**
- * Schedules a repeating yearly notification.
- * Fires instantly if today matches the event date.
+ * Schedules a repeating yearly notification for a given month/day.
+ * If current day matches, (ex: birthday) notification should appear in 1 minute.
  */
 async function scheduleAnnualNotification(
   title: string,
@@ -56,25 +56,19 @@ async function scheduleAnnualNotification(
   day: number,
 ) {
   const now = new Date();
-  const isToday = now.getMonth() + 1 === month && now.getDate() === day;
+  console.log(`Scheduling: ${title} for: ${month}/${day}`);
 
-  const trigger = isToday
-    ? null
-    : {
-        type:
-          Platform.OS === "ios"
-            ? Notifications.SchedulableTriggerInputTypes.CALENDAR
-            : Notifications.SchedulableTriggerInputTypes.YEARLY,
-        month,
-        day,
-        hour: now.getHours(),
-        minute: now.getMinutes(),
-        repeats: true,
-      };
-
-  console.log(
-    `Scheduling: ${title} for ${isToday ? "NOW (5s)" : `${month}/${day}`}`,
-  );
+  const trigger: Notifications.NotificationTriggerInput = {
+    type:
+      Platform.OS === "ios"
+        ? Notifications.SchedulableTriggerInputTypes.CALENDAR
+        : Notifications.SchedulableTriggerInputTypes.YEARLY,
+    month,
+    day,
+    hour: now.getHours(),
+    minute: now.getMinutes() + 1,
+    repeats: true,
+  };
 
   await Notifications.scheduleNotificationAsync({
     content: { title, body },
