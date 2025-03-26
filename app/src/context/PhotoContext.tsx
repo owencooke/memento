@@ -22,7 +22,7 @@ import { Button } from "../components/ui/button";
 import {
   getPhotosFromLibrary,
   createPhotoObject,
-  convertBlobToBase64,
+  convertBlobToBase64Uri,
   Photo,
 } from "@/src/libs/photos";
 import {
@@ -120,7 +120,7 @@ export const CameraProvider: React.FC<React.PropsWithChildren> = ({
         body,
         bodySerializer: formDataBodySerializer.bodySerializer,
       });
-      return convertBlobToBase64(response as Blob);
+      return convertBlobToBase64Uri(response as Blob);
     } catch (error) {
       console.log("Failed to remove image background:", error);
       return null;

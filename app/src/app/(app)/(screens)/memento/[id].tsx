@@ -1,6 +1,7 @@
 /**
  * @description Screen for viewing an individual keepsake/memento.
- * @requirements FR-26, FR-27, FR-28
+ *    Also supports sharing a memento's images to another platform.
+ * @requirements FR-26, FR-27, FR-28, FR-54
  */
 import ImageMetadataCard from "@/src/components/cards/ImageMetadataCard";
 import { ButtonIcon, Button } from "@/src/components/ui/button";
@@ -20,6 +21,9 @@ import PagerView, {
   PagerViewOnPageSelectedEvent,
 } from "react-native-pager-view";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { shareAsync, isAvailableAsync } from "expo-sharing";
+import * as FileSystem from "expo-file-system";
+import { mimeTypeToExtension } from "@/src/libs/string";
 
 const buttonClasses = "flex-1";
 const iconClasses = "w-6 h-6";
@@ -43,6 +47,29 @@ export default function ViewMemento() {
 
   const handleEditMemento = () =>
     router.push(`/(app)/(screens)/memento/edit/${memento?.id}`);
+
+  const handleShareImage = async () => {
+    try {
+      const image = memento?.images[currentImageIndex];
+      if (image?.url) {
+        // Download the image content to a temp file
+        const localUri = `${FileSystem.cacheDirectory}Memento.${mimeTypeToExtension(image.mime_type)}`;
+        await FileSystem.downloadAsync(image.url, localUri);
+
+        // Share the downloaded content
+        if (await isAvailableAsync()) {
+          await shareAsync(localUri, {
+            mimeType: image.mime_type,
+            UTI: image.mime_type,
+          });
+        } else {
+          console.log("Sharing is not available on this device");
+        }
+      }
+    } catch (error) {
+      console.error("Error sharing image:", error);
+    }
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-primary-500" edges={["bottom"]}>
@@ -111,8 +138,7 @@ export default function ViewMemento() {
       </View>
       {/* Options bar (info, edit, delete, share) */}
       <View className="flex flex-row justify-between items-center bg-primary-500">
-        {/* TODO: open Share options */}
-        <Button size="xl" className={buttonClasses}>
+        <Button size="xl" className={buttonClasses} onPress={handleShareImage}>
           <ButtonIcon as={ShareIcon} className={iconClasses} />
         </Button>
         <Button
