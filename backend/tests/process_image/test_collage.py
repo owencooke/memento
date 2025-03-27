@@ -193,8 +193,6 @@ class TestImageProcessor:
         # Given
         processor = ImageProcessor()
         angle = 15
-
-        # Mock the rotate method
         mock_pil_image.rotate.return_value = mock_pil_image
 
         # When
@@ -207,3 +205,41 @@ class TestImageProcessor:
             resample=Image.Resampling.BICUBIC,
         )
         assert result == mock_pil_image
+
+
+class TestTextManager:
+    """Tests for the TextManager class."""
+
+    def test_load_font(self):
+        """Test load_font method for Pacifico font used."""
+        # Given
+        text_manager = TextManager()
+        with patch("PIL.ImageFont.truetype") as mock_truetype:
+            # When
+            result = text_manager.load_font("Pacifico-Regular.ttf", 24)
+
+        # Then
+        mock_truetype.assert_called_once()
+        assert result == mock_truetype.return_value
+
+    def test_draw_text_with_background(self, mock_pil_objects):
+        """Test draw_text_with_background method."""
+        # Given
+        text_manager = TextManager()
+        y_position = 100
+        mock_draw = MagicMock()
+        with patch("PIL.ImageDraw.Draw", return_value=mock_draw):
+            mock_draw.textbbox.return_value = (0, 0, 100, 20)
+
+            # When
+            result = text_manager.draw_text_with_background(
+                mock_pil_objects["collage"], "Test Text", MagicMock(), y_position
+            )
+
+            # Then
+            mock_draw.textbbox.assert_called_once()
+            mock_draw.rounded_rectangle.assert_called_once()
+            mock_draw.text.assert_called_once()
+
+            # Should return a y position below the original (for next draw)
+            assert result > y_position
