@@ -16,6 +16,7 @@ import { ThemeProvider, useTheme } from "@/src/context/ThemeContext";
 import { AuthProvider, useSession } from "@/src/context/AuthContext";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { CameraProvider } from "../context/PhotoContext";
 
 export const queryClient = new QueryClient();
 
@@ -41,11 +42,13 @@ function RootContent() {
       <NavigationThemeProvider
         value={theme === "dark" ? DarkTheme : DefaultTheme}
       >
-        <Stack>
-          <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="(app)" options={{ headerShown: false }} />
-        </Stack>
-        <StatusBar style="auto" />
+        <CameraProvider>
+          <Stack>
+            <Stack.Screen name="index" options={{ headerShown: false }} />
+            <Stack.Screen name="(app)" options={{ headerShown: false }} />
+          </Stack>
+          <StatusBar style="auto" />
+        </CameraProvider>
       </NavigationThemeProvider>
     </GluestackUIProvider>
   );

@@ -1,5 +1,5 @@
 import { View, Text } from "react-native";
-import usePhotos, { Photo } from "../../hooks/usePhotos";
+import { Photo, usePhotos } from "@/src/context/PhotoContext";
 import { Button, ButtonIcon } from "../ui/button";
 import { AddIcon } from "../ui/icon";
 import { useEffect, useState, useMemo, useCallback } from "react";
@@ -36,7 +36,7 @@ export default function PhotoSelectGrid({
     pendingProcessedPhotos,
     acceptProcessedPhoto,
     rejectProcessedPhoto,
-  } = usePhotos({ initialPhotos });
+  } = usePhotos(initialPhotos);
 
   // When photos change, send updated state to parent component
   useEffect(() => {

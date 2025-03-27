@@ -8,7 +8,7 @@ import React, { useCallback, useMemo } from "react";
 import { View } from "react-native";
 import DraggableGrid from "@/src/components/draggable-grid";
 import { Button, ButtonIcon, ButtonText } from "@/src/components/ui/button";
-import { Photo } from "@/src/hooks/usePhotos";
+import { Photo } from "@/src/libs/photos";
 import InteractivePhotoCard from "@/src/components/cards/InteractivePhotoCard";
 import { EditIcon } from "@/src/components/ui/icon";
 import { Text } from "../ui/text";

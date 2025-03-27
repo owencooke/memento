@@ -1,11 +1,11 @@
 import { Coordinates, ImageWithUrl } from "../api-client/generated";
 import { GeoLocation } from "../components/inputs/LocationInput";
-import { Photo } from "../hooks/usePhotos";
+import { Photo } from "@/src/libs/photos";
 import { getDateFromISO, toISODateString } from "./date";
 
 type SelectedPhotoMetadata = Pick<
   ImageWithUrl,
-  "date" | "filename" | "coordinates"
+  "date" | "filename" | "coordinates" | "mime_type"
 >;
 
 /**
@@ -14,7 +14,7 @@ type SelectedPhotoMetadata = Pick<
 export const getRelevantImageMetadata = (
   photo: Photo,
 ): SelectedPhotoMetadata => {
-  const { exif, fileName } = photo;
+  const { exif, fileName, mimeType } = photo;
 
   // Date
   let date =
@@ -34,6 +34,7 @@ export const getRelevantImageMetadata = (
     date,
     filename: fileName ?? "",
     coordinates,
+    mime_type: mimeType ?? "image/png",
   };
 };
 

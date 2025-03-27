@@ -16,7 +16,8 @@ import { formDataBodySerializer } from "@/src/api-client/formData";
 import { queryClient } from "@/src/app/_layout";
 import MementoForm from "@/src/components/forms/MementoForm";
 import { GeoLocation } from "@/src/components/inputs/LocationInput";
-import { Photo } from "@/src/hooks/usePhotos";
+import { Photo } from "@/src/libs/photos";
+import { MementoWithImages } from "@/src/api-client/generated";
 import { isEqual } from "lodash";
 import { useMemo } from "react";
 import {
@@ -66,8 +67,7 @@ export default function EditMemento() {
     };
   }, [memento]);
 
-  const handleRedirect = () =>
-    router.dismissTo(`/(app)/(screens)/memento/${memento?.id}`);
+  const handleRedirect = () => router.back();
 
   // Call PUT Edit Memento endpoint with custom serializer for multi-part form data
   const onSubmit = async (form: MementoFormData) => {
@@ -88,9 +88,9 @@ export default function EditMemento() {
         bodySerializer: formDataBodySerializer.bodySerializer,
       },
       {
-        onSuccess: () => {
-          //   Invalidate cached GET mementos before redirecting
-          queryClient.invalidateQueries({
+        onSuccess: async () => {
+          // Invalidate cached GET mementos before redirecting
+          await queryClient.invalidateQueries({
             queryKey: getUsersMementosApiUserUserIdMementoGetQueryKey({
               path: { user_id: user_id },
             }),

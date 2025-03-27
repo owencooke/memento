@@ -12,8 +12,8 @@
     "test": "jest",
     "test:e2e": "maestro test tests/e2e/*",
     "lint": "expo lint",
-    "sync-api": "./scripts/sync-api.sh && openapi-ts",
-    "tunnel-api": "./scripts/tunnel-api.sh"
+    "sync-api": "sh scripts/sync-api.sh && openapi-ts",
+    "tunnel-api": "sh ./scripts/tunnel-api.sh"
   },
   "jest": {
     "preset": "jest-expo",
@@ -71,6 +71,7 @@
     "expo-image-picker": "~16.0.6",
     "expo-linking": "~7.0.5",
     "expo-router": "~4.0.17",
+    "expo-sharing": "~13.0.1",
     "expo-splash-screen": "~0.29.21",
     "expo-status-bar": "~2.0.1",
     "expo-symbols": "~0.2.2",
