@@ -10,7 +10,7 @@ from fastapi import UploadFile
 from loguru import logger
 from PIL import Image
 
-from server.services.db.config import supabase
+from server.services.db import supabase
 
 
 async def upload_image(file: UploadFile) -> str:

@@ -24,7 +24,7 @@ def mock_supabase() -> Generator[MagicMock, MagicMock, Any]:
             mock_supabase_client.table().insert.assert_called_once()
     ```
     """
-    with patch("server.services.db.queries.memento.supabase") as mock_supabase:
+    with patch("server.services.db.supabase") as mock_supabase:
         # Create a mock response object that can be configured in each test
         mock_query_response = MagicMock()
 
