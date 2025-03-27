@@ -51,18 +51,24 @@ def mock_supabase() -> Generator[MagicMock, MagicMock, Any]:
                 "not_",
                 "or_",
                 "filter",
+                "upload",
+                "remove",
+                "create_signed_url",
+                "create_signed_urls",
+                "download",
             ]
             for method in chain_methods:
                 getattr(chain_builder, method).return_value = chain_builder
 
             return chain_builder
 
-        # Set up table access
-        mock_table = create_chain_builder()
-        mock_supabase.table.return_value = mock_table
+        # Set up relational DB access
+        mock_supabase.table.return_value = create_chain_builder()
 
         # Set up RPC calls
-        mock_rpc = create_chain_builder()
-        mock_supabase.rpc.return_value = mock_rpc
+        mock_supabase.rpc.return_value = create_chain_builder()
+
+        # Set up storage calls
+        mock_supabase.storage.from_.return_value = create_chain_builder()
 
         yield mock_supabase, mock_query_response
