@@ -10,18 +10,6 @@ from server.services.process_image.collage.text_manager import TextManager
 
 
 @pytest.fixture
-def mock_collection() -> Collection:
-    """Creates a mock collection with test data."""
-    collection = MagicMock(spec=Collection)
-    collection.title = "Test Collection"
-    collection.caption = "Test Caption"
-    collection.location = "Test Location"
-    collection.date = MagicMock()
-    collection.date.strftime.return_value = "January 1, 2023"
-    return collection
-
-
-@pytest.fixture
 def mock_pil_objects():
     """Mock various PIL-related objects and functions."""
     with patch("PIL.Image.new") as mock_image_new:
@@ -56,7 +44,10 @@ class TestCollageGenerator:
 
     @pytest.mark.asyncio
     async def test_create_collage(
-        self, mock_collection, mock_pil_image, mock_pil_objects,
+        self,
+        collection,
+        mock_pil_image,
+        mock_pil_objects,
     ):
         """Test the create_collage method."""
         # Given
@@ -72,38 +63,39 @@ class TestCollageGenerator:
         )  # Mocked y position
 
         # When
-        result = await generator.create_collage(mock_collection, mock_images)
+        result = await generator.create_collage(collection, mock_images)
 
         # Then
         mock_pil_objects["new"].assert_called_once()
         generator._render_scattered_images.assert_called_once_with(
-            mock_pil_objects["collage"], mock_images,
+            mock_pil_objects["collage"],
+            mock_images,
         )
         generator.font_manager.load_font.assert_called()
         generator.font_manager.draw_text_with_background.assert_called()
         assert result == mock_pil_objects["collage"]
 
-    def test_format_metadata_string(self, mock_collection):
+    def test_format_metadata_string(self, collection: Collection):
         """Test _format_metadata_string method."""
         # Given
         generator = CollageGenerator()
 
         # When
-        result = generator._format_metadata_string(mock_collection)
+        result = generator._format_metadata_string(collection)
 
         # Then
         assert "Test Location" in result
-        assert "January 1, 2023" in result
+        assert "January 01, 2023" in result
         assert " • " in result
 
-    def test_format_metadata_string_single_item(self, mock_collection):
+    def test_format_metadata_string_single_item(self, collection: Collection):
         """Test _format_metadata_string with only location."""
         # Given
         generator = CollageGenerator()
-        mock_collection.date = None
+        collection.date = None
 
         # When
-        result = generator._format_metadata_string(mock_collection)
+        result = generator._format_metadata_string(collection)
 
         # Then
         assert result == "Test Location"
@@ -113,12 +105,12 @@ class TestCollageGenerator:
         """Test _format_metadata_string with no metadata."""
         # Given
         generator = CollageGenerator()
-        mock_collection = MagicMock(spec=Collection)
-        mock_collection.location = None
-        mock_collection.date = None
+        collection = MagicMock(spec=Collection)
+        collection.location = None
+        collection.date = None
 
         # When
-        result = generator._format_metadata_string(mock_collection)
+        result = generator._format_metadata_string(collection)
 
         # Then
         assert result == ""
@@ -185,7 +177,9 @@ class TestImageProcessor:
 
                     # When
                     result = processor.prepare_image(
-                        mock_pil_image, target_size, corner_radius,
+                        mock_pil_image,
+                        target_size,
+                        corner_radius,
                     )
 
                     # Then
@@ -208,6 +202,8 @@ class TestImageProcessor:
 
         # Then
         mock_pil_image.rotate.assert_called_once_with(
-            angle, expand=True, resample=Image.Resampling.BICUBIC,
+            angle,
+            expand=True,
+            resample=Image.Resampling.BICUBIC,
         )
         assert result == mock_pil_image
