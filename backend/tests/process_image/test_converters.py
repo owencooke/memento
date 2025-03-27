@@ -39,17 +39,17 @@ async def test_pil_to_png_bytes_no_resize(mock_pil_image: MagicMock) -> None:
     """Test converting PIL image to PNG bytes without needing to resize."""
     # Given
     mock_buffer = MagicMock(spec=BytesIO)
-    mock_buffer.tell.return_value = 300 * 1024  # 300KB, below the 500KB threshold
+    mock_buffer.tell.return_value = 300 * 1024  # below 500KB threshold
     expected_bytes = b"test png data"
     mock_buffer.getvalue.return_value = expected_bytes
 
-    # When
     with patch(
         "server.services.process_image.converters.BytesIO",
     ) as mock_bytesio, patch(
         "server.services.process_image.converters.logger",
     ) as mock_logger:
         mock_bytesio.return_value = mock_buffer
+        # When
         result = await pil_to_png_bytes(mock_pil_image)
 
     # Then
@@ -66,10 +66,12 @@ async def test_pil_to_png_bytes_no_resize(mock_pil_image: MagicMock) -> None:
 
 @pytest.mark.asyncio
 async def test_pil_to_png_bytes_with_resize(mock_pil_image: MagicMock) -> None:
-    """Test converting PIL image to PNG bytes with resizing for large images."""
+    """Test converting PIL image to PNG bytes with resizing for large images.
+
+    First call over size limit, second call under limit
+    """
     # Given
     mock_buffer = MagicMock(spec=BytesIO)
-    # First call over size limit, second call under limit
     mock_buffer.tell.side_effect = [600 * 1024, 450 * 1024]
     expected_bytes = b"test png data resized"
     mock_buffer.getvalue.return_value = expected_bytes
@@ -77,21 +79,20 @@ async def test_pil_to_png_bytes_with_resize(mock_pil_image: MagicMock) -> None:
     resized_image = MagicMock(spec=Image.Image)
     mock_pil_image.resize.return_value = resized_image
 
-    # When
     with patch(
         "server.services.process_image.converters.BytesIO",
     ) as mock_bytesio, patch(
         "server.services.process_image.converters.logger",
     ) as mock_logger:
         mock_bytesio.return_value = mock_buffer
+        # When
         result = await pil_to_png_bytes(mock_pil_image)
 
     # Then
     assert mock_bytesio.call_count == 1
     assert mock_buffer.tell.call_count == 2
     assert mock_logger.debug.call_count == 2
-    # Check that resize was called
     mock_pil_image.resize.assert_called_once()
-    # Check that save was called on both original and resized images
-    assert mock_pil_image.save.call_count + resized_image.save.call_count == 2
+    assert mock_pil_image.save.call_count == 1
+    assert resized_image.save.call_count == 1
     assert result == expected_bytes
