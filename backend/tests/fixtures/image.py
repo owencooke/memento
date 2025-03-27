@@ -5,7 +5,7 @@ import pytest
 def image_data() -> dict:
     """Common base data for image tests."""
     return {
-        "filename": "image123343434",
+        "filename": "image",
         "order_index": 0,
         "memento_id": 1,
     }
@@ -19,11 +19,10 @@ def expected_image_data() -> dict:
     """
     return {
         "id": 1,
-        "filename": "image123343434",
+        "filename": "image",
         "order_index": 0,
         "memento_id": 1,
         "detected_text": None,
-        "filename": "image.jpg",
         "image_label": None,
         "mime_type": "image/jpeg",
         "coordinates": None,
