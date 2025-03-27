@@ -130,8 +130,9 @@ def test_download_images(mock_supabase: MockSupabase) -> None:
     test_filenames = ["image1.jpg", "image2.jpg"]
     mock_image = MagicMock(spec=Image.Image)
     mock_storage_response.return_value = b"test image data"
-
-    with patch("server.services.storage.image.Image.open") as mock_image_open:
+    with patch("server.services.storage.image.io.BytesIO") as _, patch(
+        "server.services.storage.image.Image.open",
+    ) as mock_image_open:
         mock_image_open.return_value = mock_image
         mock_image.convert.return_value = mock_image
 
