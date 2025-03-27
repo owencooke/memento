@@ -129,7 +129,7 @@ export default function BulkCreateCollectionModal({
                     <InputField
                       onChangeText={field.onChange}
                       value={field.value}
-                      placeholder="Collection Title"
+                      placeholder="Collection title"
                     />
                   </Input>
                 )}

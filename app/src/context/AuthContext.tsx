@@ -115,6 +115,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
     checkSession();
 
+    // For E2E tests, sign in a test user to skip sign-up page
+    if (process.env.EXPO_PUBLIC_E2E_TESTING === "true") {
+      signInTestUser();
+    }
+
     // Subscribe to Supabase Auth changes
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (_, session) => {
@@ -131,3 +136,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     </AuthContext.Provider>
   );
 };
+
+const signInTestUser = async () =>
+  supabase.auth.signInWithPassword({
+    email: "e2e-test@example.com",
+    password: "memento123",
+  });

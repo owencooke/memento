@@ -1,6 +1,7 @@
 /**
  * @description Screen for viewing an individual keepsake/memento.
- * @requirements FR-26, FR-27, FR-28
+ *    Also supports sharing a memento's images to another platform.
+ * @requirements FR-26, FR-27, FR-28, FR-54
  */
 import ImageMetadataCard from "@/src/components/cards/ImageMetadataCard";
 import { ButtonIcon, Button } from "@/src/components/ui/button";
@@ -20,6 +21,9 @@ import PagerView, {
   PagerViewOnPageSelectedEvent,
 } from "react-native-pager-view";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { shareAsync, isAvailableAsync } from "expo-sharing";
+import * as FileSystem from "expo-file-system";
+import { mimeTypeToExtension } from "@/src/libs/string";
 
 const buttonClasses = "flex-1";
 const iconClasses = "w-6 h-6";
@@ -27,7 +31,9 @@ const iconClasses = "w-6 h-6";
 export default function ViewMemento() {
   // Get memento
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { mementos } = useMementos();
+  const { mementos } = useMementos({
+    queryOptions: { refetchOnMount: false },
+  });
   const memento = mementos?.find((m) => m.id === Number(id));
 
   // State
@@ -44,6 +50,29 @@ export default function ViewMemento() {
   const handleEditMemento = () =>
     router.push(`/(app)/(screens)/memento/edit/${memento?.id}`);
 
+  const handleShareImage = async () => {
+    try {
+      const image = memento?.images[currentImageIndex];
+      if (image?.url) {
+        // Download the image content to a temp file
+        const localUri = `${FileSystem.cacheDirectory}Memento.${mimeTypeToExtension(image.mime_type)}`;
+        await FileSystem.downloadAsync(image.url, localUri);
+
+        // Share the downloaded content
+        if (await isAvailableAsync()) {
+          await shareAsync(localUri, {
+            mimeType: image.mime_type,
+            UTI: image.mime_type,
+          });
+        } else {
+          console.log("Sharing is not available on this device");
+        }
+      }
+    } catch (error) {
+      console.error("Error sharing image:", error);
+    }
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-primary-500" edges={["bottom"]}>
       <View className="flex-1 bg-background-100 p-6 flex gap-6">
@@ -59,6 +88,7 @@ export default function ViewMemento() {
                 {memento.images.map((image, index) => (
                   <View key={index}>
                     <Image
+                      testID="view-memento-carousel-image"
                       source={{ uri: image.url }}
                       className="w-full h-full"
                       alt=""
@@ -93,12 +123,22 @@ export default function ViewMemento() {
                   />
                 ) : (
                   <>
-                    <Text size="2xl" italic className="font-light mb-2">
+                    <Text
+                      size="2xl"
+                      italic
+                      className="font-light mb-2"
+                      testID="view-memento-caption"
+                    >
                       {memento.caption}
                     </Text>
                     <View className="flex flex-row justify-between items-center mt-auto font-medium">
-                      <Text className="flex-1">{memento.date}</Text>
-                      <Text className="flex-1 text-right">
+                      <Text className="flex-1" testID="view-memento-date">
+                        {memento.date}
+                      </Text>
+                      <Text
+                        className="flex-1 text-right"
+                        testID="view-memento-location"
+                      >
                         {memento.location}
                       </Text>
                     </View>
@@ -111,21 +151,26 @@ export default function ViewMemento() {
       </View>
       {/* Options bar (info, edit, delete, share) */}
       <View className="flex flex-row justify-between items-center bg-primary-500">
-        {/* TODO: open Share options */}
-        <Button size="xl" className={buttonClasses}>
+        <Button size="xl" className={buttonClasses} onPress={handleShareImage}>
           <ButtonIcon as={ShareIcon} className={iconClasses} />
         </Button>
         <Button
           size="xl"
           className={buttonClasses}
           onPress={handleShowMoreDetails}
+          testID="view-memento-show-details"
         >
           <ButtonIcon
             as={InfoIcon}
             className={`${iconClasses} ${showImageMetadata && "text-tertiary-500"}`}
           />
         </Button>
-        <Button size="xl" className={buttonClasses} onPress={handleEditMemento}>
+        <Button
+          size="xl"
+          className={buttonClasses}
+          onPress={handleEditMemento}
+          testID="view-memento-edit-button"
+        >
           <ButtonIcon as={EditIcon} className={iconClasses} />
         </Button>
         {/* TODO: open Delete confirmation modal */}

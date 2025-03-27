@@ -11,7 +11,7 @@ import {
   Modal,
 } from "../ui/modal";
 import { Image } from "../ui/image";
-import { Photo } from "@/src/hooks/usePhotos";
+import { Photo } from "@/src/libs/photos";
 
 interface BackgroundRemovalModalProps {
   photo: Photo;
@@ -26,7 +26,7 @@ export default function BackgroundRemovalModal({
 }: BackgroundRemovalModalProps) {
   return (
     // Modal will be unrendered after accept/reject
-    <Modal isOpen={true}>
+    <Modal isOpen={true} testID="modal-background-removal">
       <ModalBackdrop />
       <ModalContent>
         <ModalHeader>
@@ -42,10 +42,19 @@ export default function BackgroundRemovalModal({
           />
         </ModalBody>
         <ModalFooter>
-          <Button action="secondary" onPress={reject} className="mr-2">
+          <Button
+            action="secondary"
+            onPress={reject}
+            className="mr-2"
+            testID="modal-background-removal-decline"
+          >
             <ButtonText>Keep Original</ButtonText>
           </Button>
-          <Button action="primary" onPress={accept}>
+          <Button
+            action="primary"
+            onPress={accept}
+            testID="modal-background-removal-confirm"
+          >
             <ButtonText>Confirm</ButtonText>
           </Button>
         </ModalFooter>

@@ -1,10 +1,10 @@
 """
 @description CRUD API routes for Collections.
-
-@requirements FR-3, FR-35, FR-36, FR-37
+    Also has the route for generating a collage representation for a collection.
+@requirements FR-3, FR-35, FR-36, FR-37, FR-53
 """
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from loguru import logger
 from pydantic import UUID4
 
@@ -19,9 +19,16 @@ from server.services.db.queries.collection import (
     associate_memento,
     create_collection,
     db_delete_collection,
+    get_collection,
+    get_collection_image_filenames,
     get_collections,
     update_collection,
 )
+from server.services.process_image.collage.generator import (
+    CollageGenerator,
+)
+from server.services.process_image.converters import pil_to_png_bytes
+from server.services.storage.image import download_images
 
 router = APIRouter()
 
@@ -94,3 +101,22 @@ async def delete_collection(
         raise HTTPException(status_code=400, detail="Delete collection failed")
 
     return deleted_collection
+
+
+@router.get("/{id}/collage")
+async def generate_collage(id: int) -> Response:
+    """Generates an image representation of a collection as a collage."""
+    collection = get_collection(id)
+    if not collection:
+        raise HTTPException(status_code=404, detail=f"No collection found for id={id}")
+    try:
+        image_filenames = get_collection_image_filenames(id)
+        images = download_images(image_filenames)
+        output_image = await CollageGenerator().create_collage(
+            collection,
+            images,
+        )
+        output_bytes = await pil_to_png_bytes(output_image)
+        return Response(content=output_bytes, media_type="image/png")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e)) from e

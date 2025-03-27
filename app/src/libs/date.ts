@@ -4,15 +4,17 @@
  * To get a generic date in the desired ISO format YYYY-MM-DD
  */
 export const toISODateString = (date: string | Date): string => {
-  const dateString = date instanceof Date ? date.toISOString() : date;
-
-  if (dateString.includes(" ")) {
-    // For exif (YYYY:MM:DD HH:MM:SS)
-    return dateString.split(" ")[0].replaceAll(":", "-");
+  if (typeof date === "string") {
+    if (date.includes(" ")) {
+      // For exif (YYYY:MM:DD HH:MM:SS)
+      return date.split(" ")[0].replaceAll(":", "-");
+    }
+    // For ISO (YYYY-MM-DDTHH:MM:SS)
+    return date.split("T")[0];
   }
 
-  // For ISO (YYYY-MM-DDTHH:MM:SS)
-  return dateString.split("T")[0];
+  // Ensure the date is formatted based on local datetime
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 };
 
 /**

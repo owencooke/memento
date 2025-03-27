@@ -4,11 +4,10 @@
  */
 
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import {
   updateMementoAndImagesApiUserUserIdMementoIdPutMutation,
   getUsersMementosApiUserUserIdMementoGetQueryKey,
-  getUsersMementosApiUserUserIdMementoGetOptions,
 } from "@/src/api-client/generated/@tanstack/react-query.gen";
 import { useSession } from "@/src/context/AuthContext";
 import { router, useLocalSearchParams } from "expo-router";
@@ -17,7 +16,7 @@ import { formDataBodySerializer } from "@/src/api-client/formData";
 import { queryClient } from "@/src/app/_layout";
 import MementoForm from "@/src/components/forms/MementoForm";
 import { GeoLocation } from "@/src/components/inputs/LocationInput";
-import { Photo } from "@/src/hooks/usePhotos";
+import { Photo } from "@/src/libs/photos";
 import { MementoWithImages } from "@/src/api-client/generated";
 import { isEqual } from "lodash";
 import { useMemo } from "react";
@@ -25,24 +24,19 @@ import {
   MementoFormData,
   prepareMementoPayload,
 } from "@/src/api-client/memento";
+import { useMementos } from "@/src/hooks/useMementos";
 
 export default function EditMemento() {
   // Get user id
   const { session } = useSession();
   const user_id = String(session?.user.id);
+
   // Get existing memento
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { data: mementos } = useQuery({
-    ...getUsersMementosApiUserUserIdMementoGetOptions({
-      path: {
-        user_id,
-      },
-    }),
-    refetchOnMount: false,
+  const { mementos } = useMementos({
+    queryOptions: { refetchOnMount: false },
   });
-  const memento = mementos?.find(
-    (m) => m.id === Number(id),
-  ) as MementoWithImages;
+  const memento = mementos?.find((m) => m.id === Number(id));
 
   const updateMutation = useMutation(
     updateMementoAndImagesApiUserUserIdMementoIdPutMutation(),
@@ -73,8 +67,7 @@ export default function EditMemento() {
     };
   }, [memento]);
 
-  const handleRedirect = () =>
-    router.dismissTo(`/(app)/(screens)/memento/${memento.id}`);
+  const handleRedirect = () => router.back();
 
   // Call PUT Edit Memento endpoint with custom serializer for multi-part form data
   const onSubmit = async (form: MementoFormData) => {
@@ -85,12 +78,9 @@ export default function EditMemento() {
     }
     const path = {
       user_id,
-      id: memento.id,
+      id: Number(memento?.id),
     };
-    const body: any = prepareMementoPayload({
-      ...form,
-      photos: form.photos.filter((photo) => !photo.storedInCloud),
-    });
+    const body: any = prepareMementoPayload(form);
     await updateMutation.mutateAsync(
       {
         body,
@@ -98,9 +88,9 @@ export default function EditMemento() {
         bodySerializer: formDataBodySerializer.bodySerializer,
       },
       {
-        onSuccess: () => {
-          //   Invalidate cached GET mementos before redirecting
-          queryClient.invalidateQueries({
+        onSuccess: async () => {
+          // Invalidate cached GET mementos before redirecting
+          await queryClient.invalidateQueries({
             queryKey: getUsersMementosApiUserUserIdMementoGetQueryKey({
               path: { user_id: user_id },
             }),
