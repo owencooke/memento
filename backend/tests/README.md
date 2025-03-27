@@ -1104,3 +1104,284 @@ def sample_pil_image_bytes(sample_pil_image):
     sample_pil_image.save(buffer, format="PNG")
     return buffer.getvalue()
 ```
+
+## Prompt
+
+### UserInput
+
+we're in the final stretch of pytest unit testing. The files in process_image/collage are the last things to be tested. However these are complicated Image processing classes with many functionalities.
+
+I'm not sure what the best approach is for testing this. Suggestions that reduce the complexity of Image mocks necessary would be appreciated.
+
+Ideally I am just seeking to hit statement coverage for these, with as simple tests as possible. use the same given/when/then format as previous tests
+
+### LLM Output
+
+Testing image processing code like your CollageGenerator class can be challenging due to the complexity of PIL Image objects and their operations. For these tests, I'd recommend simplifying by focusing on statement coverage with minimal complex mocking. Here's my approach:
+
+```python
+from unittest.mock import MagicMock, patch
+
+import pytest
+from PIL import Image
+
+from server.config.types import RGB, RGBA, IntPair
+from server.services.db.models.schema_public_latest import Collection
+from server.services.process_image.collage.generator import CollageGenerator
+from server.services.process_image.collage.image_processor import ImageProcessor
+from server.services.process_image.collage.text_manager import TextManager
+
+
+@pytest.fixture
+def mock_collection() -> Collection:
+    """Creates a mock collection with test data."""
+    collection = MagicMock(spec=Collection)
+    collection.title = "Test Collection"
+    collection.caption = "Test Caption"
+    collection.location = "Test Location"
+    collection.date = MagicMock()
+    collection.date.strftime.return_value = "January 1, 2023"
+    return collection
+
+
+@pytest.fixture
+def mock_image() -> MagicMock:
+    """Creates a basic mock PIL Image."""
+    mock_img = MagicMock(spec=Image.Image)
+    mock_img.width = 100
+    mock_img.height = 100
+    return mock_img
+
+
+@pytest.fixture
+def mock_pil_objects():
+    """Mock various PIL-related objects and functions."""
+    with patch("PIL.Image.new") as mock_image_new:
+        mock_collage = MagicMock(spec=Image.Image)
+        mock_image_new.return_value = mock_collage
+        yield {
+            "new": mock_image_new,
+            "collage": mock_collage,
+        }
+
+
+class TestCollageGenerator:
+    """Tests for the CollageGenerator class."""
+
+    def test_init(self):
+        """Test CollageGenerator initialization."""
+        # Given
+        canvas_size = (1000, 1200)
+        canvas_color = (200, 200, 200)
+
+        # When
+        generator = CollageGenerator(
+            canvas_size=canvas_size,
+            canvas_color=canvas_color,
+        )
+
+        # Then
+        assert generator.canvas_size == canvas_size
+        assert generator.canvas_color == canvas_color
+        assert isinstance(generator.font_manager, TextManager)
+        assert isinstance(generator.image_processor, ImageProcessor)
+
+    @pytest.mark.asyncio
+    async def test_create_collage(self, mock_collection, mock_image, mock_pil_objects):
+        """Test the create_collage method."""
+        # Given
+        generator = CollageGenerator()
+        mock_images = [mock_image, mock_image]  # Two test images
+
+        # Mock internal methods
+        generator._render_scattered_images = MagicMock()
+        generator._format_metadata_string = MagicMock(return_value="Test Metadata")
+        generator.font_manager.load_font = MagicMock()
+        generator.font_manager.draw_text_with_background = MagicMock(return_value=500)  # Mocked y position
+
+        # When
+        result = await generator.create_collage(mock_collection, mock_images)
+
+        # Then
+        mock_pil_objects["new"].assert_called_once()
+        generator._render_scattered_images.assert_called_once_with(
+            mock_pil_objects["collage"], mock_images
+        )
+        generator.font_manager.load_font.assert_called()
+        generator.font_manager.draw_text_with_background.assert_called()
+        assert result == mock_pil_objects["collage"]
+
+    def test_format_metadata_string(self, mock_collection):
+        """Test _format_metadata_string method."""
+        # Given
+        generator = CollageGenerator()
+
+        # When
+        result = generator._format_metadata_string(mock_collection)
+
+        # Then
+        assert "Test Location" in result
+        assert "January 1, 2023" in result
+        assert " • " in result
+
+    def test_format_metadata_string_single_item(self, mock_collection):
+        """Test _format_metadata_string with only location."""
+        # Given
+        generator = CollageGenerator()
+        mock_collection.date = None
+
+        # When
+        result = generator._format_metadata_string(mock_collection)
+
+        # Then
+        assert result == "Test Location"
+        assert " • " not in result
+
+    def test_format_metadata_string_empty(self):
+        """Test _format_metadata_string with no metadata."""
+        # Given
+        generator = CollageGenerator()
+        mock_collection = MagicMock(spec=Collection)
+        mock_collection.location = None
+        mock_collection.date = None
+
+        # When
+        result = generator._format_metadata_string(mock_collection)
+
+        # Then
+        assert result == ""
+
+    def test_initialize_grid(self):
+        """Test _initialize_grid method."""
+        # Given
+        generator = CollageGenerator()
+        num_images = 9
+
+        # When
+        cell_width, cell_height, grid_cells = generator._initialize_grid(num_images)
+
+        # Then
+        assert cell_width > 0
+        assert cell_height > 0
+        assert len(grid_cells) == 9  # Should create a 3x3 grid for 9 images
+        assert isinstance(grid_cells[0], tuple)
+        assert len(grid_cells[0]) == 2  # (row, col)
+
+    def test_render_scattered_images(self, mock_image, mock_pil_objects):
+        """Test _render_scattered_images method."""
+        # Given
+        generator = CollageGenerator()
+        mock_images = [mock_image] * 5
+
+        # Mock dependencies
+        generator._initialize_grid = MagicMock(return_value=(
+            100, 100, [(0, 0), (0, 1), (1, 0), (1, 1), (2, 0)]
+        ))
+        generator.image_processor.prepare_image = MagicMock(return_value=mock_image)
+        generator.image_processor.rotate_image = MagicMock(return_value=mock_image)
+        mock_image.width = 100
+        mock_image.height = 100
+
+        # When
+        generator._render_scattered_images(mock_pil_objects["collage"], mock_images)
+
+        # Then
+        generator._initialize_grid.assert_called_once_with(5)
+        assert generator.image_processor.prepare_image.call_count == 5
+        assert generator.image_processor.rotate_image.call_count == 5
+        assert mock_pil_objects["collage"].paste.call_count == 5
+
+
+class TestImageProcessor:
+    """Tests for the ImageProcessor class."""
+
+    def test_prepare_image(self, mock_image):
+        """Test prepare_image method."""
+        # Given
+        processor = ImageProcessor()
+        target_size = (200, 200)
+        corner_radius = 10
+
+        # Mock dependencies
+        with patch("PIL.ImageOps.fit") as mock_fit:
+            with patch("PIL.Image.new") as mock_new:
+                with patch("PIL.ImageDraw.Draw") as mock_draw:
+                    mock_fit.return_value = mock_image
+                    mock_rounded = MagicMock(spec=Image.Image)
+                    mock_mask = MagicMock(spec=Image.Image)
+                    mock_new.side_effect = [mock_rounded, mock_mask]
+
+                    # When
+                    result = processor.prepare_image(mock_image, target_size, corner_radius)
+
+                    # Then
+                    mock_fit.assert_called_once()
+                    mock_new.assert_called()
+                    mock_rounded.paste.assert_called_once()
+                    assert result == mock_rounded
+
+    def test_rotate_image(self, mock_image):
+        """Test rotate_image method."""
+        # Given
+        processor = ImageProcessor()
+        angle = 15
+
+        # Mock the rotate method
+        mock_image.rotate.return_value = mock_image
+
+        # When
+        result = processor.rotate_image(mock_image, angle)
+
+        # Then
+        mock_image.rotate.assert_called_once_with(
+            angle, expand=True, resample=Image.Resampling.BICUBIC
+        )
+        assert result == mock_image
+
+
+class TestTextManager:
+    """Tests for the TextManager class."""
+
+    def test_load_font(self):
+        """Test load_font method."""
+        # Given
+        text_manager = TextManager()
+        font_name = "Arial.ttf"
+        size = 24
+
+        # When
+        with patch("PIL.ImageFont.truetype") as mock_truetype:
+            with patch("PIL.ImageFont.load_default") as mock_default:
+                # Mock font not found scenario
+                mock_truetype.side_effect = Exception("Font not found")
+                result = text_manager.load_font(font_name, size)
+
+        # Then
+        mock_truetype.assert_called_once()
+        mock_default.assert_called_once()
+        assert result == mock_default.return_value
+
+    def test_draw_text_with_background(self, mock_pil_objects):
+        """Test draw_text_with_background method."""
+        # Given
+        text_manager = TextManager()
+        text = "Test Text"
+        font = MagicMock()
+        y_position = 100
+
+        # Mock dependencies
+        mock_draw = MagicMock()
+        with patch("PIL.ImageDraw.Draw", return_value=mock_draw):
+            text_manager.get_text_dimensions = MagicMock(return_value=(100, 20))
+
+            # When
+            result = text_manager.draw_text_with_background(
+                mock_pil_objects["collage"], text, font, y_position
+            )
+
+            # Then
+            text_manager.get_text_dimensions.assert_called_once()
+            mock_draw.rounded_rectangle.assert_called_once()
+            mock_draw.text.assert_called_once()
+            assert result > y_position  # Should return a y position below the original
+```

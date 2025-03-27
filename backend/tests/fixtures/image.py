@@ -38,4 +38,5 @@ def mock_pil_image() -> MagicMock:
     """Creates a mock PIL Image object for testing."""
     mock_image = MagicMock(spec=Image.Image)
     mock_image.size = (800, 600)
+    mock_image.mode = "RGBA"
     return mock_image
