@@ -15,9 +15,7 @@ appId: com.memento.app
     id: photo-grid-add-button
 - tapOn: Take a Photo
 - tapOn:
-    id: com.android.camera2:id/shutter_button
-- tapOn:
-    id: com.android.camera2:id/done_button
+    id: camera-capture-button
 - assertVisible:
     id: interactive-photo-card
 
