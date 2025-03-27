@@ -13,7 +13,7 @@ import { Heading } from "@/src/components/ui/heading";
 import { Image } from "@/src/components/ui/image";
 import { useColors } from "@/src/hooks/useColors";
 import { Spinner } from "@/src/components/ui/spinner";
-import { convertBlobToBase64Uri } from "@/src/libs/blob";
+import { convertBlobToBase64Uri } from "@/src/libs/photos";
 import { useEffect, useState } from "react";
 import { View } from "react-native";
 import { Text } from "@/src/components/ui/text";

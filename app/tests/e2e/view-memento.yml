@@ -1,0 +1,23 @@
+appId: com.memento.app
+---
+- runFlow: ./util/launch.yml
+
+# Navigate to View Memento page
+- tapOn:
+    id: memento-card
+
+# Verify memento fields and image are visible
+- assertVisible:
+    id: view-memento-carousel-image
+- assertVisible:
+    id: view-memento-caption
+- assertVisible:
+    id: view-memento-date
+- assertVisible:
+    id: view-memento-location
+
+# Show more image details
+# TODO: verify image class/detected text/date etc.
+- tapOn:
+    id: view-memento-show-details
+- assertVisible: Image Details

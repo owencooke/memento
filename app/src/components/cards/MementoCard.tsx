@@ -23,7 +23,10 @@ export default function MementoCard({
   );
 
   return (
-    <View className="flex-1 bg-background-0 rounded-xl shadow-hard-3 p-3 gap-4">
+    <View
+      className="flex-1 bg-background-0 rounded-xl shadow-hard-3 p-3 gap-4"
+      testID="memento-card"
+    >
       <View className="aspect-square">
         <Image
           source={{ uri: thumbnail.url }}

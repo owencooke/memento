@@ -1,4 +1,0 @@
-appId: com.memento.app
----
-- launchApp
-- assertVisible: 'Sign in'
