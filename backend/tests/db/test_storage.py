@@ -12,7 +12,7 @@ from tests.fixtures.supabase import MockSupabase
 @pytest.mark.asyncio
 async def test_upload_image(mock_supabase: MockSupabase) -> None:
     """Test uploading an image to Supabase storage."""
-    mock_supabase_client, mock_upload_response = mock_supabase
+    mock_supabase_client, _, mock_storage_response = mock_supabase
 
     # Given
     expected_path = "test-uuid-path"
@@ -20,7 +20,8 @@ async def test_upload_image(mock_supabase: MockSupabase) -> None:
     mock_file.content_type = "image/jpeg"
     mock_file.read.return_value = b"test image content"
 
-    mock_upload_response.path = expected_path
+    # Set the expected path on the storage response
+    mock_storage_response.path = expected_path
 
     with patch("server.services.storage.image.uuid.uuid4", return_value=expected_path):
         # When

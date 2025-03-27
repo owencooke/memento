@@ -13,7 +13,7 @@ def test_create_memento(
     expected_memento_data: dict,
 ) -> None:
     """Test inserting a new memento record with the create_memento function."""
-    mock_supabase_client, mock_query_response = mock_supabase
+    mock_supabase_client, mock_query_response, _ = mock_supabase
 
     # Given
     mock_memento = NewMemento(**memento_data)
@@ -38,7 +38,7 @@ def test_update_memento(
     expected_memento_data: dict,
 ) -> None:
     """Test inserting a new memento record with the create_memento function."""
-    mock_supabase_client, mock_query_response = mock_supabase
+    mock_supabase_client, mock_query_response, _ = mock_supabase
 
     # Given
     mock_memento = UpdateMemento(**memento_data)

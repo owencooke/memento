@@ -15,7 +15,7 @@ def test_create_image_metadata(
     expected_image_data: dict,
 ) -> None:
     """Test creating a new image metadata record for a memento."""
-    mock_supabase_client, mock_query_response = mock_supabase
+    mock_supabase_client, mock_query_response, _ = mock_supabase
 
     # Given
     mock_image = NewImageMetadata(**image_data)
@@ -36,7 +36,7 @@ def test_get_images_for_memento(
     expected_image_data: dict,
 ) -> None:
     """Test retrieving all images belonging to a memento."""
-    mock_supabase_client, mock_query_response = mock_supabase
+    mock_supabase_client, mock_query_response, _ = mock_supabase
 
     # Given
     memento_id = 1
@@ -64,7 +64,7 @@ def test_delete_image_metadata(
     expected_image_data: dict,
 ) -> None:
     """Test deleting an image metadata record."""
-    mock_supabase_client, mock_query_response = mock_supabase
+    mock_supabase_client, mock_query_response, _ = mock_supabase
 
     # Given
     image_id = 1
@@ -85,7 +85,7 @@ def test_update_image_order(
     expected_image_data: dict,
 ) -> None:
     """Test updating an image's order index."""
-    mock_supabase_client, mock_query_response = mock_supabase
+    mock_supabase_client, mock_query_response, _ = mock_supabase
 
     # Given
     image_id = 1

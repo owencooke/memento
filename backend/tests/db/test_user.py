@@ -8,7 +8,7 @@ from tests.fixtures.supabase import MockSupabase
 
 def test_get_user_info(mock_supabase: MockSupabase) -> None:
     """Test retrieving user information for a specific user ID."""
-    mock_supabase_client, mock_query_response = mock_supabase
+    mock_supabase_client, mock_query_response, _ = mock_supabase
 
     # Given
     expected_user_data = {

@@ -3,35 +3,40 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-MockSupabase = tuple[MagicMock, MagicMock]
+# Create a more explicit type for the mock return value
+MockSupabase = tuple[MagicMock, MagicMock, MagicMock]
 
 
 @pytest.fixture
-def mock_supabase() -> Generator[MagicMock, MagicMock, Any]:
+def mock_supabase() -> Generator[MockSupabase, None, None]:
     """
-    Create a mock Supabase DB client.
+    Create a mock Supabase DB client with separate controls for DB and storage responses.
 
     Example usage:
     ```python
-        def test_create_memento(mock_supabase: Tuple[MagicMock, MagicMock]) -> None:
-            mock_supabase_client, mock_query_response = mock_supabase
+        def test_create_memento(mock_supabase: MockSupabase) -> None:
+            mock_supabase_client, mock_db_response, mock_storage_response = mock_supabase
 
-            # Set the response of Supabase query to some mocked data
-            mock_query_response.data = [mock_row_1, mock_row_2, ...]
+            # Set DB response data
+            mock_db_response.data = [{"id": 1, "caption": "Test"}]
 
-            # Assert specific methods of the Supabase client were called
+            # Set storage response properties
+            mock_storage_response.path = "test-path"  # For upload responses
+            mock_storage_response.signedUrl = "https://test-url.com"  # For signed URL responses
+
+            # Test assertions
             mock_supabase_client.table.assert_called_once_with("memento")
-            mock_supabase_client.table().insert.assert_called_once()
     ```
     """
     with patch("server.services.db.supabase") as mock_supabase:
-        # Create a mock response object that can be configured in each test
-        mock_query_response = MagicMock()
+        # Create separate response objects for DB and storage operations
+        mock_db_response = MagicMock()
+        mock_storage_response = MagicMock()
 
-        # Create mock chain builders - each returns a mockable execute method
-        def create_chain_builder() -> MagicMock:
+        # Create mock chain builders for DB operations
+        def create_db_chain_builder() -> MagicMock:
             chain_builder = MagicMock()
-            chain_builder.execute.return_value = mock_query_response
+            chain_builder.execute.return_value = mock_db_response
             chain_methods = [
                 "select",
                 "insert",
@@ -51,24 +56,32 @@ def mock_supabase() -> Generator[MagicMock, MagicMock, Any]:
                 "not_",
                 "or_",
                 "filter",
-                "upload",
-                "remove",
-                "create_signed_url",
-                "create_signed_urls",
-                "download",
             ]
             for method in chain_methods:
                 getattr(chain_builder, method).return_value = chain_builder
+            return chain_builder
+
+        # Create storage mock that returns the storage response
+        def create_storage_chain_builder() -> MagicMock:
+            chain_builder = MagicMock()
+
+            # Set up return values for storage methods
+            chain_builder.upload.return_value = mock_storage_response
+            chain_builder.create_signed_url.return_value = mock_storage_response
+            chain_builder.create_signed_urls.return_value = mock_storage_response
+            chain_builder.remove.return_value = mock_storage_response
+            chain_builder.download.return_value = mock_storage_response
 
             return chain_builder
 
-        # Set up relational DB access
-        mock_supabase.table.return_value = create_chain_builder()
+        # Set up DB table access
+        mock_supabase.table.return_value = create_db_chain_builder()
 
         # Set up RPC calls
-        mock_supabase.rpc.return_value = create_chain_builder()
+        mock_supabase.rpc.return_value = create_db_chain_builder()
 
-        # Set up storage calls
-        mock_supabase.storage.from_.return_value = create_chain_builder()
+        # Set up storage access
+        mock_storage_bucket = create_storage_chain_builder()
+        mock_supabase.storage.from_.return_value = mock_storage_bucket
 
-        yield mock_supabase, mock_query_response
+        yield mock_supabase, mock_db_response, mock_storage_response
