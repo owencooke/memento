@@ -873,3 +873,234 @@ def test_download_images_with_error(mock_supabase: MockSupabase) -> None:
     assert len(result) == 1  # Only one image should be returned
     mock_logger.error.assert_called_once()  # Error should be logged
 ```
+
+## Prompt
+
+### User Input
+
+let's continue writing the test suite. I want to test my image processing functions. currently, let's write tests for the functions included in converters.py and background.py
+
+we should continue using the same given/when/then approach. No supabase fixtures needed here. But we will likely need to mock aspects of rembg or PIL. If making fixture(s) for mocking an image input leads to more modular code, you should do so.
+
+the actual tests should continue to be easy to read, with minimal mocking done withen them.
+
+### LLM Output
+
+I'll create tests for the functions in converters.py and also set up tests for background.py. Let's start by creating fixtures and test cases for these image processing functions with the Given/When/Then pattern.
+
+```python
+from io import BytesIO
+from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
+from fastapi import UploadFile
+from PIL import Image
+
+from server.services.process_image.converters import pil_to_png_bytes, upload_file_to_pil
+
+
+@pytest.fixture
+def mock_pil_image():
+    """Creates a mock PIL Image object for testing."""
+    mock_image = MagicMock(spec=Image.Image)
+    mock_image.size = (800, 600)
+    return mock_image
+
+
+@pytest.fixture
+def mock_upload_file():
+    """Creates a mock UploadFile object for testing."""
+    mock_file = AsyncMock(spec=UploadFile)
+    mock_file.read.return_value = b"test image data"
+    return mock_file
+
+
+@pytest.mark.asyncio
+async def test_upload_file_to_pil(mock_upload_file):
+    """Test converting an upload file to a PIL image."""
+    # Given
+    mock_pil_image = MagicMock(spec=Image.Image)
+
+    # When
+    with patch("server.services.process_image.converters.BytesIO") as mock_bytesio:
+        with patch("server.services.process_image.converters.Image.open") as mock_image_open:
+            mock_instance = mock_bytesio.return_value
+            mock_image_open.return_value = mock_pil_image
+
+            result = await upload_file_to_pil(mock_upload_file)
+
+    # Then
+    mock_upload_file.read.assert_called_once()
+    mock_bytesio.assert_called_once_with(b"test image data")
+    mock_image_open.assert_called_once_with(mock_instance)
+    assert result == mock_pil_image
+
+
+@pytest.mark.asyncio
+async def test_pil_to_png_bytes_no_resize(mock_pil_image):
+    """Test converting PIL image to PNG bytes without needing to resize."""
+    # Given
+    mock_buffer = MagicMock(spec=BytesIO)
+    mock_buffer.tell.return_value = 300 * 1024  # 300KB, below the 500KB threshold
+    expected_bytes = b"test png data"
+    mock_buffer.getvalue.return_value = expected_bytes
+
+    # When
+    with patch("server.services.process_image.converters.BytesIO") as mock_bytesio:
+        with patch("server.services.process_image.converters.logger") as mock_logger:
+            mock_bytesio.return_value = mock_buffer
+            result = await pil_to_png_bytes(mock_pil_image)
+
+    # Then
+    mock_bytesio.assert_called_once()
+    mock_pil_image.save.assert_called_once_with(mock_buffer, format="PNG", compress_level=6)
+    mock_buffer.tell.assert_called_once()
+    mock_logger.debug.assert_called_once()
+    assert result == expected_bytes
+
+
+@pytest.mark.asyncio
+async def test_pil_to_png_bytes_with_resize(mock_pil_image):
+    """Test converting PIL image to PNG bytes with resizing for large images."""
+    # Given
+    mock_buffer = MagicMock(spec=BytesIO)
+    # First call over size limit, second call under limit
+    mock_buffer.tell.side_effect = [600 * 1024, 450 * 1024]
+    expected_bytes = b"test png data resized"
+    mock_buffer.getvalue.return_value = expected_bytes
+
+    resized_image = MagicMock(spec=Image.Image)
+    mock_pil_image.resize.return_value = resized_image
+
+    # When
+    with patch("server.services.process_image.converters.BytesIO") as mock_bytesio:
+        with patch("server.services.process_image.converters.logger") as mock_logger:
+            mock_bytesio.return_value = mock_buffer
+            result = await pil_to_png_bytes(mock_pil_image)
+
+    # Then
+    assert mock_bytesio.call_count == 1
+    assert mock_buffer.tell.call_count == 2
+    assert mock_logger.debug.call_count == 2
+    # Check that resize was called
+    mock_pil_image.resize.assert_called_once()
+    # Check that save was called on both original and resized images
+    assert mock_pil_image.save.call_count + resized_image.save.call_count == 2
+    assert result == expected_bytes
+```
+
+Now let's create tests for background.py. I'll assume it contains functionality for background removal using rembg:
+
+```python
+from unittest.mock import MagicMock, patch
+
+import pytest
+from PIL import Image
+
+from server.services.process_image.background import remove_background
+
+
+@pytest.fixture
+def mock_pil_image():
+    """Creates a mock PIL Image object for testing."""
+    mock_image = MagicMock(spec=Image.Image)
+    mock_image.mode = "RGBA"
+    mock_image.size = (800, 600)
+    return mock_image
+
+
+def test_remove_background(mock_pil_image):
+    """Test removing background from an image."""
+    # Given
+    mock_removed_image = MagicMock(spec=Image.Image)
+
+    # When
+    with patch("server.services.process_image.background.remove") as mock_remove:
+        mock_remove.return_value = mock_removed_image
+        result = remove_background(mock_pil_image)
+
+    # Then
+    mock_remove.assert_called_once_with(mock_pil_image)
+    assert result == mock_removed_image
+
+
+def test_remove_background_with_options(mock_pil_image):
+    """Test removing background with custom options."""
+    # Given
+    mock_removed_image = MagicMock(spec=Image.Image)
+    alpha_matting = True
+    alpha_matting_foreground_threshold = 240
+    alpha_matting_background_threshold = 10
+    alpha_matting_erode_size = 10
+
+    # When
+    with patch("server.services.process_image.background.remove") as mock_remove:
+        mock_remove.return_value = mock_removed_image
+        result = remove_background(
+            mock_pil_image,
+            alpha_matting=alpha_matting,
+            alpha_matting_foreground_threshold=alpha_matting_foreground_threshold,
+            alpha_matting_background_threshold=alpha_matting_background_threshold,
+            alpha_matting_erode_size=alpha_matting_erode_size
+        )
+
+    # Then
+    mock_remove.assert_called_once_with(
+        mock_pil_image,
+        alpha_matting=alpha_matting,
+        alpha_matting_foreground_threshold=alpha_matting_foreground_threshold,
+        alpha_matting_background_threshold=alpha_matting_background_threshold,
+        alpha_matting_erode_size=alpha_matting_erode_size
+    )
+    assert result == mock_removed_image
+
+
+def test_remove_background_exception_handling(mock_pil_image):
+    """Test error handling when background removal fails."""
+    # Given
+    error_msg = "Background removal failed"
+
+    # When
+    with patch("server.services.process_image.background.remove") as mock_remove:
+        with patch("server.services.process_image.background.logger") as mock_logger:
+            mock_remove.side_effect = Exception(error_msg)
+            result = remove_background(mock_pil_image)
+
+    # Then
+    mock_remove.assert_called_once_with(mock_pil_image)
+    mock_logger.error.assert_called_once()
+    # Should return the original image if removal fails
+    assert result == mock_pil_image
+```
+
+You might also want to create a conftest.py file to share fixtures between test modules:
+
+```python
+from io import BytesIO
+from unittest.mock import MagicMock
+
+import pytest
+from PIL import Image
+
+
+@pytest.fixture
+def sample_image_data():
+    """Returns sample image data as bytes."""
+    return b"test image data"
+
+
+@pytest.fixture
+def sample_pil_image():
+    """Creates and returns a real small PIL Image for testing."""
+    # Create a 100x100 black image
+    image = Image.new("RGB", (100, 100), color=(0, 0, 0))
+    return image
+
+
+@pytest.fixture
+def sample_pil_image_bytes(sample_pil_image):
+    """Creates a real PIL Image and returns its bytes in PNG format."""
+    buffer = BytesIO()
+    sample_pil_image.save(buffer, format="PNG")
+    return buffer.getvalue()
+```
