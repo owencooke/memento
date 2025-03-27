@@ -99,6 +99,8 @@ For running tests on your local machine:
 poetry run test
 ```
 
+This will run units tests for the backend modules using Pytest. The tests results will be printed to the terminal. Additionally, an HTML code coverage report is generated and can be viewed by opening `/backend/htmlcov/index.html` in your browser.
+
 ## Supabase Configuration
 
 ### Database

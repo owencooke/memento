@@ -75,6 +75,7 @@ exclude = [
 ]
 
 [tool.pytest.ini_options]
+addopts = "--cov=server --cov-report=html"
 asyncio_default_fixture_loop_scope = "function"
 filterwarnings = [
     "error",
@@ -85,6 +86,11 @@ env = [
     "SERVER_ENVIRONMENT=pytest",
     "SERVER_DB_BASE=server_test",
 ]
+
+[tool.coverage.report]
+include_namespace_packages = true
+omit = ["**/__init__.py"]
+skip_empty = true
 
 [tool.ruff]
 # List of enabled rulsets.
