@@ -397,6 +397,8 @@ def expected_image_data() -> dict:
 
 ## Prompt
 
+### User Input
+
 your last tests for the methods in image.py were great. I want you to repeat the same process for testing the functions in storage/image.py
 
 use the given/when/then pattern like before. use the mock supabase fixture we have already defined.
@@ -587,4 +589,287 @@ def test_download_images_with_error(mock_supabase: MockSupabase) -> None:
     mock_logger.info.assert_called_once()  # Error should be logged
 ```
 
-<!-- ## Prompt -->
+## Prompt
+
+### User Input
+
+FAILED tests/db/test*storage.py::test_upload_image - AssertionError: assert <MagicMock name='supabase.storage.from*().path' id='2675272758720'> == 'test-uuid-path'
+
+i think it's because we're not properly chaining the from/upload together for storage
+
+i've tried both: mock*supabase.storage.from*.return_value = create_chain_builder()
+
+and mock*storage = MagicMock() mock_storage.from*.return_value = create_chain_builder() mock_supabase.storage = mock_storage
+
+### LLM Output
+
+I see the issue. The problem is with how we're handling the upload response. In your test, you're setting: mock_upload_response.path = expected_path. But mock_upload_response is the same object used for the database query responses - it doesn't handle the storage upload response correctly. The storage upload function is likely returning a different structure.
+
+Let's fix this by updating your mock setup:
+
+````python
+from typing import Any, Generator
+from unittest.mock import MagicMock, patch
+
+import pytest
+
+# Create a more explicit type for the mock return value
+MockSupabase = tuple[MagicMock, MagicMock, MagicMock]
+
+
+@pytest.fixture
+def mock_supabase() -> Generator[MockSupabase, None, None]:
+    """
+    Create a mock Supabase DB client with separate controls for DB and storage responses.
+
+    Example usage:
+    ```python
+        def test_create_memento(mock_supabase: MockSupabase) -> None:
+            mock_supabase_client, mock_db_response, mock_storage_response = mock_supabase
+
+            # Set DB response data
+            mock_db_response.data = [{"id": 1, "caption": "Test"}]
+
+            # Set storage response properties
+            mock_storage_response.path = "test-path"  # For upload responses
+            mock_storage_response.signedUrl = "https://test-url.com"  # For signed URL responses
+
+            # Test assertions
+            mock_supabase_client.table.assert_called_once_with("memento")
+    ``
+    """
+    with patch("server.services.db.supabase") as mock_supabase:
+        # Create separate response objects for DB and storage operations
+        mock_db_response = MagicMock()
+        mock_storage_response = MagicMock()
+
+        # Create mock chain builders for DB operations
+        def create_db_chain_builder() -> MagicMock:
+            chain_builder = MagicMock()
+            chain_builder.execute.return_value = mock_db_response
+            chain_methods = [
+                "select", "insert", "update", "delete", "eq", "neq", "gt",
+                "gte", "lt", "lte", "like", "ilike", "is_", "in_", "text_search",
+                "not_", "or_", "filter"
+            ]
+            for method in chain_methods:
+                getattr(chain_builder, method).return_value = chain_builder
+            return chain_builder
+
+        # Create storage mock that returns the storage response
+        def create_storage_chain_builder() -> MagicMock:
+            chain_builder = MagicMock()
+
+            # Set up return values for storage methods
+            chain_builder.upload.return_value = mock_storage_response
+            chain_builder.create_signed_url.return_value = mock_storage_response
+            chain_builder.create_signed_urls.return_value = mock_storage_response
+            chain_builder.remove.return_value = mock_storage_response
+            chain_builder.download.return_value = mock_storage_response
+
+            return chain_builder
+
+        # Set up DB table access
+        mock_supabase.table.return_value = create_db_chain_builder()
+
+        # Set up RPC calls
+        mock_supabase.rpc.return_value = create_db_chain_builder()
+
+        # Set up storage access
+        mock_storage_bucket = create_storage_chain_builder()
+        mock_supabase.storage.from_.return_value = mock_storage_bucket
+
+        yield mock_supabase, mock_db_response, mock_storage_response
+````
+
+## Prompt
+
+### User Input
+
+this new approach with the 3rd argument works great. can you please update all of the storage tests to use this new approach?
+
+### LLM Output
+
+I'll update the remaining tests to use the new approach with the third argument (mock_storage_response):
+
+```python
+from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
+from fastapi import UploadFile
+from PIL import Image
+
+from server.services.storage.image import (
+    delete_images,
+    download_images,
+    get_bulk_image_urls,
+    get_image_url,
+    upload_image,
+)
+from tests.fixtures.supabase import MockSupabase
+
+
+@pytest.mark.asyncio
+async def test_upload_image(mock_supabase: MockSupabase) -> None:
+    """Test uploading an image to Supabase storage."""
+    mock_supabase_client, _, mock_storage_response = mock_supabase
+
+    # Given
+    expected_path = "test-uuid-path"
+    mock_file = AsyncMock(spec=UploadFile)
+    mock_file.content_type = "image/jpeg"
+    mock_file.read.return_value = b"test image content"
+
+    # Set the expected path on the storage response
+    mock_storage_response.path = expected_path
+
+    with patch("server.services.storage.image.uuid.uuid4", return_value=expected_path):
+        # When
+        actual_path = await upload_image(mock_file)
+
+    # Then
+    mock_supabase_client.storage.from_.assert_called_once_with("images")
+    mock_supabase_client.storage.from_().upload.assert_called_once_with(
+        file=mock_file.read.return_value,
+        path=expected_path,
+        file_options={"content-type": mock_file.content_type},
+    )
+    assert actual_path == expected_path
+
+
+def test_delete_images(mock_supabase: MockSupabase) -> None:
+    """Test deleting images from Supabase storage."""
+    mock_supabase_client, _, mock_storage_response = mock_supabase
+
+    # Given
+    test_filenames = ["image1.jpg"]
+    mock_storage_response.__len__.return_value = 1
+
+    # When
+    result = delete_images(test_filenames)
+
+    # Then
+    mock_supabase_client.storage.from_.assert_called_once_with("images")
+    mock_supabase_client.storage.from_().remove.assert_called_once_with(test_filenames)
+    assert result is True
+
+
+def test_get_image_url(mock_supabase: MockSupabase) -> None:
+    """Test getting a signed URL for a single image."""
+    mock_supabase_client, _, mock_storage_response = mock_supabase
+
+    # Given
+    test_filename = "image1.jpg"
+    expected_url = "https://example.com/signed-url"
+    mock_storage_response.__getitem__.return_value = expected_url
+
+    # When
+    result = get_image_url(test_filename)
+
+    # Then
+    mock_supabase_client.storage.from_.assert_called_once_with("images")
+    mock_supabase_client.storage.from_().create_signed_url.assert_called_once_with(
+        test_filename, 86400
+    )
+    assert result == expected_url
+
+
+def test_get_bulk_image_urls(mock_supabase: MockSupabase) -> None:
+    """Test getting signed URLs for multiple images."""
+    mock_supabase_client, _, mock_storage_response = mock_supabase
+
+    # Given
+    test_filenames = ["image1.jpg", "image2.jpg"]
+    mock_response = [
+        {"path": "image1.jpg", "signedUrl": "https://example.com/signed-url-1"},
+        {"path": "image2.jpg", "signedUrl": "https://example.com/signed-url-2"},
+    ]
+    # Set the storage response value
+    mock_storage_response.__iter__.return_value = iter(mock_response)
+
+    # When
+    result = get_bulk_image_urls(test_filenames)
+
+    # Then
+    mock_supabase_client.storage.from_.assert_called_once_with("images")
+    mock_supabase_client.storage.from_().create_signed_urls.assert_called_once_with(
+        test_filenames, 86400
+    )
+    assert result == {
+        "image1.jpg": "https://example.com/signed-url-1",
+        "image2.jpg": "https://example.com/signed-url-2",
+    }
+
+
+def test_get_bulk_image_urls_empty(mock_supabase: MockSupabase) -> None:
+    """Test getting signed URLs with empty filenames list."""
+    mock_supabase_client, _, _ = mock_supabase
+
+    # Given
+    test_filenames = []
+
+    # When
+    result = get_bulk_image_urls(test_filenames)
+
+    # Then
+    mock_supabase_client.storage.from_.assert_not_called()
+    assert result == {}
+
+
+def test_download_images(mock_supabase: MockSupabase) -> None:
+    """Test downloading images from Supabase storage."""
+    mock_supabase_client, _, mock_storage_response = mock_supabase
+
+    # Given
+    test_filenames = ["image1.jpg", "image2.jpg"]
+    mock_image = MagicMock(spec=Image.Image)
+
+    # Set storage response for download to return image data
+    mock_storage_response.return_value = b"test image data"
+
+    with patch("server.services.storage.image.io.BytesIO") as mock_bytesio:
+        with patch("server.services.storage.image.Image.open") as mock_image_open:
+            mock_image_open.return_value = mock_image
+            mock_image.convert.return_value = mock_image
+
+            # When
+            result = download_images(test_filenames)
+
+    # Then
+    assert mock_supabase_client.storage.from_.call_count == 2
+    assert mock_supabase_client.storage.from_().download.call_count == 2
+    assert len(result) == 2
+    assert all(isinstance(img, MagicMock) for img in result)
+
+
+def test_download_images_with_error(mock_supabase: MockSupabase) -> None:
+    """Test downloading images with one failing."""
+    mock_supabase_client, _, _ = mock_supabase
+
+    # Given
+    test_filenames = ["valid.jpg", "error.jpg"]
+    mock_image = MagicMock(spec=Image.Image)
+
+    # Create a download side effect to simulate an error with one image
+    def download_side_effect(filename):
+        if filename == "error.jpg":
+            raise Exception("Test error")
+        return b"test image data"
+
+    mock_supabase_client.storage.from_().download.side_effect = download_side_effect
+
+    with patch("server.services.storage.image.io.BytesIO") as mock_bytesio:
+        with patch("server.services.storage.image.Image.open") as mock_image_open:
+            with patch("server.services.storage.image.logger") as mock_logger:
+                mock_image_open.return_value = mock_image
+                mock_image.convert.return_value = mock_image
+
+                # When
+                result = download_images(test_filenames)
+
+    # Then
+    assert mock_supabase_client.storage.from_.call_count == 2
+    assert mock_supabase_client.storage.from_().download.call_count == 2
+    assert len(result) == 1  # Only one image should be returned
+    mock_logger.error.assert_called_once()  # Error should be logged
+```

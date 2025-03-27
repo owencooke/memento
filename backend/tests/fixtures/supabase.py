@@ -1,4 +1,4 @@
-from typing import Any, Generator
+from typing import Generator
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -10,19 +10,19 @@ MockSupabase = tuple[MagicMock, MagicMock, MagicMock]
 @pytest.fixture
 def mock_supabase() -> Generator[MockSupabase, None, None]:
     """
-    Create a mock Supabase DB client with separate controls for DB and storage responses.
+    Create a mock Supabase DB client, along with mocks for DB/Storage responses.
 
     Example usage:
     ```python
-        def test_create_memento(mock_supabase: MockSupabase) -> None:
-            mock_supabase_client, mock_db_response, mock_storage_response = mock_supabase
+        def test_create_memento(mock_supa: MockSupabase) -> None:
+            mock_supabase_client, mock_db_response, mock_storage_response = mock_supa
 
             # Set DB response data
             mock_db_response.data = [{"id": 1, "caption": "Test"}]
 
             # Set storage response properties
-            mock_storage_response.path = "test-path"  # For upload responses
-            mock_storage_response.signedUrl = "https://test-url.com"  # For signed URL responses
+            mock_storage_response.path = "test-path"
+            mock_storage_response.signedUrl = "https://test-url.com"
 
             # Test assertions
             mock_supabase_client.table.assert_called_once_with("memento")
