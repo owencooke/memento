@@ -1,5 +1,5 @@
 import { GeoLocation } from "../components/inputs/LocationInput";
-import { Photo } from "../hooks/usePhotos";
+import { Photo } from "@/src/libs/photos";
 import { toISODateString } from "../libs/date";
 import { getRelevantImageMetadata } from "../libs/metadata";
 
@@ -16,7 +16,7 @@ export const prepareMementoPayload = (form: MementoFormData) => {
     ...restMemento
   } = form.memento;
 
-  return {
+  const payload: any = {
     memento_str: {
       ...restMemento,
       date: date ? toISODateString(date) : null,
@@ -27,10 +27,17 @@ export const prepareMementoPayload = (form: MementoFormData) => {
       ...getRelevantImageMetadata(photo),
       order_index: idx,
     })),
-    images: form.photos.map((photo) => ({
+  };
+
+  const photos = form.photos.filter((photo) => !photo.storedInCloud);
+
+  if (photos.length > 0) {
+    payload.images = photos.map((photo) => ({
       uri: photo.uri,
       type: photo.mimeType,
       name: photo.fileName,
-    })),
-  };
+    }));
+  }
+
+  return payload;
 };

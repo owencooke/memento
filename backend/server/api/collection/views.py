@@ -1,10 +1,10 @@
 """
 @description CRUD API routes for Collections.
-
-@requirements FR-3, FR-35, FR-36, FR-37
+    Also has the route for generating a collage representation for a collection.
+@requirements FR-3, FR-35, FR-36, FR-37, FR-53
 """
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from loguru import logger
 from pydantic import UUID4
 
@@ -14,17 +14,23 @@ from server.services.db.models.joins import CollectionWithMementos
 from server.services.db.models.schema_public_latest import (
     Collection,
     HasMementoInsert,
-    HasMementoUpdate,
 )
 from server.services.db.queries.collection import (
     associate_memento,
     create_collection,
     db_delete_collection,
     db_delete_has_memento,
+    get_collection,
+    get_collection_image_filenames,
     get_collections,
     get_has_mementos,
     update_collection,
 )
+from server.services.process_image.collage.generator import (
+    CollageGenerator,
+)
+from server.services.process_image.converters import pil_to_png_bytes
+from server.services.storage.image import download_images
 
 router = APIRouter()
 
@@ -95,14 +101,14 @@ async def update_collection_and_mementos(
                     status_code=400,
                     detail="Associate Memento to Collection Failed.",
                 )
-    
+
     # Remove deleted mementos from collection
     for memento_id in memento_ids_current:
         if memento_id not in mementos:
             removed_memento = db_delete_has_memento(id, memento_id)
             if not removed_memento:
                 raise HTTPException(status_code=400, detail="Delete collection failed")
-            
+
     return updated_collection
 
 
@@ -117,3 +123,22 @@ async def delete_collection(
         raise HTTPException(status_code=400, detail="Delete collection failed")
 
     return deleted_collection
+
+
+@router.get("/{id}/collage")
+async def generate_collage(id: int) -> Response:
+    """Generates an image representation of a collection as a collage."""
+    collection = get_collection(id)
+    if not collection:
+        raise HTTPException(status_code=404, detail=f"No collection found for id={id}")
+    try:
+        image_filenames = get_collection_image_filenames(id)
+        images = download_images(image_filenames)
+        output_image = await CollageGenerator().create_collage(
+            collection,
+            images,
+        )
+        output_bytes = await pil_to_png_bytes(output_image)
+        return Response(content=output_bytes, media_type="image/png")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e)) from e

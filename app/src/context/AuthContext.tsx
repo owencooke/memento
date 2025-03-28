@@ -12,7 +12,6 @@ import React, {
 import { Session } from "@supabase/supabase-js";
 import { supabase } from "@/src/libs/supabase";
 import * as WebBrowser from "expo-web-browser";
-import { useRouter } from "expo-router";
 import * as AuthSession from "expo-auth-session";
 
 const AUTH_REDIRECT_URI = AuthSession.makeRedirectUri({
@@ -71,7 +70,6 @@ const handleOAuthCallback = async (url: string) => {
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const router = useRouter();
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -91,7 +89,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
       if (result.type === "success" && result.url) {
         await handleOAuthCallback(result.url);
-        router.replace("/(app)/(tabs)/mementos");
       }
     } catch (error) {
       console.error("Google Sign-In Error:", error);
@@ -99,12 +96,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   /**
-   * Signs out the user and redirects to the sign in page.
+   * Signs out the user.
    */
   const signOut = async () => {
     await supabase.auth.signOut();
     setSession(null);
-    router.replace("/");
   };
 
   useEffect(() => {
@@ -118,6 +114,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     };
 
     checkSession();
+
+    // For E2E tests, sign in a test user to skip sign-up page
+    if (process.env.EXPO_PUBLIC_E2E_TESTING === "true") {
+      signInTestUser();
+    }
 
     // Subscribe to Supabase Auth changes
     const { data: authListener } = supabase.auth.onAuthStateChange(
@@ -135,3 +136,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     </AuthContext.Provider>
   );
 };
+
+const signInTestUser = async () =>
+  supabase.auth.signInWithPassword({
+    email: "e2e-test@example.com",
+    password: "memento123",
+  });

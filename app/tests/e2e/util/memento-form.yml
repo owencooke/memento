@@ -1,0 +1,30 @@
+# Modularized flow for filling out the Memento form fields (caption, date, location)
+
+appId: com.memento.app
+tags:
+  - util
+---
+# Set the caption
+- tapOn:
+    id: memento-form-caption
+- eraseText
+- inputText: ${CAPTION}
+- hideKeyboard
+
+# Set the date
+- tapOn:
+    id: memento-form-date
+- tapOn: 1
+- tapOn: OK
+- assertVisible: ^\d{4}-\d{2}-01$ # Asserts the date is set to the 1st day of the current year/month
+
+# Set the location
+- tapOn:
+    id: memento-form-location
+- eraseText
+- inputText: ${LOCATION_PARTIAL}
+- hideKeyboard
+- scrollUntilVisible:
+    element: ${LOCATION_FULL}
+    direction: DOWN
+- tapOn: ${LOCATION_FULL}

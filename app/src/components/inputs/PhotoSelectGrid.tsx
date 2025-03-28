@@ -1,12 +1,12 @@
 import { View, Text } from "react-native";
-import usePhotos, { Photo } from "../../hooks/usePhotos";
+import { Photo, usePhotos } from "@/src/context/PhotoContext";
 import { Button, ButtonIcon } from "../ui/button";
 import { AddIcon } from "../ui/icon";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import DraggableGrid from "@/src/components/draggable-grid";
 import PhotoSourceSheet from "./PhotoSourceSheet";
 import InteractivePhotoCard from "../cards/InteractivePhotoCard";
-import BackgroundRemovalModal from "../forms/BackgroundRemovalModal";
+import BackgroundRemovalModal from "../modals/BackgroundRemovalModal";
 
 interface GridItem {
   key: number;
@@ -36,7 +36,7 @@ export default function PhotoSelectGrid({
     pendingProcessedPhotos,
     acceptProcessedPhoto,
     rejectProcessedPhoto,
-  } = usePhotos({ initialPhotos });
+  } = usePhotos(initialPhotos);
 
   // When photos change, send updated state to parent component
   useEffect(() => {
@@ -103,6 +103,7 @@ export default function PhotoSelectGrid({
                 editable && (
                   // Render the add button
                   <Button
+                    testID="photo-grid-add-button"
                     size="lg"
                     className="mt-2 mr-2 h-full"
                     action="secondary"

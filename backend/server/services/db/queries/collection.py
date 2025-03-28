@@ -17,6 +17,18 @@ from server.services.db.models.schema_public_latest import (
 )
 
 
+def get_collection(collection_id: int) -> Collection | None:
+    """Fetch a single collection by its ID, if it exists."""
+    response = (
+        supabase.from_("collection")
+        .select("*")
+        .eq("id", collection_id)
+        .single()
+        .execute()
+    )
+    return Collection(**response.data) if response.data is not None else None
+
+
 def get_collections(
     user_id: UUID4,
 ) -> list[CollectionWithMementos]:
@@ -29,6 +41,7 @@ def get_collections(
     )
     return [CollectionWithMementos(**collection) for collection in response.data]
 
+
 def get_has_mementos(collection_id: int) -> list[int]:
     """Gets the mementos associated with a collection"""
     response = (
@@ -37,15 +50,20 @@ def get_has_mementos(collection_id: int) -> list[int]:
         .eq("collection_id", collection_id)
         .execute()
     )
+    return [item["memento_id"] for item in response.data]
 
-    memento_ids = [item['memento_id'] for item in response.data]
-    
-    return memento_ids
 
 def db_delete_has_memento(collection_id: int, memento_id: int) -> HasMemento:
-    "Deletes a memento association from the DB"
-    response = supabase.table("has_memento").delete().eq("collection_id", collection_id).eq("memento_id", memento_id).execute()
+    """Deletes a memento association from the DB"""
+    response = (
+        supabase.table("has_memento")
+        .delete()
+        .eq("collection_id", collection_id)
+        .eq("memento_id", memento_id)
+        .execute()
+    )
     return HasMemento(**response.data[0])
+
 
 def create_collection(new_collection: NewCollection, user_id: UUID4) -> Collection:
     """Creates a new collection for a user."""
@@ -97,3 +115,20 @@ def update_associate_memento(updated_has_memento: HasMementoUpdate) -> HasMement
         .execute()
     )
     return HasMemento(**response.data[0])
+
+
+def get_collection_image_filenames(collection_id: int) -> list[str]:
+    """Fetch all image filenames for mementos in a specific collection."""
+    response = (
+        supabase.from_("has_memento")
+        .select("memento:memento_id(images:image(filename))")
+        .eq("collection_id", collection_id)
+        .execute()
+    )
+
+    return [
+        image["filename"]
+        for record in response.data or []
+        for image in record.get("memento", {}).get("images", [])
+        if "filename" in image
+    ]

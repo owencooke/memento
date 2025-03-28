@@ -1,5 +1,5 @@
 import { View } from "react-native";
-import { Photo } from "@/src/hooks/usePhotos";
+import { Photo } from "@/src/libs/photos";
 import { Button, ButtonIcon } from "../ui/button";
 import { Image } from "../ui/image";
 import { Badge, BadgeIcon } from "../ui/badge";
@@ -17,7 +17,7 @@ export default function InteractivePhotoCard({
   showThumbnailBadge = false,
 }: InteractivePhotoCardProps) {
   return (
-    <View className="p-1 aspect-square">
+    <View className="p-1 aspect-square" testID="interactive-photo-card">
       <View className="relative overflow-hidden rounded-md">
         <Image
           source={{ uri: photo?.uri }}

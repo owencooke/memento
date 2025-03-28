@@ -4,7 +4,14 @@ This mobile application is an [Expo](https://expo.dev) project that was created 
 
 ## Get Started
 
-### Environment Variables
+### Prerequisites
+
+- Install [nvm (Node Version Manager)](https://github.com/nvm-sh/nvm)
+- Use nvm to install Node.js (v20+)
+- Install [npm (Node's package manager).](https://www.npmjs.com/)
+- Use npm to install [pnpm (faster and more efficient package manager)](https://pnpm.io/installation#using-npm)
+
+#### Environment Variables
 
 In the `/app/.env` file, ensure the following variables and credentials exist:
 
@@ -24,7 +31,7 @@ EXPO_PUBLIC_GOOGLE_PLACES_API_KEY=<API_KEY> # for Place Autocomplete and Place D
 2. Start the app
 
    ```bash
-    pnpm start
+    pnpm start [--port <PORT_NUMBER>]
    ```
 
 In the output, you'll find options to open the app in a
@@ -38,7 +45,7 @@ The easiest, quickstart option is to download the Expo Go app on your physical d
 
 ### Connecting to Backend
 
-### On Local Netwrok
+### On Local Network
 
 To call the Backend APIs, the Expo app needs to know the IP address of the host the backend is running on. The app host and backend host should be on the same LAN. To specify the host IP, set the following environment variable in a `.env` file:
 
@@ -103,14 +110,16 @@ Powered by [Maestro](https://maestro.mobile.dev/), the simplest and most effecti
   export MAESTRO_VERSION=1.39.0; curl -Ls "https://get.maestro.mobile.dev" | bash
   ```
   - for Windows, follow the instructions in link above
+- set the `EXPO_PUBLIC_E2E_TESTING=true` environment variable in `app/.env` to enable test user login
+- Memento app running on simulator/device (via Expo Go or Development Build)
 
 ### Run Locally
 
-Follow the instructions provided in the Maestro documentation for [running flows](https://maestro.mobile.dev/getting-started/writing-your-first-flow). You must have an emulator/simulator running with the app installed before running the commands below.
+Follow the instructions provided in the Maestro documentation for [running flows](https://maestro.mobile.dev/getting-started/writing-your-first-flow). You must have an Android simulator or physical device running the Memento app before using the commands below:
 
 - All test flows for project
   ```bash
-  pnpm test:e2e # or: maestro test
+  pnpm test:e2e
   ```
 - Specific/individual flows
   ```bash
@@ -136,17 +145,35 @@ Alternatively, the tests can be ran using the EAS CLI.
 
 Refer to the Expo Docs for more information about [custom EAS builds](https://docs.expo.dev/custom-builds/schema/#easmaestro_test).
 
-## Emulated Devices
+## Development Devices
 
-By far the most configuration-heavy and tricky part of mobile development, many of the prerequisites required to run an Android Emulator or iOS Simulator will depend on your local machine.
+By far the most configuration-heavy and tricky part of mobile development, many of the prerequisites required to run an Android Emulator, iOS Simulator, or on a physical device will depend on your local machine/environments.
 
 It is recommended to follow official documentation for installing/running emulators.
+
+### Physical Android Device
+
+ECE 493 provided Samsung Galaxy A16 5G phones for testing in the lab. Instructions for running are below:
+
+1. Enable [USB debugging](https://www.rogers.com/support/device-guides/en/mobile/tutorial/galaxy-a16-5g/14.0.0/feature_settings_debugging-enabling-usb-debugging) for the Android device and connect to computer via USB.
+2. Run the command `adb -s R5CXC1A1JXV reverse tcp:8000 tcp:8000` to make the backend server accessible directly on the Android device (ex: go to `localhost:8000/docs` in phone browser to test) and ensure `EXPO_PUBLIC_API_HOST=127.0.0.1` in the `/app/.env` file.
+3. Start the Metro server for the app:
+   - `pnpm start` will allow you to open the app within Expo Go.
+   - `pnpm android` will build an Android development build and install it directly on the device.
 
 ### Android Emulator
 
 Follow the [Android Developer documentation](https://developer.android.com/tools) for installing the Android SDK command-line tools (for `avdmanager`, `adb` and `emulator`). Alternatively, it is possible to use [Android Studio ](https://developer.android.com/tools/sdkmanager) to create devices and manage the Android SDK.
 
-Some helpful commands are provided below for reference
+#### Building app for Android
+
+Building the app and its dependencies can be quite memory intensive thanks to Gradle. Running `pnpm android` requires the emulator to be launched, but will kickoff the full Gradle build process if it hasn't been done yet. The combo of the running emulator + Gradle can overwhelm your system. It is recommended to build the dependencies first before running `pnpm android`. To do this:
+
+1. Run `npx expo prebuild` (generates the `/android` directory for creating a native build via Gradle)
+2. `cd android`
+3. `./gradlew assembleDebug` to kickoff the Gradle build for the project's dependencies
+
+Some other helpful commands are provided below for reference:
 
 #### Running a specific AVD
 

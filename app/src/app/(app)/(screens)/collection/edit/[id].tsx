@@ -71,7 +71,7 @@ export default function EditCollection() {
   }, [collection]);
 
   const handleRedirect = () =>
-    router.dismissTo(`/(app)/(screens)/(collection)/${collection.id}`);
+    router.dismissTo(`/(app)/(screens)/collection/${collection.id}`);
 
   // PUT Edit Collection Form
   const onSubmit = async (form: CollectionFormData) => {

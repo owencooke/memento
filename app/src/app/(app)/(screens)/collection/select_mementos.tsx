@@ -62,15 +62,15 @@ export default function SelectMementos() {
       : mementosWithUI;
 
   // Receive already selected mementos from form screen
-  const params = useLocalSearchParams()
-  
+  const params = useLocalSearchParams();
+
   // Array of memento IDs selected by the user
-  const ids_received: Number[] = !params.ids
+  const ids_received: number[] = !params.ids
     ? []
     : Array.isArray(params.ids)
       ? params.ids.map(Number)
       : params.ids.split(",").map(Number);
-  
+
   const [ids, setIds] = useState({}); // IDs of mementos selected
   const [selectedCount, setSelectedCount] = useState(0); // Number of mementos selected
   const [mementosWithUIState, setMementosWithUIState] = useState(gridData);
@@ -82,12 +82,13 @@ export default function SelectMementos() {
     if (!hasInitializedRef.current) {
       const updatedMementos = mementosWithUI.map((memento) => ({
         ...memento,
-        selected: ids_received.includes(memento.id),  // Select if ID is in the list
+        selected: ids_received.includes(memento.id), // Select if ID is in the list
       }));
-      
-      const gridDataWithSpacer = updatedMementos.length % 2
-      ? [...updatedMementos, { spacer: true }]
-      : updatedMementos;
+
+      const gridDataWithSpacer =
+        updatedMementos.length % 2
+          ? [...updatedMementos, { spacer: true }]
+          : updatedMementos;
 
       // Update state once with all selections
       setMementosWithUIState(gridDataWithSpacer);
@@ -98,13 +99,11 @@ export default function SelectMementos() {
 
       // Store the selected IDs
       const initialIds = Object.fromEntries(
-        updatedMementos
-          .filter((m) => m.selected)
-          .map((m) => [m.id, m.id])
+        updatedMementos.filter((m) => m.selected).map((m) => [m.id, m.id]),
       );
       setIds(initialIds);
 
-      hasInitializedRef.current = true;  // Prevent further calls
+      hasInitializedRef.current = true; // Prevent further calls
     }
   }, [mementosWithUI, ids_received]);
 
