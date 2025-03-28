@@ -12,6 +12,11 @@ from fastapi.responses import JSONResponse
 from loguru import logger
 from pydantic import UUID4
 
+import pytesseract
+from PIL import Image
+
+#from server.services.process_image import predict_class
+
 from server.api.memento.models import (
     CreateMementoSuccessResponse,
     MementoFilterParams,
@@ -91,9 +96,20 @@ async def create_new_memento(
     for i in range(len(images)):
         # Upload image to object storage
         path = await upload_image(images[i])
-
+        
         # Create new image metadata records in DB
         image_metadata[i].filename = path
+
+        image = await upload_file_to_pil(images[i])
+        
+        # Extract text
+        extracted_text = pytesseract.image_to_string(image)
+        image_metadata[i].detected_text = extracted_text
+        logger.debug(f"Adding detected text: {extracted_text}")
+
+        # Classify label
+        #image_metadata[i].image_label = predict_class(image)
+
         create_image_metadata(image_metadata[i], new_memento.id)
 
     return CreateMementoSuccessResponse(new_memento_id=new_memento.id)

@@ -11,6 +11,10 @@ export type BodyCreateNewMementoApiUserUserIdMementoPost = {
     images: Array<Blob | File>;
 };
 
+export type BodyExtractTextApiImageExtractTextPost = {
+    image_file: Blob | File;
+};
+
 export type BodyRemoveImageBackgroundApiImageRemoveBackgroundPost = {
     image_file: Blob | File;
 };
@@ -255,6 +259,31 @@ export type RemoveImageBackgroundApiImageRemoveBackgroundPostResponses = {
      */
     200: unknown;
 };
+
+export type ExtractTextApiImageExtractTextPostData = {
+    body: BodyExtractTextApiImageExtractTextPost;
+    path?: never;
+    query?: never;
+    url: '/api/image/extract_text';
+};
+
+export type ExtractTextApiImageExtractTextPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ExtractTextApiImageExtractTextPostError = ExtractTextApiImageExtractTextPostErrors[keyof ExtractTextApiImageExtractTextPostErrors];
+
+export type ExtractTextApiImageExtractTextPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: string;
+};
+
+export type ExtractTextApiImageExtractTextPostResponse = ExtractTextApiImageExtractTextPostResponses[keyof ExtractTextApiImageExtractTextPostResponses];
 
 export type GetUsersMementosApiUserUserIdMementoGetData = {
     body?: never;

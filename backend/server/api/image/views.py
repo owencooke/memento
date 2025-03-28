@@ -27,3 +27,16 @@ async def remove_image_background(image_file: UploadFile) -> Response:
         return Response(content=output_bytes, media_type="image/png")
     except BackgroundRemovalError as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
+
+
+@router.post("/extract_text")
+async def extract_text(image_file: UploadFile) -> str:
+    """Uses OCR library to extract text from image"""
+    try:
+        input_image = await upload_file_to_pil(image_file)
+        extracted_text = pytesseract.image_to_string(image)
+        
+        return extracted_text
+    
+    except Exception as e:
+        return {"error": str(e)}
