@@ -3,13 +3,20 @@ import { Image } from "@/src/components/ui/image";
 import { ImageWithUrl, MementoWithImages } from "@/src/api-client/generated";
 import { Text } from "../ui/text";
 import { useMemo } from "react";
+import { Fab, FabIcon } from "../ui/fab";
+import { CheckIcon } from "lucide-react-native";
+
+interface MementoCardProps extends MementoWithImages {
+  selected?: boolean;
+}
 
 export default function MementoCard({
   caption,
   date,
   images,
   location,
-}: MementoWithImages) {
+  selected = false,
+}: MementoCardProps) {
   // Get thumbnail
   const thumbnail = useMemo(
     () => images.find((image) => image.order_index === 0) as ImageWithUrl,
@@ -54,6 +61,14 @@ export default function MementoCard({
           </Text>
         </View>
       </View>
+      {selected && (
+        <Fab
+          size="lg"
+          className="w-10 h-10 absolute top-2 right-2 bg-tertiary-500 pointer-events-none"
+        >
+          <FabIcon as={CheckIcon} />
+        </Fab>
+      )}
     </View>
   );
 }

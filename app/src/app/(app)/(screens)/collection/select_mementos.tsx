@@ -1,19 +1,13 @@
 import MementoCard from "@/src/components/cards/MementoCard";
 import { router, useLocalSearchParams } from "expo-router";
-import {
-  View,
-  Text,
-  FlatList,
-  Pressable,
-  StyleProp,
-  ViewStyle,
-} from "react-native";
-import { useLayoutEffect, useRef, useState } from "react";
+import { View, Text, FlatList, Pressable } from "react-native";
+import { useState } from "react";
 import { Button, ButtonText } from "@/src/components/ui/button";
 import { MementoWithImages } from "@/src/api-client/generated";
 import { Fab, FabIcon } from "@/src/components/ui/fab";
 import { CheckIcon } from "@/src/components/ui/icon";
 import { useMementos } from "@/src/hooks/useMementos";
+import { Heading } from "@/src/components/ui/heading";
 
 /**
  * @description Screen for selecting mementos to add to a collection
@@ -24,120 +18,67 @@ import { useMementos } from "@/src/hooks/useMementos";
  * @returns {JSX.Element} Rendered SelectMementos screen.
  */
 export default function SelectMementos() {
-  // Extend the MementoWithImages type locally
-  type MementoWithUIProps = MementoWithImages & {
-    style?: StyleProp<ViewStyle> | null;
-    selected?: boolean | null;
-  };
-
-  const { mementos, isLoading } = useMementos({
-    queryOptions: { refetchOnMount: false },
-  });
-
-  // Convert fetched mementos to extended type
-  const mementosWithUI: MementoWithUIProps[] =
-    mementos?.map((memento) => ({
-      ...memento,
-      style: null,
-      selected: false,
-    })) ?? [];
-
-  // For odd number of mementos, add a spacer for last grid element
-  const gridData =
-    mementosWithUI?.length && mementosWithUI.length % 2
-      ? [...mementosWithUI, { spacer: true }]
-      : mementosWithUI;
-
-  // Receive already selected mementos from form screen
+  // Get local search params for pre-selected mementos
   const params = useLocalSearchParams();
-
-  // Array of memento IDs selected by the user
-  const ids_received: number[] = !params.ids
+  const preSelectedIds = !params.ids
     ? []
     : Array.isArray(params.ids)
       ? params.ids.map(Number)
       : params.ids.split(",").map(Number);
 
-  const [ids, setIds] = useState({}); // IDs of mementos selected
-  const [selectedCount, setSelectedCount] = useState(0); // Number of mementos selected
-  const [mementosWithUIState, setMementosWithUIState] = useState(gridData);
+  // Fetch mementos
+  const { mementos, isLoading } = useMementos({
+    queryOptions: { refetchOnMount: false },
+  });
 
-  const hasInitializedRef = useRef(false);
-
-  // Select the mementos that were already selected on the form
-  useLayoutEffect(() => {
-    if (!hasInitializedRef.current) {
-      const updatedMementos = mementosWithUI.map((memento) => ({
-        ...memento,
-        selected: ids_received.includes(memento.id), // Select if ID is in the list
-      }));
-
-      const gridDataWithSpacer =
-        updatedMementos.length % 2
-          ? [...updatedMementos, { spacer: true }]
-          : updatedMementos;
-
-      // Update state once with all selections
-      setMementosWithUIState(gridDataWithSpacer);
-
-      // Update selected count
-      const initialCount = updatedMementos.filter((m) => m.selected).length;
-      setSelectedCount(initialCount);
-
-      // Store the selected IDs
-      const initialIds = Object.fromEntries(
-        updatedMementos.filter((m) => m.selected).map((m) => [m.id, m.id]),
+  // State for tracking selected mementos
+  const [selectedIds, setSelectedIds] = useState<Record<number, boolean>>(
+    () => {
+      // Initialize with pre-selected IDs
+      return preSelectedIds.reduce(
+        (acc, id) => {
+          acc[id] = true;
+          return acc;
+        },
+        {} as Record<number, boolean>,
       );
-      setIds(initialIds);
+    },
+  );
 
-      hasInitializedRef.current = true; // Prevent further calls
-    }
-  }, [mementosWithUI, ids_received]);
+  // Prepare display data with selection state
+  const displayData =
+    mementos?.map((memento) => ({
+      ...memento,
+      selected: !!selectedIds[memento.id],
+    })) || [];
 
-  const handleSelectMemento = (item: MementoWithUIProps) => {
-    const updatedMementos = mementosWithUIState.map((m) =>
-      "id" in m && m.id === item.id ? { ...m, selected: !m.selected } : m,
-    );
+  // Add spacer for grid alignment if needed
+  const gridData =
+    displayData.length % 2 ? [...displayData, { spacer: true }] : displayData;
 
-    setMementosWithUIState(updatedMementos);
+  // Calculate selected count
+  const selectedCount = Object.keys(selectedIds).length;
 
-    const newSelectedCount = updatedMementos.filter(
-      (m) => "selected" in m && m.selected,
-    ).length;
-    setSelectedCount(newSelectedCount);
-
-    // Get the updated selected status from the updatedMementos array
-    const updatedItem = updatedMementos.find(
-      (m) => "id" in m && m.id === item.id,
-    );
-
-    setIds((prev) => {
-      if (updatedItem && "selected" in updatedItem && updatedItem.selected) {
-        // Item selected
-        return { ...prev, [updatedItem.id]: updatedItem.id };
-      } else if (
-        updatedItem &&
-        "selected" in updatedItem &&
-        !updatedItem.selected
-      ) {
-        // Item unselected
-        return Object.fromEntries(
-          Object.entries(prev).filter(
-            ([key]) => key !== updatedItem.id.toString(),
-          ),
-        );
+  // Toggle selection for a memento
+  const handleSelectMemento = (
+    memento: MementoWithImages & { selected?: boolean },
+  ) => {
+    setSelectedIds((prev) => {
+      const newState = { ...prev };
+      if (newState[memento.id]) {
+        delete newState[memento.id];
       } else {
-        return prev;
+        newState[memento.id] = true;
       }
+      return newState;
     });
   };
 
+  // Submit selected mementos
   const handleMementosSelected = () => {
-    const ids_string: string = Object.keys(ids).toString();
-
-    // Navigate back to the collection create page with selected mementos' IDs
+    const idsString = Object.keys(selectedIds).toString();
     router.back();
-    router.setParams({ ids: ids_string });
+    router.setParams({ ids: idsString });
   };
 
   return (
@@ -146,14 +87,17 @@ export default function SelectMementos() {
         <View className="flex-1 items-center justify-center">
           <Text>Loading...</Text>
         </View>
-      ) : mementosWithUI && mementosWithUI.length > 0 ? (
-        <View>
+      ) : displayData.length > 0 ? (
+        <View className="flex justify-center gap-6">
+          <Heading className="block" size="2xl">
+            Select Mementos
+          </Heading>
           <FlatList
             columnWrapperStyle={{ gap: 12 }}
             contentContainerStyle={{ gap: 12 }}
             numColumns={2}
             showsVerticalScrollIndicator={false}
-            data={mementosWithUIState}
+            data={gridData}
             renderItem={({ item }) =>
               "spacer" in item ? (
                 <View className="flex-1" />
@@ -163,24 +107,16 @@ export default function SelectMementos() {
                   onPress={() => handleSelectMemento(item)}
                 >
                   <MementoCard {...item} />
-                  {item.selected && (
-                    <Fab
-                      size="lg"
-                      className="w-12 h-12 absolute top-2 right-2 bg-green-500 pointer-events-none"
-                    >
-                      <FabIcon as={CheckIcon} />
-                    </Fab>
-                  )}
                 </Pressable>
               )
             }
           />
           <Button className="mt-4" size={"lg"} onPress={handleMementosSelected}>
-            {selectedCount > 0 ? (
-              <ButtonText>Select Mementos ({selectedCount})</ButtonText>
-            ) : (
-              <ButtonText>Select Mementos</ButtonText>
-            )}
+            <ButtonText>
+              {selectedCount > 0
+                ? `Select Mementos (${selectedCount})`
+                : "Select Mementos"}
+            </ButtonText>
           </Button>
         </View>
       ) : (
