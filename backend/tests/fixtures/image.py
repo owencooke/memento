@@ -1,7 +1,9 @@
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 from PIL import Image
+
+MockCollageImages = dict[str, MagicMock]
 
 
 @pytest.fixture
@@ -40,3 +42,15 @@ def mock_pil_image() -> MagicMock:
     mock_image.size = (800, 600)
     mock_image.mode = "RGBA"
     return mock_image
+
+
+@pytest.fixture
+def mock_collage_images() -> MockCollageImages:
+    """Mock a new and resulting image for transformation tests"""
+    with patch("PIL.Image.new") as mock_image_new:
+        mock_collage = MagicMock(spec=Image.Image)
+        mock_image_new.return_value = mock_collage
+        return {
+            "new": mock_image_new,
+            "collage": mock_collage,
+        }
