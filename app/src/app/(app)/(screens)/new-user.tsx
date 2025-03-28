@@ -16,27 +16,30 @@ import {
   FormControlLabelText,
 } from "@/src/components/ui/form-control";
 import { useMutation } from "@tanstack/react-query";
-import { userInfoApiUserPostMutation } from "@/src/api-client/generated/@tanstack/react-query.gen";
+import { postUserInfoApiUserPostMutation } from "@/src/api-client/generated/@tanstack/react-query.gen";
 import { router } from "expo-router";
 import { toISODateString } from "@/src/libs/date";
 import { ArrowRightIcon } from "@/src/components/ui/icon";
 import { View } from "react-native";
 import { Image } from "@/src/components/ui/image";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Notifications from "expo-notifications";
 
-interface NewUserInfo {
+interface NewUserInfoForm {
   birthday: Date;
 }
 
+Notifications.requestPermissionsAsync();
+
 export default function NewUserForm() {
   const { session } = useSession();
-  const { control, handleSubmit } = useForm<NewUserInfo>({
+  const { control, handleSubmit } = useForm<NewUserInfoForm>({
     defaultValues: { birthday: new Date() },
   });
 
-  const createUserInfoMutation = useMutation(userInfoApiUserPostMutation());
+  const createUserInfoMutation = useMutation(postUserInfoApiUserPostMutation());
 
-  const onSubmit = async (form: NewUserInfo) => {
+  const onSubmit = async (form: NewUserInfoForm) => {
     await createUserInfoMutation.mutateAsync(
       {
         body: {
@@ -59,7 +62,7 @@ export default function NewUserForm() {
     <SafeAreaView className="flex-1 p-6 justify-center" edges={["bottom"]}>
       <View className="flex items-center gap-2 mb-4">
         <Image
-          size="lg"
+          size="xl"
           // TODO: replace with our logo!
           source={require("@/src/assets/images/react-logo.png")}
           alt="Memento Logo"
@@ -74,8 +77,8 @@ export default function NewUserForm() {
         thoughtful cards, and more!
       </Text>
       <Text size="lg" className="text-left font-light mb-8">
-        If you'd like reminders to save your cards and other mementos within the
-        app, enable push notifications and enter your birthday below!
+        If you'd like reminders to save your mementos within the app, enable
+        push notifications and enter your birthday below!
       </Text>
 
       <FormControl size={"lg"} className="mb-6">

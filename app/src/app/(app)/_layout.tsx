@@ -55,9 +55,14 @@ export default function AppLayout() {
 
   return (
     <Stack
-      screenOptions={{
-        header: ({ options }) => <Header title={options.title} mode="goBack" />,
-      }}
+      screenOptions={({ route }) => ({
+        header: ({ options }) =>
+          route.name === "(screens)/new-user" ? (
+            <></>
+          ) : (
+            <Header title={options.title} mode="goBack" />
+          ),
+      })}
     >
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
     </Stack>
