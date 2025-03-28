@@ -21,8 +21,8 @@ export async function scheduleAllNotifications(birthdayString: string) {
 async function scheduleBirthdayNotification(birthdayString: string) {
   const date = getDateFromISO(birthdayString);
   await scheduleAnnualNotification(
-    "Happy Birthday! 🎉",
-    "Hope you have an amazing day! 🎂",
+    "Happy Birthday! 🎂",
+    "Make your day unforgettable — save your birthday cards and memories in Memento!",
     date.getMonth() + 1,
     date.getDate(),
   );
@@ -30,8 +30,8 @@ async function scheduleBirthdayNotification(birthdayString: string) {
 
 async function scheduleChristmasNotification() {
   await scheduleAnnualNotification(
-    "Merry Christmas! 🎄",
-    "Hope you're having a wonderful holiday! 🎁",
+    "Happy Holidays! 🎄",
+    "Capture the magic of your holiday memories in some new mementos!",
     12,
     25,
   );
@@ -40,7 +40,7 @@ async function scheduleChristmasNotification() {
 async function scheduleValentinesNotification() {
   await scheduleAnnualNotification(
     "Happy Valentine's Day! 💘",
-    "Sending you love and good vibes! ❤️",
+    "Keep love alive by saving your Valentine's cards and gifts in Memento!",
     2,
     14,
   );
@@ -100,5 +100,5 @@ async function logScheduledNotifications() {
 
 async function clearAllScheduledNotifications() {
   await Notifications.cancelAllScheduledNotificationsAsync();
-  console.log("✅ All scheduled notifications have been cleared.");
+  console.log("All scheduled notifications have been cleared.");
 }
