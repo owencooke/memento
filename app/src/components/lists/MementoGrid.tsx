@@ -10,25 +10,31 @@ interface MementoGridProps<ItemT extends MementoWithImages>
     "data" | "renderItem" | "keyExtractor"
   > {
   mementos: ItemT[];
-  onMementoPress: (memento: ItemT) => void;
+  onMementoPress?: (memento: ItemT) => void;
   emptyMessage?: string;
 }
 
 // A reusable grid component for displaying mementos.
 export default function MementoGrid<ItemT extends MementoWithImages>({
   mementos,
-  onMementoPress,
+  onMementoPress = () => {},
   emptyMessage = "No mementos yet!",
   numColumns = 2,
   ...restProps
 }: MementoGridProps<ItemT>) {
-  // For odd number of mementos, add a spacer for last grid element
+  // Calculate spacers needed to complete the last row
   // (so last memento doesn't expand to fill multiple columns)
   const gridData = useMemo(() => {
-    return mementos?.length && mementos.length % numColumns !== 0
-      ? [...mementos, { spacer: true }]
-      : mementos;
+    if (!mementos?.length) return [];
+    const spacers = Array(
+      (numColumns - (mementos.length % numColumns)) % numColumns,
+    )
+      .fill(null)
+      .map((_, i) => ({ spacer: true, id: `spacer-${i}` }));
+    return [...mementos, ...spacers];
   }, [mementos, numColumns]);
+
+  const showText = numColumns <= 2;
 
   return (
     <FlatList
@@ -48,7 +54,7 @@ export default function MementoGrid<ItemT extends MementoWithImages>({
             className="flex-1"
             onPress={() => onMementoPress(item as ItemT)}
           >
-            <MementoCard {...item} />
+            <MementoCard {...item} showText={showText} />
           </Pressable>
         )
       }

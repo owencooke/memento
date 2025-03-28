@@ -1,5 +1,5 @@
 import { useForm, Controller } from "react-hook-form";
-import { ScrollView, View } from "react-native";
+import { View } from "react-native";
 import {
   FormControl,
   FormControlError,
@@ -13,16 +13,15 @@ import { Input, InputField } from "@/src/components/ui/input";
 import { Textarea, TextareaInput } from "@/src/components/ui/textarea";
 import { Button, ButtonSpinner, ButtonText } from "@/src/components/ui/button";
 import { useCallback } from "react";
-import { AlertCircleIcon, TrashIcon } from "@/src/components/ui/icon";
+import { AlertCircleIcon } from "@/src/components/ui/icon";
 import LocationInput, {
   GeoLocation,
 } from "@/src/components/inputs/LocationInput";
 import { FlatList } from "react-native";
 import DatePickerInput from "@/src/components/inputs/DatePickerInput";
-import MementoCard from "../cards/MementoCard";
-import { Fab, FabIcon } from "../ui/fab";
 import { router, useLocalSearchParams } from "expo-router";
 import { useMementos } from "@/src/hooks/useMementos";
+import MementoGrid from "../lists/MementoGrid";
 
 /**
  * Form values for the CreateCollection screen
@@ -49,6 +48,14 @@ export default function CollectionForm({
   isSubmitting,
   onSubmit,
 }: CollectionFormProps) {
+  // Get local search params for selected mementos from select_mementos page
+  const { ids: idsString } = useLocalSearchParams<{ ids: string }>();
+  const selectedMementoIds = !idsString
+    ? []
+    : Array.isArray(idsString)
+      ? idsString.map(Number)
+      : idsString.split(",").map(Number);
+
   const {
     control,
     handleSubmit,
@@ -85,37 +92,10 @@ export default function CollectionForm({
   );
 
   const handleAddMementosPress = () => {
-    router.push(`/(app)/(screens)/collection/select_mementos?ids=${ids}`);
+    router.push(
+      `/(app)/(screens)/collection/select_mementos?ids=${selectedMementoIds}`,
+    );
   };
-
-  const handleRemoveSelection = (id: number) => {
-    const updatedIds = ids.filter((_id) => _id !== id);
-
-    router.setParams({
-      ids: updatedIds.length ? updatedIds.join(",") : "",
-    });
-  };
-
-  // Receive selected mementos from select_mementos page
-  const params = useLocalSearchParams();
-
-  // Array of memento IDs selected by the user
-  const ids: number[] = !params.ids
-    ? []
-    : Array.isArray(params.ids)
-      ? params.ids.map(Number)
-      : params.ids.split(",").map(Number);
-
-  // Filter for mementos selected by the user
-  const mementos_filtered = mementos?.filter((memento) =>
-    ids.includes(memento.id),
-  );
-
-  // For odd number of mementos, add a spacer for last grid element
-  const gridData =
-    mementos_filtered?.length && mementos_filtered.length % 2
-      ? [...mementos_filtered, { spacer: true }]
-      : mementos_filtered;
 
   return (
     <FlatList
@@ -212,29 +192,14 @@ export default function CollectionForm({
             <FormControlLabel>
               <FormControlLabelText>Mementos</FormControlLabelText>
             </FormControlLabel>
-            {ids.length > 0 && (
-              <View className="flex-1 bg-background-100 py-4">
-                <ScrollView
-                  horizontal={true}
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={{ gap: 12, flexDirection: "row" }}
-                >
-                  {gridData?.map((item, index) =>
-                    "spacer" in item ? (
-                      <View key={index} className="flex-1" />
-                    ) : (
-                      <View key={index}>
-                        <MementoCard key={index} {...item} />
-                        <Fab
-                          size="lg"
-                          onPress={() => handleRemoveSelection(item.id)}
-                        >
-                          <FabIcon as={TrashIcon} />
-                        </Fab>
-                      </View>
-                    ),
+            {selectedMementoIds.length > 0 && (
+              <View className="flex-1 py-4">
+                <MementoGrid
+                  numColumns={3}
+                  mementos={mementos?.filter((memento) =>
+                    selectedMementoIds.includes(memento.id),
                   )}
-                </ScrollView>
+                />
               </View>
             )}
             <Button

@@ -8,6 +8,7 @@ import { CheckIcon } from "lucide-react-native";
 
 interface MementoCardProps extends MementoWithImages {
   selected?: boolean;
+  showText?: boolean;
 }
 
 export default function MementoCard({
@@ -16,6 +17,7 @@ export default function MementoCard({
   images,
   location,
   selected = false,
+  showText = true,
 }: MementoCardProps) {
   // Get thumbnail
   const thumbnail = useMemo(
@@ -42,25 +44,27 @@ export default function MementoCard({
           resizeMode="cover"
         />
       </View>
-      <View className="flex flex-1 justify-between gap-1">
-        {caption && (
-          <Text
-            size="md"
-            italic
-            className="text-center line-clamp-2 font-light flex-1"
-          >
-            {caption}
-          </Text>
-        )}
-        <View className="flex flex-row justify-between items-center mt-auto font-medium">
-          <Text className="flex-1" size="sm">
-            {date}
-          </Text>
-          <Text className="flex-1 text-right" size="sm">
-            {city}
-          </Text>
+      {showText && (
+        <View className="flex flex-1 justify-between gap-1">
+          {caption && (
+            <Text
+              size="md"
+              italic
+              className="text-center line-clamp-2 font-light flex-1"
+            >
+              {caption}
+            </Text>
+          )}
+          <View className="flex flex-row justify-between items-center mt-auto font-medium">
+            <Text className="flex-1" size="sm">
+              {date}
+            </Text>
+            <Text className="flex-1 text-right" size="sm">
+              {city}
+            </Text>
+          </View>
         </View>
-      </View>
+      )}
       {selected && (
         <Fab
           size="lg"
