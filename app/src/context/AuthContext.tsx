@@ -100,6 +100,33 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     await AsyncStorage.removeItem("isNewUser");
   };
 
+  useEffect(() => {
+    // Check async storage for a valid session from previous app use
+    const checkSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      setSession(session);
+      setIsLoading(false);
+    };
+
+    checkSession();
+
+    // For E2E tests, sign in a test user to skip sign-up page
+    if (process.env.EXPO_PUBLIC_E2E_TESTING === "true") {
+      signInTestUser();
+    }
+
+    // Subscribe to Supabase Auth changes
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (_, session) => {
+        setSession(session);
+        setIsLoading(false);
+      },
+    );
+    return () => authListener.subscription?.unsubscribe();
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{ session, isLoading, signIn, signOut, isNewUser }}
@@ -156,3 +183,9 @@ const checkIfNewUser = async (user: User) => {
     .eq("id", user.id);
   return !userInfo || userInfo.length === 0;
 };
+
+const signInTestUser = async () =>
+  supabase.auth.signInWithPassword({
+    email: "e2e-test@example.com",
+    password: "memento123",
+  });

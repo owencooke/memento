@@ -152,7 +152,11 @@ export default function Mementos() {
           </View>
         }
       />
-      <Fab size="lg" onPress={() => setShowCreateOptions(true)}>
+      <Fab
+        size="lg"
+        onPress={() => setShowCreateOptions(true)}
+        testID="fab-create-memento"
+      >
         <FabIcon as={AddIcon} />
         <Actionsheet isOpen={showCreateOptions} onClose={closeCreateOptions}>
           <ActionsheetBackdrop />

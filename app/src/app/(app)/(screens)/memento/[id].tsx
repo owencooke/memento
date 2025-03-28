@@ -31,7 +31,9 @@ const iconClasses = "w-6 h-6";
 export default function ViewMemento() {
   // Get memento
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { mementos } = useMementos();
+  const { mementos } = useMementos({
+    queryOptions: { refetchOnMount: false },
+  });
   const memento = mementos?.find((m) => m.id === Number(id));
 
   // State
@@ -86,6 +88,7 @@ export default function ViewMemento() {
                 {memento.images.map((image, index) => (
                   <View key={index}>
                     <Image
+                      testID="view-memento-carousel-image"
                       source={{ uri: image.url }}
                       className="w-full h-full"
                       alt=""
@@ -120,12 +123,22 @@ export default function ViewMemento() {
                   />
                 ) : (
                   <>
-                    <Text size="2xl" italic className="font-light mb-2">
+                    <Text
+                      size="2xl"
+                      italic
+                      className="font-light mb-2"
+                      testID="view-memento-caption"
+                    >
                       {memento.caption}
                     </Text>
                     <View className="flex flex-row justify-between items-center mt-auto font-medium">
-                      <Text className="flex-1">{memento.date}</Text>
-                      <Text className="flex-1 text-right">
+                      <Text className="flex-1" testID="view-memento-date">
+                        {memento.date}
+                      </Text>
+                      <Text
+                        className="flex-1 text-right"
+                        testID="view-memento-location"
+                      >
                         {memento.location}
                       </Text>
                     </View>
@@ -145,13 +158,19 @@ export default function ViewMemento() {
           size="xl"
           className={buttonClasses}
           onPress={handleShowMoreDetails}
+          testID="view-memento-show-details"
         >
           <ButtonIcon
             as={InfoIcon}
             className={`${iconClasses} ${showImageMetadata && "text-tertiary-500"}`}
           />
         </Button>
-        <Button size="xl" className={buttonClasses} onPress={handleEditMemento}>
+        <Button
+          size="xl"
+          className={buttonClasses}
+          onPress={handleEditMemento}
+          testID="view-memento-edit-button"
+        >
           <ButtonIcon as={EditIcon} className={iconClasses} />
         </Button>
         {/* TODO: open Delete confirmation modal */}

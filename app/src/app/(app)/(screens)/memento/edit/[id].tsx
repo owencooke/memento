@@ -4,11 +4,10 @@
  */
 
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import {
   updateMementoAndImagesApiUserUserIdMementoIdPutMutation,
   getUsersMementosApiUserUserIdMementoGetQueryKey,
-  getUsersMementosApiUserUserIdMementoGetOptions,
 } from "@/src/api-client/generated/@tanstack/react-query.gen";
 import { useSession } from "@/src/context/AuthContext";
 import { router, useLocalSearchParams } from "expo-router";
@@ -25,24 +24,19 @@ import {
   MementoFormData,
   prepareMementoPayload,
 } from "@/src/api-client/memento";
+import { useMementos } from "@/src/hooks/useMementos";
 
 export default function EditMemento() {
   // Get user id
   const { session } = useSession();
   const user_id = String(session?.user.id);
+
   // Get existing memento
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { data: mementos } = useQuery({
-    ...getUsersMementosApiUserUserIdMementoGetOptions({
-      path: {
-        user_id,
-      },
-    }),
-    refetchOnMount: false,
+  const { mementos } = useMementos({
+    queryOptions: { refetchOnMount: false },
   });
-  const memento = mementos?.find(
-    (m) => m.id === Number(id),
-  ) as MementoWithImages;
+  const memento = mementos?.find((m) => m.id === Number(id));
 
   const updateMutation = useMutation(
     updateMementoAndImagesApiUserUserIdMementoIdPutMutation(),
@@ -84,12 +78,9 @@ export default function EditMemento() {
     }
     const path = {
       user_id,
-      id: memento.id,
+      id: Number(memento?.id),
     };
-    const body: any = prepareMementoPayload({
-      ...form,
-      photos: form.photos.filter((photo) => !photo.storedInCloud),
-    });
+    const body: any = prepareMementoPayload(form);
     await updateMutation.mutateAsync(
       {
         body,

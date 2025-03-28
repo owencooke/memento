@@ -10,7 +10,7 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "test": "jest",
-    "test:e2e": "maestro test",
+    "test:e2e": "maestro test tests/e2e/*",
     "lint": "expo lint",
     "sync-api": "sh scripts/sync-api.sh && openapi-ts",
     "tunnel-api": "sh ./scripts/tunnel-api.sh"

@@ -4,9 +4,9 @@ import { Input, InputField, InputSlot, InputIcon } from "../ui/input";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { toISODateString } from "@/src/libs/date";
 import { Box } from "../ui/box";
-import { Pressable, Platform } from "react-native";
+import { Pressable, Platform, ViewProps, View } from "react-native";
 
-interface DatePickerInputProps {
+interface DatePickerInputProps extends ViewProps {
   value: Date | null;
   onChange?: (value: Date | undefined) => void;
 }
@@ -19,6 +19,7 @@ interface DatePickerInputProps {
 const DatePickerInput = ({
   value,
   onChange = (_) => {},
+  ...props
 }: DatePickerInputProps) => {
   const [showDatePicker, setShowDatePicker] = useState(false);
 
@@ -27,7 +28,7 @@ const DatePickerInput = ({
   };
 
   return (
-    <>
+    <View {...props}>
       {Platform.OS === "android" && (
         <Box className="relative w-full">
           <Pressable
@@ -58,7 +59,7 @@ const DatePickerInput = ({
           maximumDate={new Date()}
         />
       )}
-    </>
+    </View>
   );
 };
 

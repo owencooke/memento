@@ -1,9 +1,13 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, UseQueryOptions } from "@tanstack/react-query";
 import { getUsersMementosApiUserUserIdMementoGetOptions } from "../api-client/generated/@tanstack/react-query.gen";
 import { useSession } from "../context/AuthContext";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useDebounce } from "./useDebounce";
 import { BoundingBox } from "@/src/components/inputs/LocationInput";
+import {
+  GetUsersMementosApiUserUserIdMementoGetData,
+  GetUsersMementosApiUserUserIdMementoGetResponse,
+} from "../api-client/generated";
 
 interface MementoFilters {
   start_date: string | null;
@@ -13,21 +17,31 @@ interface MementoFilters {
 
 const tenMinutesInMs = 10 * 60 * 1000;
 
+interface UseMementosProps {
+  initialFilters?: MementoFilters;
+  queryOptions?: Omit<
+    UseQueryOptions<GetUsersMementosApiUserUserIdMementoGetData>,
+    "queryFn" | "queryKey"
+  >;
+}
+
 /**
  * Hook that gets all the Mementos for a user (from API or query cache),
  * with support for filtering and search.
  */
-export const useMementos = () => {
+export const useMementos = ({
+  initialFilters = { start_date: null, end_date: null, bbox: null },
+  queryOptions = {},
+}: UseMementosProps = {}) => {
   const { session } = useSession();
 
   const [searchText, setSearchText] = useState("");
-  const [filters, setFilters] = useState<MementoFilters>({
-    start_date: null,
-    end_date: null,
-    bbox: null,
-  });
+  const [filters, setFilters] = useState<MementoFilters>(initialFilters);
 
-  const activeFilterCount = Object.values(filters).filter(Boolean).length;
+  const activeFilterCount = useMemo(
+    () => Object.values(filters).filter(Boolean).length,
+    [filters],
+  );
 
   const debouncedQueryParams = useDebounce(
     {
@@ -42,7 +56,10 @@ export const useMementos = () => {
     600,
   );
 
-  const { data, refetch, isLoading } = useQuery({
+  const { data, refetch, isLoading } = useQuery<
+    GetUsersMementosApiUserUserIdMementoGetResponse,
+    Error
+  >({
     ...getUsersMementosApiUserUserIdMementoGetOptions({
       path: {
         user_id: String(session?.user.id),
@@ -54,6 +71,7 @@ export const useMementos = () => {
     gcTime: tenMinutesInMs,
     // Keep showing previous data while loading new result
     placeholderData: (previousData) => previousData,
+    ...(queryOptions as any),
   });
 
   return {

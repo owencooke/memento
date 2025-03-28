@@ -17,7 +17,7 @@ export default function InteractivePhotoCard({
   showThumbnailBadge = false,
 }: InteractivePhotoCardProps) {
   return (
-    <View className="p-1 aspect-square">
+    <View className="p-1 aspect-square" testID="interactive-photo-card">
       <View className="relative overflow-hidden rounded-md">
         <Image
           source={{ uri: photo?.uri }}
