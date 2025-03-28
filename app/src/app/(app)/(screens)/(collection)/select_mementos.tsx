@@ -73,7 +73,8 @@ export default function SelectMementos() {
   
   const [ids, setIds] = useState({}); // IDs of mementos selected
   const [selectedCount, setSelectedCount] = useState(0); // Number of mementos selected
-  
+  const [mementosWithUIState, setMementosWithUIState] = useState(gridData);
+
   const hasInitializedRef = useRef(false);
 
   // Select the mementos that were already selected on the form
@@ -83,9 +84,13 @@ export default function SelectMementos() {
         ...memento,
         selected: ids_received.includes(memento.id),  // Select if ID is in the list
       }));
+      
+      const gridDataWithSpacer = updatedMementos.length % 2
+      ? [...updatedMementos, { spacer: true }]
+      : updatedMementos;
 
       // Update state once with all selections
-      setMementosWithUIState(updatedMementos);
+      setMementosWithUIState(gridDataWithSpacer);
 
       // Update selected count
       const initialCount = updatedMementos.filter((m) => m.selected).length;
@@ -102,8 +107,6 @@ export default function SelectMementos() {
       hasInitializedRef.current = true;  // Prevent further calls
     }
   }, [mementosWithUI, ids_received]);
-
-  const [mementosWithUIState, setMementosWithUIState] = useState(gridData);
 
   const handleSelectMemento = (item: MementoWithUIProps) => {
     const updatedMementos = mementosWithUIState.map((m) =>
