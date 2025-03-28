@@ -14,6 +14,7 @@ from pydantic import UUID4
 
 import pytesseract
 from PIL import Image
+from server.services.process_image.converters import upload_file_to_pil
 
 #from server.services.process_image import predict_class
 
