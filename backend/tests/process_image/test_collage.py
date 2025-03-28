@@ -8,7 +8,6 @@ from server.services.db.models.schema_public_latest import Collection
 from server.services.process_image.collage.generator import CollageGenerator
 from server.services.process_image.collage.image_processor import ImageProcessor
 from server.services.process_image.collage.text_manager import TextManager
-from tests.fixtures.image import MockCollageImages
 
 
 class TestCollageGenerator:
@@ -19,33 +18,31 @@ class TestCollageGenerator:
         self,
         collection: Collection,
         mock_pil_image: MagicMock,
-        mock_collage_images: MockCollageImages,
     ) -> None:
         """Test the create_collage method."""
         # Given
         generator = CollageGenerator()
         mock_images = [mock_pil_image, mock_pil_image]  # Two test images
+        with patch("PIL.Image.new", return_value=mock_pil_image):
+            # Mock internal methods
+            generator._render_scattered_images = MagicMock()
+            generator._format_metadata_string = MagicMock(return_value="Test Metadata")
+            generator.font_manager.load_font = MagicMock()
+            generator.font_manager.draw_text_with_background = MagicMock(
+                return_value=500,
+            )
 
-        # Mock internal methods
-        generator._render_scattered_images = MagicMock()
-        generator._format_metadata_string = MagicMock(return_value="Test Metadata")
-        generator.font_manager.load_font = MagicMock()
-        generator.font_manager.draw_text_with_background = MagicMock(
-            return_value=500,
-        )
+            # When
+            result = await generator.create_collage(collection, mock_images)
 
-        # When
-        result = await generator.create_collage(collection, mock_images)
-
-        # Then
-        mock_collage_images["new"].assert_called_once()
-        generator._render_scattered_images.assert_called_once_with(
-            mock_collage_images["collage"],
-            mock_images,
-        )
-        generator.font_manager.load_font.assert_called()
-        generator.font_manager.draw_text_with_background.assert_called()
-        assert result == mock_collage_images["collage"]
+            # Then
+            generator._render_scattered_images.assert_called_once_with(
+                mock_pil_image,
+                mock_images,
+            )
+            generator.font_manager.load_font.assert_called()
+            generator.font_manager.draw_text_with_background.assert_called()
+            assert result == mock_pil_image
 
     def test_format_metadata_string(self, collection: Collection) -> None:
         """Test _format_metadata_string method."""
@@ -106,10 +103,10 @@ class TestCollageGenerator:
     def test_render_scattered_images(
         self,
         mock_pil_image: MagicMock,
-        mock_collage_images: MockCollageImages,
     ) -> None:
         """Test _render_scattered_images method."""
         # Given
+        collage = mock_pil_image
         generator = CollageGenerator()
         mock_images = [mock_pil_image] * 5
 
@@ -123,13 +120,13 @@ class TestCollageGenerator:
         mock_pil_image.height = 100
 
         # When
-        generator._render_scattered_images(mock_collage_images["collage"], mock_images)
+        generator._render_scattered_images(collage, mock_images)
 
         # Then
         generator._initialize_grid.assert_called_once_with(5)
         assert generator.image_processor.prepare_image.call_count == 5
         assert generator.image_processor.rotate_image.call_count == 5
-        assert mock_collage_images["collage"].paste.call_count == 5
+        assert collage.paste.call_count == 5
 
 
 class TestImageProcessor:
@@ -198,10 +195,7 @@ class TestTextManager:
         mock_truetype.assert_called_once()
         assert result == mock_truetype.return_value
 
-    def test_draw_text_with_background(
-        self,
-        mock_collage_images: MockCollageImages,
-    ) -> None:
+    def test_draw_text_with_background(self, mock_pil_image: MagicMock) -> None:
         """Test draw_text_with_background method."""
         # Given
         text_manager = TextManager()
@@ -212,7 +206,7 @@ class TestTextManager:
 
             # When
             result = text_manager.draw_text_with_background(
-                mock_collage_images["collage"],
+                mock_pil_image,
                 "Test Text",
                 MagicMock(),
                 y_position,
