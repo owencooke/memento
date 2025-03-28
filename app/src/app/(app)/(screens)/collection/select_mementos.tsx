@@ -5,12 +5,14 @@
  */
 import MementoCard from "@/src/components/cards/MementoCard";
 import { router, useLocalSearchParams } from "expo-router";
-import { View, Text, FlatList, Pressable } from "react-native";
+import { View, FlatList, Pressable } from "react-native";
 import { useMemo, useState } from "react";
 import { Button, ButtonText } from "@/src/components/ui/button";
 import { MementoWithImages } from "@/src/api-client/generated";
 import { useMementos } from "@/src/hooks/useMementos";
 import { Heading } from "@/src/components/ui/heading";
+import { Text } from "@/src/components/ui/text";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function SelectMementos() {
   // Get local search params for pre-selected mementos IDs
@@ -74,43 +76,51 @@ export default function SelectMementos() {
   };
 
   return (
-    <View className="flex-1 bg-background-100 py-4 px-6">
-      <View className="flex justify-center gap-6">
-        <Heading className="block" size="2xl">
-          Select Mementos
-        </Heading>
-        <FlatList
-          columnWrapperStyle={{ gap: 12 }}
-          contentContainerStyle={{ gap: 12 }}
-          numColumns={2}
-          showsVerticalScrollIndicator={false}
-          data={gridData}
-          renderItem={({ item }) =>
-            "spacer" in item ? (
-              <View className="flex-1" />
-            ) : (
-              <Pressable
-                className="flex-1"
-                onPress={() => handleSelectMemento(item)}
-              >
-                <MementoCard {...item} />
-              </Pressable>
-            )
-          }
-          ListEmptyComponent={
-            <View className="flex-1 items-center justify-center">
-              <Text>No mementos yet!</Text>
-            </View>
-          }
-        />
-        <Button className="mt-4" size={"lg"} onPress={handleMementosSelected}>
-          <ButtonText>
-            {selectedCount > 0
-              ? `Select Mementos (${selectedCount})`
-              : "Select Mementos"}
-          </ButtonText>
-        </Button>
-      </View>
-    </View>
+    <SafeAreaView className="flex-1 py-4 px-6" edges={["bottom"]}>
+      <FlatList
+        columnWrapperStyle={{ gap: 12 }}
+        contentContainerStyle={{ gap: 12 }}
+        numColumns={2}
+        showsVerticalScrollIndicator={false}
+        data={gridData}
+        ListHeaderComponent={
+          <View className="flex justify-center gap-2">
+            <Heading className="block" size="2xl">
+              Select Mementos
+            </Heading>
+            <Text size="lg" className="text-left font-light mb-4">
+              Choose which mementos you want to be stored within this
+              collection!
+            </Text>
+          </View>
+        }
+        renderItem={({ item }) =>
+          "spacer" in item ? (
+            <View className="flex-1" />
+          ) : (
+            <Pressable
+              className="flex-1"
+              onPress={() => handleSelectMemento(item)}
+            >
+              <MementoCard {...item} />
+            </Pressable>
+          )
+        }
+        ListFooterComponent={
+          <Button className="mt-4" size={"lg"} onPress={handleMementosSelected}>
+            <ButtonText>
+              {selectedCount > 0
+                ? `Select Mementos (${selectedCount})`
+                : "Select Mementos"}
+            </ButtonText>
+          </Button>
+        }
+        ListEmptyComponent={
+          <View className="flex-1 items-center justify-center">
+            <Text>No mementos yet!</Text>
+          </View>
+        }
+      />
+    </SafeAreaView>
   );
 }
