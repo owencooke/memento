@@ -102,7 +102,7 @@ class UserInfoBaseSchema(CustomModel):
 	id: UUID4
 
 	# Columns
-	birthday: datetime.date | None = Field(default=None)
+	birthday: datetime.date
 # INSERT CLASSES
 # Note: These models are used for insert operations. Auto-generated fields
 # (like IDs and timestamps) are optional.
@@ -215,11 +215,8 @@ class UserInfoInsert(CustomModelInsert):
 	# Primary Keys
 	id: UUID4 | None = Field(default=None)  # has default value
 
-	# Field properties:
-	# birthday: nullable
-
-		# Optional fields
-	birthday: datetime.date | None = Field(default=None)
+# Required fields
+	birthday: datetime.date
 # UPDATE CLASSES
 # Note: These models are used for update operations. All fields are optional.
 
@@ -327,10 +324,7 @@ class UserInfoUpdate(CustomModelUpdate):
 	# Primary Keys
 	id: UUID4 | None = Field(default=None)
 
-	# Field properties:
-	# birthday: nullable
-
-		# Optional fields
+	# Optional fields
 	birthday: datetime.date | None = Field(default=None)
 
 

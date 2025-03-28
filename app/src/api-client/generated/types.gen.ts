@@ -183,7 +183,15 @@ export type UpdateCollection = {
  */
 export type UserInfo = {
     id: string;
-    birthday?: string | null;
+    birthday: string;
+};
+
+/**
+ * UserInfo Insert Schema.
+ */
+export type UserInfoInsert = {
+    id?: string | null;
+    birthday: string;
 };
 
 export type ValidationError = {
@@ -232,6 +240,31 @@ export type UserInfoApiUserIdGetResponses = {
 };
 
 export type UserInfoApiUserIdGetResponse = UserInfoApiUserIdGetResponses[keyof UserInfoApiUserIdGetResponses];
+
+export type PostUserInfoApiUserPostData = {
+    body: UserInfoInsert;
+    path?: never;
+    query?: never;
+    url: '/api/user/';
+};
+
+export type PostUserInfoApiUserPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type PostUserInfoApiUserPostError = PostUserInfoApiUserPostErrors[keyof PostUserInfoApiUserPostErrors];
+
+export type PostUserInfoApiUserPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: UserInfo;
+};
+
+export type PostUserInfoApiUserPostResponse = PostUserInfoApiUserPostResponses[keyof PostUserInfoApiUserPostResponses];
 
 export type RemoveImageBackgroundApiImageRemoveBackgroundPostData = {
     body: BodyRemoveImageBackgroundApiImageRemoveBackgroundPost;
