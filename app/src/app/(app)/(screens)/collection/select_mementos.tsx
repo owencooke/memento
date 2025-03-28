@@ -3,16 +3,16 @@
  *
  * @requirements FR-41
  */
-import MementoCard from "@/src/components/cards/MementoCard";
 import { router, useLocalSearchParams } from "expo-router";
-import { View, FlatList, Pressable } from "react-native";
-import { useMemo, useState } from "react";
+import { View } from "react-native";
+import { useState } from "react";
 import { Button, ButtonText } from "@/src/components/ui/button";
 import { MementoWithImages } from "@/src/api-client/generated";
 import { useMementos } from "@/src/hooks/useMementos";
 import { Heading } from "@/src/components/ui/heading";
 import { Text } from "@/src/components/ui/text";
 import { SafeAreaView } from "react-native-safe-area-context";
+import MementoGrid from "@/src/components/lists/MementoGrid";
 
 export default function SelectMementos() {
   // Get local search params for pre-selected mementos IDs
@@ -37,18 +37,6 @@ export default function SelectMementos() {
       {} as Record<number, boolean>,
     ),
   );
-
-  // Prepare display data with selection state / spacer for odd # of mementos
-  const gridData = useMemo(() => {
-    const selectionMementos = mementos?.map((memento) => ({
-      ...memento,
-      selected: !!selectedIds[memento.id],
-    }));
-
-    return selectionMementos?.length && selectionMementos.length % 2
-      ? [...selectionMementos, { spacer: true }]
-      : selectionMementos;
-  }, [mementos, selectedIds]);
 
   // Calculate selected count
   const selectedCount = Object.keys(selectedIds).length;
@@ -77,12 +65,12 @@ export default function SelectMementos() {
 
   return (
     <SafeAreaView className="flex-1 py-4 px-6" edges={["bottom"]}>
-      <FlatList
-        columnWrapperStyle={{ gap: 12 }}
-        contentContainerStyle={{ gap: 12 }}
-        numColumns={2}
-        showsVerticalScrollIndicator={false}
-        data={gridData}
+      <MementoGrid
+        mementos={mementos?.map((memento) => ({
+          ...memento,
+          selected: !!selectedIds[memento.id],
+        }))}
+        onMementoPress={handleSelectMemento}
         ListHeaderComponent={
           <View className="flex justify-center gap-2">
             <Heading className="block" size="2xl">
@@ -94,18 +82,6 @@ export default function SelectMementos() {
             </Text>
           </View>
         }
-        renderItem={({ item }) =>
-          "spacer" in item ? (
-            <View className="flex-1" />
-          ) : (
-            <Pressable
-              className="flex-1"
-              onPress={() => handleSelectMemento(item)}
-            >
-              <MementoCard {...item} />
-            </Pressable>
-          )
-        }
         ListFooterComponent={
           <Button className="mt-4" size={"lg"} onPress={handleMementosSelected}>
             <ButtonText>
@@ -114,11 +90,6 @@ export default function SelectMementos() {
                 : "Select Mementos"}
             </ButtonText>
           </Button>
-        }
-        ListEmptyComponent={
-          <View className="flex-1 items-center justify-center">
-            <Text>No mementos yet!</Text>
-          </View>
         }
       />
     </SafeAreaView>

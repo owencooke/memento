@@ -42,13 +42,6 @@ export interface CollectionFormProps {
   onSubmit: (data: CollectionFormData) => Promise<void>;
 }
 
-const defaultValues: CollectionFormData = {
-  title: "",
-  caption: "",
-  date: null,
-  location: { text: "" },
-};
-
 export default function CollectionForm({
   initialValues,
   title,
@@ -63,7 +56,12 @@ export default function CollectionForm({
     setValue,
     formState: { errors },
   } = useForm<CollectionFormData>({
-    defaultValues: initialValues || defaultValues,
+    defaultValues: initialValues || {
+      title: "",
+      caption: "",
+      date: null,
+      location: { text: "" },
+    },
   });
 
   const { mementos } = useMementos({
