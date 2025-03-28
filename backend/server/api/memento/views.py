@@ -16,7 +16,7 @@ import pytesseract
 from PIL import Image
 from server.services.process_image.converters import upload_file_to_pil
 
-#from server.services.process_image import predict_class
+from server.services.process_image.image_class import predict_class
 
 from server.api.memento.models import (
     CreateMementoSuccessResponse,
@@ -106,10 +106,12 @@ async def create_new_memento(
         # Extract text
         extracted_text = pytesseract.image_to_string(image)
         image_metadata[i].detected_text = extracted_text
-        logger.debug(f"Adding detected text: {extracted_text}")
+        logger.info(f"Adding detected text: {extracted_text}")
 
         # Classify label
-        #image_metadata[i].image_label = predict_class(image)
+        predicted_class = predict_class(image)
+        image_metadata[i].image_label = predict_class(image)
+        logger.info(f"Adding predicted class: {predicted_class}")
 
         create_image_metadata(image_metadata[i], new_memento.id)
 
