@@ -14,6 +14,8 @@ from server.services.process_image.converters import (
     upload_file_to_pil,
 )
 
+from server.services.process_image.image_class import predict_class
+
 router = APIRouter()
 
 
@@ -27,3 +29,12 @@ async def remove_image_background(image_file: UploadFile) -> Response:
         return Response(content=output_bytes, media_type="image/png")
     except BackgroundRemovalError as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
+    
+
+@router.post("/classify-image")
+async def classify_image(image_file: UploadFile) -> str:
+    """Post route that takes an image and performs image classification"""
+    input_image = await upload_file_to_pil(image_file)
+    predicted_class = predict_class(input_image)
+
+    return predicted_class
