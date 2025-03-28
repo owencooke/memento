@@ -1,12 +1,17 @@
-import numpy as np
 import cv2
+import numpy as np
+from loguru import logger
 from PIL import Image
-from tensorflow.keras.applications.resnet50 import ResNet50
-from tensorflow.keras.preprocessing import image
-from tensorflow.keras.applications.resnet50 import preprocess_input, decode_predictions
+from tensorflow.keras.applications.resnet50 import (  # type: ignore
+    ResNet50,  # type: ignore
+    decode_predictions,
+    preprocess_input,
+)
+from tensorflow.keras.preprocessing import image  # type: ignore
 
 # Load the pre-trained ResNet50 model
-model = ResNet50(weights='imagenet')
+model = ResNet50(weights="imagenet")
+
 
 # Function to process PIL.Image
 def predict_class(pil_img: Image.Image):
@@ -32,13 +37,19 @@ def predict_class(pil_img: Image.Image):
     y_offset = (224 - new_h) // 2
 
     # Place the resized image on the center of the padded canvas
-    padded[y_offset:y_offset+new_h, x_offset:x_offset+new_w] = resized
+    padded[y_offset : y_offset + new_h, x_offset : x_offset + new_w] = resized
 
     # Convert to array format for Keras
     x = image.img_to_array(padded)
     x = np.expand_dims(x, axis=0)
     x = preprocess_input(x)
-    
-    preds = model.predict(x)
 
-    return decode_predictions(preds, top=1)[0][1] # Best prediction
+    preds = model.predict(x)
+    logger.info({model})
+    logger.info("DEBUG", str(preds))
+
+    results = decode_predictions(preds, top=1)
+
+    logger.info("DEBUG", str(results))
+
+    return decode_predictions(preds, top=1)[0][1]  # Best prediction

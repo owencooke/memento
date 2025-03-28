@@ -7,16 +7,11 @@
 import json
 from typing import Annotated, Optional
 
+import pytesseract
 from fastapi import APIRouter, Depends, Form, UploadFile
 from fastapi.responses import JSONResponse
 from loguru import logger
 from pydantic import UUID4
-
-import pytesseract
-from PIL import Image
-from server.services.process_image.converters import upload_file_to_pil
-
-from server.services.process_image.image_class import predict_class
 
 from server.api.memento.models import (
     CreateMementoSuccessResponse,
@@ -38,6 +33,8 @@ from server.services.db.queries.memento import (
     get_mementos,
     update_memento,
 )
+from server.services.process_image.converters import upload_file_to_pil
+from server.services.process_image.image_class import predict_class
 from server.services.storage.image import (
     delete_images,
     get_bulk_image_urls,
@@ -97,12 +94,12 @@ async def create_new_memento(
     for i in range(len(images)):
         # Upload image to object storage
         path = await upload_image(images[i])
-        
+
         # Create new image metadata records in DB
         image_metadata[i].filename = path
 
         image = await upload_file_to_pil(images[i])
-        
+
         # Extract text
         extracted_text = pytesseract.image_to_string(image)
         image_metadata[i].detected_text = extracted_text
@@ -110,7 +107,7 @@ async def create_new_memento(
 
         # Classify label
         predicted_class = predict_class(image)
-        image_metadata[i].image_label = predict_class(image)
+        image_metadata[i].image_label = predicted_class
         logger.info(f"Adding predicted class: {predicted_class}")
 
         create_image_metadata(image_metadata[i], new_memento.id)
