@@ -6,7 +6,6 @@ import {
   deleteCollectionApiUserUserIdCollectionIdDeleteMutation,
   getUsersCollectionsApiUserUserIdCollectionGetOptions,
   getUsersCollectionsApiUserUserIdCollectionGetQueryKey,
-  getUsersMementosApiUserUserIdMementoGetOptions,
 } from "@/src/api-client/generated/@tanstack/react-query.gen";
 import { ButtonIcon, Button } from "@/src/components/ui/button";
 import { EditIcon, ShareIcon, TrashIcon } from "@/src/components/ui/icon";
@@ -21,6 +20,7 @@ import { FlatList, Pressable } from "react-native";
 import MementoCard from "@/src/components/cards/MementoCard";
 import DeleteCollectionModal from "@/src/components/modals/DeleteModal";
 import { queryClient } from "@/src/app/_layout";
+import { useMementos } from "@/src/hooks/useMementos";
 
 const buttonClasses = "flex-1";
 const iconClasses = "w-6 h-6";
@@ -42,13 +42,8 @@ export default function ViewCollection() {
   const collection = collections?.find((c) => c.id === Number(id));
 
   // Get associated mementos
-  const { data: all_mementos } = useQuery({
-    ...getUsersMementosApiUserUserIdMementoGetOptions({
-      path: {
-        user_id: session?.user.id ?? "",
-      },
-    }),
-    refetchOnMount: false,
+  const { mementos: all_mementos } = useMementos({
+    queryOptions: { refetchOnMount: false },
   });
   const mementos = all_mementos?.filter((m) =>
     collection?.mementos.some((cm) => cm.memento_id === m.id),
@@ -71,7 +66,7 @@ export default function ViewCollection() {
   const handleEditCollection = () => {
     const ids = mementos?.map((memento) => memento.id);
     router.push(
-      `/(app)/(screens)/(collection)/edit/${collection?.id}?ids=${ids}`,
+      `/(app)/(screens)/collection/edit/${collection?.id}?ids=${ids}`,
     );
   };
 

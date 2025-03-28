@@ -22,9 +22,7 @@ import DatePickerInput from "@/src/components/inputs/DatePickerInput";
 import MementoCard from "../cards/MementoCard";
 import { Fab, FabIcon } from "../ui/fab";
 import { router, useLocalSearchParams } from "expo-router";
-import { useQuery } from "@tanstack/react-query";
-import { getUsersMementosApiUserUserIdMementoGetOptions } from "@/src/api-client/generated/@tanstack/react-query.gen";
-import { useSession } from "@/src/context/AuthContext";
+import { useMementos } from "@/src/hooks/useMementos";
 
 /**
  * Form values for the CreateCollection screen
@@ -44,6 +42,13 @@ export interface CollectionFormProps {
   onSubmit: (data: CollectionFormData) => Promise<void>;
 }
 
+const defaultValues: CollectionFormData = {
+  title: "",
+  caption: "",
+  date: null,
+  location: { text: "" },
+};
+
 export default function CollectionForm({
   initialValues,
   title,
@@ -51,13 +56,6 @@ export default function CollectionForm({
   isSubmitting,
   onSubmit,
 }: CollectionFormProps) {
-  const defaultValues: CollectionFormData = {
-    title: "",
-    caption: "",
-    date: null,
-    location: { text: "" },
-  };
-
   const {
     control,
     handleSubmit,
@@ -68,15 +66,12 @@ export default function CollectionForm({
     defaultValues: initialValues || defaultValues,
   });
 
-  const { session } = useSession();
+  const { mementos } = useMementos({
+    queryOptions: { refetchOnMount: false },
+  });
 
-  // Prevent re-rendering location input when Geolocation changes
+  // Updates the location input when GeoLocation changes
   const locationValue = watch("location");
-  /**
-   * Updates the location input when GeoLocation changes
-   *
-   * @param {GeoLocation} location - new location value
-   */
   const handleLocationChange = useCallback(
     (location: GeoLocation) => {
       const hasChanged =
@@ -91,17 +86,8 @@ export default function CollectionForm({
     [locationValue, setValue],
   );
 
-  const { data: mementos } = useQuery({
-    ...getUsersMementosApiUserUserIdMementoGetOptions({
-      path: {
-        user_id: session?.user.id ?? "",
-      },
-    }),
-    refetchOnMount: false,
-  });
-
   const handleAddMementosPress = () => {
-    router.push(`/(app)/(screens)/(collection)/select_mementos?ids=${ids}`);
+    router.push(`/(app)/(screens)/collection/select_mementos?ids=${ids}`);
   };
 
   const handleRemoveSelection = (id: number) => {
@@ -116,7 +102,7 @@ export default function CollectionForm({
   const params = useLocalSearchParams();
 
   // Array of memento IDs selected by the user
-  const ids: Number[] = !params.ids
+  const ids: number[] = !params.ids
     ? []
     : Array.isArray(params.ids)
       ? params.ids.map(Number)

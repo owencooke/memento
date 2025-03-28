@@ -28,7 +28,7 @@ export default function CreateMemento() {
   // Call POST Create Memento endpoint with custom serializer for multi-part form data
   const onSubmit = async (form: MementoFormData) => {
     const body: any = prepareMementoPayload(form);
-    const path = { user_id: session?.user.id ?? "" };
+    const path = { user_id: String(session?.user.id) };
     await createMutation.mutateAsync(
       {
         body,

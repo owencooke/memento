@@ -1,7 +1,4 @@
-import { getUsersMementosApiUserUserIdMementoGetOptions } from "@/src/api-client/generated/@tanstack/react-query.gen";
 import MementoCard from "@/src/components/cards/MementoCard";
-import { useSession } from "@/src/context/AuthContext";
-import { useQuery } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import {
   View,
@@ -16,6 +13,7 @@ import { Button, ButtonText } from "@/src/components/ui/button";
 import { MementoWithImages } from "@/src/api-client/generated";
 import { Fab, FabIcon } from "@/src/components/ui/fab";
 import { CheckIcon } from "@/src/components/ui/icon";
+import { useMementos } from "@/src/hooks/useMementos";
 
 /**
  * @description Screen for selecting mementos to add to a collection
@@ -26,25 +24,14 @@ import { CheckIcon } from "@/src/components/ui/icon";
  * @returns {JSX.Element} Rendered SelectMementos screen.
  */
 export default function SelectMementos() {
-  const { session } = useSession();
-
   // Extend the MementoWithImages type locally
   type MementoWithUIProps = MementoWithImages & {
     style?: StyleProp<ViewStyle> | null;
     selected?: boolean | null;
   };
 
-  const {
-    data: mementos,
-    isLoading,
-    isFetching,
-  } = useQuery({
-    ...getUsersMementosApiUserUserIdMementoGetOptions({
-      path: {
-        user_id: session?.user.id ?? "",
-      },
-    }),
-    refetchOnMount: false,
+  const { mementos, isLoading } = useMementos({
+    queryOptions: { refetchOnMount: false },
   });
 
   // Convert fetched mementos to extended type
@@ -155,7 +142,7 @@ export default function SelectMementos() {
 
   return (
     <View className="flex-1 bg-background-100 py-4 px-6">
-      {isLoading || isFetching ? (
+      {isLoading ? (
         <View className="flex-1 items-center justify-center">
           <Text>Loading...</Text>
         </View>
