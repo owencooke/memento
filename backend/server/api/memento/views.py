@@ -8,10 +8,12 @@ import json
 from typing import Annotated, Optional
 
 import pytesseract
-from fastapi import APIRouter, Depends, Form, UploadFile
+from fastapi import APIRouter, Depends, Form, UploadFile, BackgroundTasks
 from fastapi.responses import JSONResponse
 from loguru import logger
 from pydantic import UUID4
+
+from PIL import Image
 
 from server.api.memento.models import (
     CreateMementoSuccessResponse,
@@ -26,6 +28,8 @@ from server.services.db.queries.image import (
     create_image_metadata,
     delete_image_metadata,
     get_images_for_memento,
+    update_detected_text,
+    update_image_label,
     update_image_order,
 )
 from server.services.db.queries.memento import (
@@ -66,8 +70,33 @@ def get_users_mementos(
     return mementos
 
 
+# Helper function for image processing for creating/editing a memento
+def process_images_in_background(
+    images: list[tuple[Image.Image, str]],
+    memento_id: int
+):
+    """Handles image processing in the background."""
+    for image, filename in images:  # Accessing each tuple's Image and filename
+        try:
+            # Extract text from the image
+            extracted_text = pytesseract.image_to_string(image)
+            
+            # Classify label
+            predicted_class = predict_class(image)
+            
+            update_detected_text(memento_id, filename, extracted_text)
+            logger.info(f"Adding detected text: {extracted_text}")
+
+            update_image_label(memento_id, filename, predicted_class)
+            logger.info(f"Adding predicted class: {predicted_class}")
+            
+        except Exception as e:
+            logger.error(f"Failed to process image {filename}: {e}")
+
+
 @router.post("/")
 async def create_new_memento(
+    background_tasks: BackgroundTasks,
     memento_str: Annotated[str, Form()],
     image_metadata_str: Annotated[str, Form()],
     images: list[UploadFile],
@@ -91,6 +120,7 @@ async def create_new_memento(
     # Create new memento in DB
     new_memento = create_memento(memento, user_id)
 
+    pil_images = []
     for i in range(len(images)):
         # Upload image to object storage
         path = await upload_image(images[i])
@@ -98,25 +128,22 @@ async def create_new_memento(
         # Create new image metadata records in DB
         image_metadata[i].filename = path
 
-        image = await upload_file_to_pil(images[i])
-
-        # Extract text
-        extracted_text = pytesseract.image_to_string(image)
-        image_metadata[i].detected_text = extracted_text
-        logger.info(f"Adding detected text: {extracted_text}")
-
-        # Classify label
-        predicted_class = predict_class(image)
-        image_metadata[i].image_label = predicted_class
-        logger.info(f"Adding predicted class: {predicted_class}")
-
         create_image_metadata(image_metadata[i], new_memento.id)
+
+        new_image = await upload_file_to_pil(images[i])
+        pil_images.append((new_image, path))
+
+    background_tasks.add_task(
+        process_images_in_background, pil_images, new_memento.id
+    )
+    logger.info(f"Running image processing in the background...")
 
     return CreateMementoSuccessResponse(new_memento_id=new_memento.id)
 
 
 @router.put("/{id}")
 async def update_memento_and_images(
+    background_tasks: BackgroundTasks,
     id: int,
     memento_str: Annotated[str, Form()],
     image_metadata_str: Annotated[str, Form()],
@@ -164,6 +191,7 @@ async def update_memento_and_images(
 
     # New images
     if images:
+        pil_images = []
         for image in images:
             # Upload image file to storage
             path = await upload_image(image)
@@ -174,20 +202,17 @@ async def update_memento_and_images(
             )
             new_metadata.filename = path
 
-            new_image = await upload_file_to_pil(image)
-            
-            # Extract text
-            extracted_text = pytesseract.image_to_string(new_image)
-            new_metadata.detected_text = extracted_text
-            logger.info(f"Adding detected text: {extracted_text}")
-
-            # Classify label
-            predicted_class = predict_class(new_image)
-            new_metadata.image_label = predicted_class
-            logger.info(f"Adding predicted class: {predicted_class}")
-
+            # Create image metadata in DB
             create_image_metadata(new_metadata, updated_memento.id)
-            logger.info(f"Created image metadata record for {image.filename}")
+            logger.info(f"Created image metadata record for {metadata.filename}")
+
+            new_image = await upload_file_to_pil(image)
+            pil_images.append((new_image, path))
+
+        background_tasks.add_task(
+            process_images_in_background, pil_images, updated_memento.id
+        )
+        logger.info(f"Running image processing in the background...")
 
     return JSONResponse(
         content={"message": f"Successfully updated Memento[{updated_memento.id}]"},
