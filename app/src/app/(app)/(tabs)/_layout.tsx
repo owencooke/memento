@@ -4,9 +4,12 @@ import { IconSymbol } from "@/src/components/ui/IconSymbol";
 import TabBarBackground from "@/src/components/ui/TabBarBackground";
 import Header from "@/src/components/navigation/Header";
 import { useColors } from "@/src/hooks/useColors";
+import { useWebSocket } from "@/src/hooks/useWebSocket";
 
 export default function TabLayout() {
   const { getColor } = useColors();
+
+  useWebSocket();
 
   return (
     <Tabs
