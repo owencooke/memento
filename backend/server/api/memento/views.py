@@ -1,6 +1,6 @@
 """
 @description CRUD API routes for Keepsakes/Mementos.
-@requirements FR-12, FR-13, FR-14, FR-15, FR-17, FR-19, FR-20, FR-21, FR-26, FR-27,\
+@requirements FR-8, FR-11, FR-12, FR-13, FR-14, FR-15, FR-17, FR-19, FR-20, FR-21, FR-26, FR-27,\
         FR-28, FR-30, FR31, FR-32, FR-33
 """
 
@@ -173,6 +173,19 @@ async def update_memento_and_images(
                 new for new in image_metadata if new.filename == image.filename
             )
             new_metadata.filename = path
+
+            new_image = await upload_file_to_pil(image)
+            
+            # Extract text
+            extracted_text = pytesseract.image_to_string(new_image)
+            new_metadata.detected_text = extracted_text
+            logger.info(f"Adding detected text: {extracted_text}")
+
+            # Classify label
+            predicted_class = predict_class(new_image)
+            new_metadata.image_label = predicted_class
+            logger.info(f"Adding predicted class: {predicted_class}")
+
             create_image_metadata(new_metadata, updated_memento.id)
             logger.info(f"Created image metadata record for {image.filename}")
 

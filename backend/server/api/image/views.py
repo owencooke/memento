@@ -1,6 +1,6 @@
 """
 @description API routes for Image Processing
-@requirements FR-10
+@requirements FR-8, FR-10, FR-11
 """
 
 import pytesseract
