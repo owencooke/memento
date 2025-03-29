@@ -5,6 +5,15 @@ import { Center } from "@/src/components/ui/center";
 import { Spinner } from "@/src/components/ui/spinner";
 import Header from "@/src/components/navigation/Header";
 import { useWebSocket } from "@/src/hooks/useWebSocket";
+import * as Notifications from "expo-notifications";
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
 
 export default function AppLayout() {
   const { session, isLoading } = useSession();

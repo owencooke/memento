@@ -3,6 +3,7 @@ import { useSession } from "../context/AuthContext";
 import { getWsUrl } from "../api-client/config";
 import { WebSocketMessage } from "../api-client/generated";
 import { AppState } from "react-native";
+import * as Notifications from "expo-notifications";
 
 export const useWebSocket = () => {
   const { session } = useSession();
@@ -10,8 +11,7 @@ export const useWebSocket = () => {
 
   const processMessage = (message: WebSocketMessage) => {
     if (message.type === "recommendation") {
-      // TODO: add recommendatione event handler
-      console.log("Received recommendation:", message.body);
+      handleRecommendedCollection(message.body as number[]);
     } else {
       console.log("WS received undefined message type:", message);
     }
@@ -60,4 +60,21 @@ export const useWebSocket = () => {
       wsRef.current = null;
     };
   }, [connect]);
+};
+
+const handleRecommendedCollection = (mementoIds: number[]) => {
+  console.log(
+    "Sending in-app notification for recommended collection:",
+    mementoIds,
+  );
+  Notifications.scheduleNotificationAsync({
+    content: {
+      title: "A new collection, just for you! 🗂️",
+      body: "We've curated a special set of memories. Tap to check them out!",
+      data: {
+        url: `/(app)/(screens)/collection/create?ids=${mementoIds}`,
+      },
+    },
+    trigger: null,
+  });
 };
