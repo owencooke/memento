@@ -87,6 +87,25 @@ export default function CollectionForm({
     location: GeoLocation | null;
   }>({ date: null, location: null });
 
+  useEffect(() => {
+    const selectedMementos = mementos?.filter((memento) =>
+      selectedMementoIds.includes(memento.id),
+    );
+
+    if (selectedMementos && selectedMementos.length > 0) {
+      setDerivedMetadata({ date: null, location: null });
+      aggregateMetadata(selectedMementos).then(({ date, location }) => {
+        if (date || location) {
+          setDerivedMetadata({ date, location });
+          setShowModal(true);
+        }
+      });
+    } else {
+      setDerivedMetadata({ date: null, location: null });
+    }
+    setValue("mementoIds", selectedMementoIds);
+  }, [selectedMementoIds, mementos, setValue]);
+
   // Updates the location input when GeoLocation changes
   const locationValue = watch("location");
   const handleLocationChange = useCallback(
@@ -108,25 +127,6 @@ export default function CollectionForm({
       `/(app)/(screens)/collection/select_mementos?ids=${selectedMementoIds}`,
     );
   };
-
-  useEffect(() => {
-    const selectedMementos = mementos?.filter((memento) =>
-      selectedMementoIds.includes(memento.id),
-    );
-
-    if (selectedMementos && selectedMementos.length > 0) {
-      setDerivedMetadata({ date: null, location: null });
-      aggregateMetadata(selectedMementos).then(({ date, location }) => {
-        if (date || location) {
-          setDerivedMetadata({ date, location });
-          setShowModal(true);
-        }
-      });
-    } else {
-      setDerivedMetadata({ date: null, location: null });
-    }
-    setValue("mementoIds", selectedMementoIds);
-  }, [selectedMementoIds, mementos, setValue]);
 
   const handleAccept = ({
     location,
