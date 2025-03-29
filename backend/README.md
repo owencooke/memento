@@ -35,6 +35,14 @@ Lastly, install the project's Python dependencies via Poetry:
 poetry install
 ```
 
+#### Installing PyTesseract
+
+PyTesseract (https://github.com/madmaze/pytesseract) is used for OCR. To install:
+
+1. Install tesseract (https://tesseract-ocr.github.io/tessdoc/Installation.html) for your OS
+2. Add Tesseract to your PATH
+3. Run tesseract --version in your terminal. If it runs, then PyTesseract is installed.
+
 #### Setting Environment Variables
 
 The Supabase URL, Key, and Database URL must be declared in the .env file:

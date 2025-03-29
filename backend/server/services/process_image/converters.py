@@ -8,6 +8,7 @@ from PIL import Image
 async def upload_file_to_pil(image: UploadFile) -> Image.Image:
     """Converts a FastAPI UploadFile to a PIL Image."""
     image_bytes = await image.read()
+    await image.seek(0)
     return Image.open(BytesIO(image_bytes))
 
 

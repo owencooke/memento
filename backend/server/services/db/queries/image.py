@@ -41,3 +41,29 @@ def update_image_order(id: int, order_index: int) -> bool:
         .execute()
     )
     return len(response.data) == 1
+
+
+def update_detected_text(memento_id: int, filename: str, text: str) -> bool:
+    """Updates the detected text of an image"""
+    response = (
+        supabase.table("image")
+        .update({"detected_text": text})
+        .eq("memento_id", memento_id)
+        .eq("filename", filename)
+        .execute()
+    )
+
+    return len(response.data) == 1
+
+
+def update_image_label(memento_id: int, filename: str, text: str) -> bool:
+    """Updates the label of an image"""
+    response = (
+        supabase.table("image")
+        .update({"image_label": text})
+        .eq("memento_id", memento_id)
+        .eq("filename", filename)
+        .execute()
+    )
+
+    return len(response.data) == 1
