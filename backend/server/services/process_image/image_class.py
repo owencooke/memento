@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-from loguru import logger
 from PIL import Image
 from tensorflow.keras.applications.resnet50 import (  # type: ignore
     ResNet50,  # type: ignore
@@ -45,11 +44,5 @@ def predict_class(pil_img: Image.Image):
     x = preprocess_input(x)
 
     preds = model.predict(x)
-    logger.info({model})
-    logger.info("DEBUG", str(preds))
 
-    results = decode_predictions(preds, top=1)
-
-    logger.info("DEBUG", str(results))
-
-    return decode_predictions(preds, top=1)[0][1]  # Best prediction
+    return decode_predictions(preds, top=1)[0][0][1]  # Best prediction
