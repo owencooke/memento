@@ -28,16 +28,16 @@ export default function EditCollection() {
   const user_id = String(session?.user.id);
   // Get existing collection and IDs of the collection's mementos
   const { id, ids } = useLocalSearchParams();
-  
+
   // Array of the collection's memento IDs
-  const ids_array: Number[] = !ids
+  const ids_array: number[] = !ids
     ? []
     : Array.isArray(ids)
-    ? ids.map(Number)
-    : ids.split(",").map(Number);
+      ? ids.map(Number)
+      : ids.split(",").map(Number);
 
   // Store the initial IDs in a ref to preserve them across renders
-  const initialIdsRef = useRef<Number[]>(ids_array);
+  const initialIdsRef = useRef<number[]>(ids_array);
 
   const { data: collections } = useQuery({
     ...getUsersCollectionsApiUserUserIdCollectionGetOptions({
@@ -76,7 +76,8 @@ export default function EditCollection() {
   // PUT Edit Collection Form
   const onSubmit = async (form: CollectionFormData) => {
     // Skip form submission if no changes made
-    const idsAreEqual = JSON.stringify(initialIdsRef.current) === JSON.stringify(ids_array);
+    const idsAreEqual =
+      JSON.stringify(initialIdsRef.current) === JSON.stringify(ids_array);
     if (isEqual(form, initialFormValues) && idsAreEqual) {
       handleRedirect();
       return;

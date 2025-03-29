@@ -451,6 +451,71 @@ export type UpdateCollectionAndMementosApiUserUserIdCollectionIdPutResponses = {
 
 export type UpdateCollectionAndMementosApiUserUserIdCollectionIdPutResponse = UpdateCollectionAndMementosApiUserUserIdCollectionIdPutResponses[keyof UpdateCollectionAndMementosApiUserUserIdCollectionIdPutResponses];
 
+export type GenerateCollageApiUserUserIdCollectionIdCollageGetData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/api/user/{user_id}/collection/{id}/collage';
+};
+
+export type GenerateCollageApiUserUserIdCollectionIdCollageGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GenerateCollageApiUserUserIdCollectionIdCollageGetError = GenerateCollageApiUserUserIdCollectionIdCollageGetErrors[keyof GenerateCollageApiUserUserIdCollectionIdCollageGetErrors];
+
+export type GenerateCollageApiUserUserIdCollectionIdCollageGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
+export type TestCollageApiTestingCollageGetData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * Local folder path containing test image files
+         */
+        folder_path: string;
+        /**
+         * Collection title
+         */
+        title?: string;
+        /**
+         * Collection caption
+         */
+        caption?: string | null;
+        /**
+         * Collection location
+         */
+        location?: string | null;
+    };
+    url: '/api/testing/collage';
+};
+
+export type TestCollageApiTestingCollageGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type TestCollageApiTestingCollageGetError = TestCollageApiTestingCollageGetErrors[keyof TestCollageApiTestingCollageGetErrors];
+
+export type TestCollageApiTestingCollageGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
 export type ClientOptions = {
     baseUrl: `${string}://${string}` | (string & {});
 };

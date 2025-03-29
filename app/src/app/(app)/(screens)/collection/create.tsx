@@ -32,11 +32,11 @@ export default function CreateCollection() {
   const params = useLocalSearchParams();
 
   // Array of memento IDs selected by the user
-  const ids: Number[] = !params.ids
+  const ids: number[] = !params.ids
     ? []
     : Array.isArray(params.ids)
-    ? params.ids.map(Number)
-    : params.ids.split(",").map(Number);
+      ? params.ids.map(Number)
+      : params.ids.split(",").map(Number);
 
   /**
    * Handles form submission by creating a new collection.

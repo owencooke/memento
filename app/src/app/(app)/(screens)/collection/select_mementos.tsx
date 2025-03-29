@@ -1,21 +1,13 @@
-import { getUsersMementosApiUserUserIdMementoGetOptions } from "@/src/api-client/generated/@tanstack/react-query.gen";
-import MementoCard from "@/src/components/cards/MementoCard";
-import { useSession } from "@/src/context/AuthContext";
-import { useQuery } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
-import {
-  View,
-  Text,
-  FlatList,
-  Pressable,
-  StyleProp,
-  ViewStyle,
-} from "react-native";
-import { useLayoutEffect, useRef, useState } from "react";
+import { View } from "react-native";
+import { useState } from "react";
 import { Button, ButtonText } from "@/src/components/ui/button";
 import { MementoWithImages } from "@/src/api-client/generated";
-import { Fab, FabIcon } from "@/src/components/ui/fab";
-import { CheckIcon } from "@/src/components/ui/icon";
+import { useMementos } from "@/src/hooks/useMementos";
+import { Heading } from "@/src/components/ui/heading";
+import { SafeAreaView } from "react-native-safe-area-context";
+import MementoGrid from "@/src/components/lists/MementoGrid";
+import { Text } from "@/src/components/ui/text";
 
 /**
  * @description Screen for selecting mementos to add to a collection
@@ -26,179 +18,82 @@ import { CheckIcon } from "@/src/components/ui/icon";
  * @returns {JSX.Element} Rendered SelectMementos screen.
  */
 export default function SelectMementos() {
-  const { session } = useSession();
+  // Get local search params for pre-selected mementos IDs
+  const { ids: idsString } = useLocalSearchParams<{ ids: string }>();
+  const preSelectedIds = !idsString
+    ? []
+    : Array.isArray(idsString)
+      ? idsString.map(Number)
+      : idsString.split(",").map(Number);
 
-  // Extend the MementoWithImages type locally
-  type MementoWithUIProps = MementoWithImages & {
-    style?: StyleProp<ViewStyle> | null;
-    selected?: boolean | null;
-  };
-
-  const {
-    data: mementos,
-    isLoading,
-    isFetching,
-  } = useQuery({
-    ...getUsersMementosApiUserUserIdMementoGetOptions({
-      path: {
-        user_id: session?.user.id ?? "",
-      },
-    }),
-    refetchOnMount: false,
+  const { mementos } = useMementos({
+    queryOptions: { refetchOnMount: false },
   });
 
-  // Convert fetched mementos to extended type
-  const mementosWithUI: MementoWithUIProps[] =
-    mementos?.map((memento) => ({
-      ...memento,
-      style: null,
-      selected: false,
-    })) ?? [];
+  // State for tracking selected memento IDs (initialized with prev selected)
+  const [selectedIds, setSelectedIds] = useState<Record<number, boolean>>(() =>
+    preSelectedIds.reduce(
+      (acc, id) => {
+        acc[id] = true;
+        return acc;
+      },
+      {} as Record<number, boolean>,
+    ),
+  );
 
-  // For odd number of mementos, add a spacer for last grid element
-  const gridData =
-    mementosWithUI?.length && mementosWithUI.length % 2
-      ? [...mementosWithUI, { spacer: true }]
-      : mementosWithUI;
+  // Calculate selected count
+  const selectedCount = Object.keys(selectedIds).length;
 
-  // Receive already selected mementos from form screen
-  const params = useLocalSearchParams()
-  
-  // Array of memento IDs selected by the user
-  const ids_received: Number[] = !params.ids
-    ? []
-    : Array.isArray(params.ids)
-      ? params.ids.map(Number)
-      : params.ids.split(",").map(Number);
-  
-  const [ids, setIds] = useState({}); // IDs of mementos selected
-  const [selectedCount, setSelectedCount] = useState(0); // Number of mementos selected
-  
-  const hasInitializedRef = useRef(false);
-
-  // Select the mementos that were already selected on the form
-  useLayoutEffect(() => {
-    if (!hasInitializedRef.current) {
-      const updatedMementos = mementosWithUI.map((memento) => ({
-        ...memento,
-        selected: ids_received.includes(memento.id),  // Select if ID is in the list
-      }));
-
-      // Update state once with all selections
-      setMementosWithUIState(updatedMementos);
-
-      // Update selected count
-      const initialCount = updatedMementos.filter((m) => m.selected).length;
-      setSelectedCount(initialCount);
-
-      // Store the selected IDs
-      const initialIds = Object.fromEntries(
-        updatedMementos
-          .filter((m) => m.selected)
-          .map((m) => [m.id, m.id])
-      );
-      setIds(initialIds);
-
-      hasInitializedRef.current = true;  // Prevent further calls
-    }
-  }, [mementosWithUI, ids_received]);
-
-  const [mementosWithUIState, setMementosWithUIState] = useState(gridData);
-
-  const handleSelectMemento = (item: MementoWithUIProps) => {
-    const updatedMementos = mementosWithUIState.map((m) =>
-      "id" in m && m.id === item.id ? { ...m, selected: !m.selected } : m,
-    );
-
-    setMementosWithUIState(updatedMementos);
-
-    const newSelectedCount = updatedMementos.filter(
-      (m) => "selected" in m && m.selected,
-    ).length;
-    setSelectedCount(newSelectedCount);
-
-    // Get the updated selected status from the updatedMementos array
-    const updatedItem = updatedMementos.find(
-      (m) => "id" in m && m.id === item.id,
-    );
-
-    setIds((prev) => {
-      if (updatedItem && "selected" in updatedItem && updatedItem.selected) {
-        // Item selected
-        return { ...prev, [updatedItem.id]: updatedItem.id };
-      } else if (
-        updatedItem &&
-        "selected" in updatedItem &&
-        !updatedItem.selected
-      ) {
-        // Item unselected
-        return Object.fromEntries(
-          Object.entries(prev).filter(
-            ([key]) => key !== updatedItem.id.toString(),
-          ),
-        );
+  // Toggle selection for a memento
+  const handleSelectMemento = (
+    memento: MementoWithImages & { selected?: boolean },
+  ) => {
+    setSelectedIds((prev) => {
+      const newState = { ...prev };
+      if (newState[memento.id]) {
+        delete newState[memento.id];
       } else {
-        return prev;
+        newState[memento.id] = true;
       }
+      return newState;
     });
   };
-
+  // Submit selected mementos
   const handleMementosSelected = () => {
-    const ids_string: string = Object.keys(ids).toString();
-
-    // Navigate back to the collection create page with selected mementos' IDs
+    const idsString = Object.keys(selectedIds).toString();
     router.back();
-    router.setParams({ ids: ids_string });
+    router.setParams({ ids: idsString });
   };
 
   return (
-    <View className="flex-1 bg-background-100 py-4 px-6">
-      {isLoading || isFetching ? (
-        <View className="flex-1 items-center justify-center">
-          <Text>Loading...</Text>
-        </View>
-      ) : mementosWithUI && mementosWithUI.length > 0 ? (
-        <View>
-          <FlatList
-            columnWrapperStyle={{ gap: 12 }}
-            contentContainerStyle={{ gap: 12 }}
-            numColumns={2}
-            showsVerticalScrollIndicator={false}
-            data={mementosWithUIState}
-            renderItem={({ item }) =>
-              "spacer" in item ? (
-                <View className="flex-1" />
-              ) : (
-                <Pressable
-                  className="flex-1"
-                  onPress={() => handleSelectMemento(item)}
-                >
-                  <MementoCard {...item} />
-                  {item.selected && (
-                    <Fab
-                      size="lg"
-                      className="w-12 h-12 absolute top-2 right-2 bg-green-500 pointer-events-none"
-                    >
-                      <FabIcon as={CheckIcon} />
-                    </Fab>
-                  )}
-                </Pressable>
-              )
-            }
-          />
+    <SafeAreaView className="flex-1 py-4 px-6" edges={["bottom"]}>
+      <MementoGrid
+        mementos={mementos?.map((memento) => ({
+          ...memento,
+          selected: !!selectedIds[memento.id],
+        }))}
+        onMementoPress={handleSelectMemento}
+        ListHeaderComponent={
+          <View className="flex justify-center gap-2">
+            <Heading className="block" size="2xl">
+              Select Mementos
+            </Heading>
+            <Text size="lg" className="text-left font-light mb-4">
+              Choose which mementos you want to be stored within this
+              collection!
+            </Text>
+          </View>
+        }
+        ListFooterComponent={
           <Button className="mt-4" size={"lg"} onPress={handleMementosSelected}>
-            {selectedCount > 0 ? (
-              <ButtonText>Select Mementos ({selectedCount})</ButtonText>
-            ) : (
-              <ButtonText>Select Mementos</ButtonText>
-            )}
+            <ButtonText>
+              {selectedCount > 0
+                ? `Select Mementos (${selectedCount})`
+                : "Select Mementos"}
+            </ButtonText>
           </Button>
-        </View>
-      ) : (
-        <View className="flex-1 items-center justify-center">
-          <Text>No mementos yet!</Text>
-        </View>
-      )}
-    </View>
+        }
+      />
+    </SafeAreaView>
   );
 }

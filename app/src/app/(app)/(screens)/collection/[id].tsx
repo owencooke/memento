@@ -1,12 +1,11 @@
 /**
- * @description Screen for viewing an collection
+ * @description Screen for viewing a collection
  * @requirements FR-3 FR-46
  */
 import {
   deleteCollectionApiUserUserIdCollectionIdDeleteMutation,
   getUsersCollectionsApiUserUserIdCollectionGetOptions,
   getUsersCollectionsApiUserUserIdCollectionGetQueryKey,
-  getUsersMementosApiUserUserIdMementoGetOptions,
 } from "@/src/api-client/generated/@tanstack/react-query.gen";
 import { ButtonIcon, Button } from "@/src/components/ui/button";
 import { EditIcon, ShareIcon, TrashIcon } from "@/src/components/ui/icon";
@@ -21,6 +20,7 @@ import { FlatList, Pressable } from "react-native";
 import MementoCard from "@/src/components/cards/MementoCard";
 import DeleteCollectionModal from "@/src/components/modals/DeleteModal";
 import { queryClient } from "@/src/app/_layout";
+import { useMementos } from "@/src/hooks/useMementos";
 
 const buttonClasses = "flex-1";
 const iconClasses = "w-6 h-6";
@@ -42,13 +42,8 @@ export default function ViewCollection() {
   const collection = collections?.find((c) => c.id === Number(id));
 
   // Get associated mementos
-  const { data: all_mementos } = useQuery({
-    ...getUsersMementosApiUserUserIdMementoGetOptions({
-      path: {
-        user_id: session?.user.id ?? "",
-      },
-    }),
-    refetchOnMount: false,
+  const { mementos: all_mementos } = useMementos({
+    queryOptions: { refetchOnMount: false },
   });
   const mementos = all_mementos?.filter((m) =>
     collection?.mementos.some((cm) => cm.memento_id === m.id),
@@ -79,13 +74,17 @@ export default function ViewCollection() {
     router.push(`/(app)/(screens)/memento/${id}`);
   };
 
+  const handleShareCollection = () =>
+    router.push(
+      `/(app)/(screens)/collection/collage/${collection?.id}?title=${collection?.title}`,
+    );
+
   // Delete collection
   const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
   const handleDeletePress = () => {
     setDeleteModalVisible(true);
   };
   const handleConfirmDelete = () => {
-    console.log("Deleting collection...");
     onDelete(Number(id)); // FIXME: collection?.id is number | undefined
   };
   const onDelete = async (id: number) => {
@@ -165,8 +164,11 @@ export default function ViewCollection() {
       </Box>
       {/* Options bar (info, edit, delete, share) */}
       <Box className="flex flex-row justify-between items-center bg-primary-500">
-        {/* TODO: open Share options */}
-        <Button size="xl" className={buttonClasses}>
+        <Button
+          size="xl"
+          className={buttonClasses}
+          onPress={handleShareCollection}
+        >
           <ButtonIcon as={ShareIcon} className={iconClasses} />
         </Button>
         <Button

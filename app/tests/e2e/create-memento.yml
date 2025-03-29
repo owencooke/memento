@@ -1,0 +1,60 @@
+appId: com.memento.app
+---
+- runFlow: ./util/launch.yml
+
+# Navigate to Create Memento page
+- tapOn:
+    id: fab-create-memento
+- tapOn: Create a single memento
+- assertVisible: Create Memento
+
+# Take a photo
+- assertNotVisible:
+    id: interactive-photo-card
+- tapOn:
+    id: photo-grid-add-button
+- tapOn: Take a Photo
+- tapOn:
+    id: camera-capture-button
+- assertVisible:
+    id: interactive-photo-card
+
+# Reject background removal
+- assertVisible:
+    id: modal-background-removal
+- tapOn:
+    id: modal-background-removal-decline
+
+# Select photos from device library
+# NOTE: requires at least 1 photo to have been added to device library
+- tapOn:
+    id: photo-grid-add-button
+- tapOn: Select from Library
+- tapOn:
+    text: ".*Photo taken on.*" # default "accessibilityText" value identified for photos downloaded from Chrome on emulator
+    index: 0
+- tapOn: Add (1)
+
+# Accept background removal
+- assertVisible:
+    id: modal-background-removal
+- tapOn:
+    id: modal-background-removal-confirm
+
+# Fill out other form fields
+- runFlow:
+    file: ./util/memento-form.yml
+    env:
+      CAPTION: "Single made by Maestro"
+      LOCATION_PARTIAL: "Edmon"
+      LOCATION_FULL: "Edmonton, AB, Canada"
+
+# Submit the form
+- tapOn:
+    id: memento-form-submit-button
+
+# Verify new memento added to grid view
+- assertVisible: Mementos
+- assertVisible: Single made by Maestro
+- assertVisible: ^\d{4}-\d{2}-01$
+- assertVisible: Edmonton

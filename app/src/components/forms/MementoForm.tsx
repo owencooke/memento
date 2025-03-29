@@ -16,7 +16,7 @@ import { AlertCircleIcon } from "@/src/components/ui/icon";
 import PhotoSelectGrid from "@/src/components/inputs/PhotoSelectGrid";
 import { FlatList } from "react-native";
 import { ReactElement, useCallback, useState } from "react";
-import { Photo } from "@/src/hooks/usePhotos";
+import { Photo } from "@/src/libs/photos";
 import DatePickerInput from "@/src/components/inputs/DatePickerInput";
 import LocationInput, {
   GeoLocation,
@@ -163,6 +163,7 @@ export default function MementoForm({
               render={({ field }) => (
                 <Textarea size="md" className="bg-background-0">
                   <TextareaInput
+                    testID="memento-form-caption"
                     onChangeText={(text) => field.onChange(text)}
                     value={field.value}
                     placeholder="Ex: an ancient seashell found in Hawaii"
@@ -180,6 +181,7 @@ export default function MementoForm({
               control={control}
               render={({ field }) => (
                 <DatePickerInput
+                  testID="memento-form-date"
                   value={field.value}
                   onChange={(date) => field.onChange(date)}
                 />
@@ -195,6 +197,7 @@ export default function MementoForm({
               control={control}
               render={({ field }) => (
                 <LocationInput
+                  testID="memento-form-location"
                   value={field.value}
                   onChange={handleLocationChange}
                 />
@@ -202,6 +205,7 @@ export default function MementoForm({
             />
           </FormControl>
           <Button
+            testID="memento-form-submit-button"
             className="mt-auto"
             size={"lg"}
             onPress={handleSubmit(onSubmit)}

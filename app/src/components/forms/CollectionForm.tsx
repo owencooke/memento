@@ -1,5 +1,5 @@
 import { useForm, Controller } from "react-hook-form";
-import { ScrollView, View } from "react-native";
+import { View } from "react-native";
 import {
   FormControl,
   FormControlError,
@@ -13,20 +13,17 @@ import { Input, InputField } from "@/src/components/ui/input";
 import { Textarea, TextareaInput } from "@/src/components/ui/textarea";
 import { Button, ButtonSpinner, ButtonText } from "@/src/components/ui/button";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { AlertCircleIcon, TrashIcon } from "@/src/components/ui/icon";
+import { AlertCircleIcon } from "@/src/components/ui/icon";
 import LocationInput, {
   GeoLocation,
 } from "@/src/components/inputs/LocationInput";
 import { FlatList } from "react-native";
 import DatePickerInput from "@/src/components/inputs/DatePickerInput";
-import MementoCard from "../cards/MementoCard";
-import { Fab, FabIcon } from "../ui/fab";
 import { router, useLocalSearchParams } from "expo-router";
-import { useQuery } from "@tanstack/react-query";
-import { getUsersMementosApiUserUserIdMementoGetOptions } from "@/src/api-client/generated/@tanstack/react-query.gen";
-import { useSession } from "@/src/context/AuthContext";
 import { aggregateMetadata } from "@/src/libs/metadata";
 import AutofillFieldsModal from "../modals/AutofillFieldsModal";
+import { useMementos } from "@/src/hooks/useMementos";
+import MementoGrid from "../lists/MementoGrid";
 
 /**
  * Form values for the CreateCollection screen
@@ -54,13 +51,14 @@ export default function CollectionForm({
   isSubmitting,
   onSubmit,
 }: CollectionFormProps) {
-  const defaultValues: CollectionFormData = {
-    title: "",
-    caption: "",
-    date: null,
-    location: { text: "" },
-    mementoIds: [],
-  };
+  // Get local search params for selected mementos from select_mementos page
+  const { ids: idsString } = useLocalSearchParams<{ ids: string }>();
+  const selectedMementoIds = useMemo(() => {
+    if (!idsString) return [];
+    return Array.isArray(idsString)
+      ? idsString.map(Number)
+      : idsString.split(",").map(Number);
+  }, [idsString]);
 
   const {
     control,
@@ -69,10 +67,19 @@ export default function CollectionForm({
     setValue,
     formState: { errors },
   } = useForm<CollectionFormData>({
-    defaultValues: initialValues || defaultValues,
+    defaultValues: initialValues || {
+      title: "",
+      caption: "",
+      date: null,
+      location: { text: "" },
+      mementoIds: [],
+    },
   });
 
-  const { session } = useSession();
+  // Prevent re-rendering location input when Geolocation changes
+  const { mementos } = useMementos({
+    queryOptions: { refetchOnMount: false },
+  });
 
   const [showModal, setShowModal] = useState(false);
   const [derivedMetadata, setDerivedMetadata] = useState<{
@@ -80,13 +87,8 @@ export default function CollectionForm({
     location: GeoLocation | null;
   }>({ date: null, location: null });
 
-  // Prevent re-rendering location input when Geolocation changes
+  // Updates the location input when GeoLocation changes
   const locationValue = watch("location");
-  /**
-   * Updates the location input when GeoLocation changes
-   *
-   * @param {GeoLocation} location - new location value
-   */
   const handleLocationChange = useCallback(
     (location: GeoLocation) => {
       const hasChanged =
@@ -101,30 +103,11 @@ export default function CollectionForm({
     [locationValue, setValue],
   );
 
-  const { data: mementos } = useQuery({
-    ...getUsersMementosApiUserUserIdMementoGetOptions({
-      path: {
-        user_id: session?.user.id ?? "",
-      },
-    }),
-    refetchOnMount: false,
-  });
-
   const handleAddMementosPress = () => {
-    const ids = selectedMementoIds.join(",");
-    router.push(`/(app)/(screens)/collection/select_mementos?ids=${ids}`);
+    router.push(
+      `/(app)/(screens)/collection/select_mementos?ids=${selectedMementoIds}`,
+    );
   };
-
-  // Receive selected mementos from select_mementos page
-  const params = useLocalSearchParams();
-
-  // Array of memento IDs selected by the user
-  const selectedMementoIds = useMemo(() => {
-    if (!params.ids) return [];
-    return Array.isArray(params.ids)
-      ? params.ids.map(Number)
-      : params.ids.split(",").map(Number);
-  }, [params.ids]);
 
   useEffect(() => {
     const selectedMementos = mementos?.filter((memento) =>
@@ -274,45 +257,15 @@ export default function CollectionForm({
                 render={({ field: { value } }) => (
                   <>
                     {value.length > 0 && (
-                      <View className="flex-1 bg-background-100 py-4">
-                        <ScrollView
-                          horizontal={true}
-                          showsHorizontalScrollIndicator={false}
-                          contentContainerStyle={{
-                            gap: 12,
-                            flexDirection: "row",
-                          }}
-                        >
-                          {value?.map((id) => {
-                            const memento = mementos?.find((m) => m.id === id);
-                            return memento ? (
-                              <View key={id}>
-                                <MementoCard {...memento} />
-                                <Fab
-                                  size="lg"
-                                  onPress={() => {
-                                    const updatedIds = value.filter(
-                                      (value) => value !== id,
-                                    );
-                                    setValue("mementoIds", updatedIds);
-                                    router.setParams({
-                                      ids: updatedIds.length
-                                        ? updatedIds.join(",")
-                                        : "",
-                                    });
-                                  }}
-                                >
-                                  <FabIcon as={TrashIcon} />
-                                </Fab>
-                              </View>
-                            ) : (
-                              <View className="flex-1" />
-                            );
-                          })}
-                        </ScrollView>
+                      <View className="flex-1 py-4">
+                        <MementoGrid
+                          numColumns={3}
+                          mementos={mementos?.filter((memento) =>
+                            value.includes(memento.id),
+                          )}
+                        />
                       </View>
                     )}
-
                     <Button
                       className="mt-auto"
                       action="secondary"
