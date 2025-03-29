@@ -44,6 +44,7 @@ def update_image_order(id: int, order_index: int) -> bool:
 
 
 def update_detected_text(memento_id: int, filename: str, text: str) -> bool:
+    """Updates the detected text of an image"""
     response = (
         supabase.table("image")
         .update({"detected_text": text})
@@ -56,6 +57,7 @@ def update_detected_text(memento_id: int, filename: str, text: str) -> bool:
 
 
 def update_image_label(memento_id: int, filename: str, text: str) -> bool:
+    """Updates the label of an image"""
     response = (
         supabase.table("image")
         .update({"image_label": text})

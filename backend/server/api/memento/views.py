@@ -74,7 +74,7 @@ def get_users_mementos(
 def process_images_in_background(
     images: list[tuple[Image.Image, str]],
     memento_id: int
-):
+) -> None:
     """Handles image processing in the background."""
     for image, filename in images:  # Accessing each tuple's Image and filename
         try:

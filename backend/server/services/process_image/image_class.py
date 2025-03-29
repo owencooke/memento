@@ -13,7 +13,8 @@ model = ResNet50(weights="imagenet")
 
 
 # Function to process PIL.Image
-def predict_class(pil_img: Image.Image):
+def predict_class(pil_img: Image.Image) -> str:
+    """Classify an image using a classification model"""
     # Convert PIL image to OpenCV format (BGR)
     img = np.array(pil_img)
     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)

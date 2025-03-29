@@ -36,20 +36,18 @@ async def extract_text(image_file: UploadFile) -> str:
     """Uses OCR library to extract text from image"""
     try:
         input_image = await upload_file_to_pil(image_file)
-        extracted_text = pytesseract.image_to_string(input_image)
 
-        return extracted_text
+        return pytesseract.image_to_string(input_image)
 
     except Exception as e:
         return {"error": str(e)}
 
 
 @router.post("/classify")
-async def extract_text(image_file: UploadFile) -> str:
+async def classify_image(image_file: UploadFile) -> str:
     """Test route for using Tensorflow/Keras to classify image"""
     try:
         input_image = await upload_file_to_pil(image_file)
-        result = predict_class(input_image)
-        return result
+        return predict_class(input_image)
     except Exception as e:
         return {"error": str(e)}
