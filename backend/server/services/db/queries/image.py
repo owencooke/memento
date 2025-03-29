@@ -1,6 +1,6 @@
 """
 @description Supabase DB queries for Image Metadata.
-@requirements FR-21, FR-32
+@requirements FR-8, FR-11, FR-21, FR-32
 """
 
 from server.api.memento.models import NewImageMetadata
@@ -32,38 +32,13 @@ def delete_image_metadata(id: int) -> bool:
     return len(response.data) == 1
 
 
-def update_image_order(id: int, order_index: int) -> bool:
-    """Updates an image metadata record with new re-ordered index."""
-    response = (
-        supabase.table("image")
-        .update({"order_index": order_index})
-        .eq("id", id)
-        .execute()
-    )
-    return len(response.data) == 1
-
-
-def update_detected_text(memento_id: int, filename: str, text: str) -> bool:
+def update_image(memento_id: int, filename: str, field: str, value: str | int) -> bool:
     """Updates the detected text of an image"""
     response = (
         supabase.table("image")
-        .update({"detected_text": text})
+        .update({field: value})
         .eq("memento_id", memento_id)
         .eq("filename", filename)
         .execute()
     )
-
-    return len(response.data) == 1
-
-
-def update_image_label(memento_id: int, filename: str, text: str) -> bool:
-    """Updates the label of an image"""
-    response = (
-        supabase.table("image")
-        .update({"image_label": text})
-        .eq("memento_id", memento_id)
-        .eq("filename", filename)
-        .execute()
-    )
-
     return len(response.data) == 1
