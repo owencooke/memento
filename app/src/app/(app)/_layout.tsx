@@ -4,9 +4,12 @@ import { useSession } from "@/src/context/AuthContext";
 import { Center } from "@/src/components/ui/center";
 import { Spinner } from "@/src/components/ui/spinner";
 import Header from "@/src/components/navigation/Header";
+import { useWebSocket } from "@/src/hooks/useWebSocket";
 
 export default function AppLayout() {
   const { session, isLoading } = useSession();
+
+  useWebSocket();
 
   // Checking auth session
   if (isLoading) {

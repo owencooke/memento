@@ -3,15 +3,27 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException, Query, Response
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Query, Response
 from loguru import logger
 from PIL import Image
+from pydantic import UUID4
 
+from server.background_tasks.recommend import recommend_collection
 from server.services.db.models.schema_public_latest import Collection
 from server.services.process_image.collage.generator import CollageGenerator
 from server.services.process_image.converters import pil_to_png_bytes
 
 router = APIRouter(prefix="/testing", tags=["testing"])
+
+
+@router.post("/recommend-collection/{user_id}")
+def test_recommend_collection(
+    background_tasks: BackgroundTasks,
+    user_id: UUID4,
+) -> str:
+    """Test endpoint for recommending a collection via WS."""
+    background_tasks.add_task(recommend_collection, user_id)
+    return "Scheduled recommend_collection background task."
 
 
 @router.get("/collage")
