@@ -19,6 +19,7 @@ import {
 } from "../ui/checkbox";
 import { VStack } from "../ui/vstack";
 import { CheckIcon } from "../ui/icon";
+import { toISODateString } from "@/src/libs/date";
 
 interface AutofillFieldsModalProps {
   location: string;
@@ -61,7 +62,7 @@ export default function AutofillFieldsModal({
                   <CheckboxIcon as={CheckIcon} />
                 </CheckboxIndicator>
                 <CheckboxLabel className="flex-1">
-                  Use date: {date.toISOString()}
+                  Use date: {toISODateString(date)}
                 </CheckboxLabel>
               </Checkbox>
             </VStack>
