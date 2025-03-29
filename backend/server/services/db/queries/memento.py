@@ -23,7 +23,7 @@ def create_memento(new_memento: NewMemento, user_id: UUID4) -> Memento:
 
 def get_mementos(
     user_id: UUID4,
-    filter_query: MementoFilterParams | None,
+    filter_query: MementoFilterParams | None = None,
 ) -> list[MementoWithImages]:
     """Gets all the mementos belonging to a user."""
     query = (
