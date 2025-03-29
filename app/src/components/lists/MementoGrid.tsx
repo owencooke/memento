@@ -38,7 +38,7 @@ export default function MementoGrid<ItemT extends MementoWithImages>({
 
   return (
     <FlatList
-      columnWrapperStyle={{ gap: 12 }}
+      columnWrapperStyle={{ gap: 12, marginBottom: showText ? 0 : 12 }}
       contentContainerStyle={{ gap: 12, flexGrow: 1 }}
       numColumns={numColumns}
       showsVerticalScrollIndicator={false}
