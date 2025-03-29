@@ -10,10 +10,18 @@ from server.api.websocket.models import (
 
 
 class WebSocketManager:
-    def __init__(self):
+    """Abstracts logic for managing and utilizing WebSocket connections"""
+
+    def __init__(self) -> None:
+        """Initiliaze with no connections."""
         self.state = WebSocketState(connections={})
 
-    async def connect(self, user_id: UUID4, session_id: UUID4, websocket: WebSocket):
+    async def connect(
+        self,
+        user_id: UUID4,
+        session_id: UUID4,
+        websocket: WebSocket,
+    ) -> None:
         """Adds a WebSocket connection for a user and specific session."""
         logger.info(
             f"Accepting WS connection for user[{user_id}] session[{session_id}]",
@@ -23,7 +31,7 @@ class WebSocketManager:
             self.state.connections[user_id] = UserConnections(sessions={})
         self.state.connections[user_id].sessions[session_id] = websocket
 
-    async def disconnect(self, user_id: UUID4, session_id: UUID4):
+    async def disconnect(self, user_id: UUID4, session_id: UUID4) -> None:
         """Removes a WebSocket connection for a specific session."""
         logger.info(f"Disconnecting WS for user[{user_id}] session[{session_id}]")
         if user_id in self.state.connections:
@@ -33,7 +41,7 @@ class WebSocketManager:
             if not self.state.connections[user_id].sessions:
                 self.state.connections.pop(user_id, None)
 
-    async def send_message(self, user_id: UUID4, message: WebSocketMessage):
+    async def send_message(self, user_id: UUID4, message: WebSocketMessage) -> None:
         """Sends a message to all sessions for a specific user."""
         logger.info(f"Sending message to client via WS: {message}")
         if user_id in self.state.connections:

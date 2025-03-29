@@ -6,18 +6,30 @@ from pydantic import UUID4, BaseModel, ConfigDict
 
 
 class UserConnections(BaseModel):
-    sessions: dict[UUID4, WebSocket]  # session_id -> WebSocket
+    """Active WebSocket sessions for a specific user."""
+
+    sessions: dict[UUID4, WebSocket]
+
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
 
 class WebSocketState(BaseModel):
-    connections: dict[UUID4, UserConnections]  # user_id -> UserConnections
+    """Active WebSocket connections for all users."""
+
+    connections: dict[UUID4, UserConnections]
 
 
 class MessageType(str, Enum):
+    """
+    Enum for different types of WebSocket messages:
+        RECOMMENDATION: for sending collection recommendations to client.
+    """
+
     RECOMMENDATION = "recommendation"
 
 
 class WebSocketMessage(BaseModel):
+    """The structure of a WebSocket message."""
+
     type: MessageType
     body: Any
