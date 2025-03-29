@@ -19,7 +19,7 @@ class WebSocketState(BaseModel):
     connections: dict[UUID4, UserConnections]
 
 
-class MessageType(str, Enum):
+class WSMessageType(str, Enum):
     """
     Enum for different types of WebSocket messages:
         RECOMMENDATION: for sending collection recommendations to client.
@@ -31,5 +31,5 @@ class MessageType(str, Enum):
 class WebSocketMessage(BaseModel):
     """The structure of a WebSocket message."""
 
-    type: MessageType
+    type: WSMessageType
     body: Any

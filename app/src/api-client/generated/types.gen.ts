@@ -192,6 +192,16 @@ export type ValidationError = {
     type: string;
 };
 
+export type WsMessageType = 'recommendation';
+
+/**
+ * The structure of a WebSocket message.
+ */
+export type WebSocketMessage = {
+    type: WsMessageType;
+    body: unknown;
+};
+
 export type HealthCheckApiGetData = {
     body?: never;
     path?: never;
