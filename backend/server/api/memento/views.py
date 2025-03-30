@@ -4,13 +4,11 @@
       FR-26, FR-27, FR-28, FR-30, FR31, FR-32, FR-33, FR-34
 """
 
-from http.client import HTTPException
 import json
 from typing import Annotated, Optional
 
 import pytesseract
-from server.services.db.models.schema_public_latest import Memento
-from fastapi import APIRouter, BackgroundTasks, Depends, Form, UploadFile
+from fastapi import APIRouter, BackgroundTasks, Depends, Form, HTTPException, UploadFile
 from fastapi.responses import JSONResponse
 from loguru import logger
 from PIL import Image
@@ -25,6 +23,7 @@ from server.api.memento.models import (
 )
 from server.api.path import get_user_id
 from server.services.db.models.joins import MementoWithImages
+from server.services.db.models.schema_public_latest import Memento
 from server.services.db.queries.image import (
     create_image_metadata,
     delete_image_metadata,
@@ -234,5 +233,5 @@ async def delete_memento(
 
     if not deleted_memento:
         raise HTTPException(status_code=400, detail="Delete collection failed")
-    
+
     return deleted_memento
