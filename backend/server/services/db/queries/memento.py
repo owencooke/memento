@@ -5,7 +5,12 @@
 
 from pydantic import UUID4
 
-from server.api.memento.models import MementoFilterParams, NewMemento, UpdateMemento
+from server.api.memento.models import (
+    MementoFilterParams,
+    MementoWithCoordinates,
+    NewMemento,
+    UpdateMemento,
+)
 from server.services.db.config import supabase
 from server.services.db.models.joins import MementoWithImages
 from server.services.db.models.schema_public_latest import Memento
@@ -80,3 +85,14 @@ def update_memento(id: int, updated_memento: UpdateMemento) -> Memento:
         .execute()
     )
     return Memento(**response.data[0])
+
+
+def get_mementos_for_clustering(user_id: UUID4) -> list[MementoWithCoordinates]:
+    query = (
+        supabase.table("memento")
+        .select("user_id, id, coordinates")
+        .eq("user_id", str(user_id))
+        .neq("coordinates", None)
+    )
+    response = query.execute()
+    return [MementoWithCoordinates(**item) for item in response.data]
