@@ -44,7 +44,7 @@ router = APIRouter()
 @router.get("/")
 def get_users_mementos(
     user_id: UUID4 = Depends(get_user_id),
-    filter_query: MementoFilterParams = Depends(),
+    filter_query: MementoFilterParams = Depends(MementoFilterParams.from_query_params),
 ) -> list[MementoWithImages]:
     """Gets all the mementos belonging to a user."""
     mementos = get_mementos(user_id, filter_query)

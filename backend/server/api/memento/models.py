@@ -2,6 +2,7 @@ import datetime
 import re
 from typing import Any, Optional
 
+from fastapi import Query
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 from server.services.db.models.gis import BaseWithCoordinates, CoordinatesInsert
@@ -48,6 +49,36 @@ class MementoFilterParams(BaseModel):
         default=None,
         description="Text to search in memento caption and detected text",
     )
+    image_labels: Optional[list[str]] = Field(
+        default=None, description="Filter mementos by associated image labels"
+    )
+
+    @classmethod
+    def from_query_params(
+        cls,
+        start_date: Optional[datetime.date] = None,
+        end_date: Optional[datetime.date] = None,
+        min_lat: Optional[float] = None,
+        min_long: Optional[float] = None,
+        max_lat: Optional[float] = None,
+        max_long: Optional[float] = None,
+        text: Optional[str] = None,
+        image_labels: Optional[str] = Query(
+            None,
+            description="Comma-separated image labels",
+        ),
+    ):
+        """Convert query parameters into MementoFilterParams model"""
+        return cls(
+            start_date=start_date,
+            end_date=end_date,
+            min_lat=min_lat,
+            min_long=min_long,
+            max_lat=max_lat,
+            max_long=max_long,
+            text=text,
+            image_labels=image_labels.split(",") if image_labels else None,
+        )
 
     @field_validator("text")
     @classmethod
