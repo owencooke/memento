@@ -62,7 +62,7 @@ export default function SelectMementos() {
   const handleMementosSelected = () => {
     const idsString = Object.keys(selectedIds).toString();
     router.back();
-    router.setParams({ ids: idsString });
+    router.setParams({ ids: idsString, freshlySelected: "true" });
   };
 
   return (

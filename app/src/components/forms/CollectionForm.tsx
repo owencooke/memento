@@ -52,7 +52,10 @@ export default function CollectionForm({
   onSubmit,
 }: CollectionFormProps) {
   // Get local search params for selected mementos from select_mementos page
-  const { ids: idsString } = useLocalSearchParams<{ ids: string }>();
+  const { ids: idsString, freshlySelected } = useLocalSearchParams<{
+    ids: string;
+    freshlySelected: string;
+  }>();
   const selectedMementoIds = useMemo(() => {
     if (!idsString) return [];
     return Array.isArray(idsString)
@@ -92,19 +95,21 @@ export default function CollectionForm({
       selectedMementoIds.includes(memento.id),
     );
 
-    if (selectedMementos && selectedMementos.length > 0) {
-      setDerivedMetadata({ date: null, location: null });
+    setDerivedMetadata({ date: null, location: null });
+    if (
+      selectedMementos &&
+      selectedMementos.length > 0 &&
+      freshlySelected === "true"
+    ) {
       aggregateMetadata(selectedMementos).then(({ date, location }) => {
         if (date || location) {
           setDerivedMetadata({ date, location });
           setShowModal(true);
         }
       });
-    } else {
-      setDerivedMetadata({ date: null, location: null });
     }
     setValue("mementoIds", selectedMementoIds);
-  }, [selectedMementoIds, mementos, setValue]);
+  }, [selectedMementoIds, mementos, setValue, freshlySelected]);
 
   // Updates the location input when GeoLocation changes
   const locationValue = watch("location");
