@@ -4,10 +4,12 @@
       FR-26, FR-27, FR-28, FR-30, FR31, FR-32, FR-33
 """
 
+from http.client import HTTPException
 import json
 from typing import Annotated, Optional
 
 import pytesseract
+from backend.server.services.db.models.schema_public_latest import Memento
 from fastapi import APIRouter, BackgroundTasks, Depends, Form, UploadFile
 from fastapi.responses import JSONResponse
 from loguru import logger
@@ -31,6 +33,7 @@ from server.services.db.queries.image import (
 )
 from server.services.db.queries.memento import (
     create_memento,
+    db_delete_memento,
     get_mementos,
     update_memento,
 )
@@ -220,3 +223,16 @@ async def update_memento_and_images(
     return JSONResponse(
         content={"message": f"Successfully updated Memento[{updated_memento.id}]"},
     )
+
+
+@router.delete("/{id}")
+async def delete_memento(
+    id: int,
+) -> Memento:
+    """Delete a memento"""
+    deleted_memento = db_delete_memento(id)
+
+    if not deleted_memento:
+        raise HTTPException(status_code=400, detail="Delete collection failed")
+    
+    return delete_memento

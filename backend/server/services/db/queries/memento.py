@@ -80,3 +80,9 @@ def update_memento(id: int, updated_memento: UpdateMemento) -> Memento:
         .execute()
     )
     return Memento(**response.data[0])
+
+
+def db_delete_memento(id: int) -> Memento:
+    """Deletes a memento from the DB"""
+    response = supabase.table("memento").delete().eq("id", id).execute()
+    return Memento(**response.data[0])
