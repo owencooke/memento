@@ -1,7 +1,7 @@
 /**
  * @description Screen for viewing an individual keepsake/memento.
  *    Also supports sharing a memento's images to another platform.
- * @requirements FR-26, FR-27, FR-28, FR-54
+ * @requirements FR-26, FR-27, FR-28, FR-34, FR-54
  */
 import ImageMetadataCard from "@/src/components/cards/ImageMetadataCard";
 import { ButtonIcon, Button } from "@/src/components/ui/button";

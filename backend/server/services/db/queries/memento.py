@@ -1,6 +1,6 @@
 """
 @description Supabase DB queries for Keepsakes/Mementos.
-@requirements FR-17, FR-19, FR-26, FR-27, FR30, FR33
+@requirements FR-17, FR-19, FR-26, FR-27, FR-30, FR-33, FR-34
 """
 
 from pydantic import UUID4
