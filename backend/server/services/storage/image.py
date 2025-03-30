@@ -17,6 +17,7 @@ async def upload_image(file: UploadFile) -> str:
     """Uploads an image to Supabase Storage API. Returns path in /images bucket."""
     path = str(uuid.uuid4())
     image_content = await file.read()
+    await file.seek(0)
     response = supabase.storage.from_("images").upload(
         file=image_content,
         path=path,
