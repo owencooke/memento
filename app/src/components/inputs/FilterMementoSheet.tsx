@@ -81,7 +81,9 @@ export default function FilterMementoSheet({
     defaultValues,
   });
 
-  const { image_labels, isLoading } = useImageLabels({});
+  const { image_labels, refetch, isLoading } = useImageLabels({
+    queryOptions: { refetchOnMount: false },
+  });
 
   const startDate = watch("start_date");
 
@@ -204,13 +206,24 @@ export default function FilterMementoSheet({
                             <SelectDragIndicator />
                           </SelectDragIndicatorWrapper>
                           {image_labels.length > 0 && !isLoading ? (
-                            image_labels.map((label) => (
-                              <SelectItem
-                                key={label}
-                                label={label}
-                                value={label}
-                              />
-                            ))
+                            image_labels.map((label) => {
+                              const formattedLabel = label
+                                .split("_")
+                                .map(
+                                  (word) =>
+                                    word.charAt(0).toUpperCase() +
+                                    word.slice(1),
+                                )
+                                .join(" ");
+
+                              return (
+                                <SelectItem
+                                  key={label}
+                                  label={formattedLabel}
+                                  value={label}
+                                />
+                              );
+                            })
                           ) : (
                             <SelectItem
                               label={"No Options"}
