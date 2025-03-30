@@ -269,6 +269,10 @@ export type GetUsersMementosApiUserUserIdMementoGetData = {
         max_lat?: number | null;
         max_long?: number | null;
         text?: string | null;
+        /**
+         * Comma-separated image labels
+         */
+        image_labels?: string | null;
     };
     url: '/api/user/{user_id}/memento/';
 };
@@ -342,6 +346,33 @@ export type UpdateMementoAndImagesApiUserUserIdMementoIdPutResponses = {
      */
     200: unknown;
 };
+
+export type GetUsersImageLabelsApiUserUserIdMementoImageLabelsGetData = {
+    body?: never;
+    path: {
+        user_id: string;
+    };
+    query?: never;
+    url: '/api/user/{user_id}/memento/image_labels';
+};
+
+export type GetUsersImageLabelsApiUserUserIdMementoImageLabelsGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetUsersImageLabelsApiUserUserIdMementoImageLabelsGetError = GetUsersImageLabelsApiUserUserIdMementoImageLabelsGetErrors[keyof GetUsersImageLabelsApiUserUserIdMementoImageLabelsGetErrors];
+
+export type GetUsersImageLabelsApiUserUserIdMementoImageLabelsGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: Array<string>;
+};
+
+export type GetUsersImageLabelsApiUserUserIdMementoImageLabelsGetResponse = GetUsersImageLabelsApiUserUserIdMementoImageLabelsGetResponses[keyof GetUsersImageLabelsApiUserUserIdMementoImageLabelsGetResponses];
 
 export type GetUsersCollectionsApiUserUserIdCollectionGetData = {
     body?: never;
