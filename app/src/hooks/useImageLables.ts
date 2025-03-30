@@ -36,9 +36,6 @@ export const useImageLabels = ({
         user_id: String(session?.user.id),
       },
     }),
-    // Keep previous results in cache for certain time period
-    staleTime: tenMinutesInMs,
-    gcTime: tenMinutesInMs,
     ...(queryOptions as any),
   });
 
