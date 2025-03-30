@@ -82,12 +82,13 @@ def process_images_in_background(
             # Classify label
             predicted_class = predict_class(image)
             
-            update_image(memento_id, filename, "detected_text", extracted_text)
+            update_image(
+                memento_id, filename, 
+                {"detected_text": extracted_text, "image_label": predicted_class}
+            )
             logger.info(f"Adding detected text: {extracted_text}")
-
-            update_image(memento_id, filename, "image_label", predicted_class)
             logger.info(f"Adding predicted class: {predicted_class}")
-            
+
         except Exception as e:
             logger.error(f"Failed to process image {filename}: {e}")
 
@@ -176,7 +177,7 @@ async def update_memento_and_images(
         )
         if image_kept:
             # User kept old image; update DB record in case images re-ordered
-            update_image(id, image_kept.filename, "order_index", image_kept.order_index)
+            update_image(id, image_kept.filename, {"order_index": image_kept.order_index})
             logger.info(f"Updated image metadata for file: {image_kept.filename}")
         else:
             # User removed the old image; delete from DB/storage

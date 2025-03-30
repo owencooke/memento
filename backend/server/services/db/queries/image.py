@@ -3,6 +3,7 @@
 @requirements FR-8, FR-11, FR-21, FR-32
 """
 
+from typing import Dict
 from server.api.memento.models import NewImageMetadata
 from server.services.db.config import supabase
 from server.services.db.models.joins import ImageWithUrl
@@ -32,11 +33,11 @@ def delete_image_metadata(id: int) -> bool:
     return len(response.data) == 1
 
 
-def update_image(memento_id: int, filename: str, field: str, value: str | int) -> bool:
+def update_image(memento_id: int, filename: str, updates: Dict[str, str | int]) -> bool:
     """Updates the detected text of an image"""
     response = (
         supabase.table("image")
-        .update({field: value})
+        .update(updates)
         .eq("memento_id", memento_id)
         .eq("filename", filename)
         .execute()
