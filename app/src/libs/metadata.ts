@@ -1,7 +1,6 @@
 import {
   Coordinates,
   ImageWithUrl,
-  Memento,
   MementoWithImages,
 } from "../api-client/generated";
 import { GeoLocation } from "../components/inputs/LocationInput";
@@ -56,7 +55,7 @@ export const getRelevantMetadata = (
   item: Photo | MementoWithImages,
 ): Metadata => {
   if (isPhoto(item)) {
-    const { exif, fileName } = item;
+    const { exif } = item;
 
     // Date
     let date =

@@ -7,7 +7,6 @@ import {
 import { toISODateString } from "@/src/libs/date";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useEffect } from "react";
 import { useLocalSearchParams } from "expo-router";
 import { queryClient } from "@/src/app/_layout";
 import CollectionForm, {
