@@ -20,6 +20,7 @@ import {
 import { VStack } from "../ui/vstack";
 import { CheckIcon } from "../ui/icon";
 import { toISODateString } from "@/src/libs/date";
+import { Divider } from "../ui/divider";
 
 interface AutofillFieldsModalProps {
   location: string;
@@ -45,6 +46,8 @@ export default function AutofillFieldsModal({
           <Heading size="lg">Use derived metadata?</Heading>
           <ModalCloseButton />
         </ModalHeader>
+
+        <Divider />
 
         <ModalBody className="flex flex-col gap-4">
           <FormControl>
