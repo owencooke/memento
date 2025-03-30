@@ -13,6 +13,7 @@ interface MementoFilters {
   start_date: string | null;
   end_date: string | null;
   bbox: BoundingBox | null;
+  image_label: string | null;
 }
 
 const tenMinutesInMs = 10 * 60 * 1000;
@@ -30,7 +31,12 @@ interface UseMementosProps {
  * with support for filtering and search.
  */
 export const useMementos = ({
-  initialFilters = { start_date: null, end_date: null, bbox: null },
+  initialFilters = {
+    start_date: null,
+    end_date: null,
+    bbox: null,
+    image_label: null,
+  },
   queryOptions = {},
 }: UseMementosProps = {}) => {
   const { session } = useSession();
@@ -52,6 +58,7 @@ export const useMementos = ({
       max_lat: filters.bbox?.northeast.lat ?? undefined,
       max_long: filters.bbox?.northeast.lng ?? undefined,
       text: searchText?.trim() || undefined,
+      image_labels: filters.image_label ?? undefined,
     },
     600,
   );
