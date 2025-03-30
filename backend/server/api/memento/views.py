@@ -9,7 +9,7 @@ import json
 from typing import Annotated, Optional
 
 import pytesseract
-from backend.server.services.db.models.schema_public_latest import Memento
+from server.services.db.models.schema_public_latest import Memento
 from fastapi import APIRouter, BackgroundTasks, Depends, Form, UploadFile
 from fastapi.responses import JSONResponse
 from loguru import logger
@@ -235,4 +235,4 @@ async def delete_memento(
     if not deleted_memento:
         raise HTTPException(status_code=400, detail="Delete collection failed")
     
-    return delete_memento
+    return deleted_memento

@@ -12,17 +12,19 @@ import { Icon, TrashIcon } from "@/src/components/ui/icon";
 import { Box } from "@/src/components/ui/box";
 import { Heading } from "../ui/heading";
 
-type DeleteCollectionModalProps = {
+type DeleteModalProps = {
   visible: boolean;
+  type: string;
   onClose: () => void;
   onConfirm: () => void;
 };
 
-export default function DeleteCollectionModal({
+export default function DeleteModal({
   visible,
+  type,
   onClose,
   onConfirm,
-}: DeleteCollectionModalProps) {
+}: DeleteModalProps) {
   if (!visible) return null;
 
   return (
@@ -36,10 +38,10 @@ export default function DeleteCollectionModal({
         </ModalHeader>
         <ModalBody className="mt-0 mb-4">
           <Heading size="md" className="text-typography-950 mb-2 text-center">
-            Delete Collection
+            Delete {type[0].toUpperCase() + type.slice(1)}
           </Heading>
           <Text size="sm" className="text-typography-500 text-center">
-            Are you sure you want to delete this collection? This action cannot
+            Are you sure you want to delete this {type}? This action cannot
             be undone.
           </Text>
         </ModalBody>
