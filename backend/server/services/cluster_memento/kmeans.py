@@ -1,12 +1,12 @@
 from typing import List
 
 import numpy as np
+from loguru import logger
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 from sklearn.preprocessing import StandardScaler
 
 from server.api.memento.models import MementoWithCoordinates
-from server.services.db.models.gis import Coordinates
 
 
 def cluster_mementos(
@@ -37,6 +37,10 @@ def cluster_mementos(
     scaler = StandardScaler()
     scaled_coordinates = scaler.fit_transform(coordinates)
 
+    logger.info(f"Memento IDs Received: {ids}")
+    logger.info(f"Coordinates Received: {coordinates}")
+    logger.info(f"Scaled Coordinates: {scaled_coordinates}")
+
     # Find optimal number of clusters using silhouette score
     best_n_clusters = 2  # Default
     best_score = -1
@@ -53,20 +57,25 @@ def cluster_mementos(
             best_score = score
             best_n_clusters = n_clusters
 
+    logger.info(f"Best N Clusters: {best_n_clusters}")
+
     # Perform K-means with optimal cluster number
     kmeans = KMeans(n_clusters=best_n_clusters, random_state=42, n_init=10)
     cluster_labels = kmeans.fit_predict(scaled_coordinates)
 
+    logger.info(f"KMeans: {kmeans}")
+
     # Find the most dense cluster (with the most Mementos)
     unique_labels, counts = np.unique(cluster_labels, return_counts=True)
     densest_cluster = unique_labels[np.argmax(counts)]
+
+    logger.info(f"Densest Cluster: {densest_cluster}")
 
     # Get indices of mementos in the densest cluster
     cluster_indices = np.where(cluster_labels == densest_cluster)[0]
 
     # If the densest cluster has more elements than needed, select those closest to center
     if len(cluster_indices) > n_recommendations:
-        # Find cluster center
         cluster_center = kmeans.cluster_centers_[densest_cluster]
 
         # Calculate distances to center for all points in cluster
@@ -83,29 +92,6 @@ def cluster_mementos(
     # Convert indices to IDs
     recommended_ids = [ids[i] for i in recommended_indices]
 
+    logger.info(f"Recommended Ids: {recommended_ids}")
+
     return recommended_ids
-
-
-# Example usage (for testing)
-if __name__ == "__main__":
-    # This is just for testing and would not be part of the actual implementation
-    sample_mementos = [
-        MementoWithCoordinates(
-            id=1,
-            user_id="user1",
-            coordinates=Coordinates(lat=44.8125449, long=20.46123),
-        ),
-        MementoWithCoordinates(
-            id=2,
-            user_id="user1",
-            coordinates=Coordinates(lat=53.5460983, long=-113.4937266),
-        ),
-        MementoWithCoordinates(
-            id=3,
-            user_id="user1",
-            coordinates=Coordinates(lat=54.5460983, long=-113.4937266),
-        ),
-    ]
-
-    recommended_ids = cluster_mementos(sample_mementos, n_recommendations=2)
-    print(f"Recommended Memento IDs: {recommended_ids}")
