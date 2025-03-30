@@ -51,7 +51,7 @@ export default function CollectionForm({
   isSubmitting,
   onSubmit,
 }: CollectionFormProps) {
-  // Get local search params for selected mementos from select_mementos page
+  // Get local search params for selected mementos from select_mementos page and freshly selected if passed from select_mementos page
   const { ids: idsString, freshlySelected } = useLocalSearchParams<{
     ids: string;
     freshlySelected: string;
@@ -84,17 +84,18 @@ export default function CollectionForm({
     queryOptions: { refetchOnMount: false },
   });
 
+  // State management for derived metadata modal
   const [showModal, setShowModal] = useState(false);
   const [derivedMetadata, setDerivedMetadata] = useState<{
     date: Date | null;
     location: GeoLocation | null;
   }>({ date: null, location: null });
 
+  // When selected mementos are changed aggregates metadata and shows modal
   useEffect(() => {
     const selectedMementos = mementos?.filter((memento) =>
       selectedMementoIds.includes(memento.id),
     );
-
     setDerivedMetadata({ date: null, location: null });
     if (
       selectedMementos &&
