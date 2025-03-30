@@ -4,6 +4,7 @@
 """
 
 from typing import Dict
+
 from server.api.memento.models import NewImageMetadata
 from server.services.db.config import supabase
 from server.services.db.models.joins import ImageWithUrl

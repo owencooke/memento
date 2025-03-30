@@ -40,7 +40,7 @@ async def extract_text(image_file: UploadFile) -> str:
         return pytesseract.image_to_string(input_image)
 
     except Exception as e:
-        return e
+        return str(e)
 
 
 @router.post("/classify")
@@ -50,4 +50,4 @@ async def classify_image(image_file: UploadFile) -> str:
         input_image = await upload_file_to_pil(image_file)
         return predict_class(input_image)
     except Exception as e:
-        return e
+        return str(e)
