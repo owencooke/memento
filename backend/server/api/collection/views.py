@@ -14,7 +14,6 @@ from server.services.db.models.joins import CollectionWithMementos
 from server.services.db.models.schema_public_latest import (
     Collection,
     HasMementoInsert,
-    HasMementoUpdate,
 )
 from server.services.db.queries.collection import (
     associate_memento,
@@ -89,47 +88,29 @@ async def update_collection_and_mementos(
         raise HTTPException(status_code=400, detail="Update collection failed")
 
     memento_ids_current = get_has_mementos(id)
+    mementos_to_add = [m_id for m_id in mementos if m_id not in memento_ids_current]
+    mementos_to_remove = [m_id for m_id in memento_ids_current if m_id not in mementos]
 
     # Add mementos to collection
-    for memento_id in mementos:
-        if memento_id not in memento_ids_current:
-            has_memento = HasMementoInsert(
-                collection_id=id,
-                memento_id=memento_id,
+    for memento_id in mementos_to_add:
+        has_memento = HasMementoInsert(
+            collection_id=id,
+            memento_id=memento_id,
+        )
+        if not associate_memento(has_memento):
+            raise HTTPException(
+                status_code=400,
+                detail="Associate Memento to Collection Failed.",
             )
-            if not associate_memento(has_memento):
-                raise HTTPException(
-                    status_code=400,
-                    detail="Associate Memento to Collection Failed.",
-                )
 
     # Remove deleted mementos from collection
-    for memento_id in memento_ids_current:
-        if memento_id not in mementos:
-            removed_memento = db_delete_has_memento(id, memento_id)
-            if not removed_memento:
-                raise HTTPException(status_code=400, detail="Delete collection failed")
-
-    # Add mementos to collection
-    for memento_id in mementos:
-        if memento_id not in memento_ids_current:
-            has_memento = HasMementoInsert(
-                collection_id=id,
-                memento_id=memento_id,
+    for memento_id in mementos_to_remove:
+        if not db_delete_has_memento(id, memento_id):
+            raise HTTPException(
+                status_code=400,
+                detail=f"Failed to remove mementos {memento_id}",
             )
-            if not associate_memento(has_memento):
-                raise HTTPException(
-                    status_code=400,
-                    detail="Associate Memento to Collection Failed.",
-                )
-    
-    # Remove deleted mementos from collection
-    for memento_id in memento_ids_current:
-        if memento_id not in mementos:
-            removed_memento = db_delete_has_memento(id, memento_id)
-            if not removed_memento:
-                raise HTTPException(status_code=400, detail="Delete collection failed")
-            
+
     return updated_collection
 
 
