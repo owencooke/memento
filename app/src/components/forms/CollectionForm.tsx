@@ -154,8 +154,8 @@ export default function CollectionForm({
     <>
       {showModal && derivedMetadata && (
         <AutofillFieldsModal
-          location={derivedMetadata.location?.text || "Unknown"}
-          date={derivedMetadata.date || new Date()}
+          location={derivedMetadata.location?.text || null}
+          date={derivedMetadata.date || null}
           accept={handleAccept}
           reject={() => {
             setShowModal(false);

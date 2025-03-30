@@ -23,8 +23,8 @@ import { toISODateString } from "@/src/libs/date";
 import { Divider } from "../ui/divider";
 
 interface AutofillFieldsModalProps {
-  location: string;
-  date: Date;
+  location: string | null;
+  date: Date | null;
   accept: (selected: { location: boolean; date: boolean }) => void;
   reject: () => void;
 }
@@ -52,22 +52,26 @@ export default function AutofillFieldsModal({
         <ModalBody className="flex flex-col gap-4">
           <FormControl>
             <VStack space="sm">
-              <Checkbox isChecked={useLocation} onChange={setUseLocation}>
-                <CheckboxIndicator>
-                  <CheckboxIcon as={CheckIcon} />
-                </CheckboxIndicator>
-                <CheckboxLabel className="flex-1">
-                  Use location: {location}
-                </CheckboxLabel>
-              </Checkbox>
-              <Checkbox isChecked={useDate} onChange={setUseDate}>
-                <CheckboxIndicator>
-                  <CheckboxIcon as={CheckIcon} />
-                </CheckboxIndicator>
-                <CheckboxLabel className="flex-1">
-                  Use date: {toISODateString(date)}
-                </CheckboxLabel>
-              </Checkbox>
+              {location && (
+                <Checkbox isChecked={useLocation} onChange={setUseLocation}>
+                  <CheckboxIndicator>
+                    <CheckboxIcon as={CheckIcon} />
+                  </CheckboxIndicator>
+                  <CheckboxLabel className="flex-1">
+                    Use location: {location}
+                  </CheckboxLabel>
+                </Checkbox>
+              )}
+              {date && (
+                <Checkbox isChecked={useDate} onChange={setUseDate}>
+                  <CheckboxIndicator>
+                    <CheckboxIcon as={CheckIcon} />
+                  </CheckboxIndicator>
+                  <CheckboxLabel className="flex-1">
+                    Use date: {toISODateString(date)}
+                  </CheckboxLabel>
+                </Checkbox>
+              )}
             </VStack>
           </FormControl>
         </ModalBody>
