@@ -1,5 +1,8 @@
 import { useQuery, UseQueryOptions } from "@tanstack/react-query";
-import { getUsersMementosApiUserUserIdMementoGetOptions } from "../api-client/generated/@tanstack/react-query.gen";
+import {
+  getUsersImageLabelsApiUserUserIdMementoImageLabelsGetOptions,
+  getUsersMementosApiUserUserIdMementoGetOptions,
+} from "../api-client/generated/@tanstack/react-query.gen";
 import { useSession } from "../context/AuthContext";
 import {
   GetUsersImageLabelsApiUserUserIdMementoImageLabelsGetData,
@@ -19,7 +22,7 @@ interface UseImageLabelsProps {
  * Hook that gets all the Mementos for a user (from API or query cache),
  * with support for filtering and search.
  */
-export const useMementos = ({
+export const useImageLabels = ({
   queryOptions = {},
 }: UseImageLabelsProps = {}) => {
   const { session } = useSession();
@@ -28,7 +31,7 @@ export const useMementos = ({
     GetUsersImageLabelsApiUserUserIdMementoImageLabelsGetResponse,
     Error
   >({
-    ...getUsersMementosApiUserUserIdMementoGetOptions({
+    ...getUsersImageLabelsApiUserUserIdMementoImageLabelsGetOptions({
       path: {
         user_id: String(session?.user.id),
       },
