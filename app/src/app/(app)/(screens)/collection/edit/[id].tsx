@@ -17,7 +17,7 @@ import { queryClient } from "@/src/app/_layout";
 import { GeoLocation } from "@/src/components/inputs/LocationInput";
 import { CollectionWithMementos } from "@/src/api-client/generated";
 import { isEqual } from "lodash";
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import CollectionForm, {
   CollectionFormData,
 } from "@/src/components/forms/CollectionForm";
@@ -26,8 +26,19 @@ export default function EditCollection() {
   // Get user id
   const { session } = useSession();
   const user_id = String(session?.user.id);
-  // Get existing collection
-  const { id } = useLocalSearchParams<{ id: string }>();
+  // Get existing collection and IDs of the collection's mementos
+  const { id, ids } = useLocalSearchParams();
+
+  // Array of the collection's memento IDs
+  const ids_array: number[] = !ids
+    ? []
+    : Array.isArray(ids)
+      ? ids.map(Number)
+      : ids.split(",").map(Number);
+
+  // Store the initial IDs in a ref to preserve them across renders
+  const initialIdsRef = useRef<number[]>(ids_array);
+
   const { data: collections } = useQuery({
     ...getUsersCollectionsApiUserUserIdCollectionGetOptions({
       path: {
@@ -65,7 +76,9 @@ export default function EditCollection() {
   // PUT Edit Collection Form
   const onSubmit = async (form: CollectionFormData) => {
     // Skip form submission if no changes made
-    if (isEqual(form, initialFormValues)) {
+    const idsAreEqual =
+      JSON.stringify(initialIdsRef.current) === JSON.stringify(ids_array);
+    if (isEqual(form, initialFormValues) && idsAreEqual) {
       handleRedirect();
       return;
     }
@@ -92,7 +105,7 @@ export default function EditCollection() {
       {
         body: {
           collection: updatedCollection,
-          mementos: [],
+          mementos: ids_array,
         } as any,
         path,
       },

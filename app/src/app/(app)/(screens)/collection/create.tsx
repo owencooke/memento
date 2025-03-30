@@ -7,6 +7,7 @@ import {
 import { toISODateString } from "@/src/libs/date";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useLocalSearchParams } from "expo-router";
 import { queryClient } from "@/src/app/_layout";
 import CollectionForm, {
   CollectionFormData,
@@ -15,7 +16,7 @@ import CollectionForm, {
 /**
  * @description Screen for creating a new collection
  *
- * @requirements FR-35, FR-36, FR-37
+ * @requirements FR-35, FR-36, FR-37, FR-41
  *
  * @component
  * @returns {JSX.Element} Rendered CreateCollection screen.
@@ -25,6 +26,16 @@ export default function CreateCollection() {
   const createMutation = useMutation(
     createNewCollectionApiUserUserIdCollectionPostMutation(),
   );
+
+  // Receive selected mementos from select_mementos page
+  const params = useLocalSearchParams();
+
+  // Array of memento IDs selected by the user
+  const ids: number[] = !params.ids
+    ? []
+    : Array.isArray(params.ids)
+      ? params.ids.map(Number)
+      : params.ids.split(",").map(Number);
 
   /**
    * Handles form submission by creating a new collection.
@@ -50,7 +61,7 @@ export default function CreateCollection() {
       {
         body: {
           new_collection: collection,
-          mementos: [], // Mementos currently empty
+          mementos: ids,
         } as any,
         path,
       },
