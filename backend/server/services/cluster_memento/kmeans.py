@@ -63,12 +63,13 @@ def cluster_mementos(
     kmeans = KMeans(n_clusters=best_n_clusters, random_state=42, n_init=10)
     cluster_labels = kmeans.fit_predict(scaled_coordinates)
 
-    logger.info(f"KMeans: {kmeans}")
+    logger.info(f"Cluster Labels: {cluster_labels}")
 
     # Find the most dense cluster (with the most Mementos)
     unique_labels, counts = np.unique(cluster_labels, return_counts=True)
     densest_cluster = unique_labels[np.argmax(counts)]
 
+    logger.info(f"Unique Labels: {unique_labels}")
     logger.info(f"Densest Cluster: {densest_cluster}")
 
     # Get indices of mementos in the densest cluster
