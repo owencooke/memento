@@ -93,3 +93,25 @@ def update_memento(id: int, updated_memento: UpdateMemento) -> Memento:
         .execute()
     )
     return Memento(**response.data[0])
+
+
+def get_image_labels(user_id: UUID4) -> list[str]:
+    """Gets all image labels from associated images of users mementos"""
+    response = (
+        supabase.table("memento")
+        .select("user_id, images:image(image_label)")
+        .eq("user_id", str(user_id))
+        .neq("image.image_label", None)
+        .neq("image.image_label", "")
+        .execute()
+    )
+    labels = list(
+        {
+            image["image_label"]
+            for memento in response.data
+            for image in memento["images"]
+        },
+    )
+    labels.sort()
+
+    return labels

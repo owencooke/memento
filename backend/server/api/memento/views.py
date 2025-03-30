@@ -29,6 +29,7 @@ from server.services.db.queries.image import (
 )
 from server.services.db.queries.memento import (
     create_memento,
+    get_image_labels,
     get_mementos,
     update_memento,
 )
@@ -163,3 +164,11 @@ async def update_memento_and_images(
     return JSONResponse(
         content={"message": f"Successfully updated Memento[{updated_memento.id}]"},
     )
+
+
+@router.get("/image_labels")
+def get_users_image_labels(
+    user_id: UUID4 = Depends(get_user_id),
+) -> list[str]:
+    """Gets all the mementos belonging to a user."""
+    return get_image_labels(user_id)
