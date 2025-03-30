@@ -1,6 +1,6 @@
 """
 @description Supabase DB queries for Keepsakes/Mementos.
-@requirements FR-17, FR-19, FR-26, FR-27, FR30, FR33
+@requirements FR-16, FR-17, FR-19, FR-26, FR-27, FR30, FR33
 """
 
 from loguru import logger
