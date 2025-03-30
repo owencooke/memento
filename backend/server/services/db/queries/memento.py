@@ -3,6 +3,7 @@
 @requirements FR-17, FR-19, FR-26, FR-27, FR30, FR33
 """
 
+from loguru import logger
 from pydantic import UUID4
 
 from server.api.memento.models import MementoFilterParams, NewMemento, UpdateMemento
@@ -66,6 +67,18 @@ def get_mementos(
             else:
                 # If no mementos are in the bounding box, return an empty list early
                 return []
+
+        # Filter by mementos with associated images labels
+        if filter_query.image_labels:
+            image_query = (
+                supabase.table("image")
+                .select("memento_id")
+                .in_("image_label", filter_query.image_labels)
+                .execute()
+            )
+            labeled_memento_ids = [item["memento_id"] for item in image_query.data]
+            if labeled_memento_ids:
+                query.in_("id", labeled_memento_ids)
 
     response = query.execute()
     return [MementoWithImages(**item) for item in response.data]
