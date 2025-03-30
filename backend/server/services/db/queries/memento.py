@@ -3,7 +3,6 @@
 @requirements FR-16, FR-17, FR-19, FR-26, FR-27, FR30, FR33
 """
 
-from loguru import logger
 from pydantic import UUID4
 
 from server.api.memento.models import MementoFilterParams, NewMemento, UpdateMemento

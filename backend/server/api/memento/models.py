@@ -50,7 +50,8 @@ class MementoFilterParams(BaseModel):
         description="Text to search in memento caption and detected text",
     )
     image_labels: Optional[list[str]] = Field(
-        default=None, description="Filter mementos by associated image labels"
+        default=None,
+        description="Filter mementos by associated image labels",
     )
 
     @classmethod
@@ -67,7 +68,7 @@ class MementoFilterParams(BaseModel):
             None,
             description="Comma-separated image labels",
         ),
-    ):
+    ) -> Any:
         """Convert query parameters into MementoFilterParams model"""
         return cls(
             start_date=start_date,
