@@ -101,6 +101,68 @@ export const removeImageBackgroundApiImageRemoveBackgroundPostMutation = (option
     return mutationOptions;
 };
 
+export const extractTextApiImageExtractTextPostQueryKey = (options: Options<ExtractTextApiImageExtractTextPostData>) => createQueryKey('extractTextApiImageExtractTextPost', options);
+
+export const extractTextApiImageExtractTextPostOptions = (options: Options<ExtractTextApiImageExtractTextPostData>) => {
+    return queryOptions({
+        queryFn: async ({ queryKey, signal }) => {
+            const { data } = await extractTextApiImageExtractTextPost({
+                ...options,
+                ...queryKey[0],
+                signal,
+                throwOnError: true
+            });
+            return data;
+        },
+        queryKey: extractTextApiImageExtractTextPostQueryKey(options)
+    });
+};
+
+export const extractTextApiImageExtractTextPostMutation = (options?: Partial<Options<ExtractTextApiImageExtractTextPostData>>) => {
+    const mutationOptions: UseMutationOptions<ExtractTextApiImageExtractTextPostResponse, ExtractTextApiImageExtractTextPostError, Options<ExtractTextApiImageExtractTextPostData>> = {
+        mutationFn: async (localOptions) => {
+            const { data } = await extractTextApiImageExtractTextPost({
+                ...options,
+                ...localOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const classifyImageApiImageClassifyPostQueryKey = (options: Options<ClassifyImageApiImageClassifyPostData>) => createQueryKey('classifyImageApiImageClassifyPost', options);
+
+export const classifyImageApiImageClassifyPostOptions = (options: Options<ClassifyImageApiImageClassifyPostData>) => {
+    return queryOptions({
+        queryFn: async ({ queryKey, signal }) => {
+            const { data } = await classifyImageApiImageClassifyPost({
+                ...options,
+                ...queryKey[0],
+                signal,
+                throwOnError: true
+            });
+            return data;
+        },
+        queryKey: classifyImageApiImageClassifyPostQueryKey(options)
+    });
+};
+
+export const classifyImageApiImageClassifyPostMutation = (options?: Partial<Options<ClassifyImageApiImageClassifyPostData>>) => {
+    const mutationOptions: UseMutationOptions<ClassifyImageApiImageClassifyPostResponse, ClassifyImageApiImageClassifyPostError, Options<ClassifyImageApiImageClassifyPostData>> = {
+        mutationFn: async (localOptions) => {
+            const { data } = await classifyImageApiImageClassifyPost({
+                ...options,
+                ...localOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
 export const getUsersMementosApiUserUserIdMementoGetQueryKey = (options: Options<GetUsersMementosApiUserUserIdMementoGetData>) => createQueryKey('getUsersMementosApiUserUserIdMementoGet', options);
 
 export const getUsersMementosApiUserUserIdMementoGetOptions = (options: Options<GetUsersMementosApiUserUserIdMementoGetData>) => {

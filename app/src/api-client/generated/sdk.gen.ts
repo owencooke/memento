@@ -59,6 +59,38 @@ export const removeImageBackgroundApiImageRemoveBackgroundPost = <ThrowOnError e
 };
 
 /**
+ * Extract Text
+ * Uses OCR library to extract text from image
+ */
+export const extractTextApiImageExtractTextPost = <ThrowOnError extends boolean = false>(options: Options<ExtractTextApiImageExtractTextPostData, ThrowOnError>) => {
+    return (options.client ?? _heyApiClient).post<ExtractTextApiImageExtractTextPostResponse, ExtractTextApiImageExtractTextPostError, ThrowOnError>({
+        ...formDataBodySerializer,
+        url: '/api/image/extract-text',
+        ...options,
+        headers: {
+            'Content-Type': null,
+            ...options?.headers
+        }
+    });
+};
+
+/**
+ * Classify Image
+ * Test route for using Tensorflow/Keras to classify image
+ */
+export const classifyImageApiImageClassifyPost = <ThrowOnError extends boolean = false>(options: Options<ClassifyImageApiImageClassifyPostData, ThrowOnError>) => {
+    return (options.client ?? _heyApiClient).post<ClassifyImageApiImageClassifyPostResponse, ClassifyImageApiImageClassifyPostError, ThrowOnError>({
+        ...formDataBodySerializer,
+        url: '/api/image/classify',
+        ...options,
+        headers: {
+            'Content-Type': null,
+            ...options?.headers
+        }
+    });
+};
+
+/**
  * Get Users Mementos
  * Gets all the mementos belonging to a user.
  */
