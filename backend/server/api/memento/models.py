@@ -7,11 +7,16 @@ from pydantic import BaseModel, Field, field_validator, model_validator
 from server.services.db.models.gis import BaseWithCoordinates, CoordinatesInsert
 from server.services.db.models.schema_public_latest import (
     ImageInsert,
+    Memento,
     MementoInsert,
     MementoUpdate,
 )
 
 # Note: the ignores are for MyPy, to ignore "coordinates" field type differences
+
+
+class MementoWithCoordinates(BaseWithCoordinates, Memento):  # type: ignore[misc]
+    """Memento with coordiantes"""
 
 
 class NewMemento(CoordinatesInsert, BaseWithCoordinates, MementoInsert):  # type: ignore[misc]
