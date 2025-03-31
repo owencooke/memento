@@ -17,19 +17,19 @@ export const colors = {
     "--color-primary-900": "27 66 97",
     "--color-primary-950": "18 44 64",
 
-    /* Secondary - Based on #36454f (Azul Petróleo) */
-    "--color-secondary-0": "230 235 240",
-    "--color-secondary-50": "218 224 230",
-    "--color-secondary-100": "202 210 217",
-    "--color-secondary-200": "179 188 196",
-    "--color-secondary-300": "147 159 171",
-    "--color-secondary-400": "103 115 127",
-    "--color-secondary-500": "54 69 79",
-    "--color-secondary-600": "43 55 63",
-    "--color-secondary-700": "36 46 53",
-    "--color-secondary-800": "29 37 42",
-    "--color-secondary-900": "21 27 31",
-    "--color-secondary-950": "14 18 21",
+    /* Secondary - Ultra-Faint Blue (#F9FCFE) */
+    "--color-secondary-0": "255 255 255",
+    "--color-secondary-50": "252 253 255",
+    "--color-secondary-100": "249 251 254",
+    "--color-secondary-200": "243 247 253",
+    "--color-secondary-300": "236 243 251",
+    "--color-secondary-400": "225 236 248",
+    "--color-secondary-500": "210 226 242",
+    "--color-secondary-600": "180 206 228",
+    "--color-secondary-700": "148 173 193",
+    "--color-secondary-800": "119 140 157",
+    "--color-secondary-900": "96 113 127",
+    "--color-secondary-950": "64 75 84",
 
     /* Tertiary - Based on #809be7 (Blue Cue) */
     "--color-tertiary-0": "241 245 254",
