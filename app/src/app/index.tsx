@@ -86,10 +86,13 @@ export default function SignIn() {
             style={titleStyle}
             className="flex-1 items-center gap-2"
           >
-            <Heading className="mt-4 text-primary-500" size="4xl">
+            <Heading
+              className="mt-4 text-primary-500 font-[title] font-extrablack"
+              size="4xl"
+            >
               Memento
             </Heading>
-            <Text size="2xl" className="text-primary-500">
+            <Text size="2xl" className="text-primary-500 font-[title]">
               Memories That Last
             </Text>
           </Animated.View>
