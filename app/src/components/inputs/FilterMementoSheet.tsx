@@ -206,7 +206,7 @@ export default function FilterMementoSheet({
                         <SelectTrigger>
                           <SelectInput
                             placeholder="Select option"
-                            className="flex-1"
+                            className="flex-1 align-middle p-0 pl-2 m-0 h-full text-normal"
                             value={formattedSelectedValue}
                           />
                           <SelectIcon className="mr-3" as={ChevronDownIcon} />
