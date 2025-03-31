@@ -28,7 +28,7 @@ def get_mementos(
     """Gets all the mementos belonging to a user."""
     query = (
         supabase.table("memento")
-        .select("*, images:image(*)")
+        .select("*, images:image!inner(*)")
         .eq("user_id", str(user_id))
     )
 
@@ -40,7 +40,7 @@ def get_mementos(
         if filter_query.text:
             query.text_search("memento_searchable_content", filter_query.text)
         if filter_query.image_labels:
-            query.in_("image_label", filter_query.image_labels)
+            query.in_("images.image_label", filter_query.image_labels)
 
         # Bounding box filtering using the RPC function
         if all(
