@@ -63,8 +63,8 @@ export default function NewUserForm() {
       <View className="flex items-center gap-2 mb-4">
         <Image
           size="xl"
-          // TODO: replace with our logo!
-          source={require("@/src/assets/images/react-logo.png")}
+          resizeMode="contain"
+          source={require("@/src/assets/images/logo.png")}
           alt="Memento Logo"
         />
         <Heading className="block" size="2xl">

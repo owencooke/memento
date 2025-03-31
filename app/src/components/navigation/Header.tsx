@@ -44,10 +44,10 @@ const Header: React.FC<HeaderProps> = ({ title, mode = "avatar" }) => {
         )}
         <Image
           size="sm"
-          // TODO: replace with our logo!
-          source={require("@/src/assets/images/react-logo.png")}
+          source={require("@/src/assets/images/logo.png")}
           alt="Memento Logo"
           className="mr-2"
+          resizeMode="contain"
         />
         {title && mode === "avatar" && (
           <Text size="xl" className="font-semibold">

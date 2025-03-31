@@ -31,7 +31,8 @@ export default function SignIn() {
       <View className="flex flex-1 justify-start items-center">
         <Image
           size="xl"
-          source={require("@/src/assets/images/react-logo.png")}
+          resizeMode="contain"
+          source={require("@/src/assets/images/logo.png")}
           alt="Memento Logo"
         />
         <Heading className="mt-4" size="4xl">
