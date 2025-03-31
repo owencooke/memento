@@ -227,5 +227,5 @@ async def update_memento_and_images(
 def get_users_image_labels(
     user_id: UUID4 = Depends(get_user_id),
 ) -> list[str]:
-    """Gets all the mementos belonging to a user."""
+    """Gets each unique image label from images associated with user's mementos"""
     return get_image_labels(user_id)
