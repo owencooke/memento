@@ -205,6 +205,10 @@ export default function FilterMementoSheet({
                           <SelectDragIndicatorWrapper>
                             <SelectDragIndicator />
                           </SelectDragIndicatorWrapper>
+
+                          {/* Default selection */}
+                          <SelectItem label="No selection" value="" />
+
                           {image_labels.length > 0 && !isLoading ? (
                             image_labels.map((label) => {
                               const formattedLabel = label
