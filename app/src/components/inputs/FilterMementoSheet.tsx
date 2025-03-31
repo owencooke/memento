@@ -187,58 +187,71 @@ export default function FilterMementoSheet({
                 <Controller
                   name="image_label"
                   control={control}
-                  render={({ field }) => (
-                    <Select
-                      selectedValue={field.value}
-                      onValueChange={field.onChange}
-                    >
-                      <SelectTrigger>
-                        <SelectInput
-                          placeholder="Select option"
-                          className="flex-1"
-                        />
-                        <SelectIcon className="mr-3" as={ChevronDownIcon} />
-                      </SelectTrigger>
-                      <SelectPortal>
-                        <SelectBackdrop />
-                        <SelectContent>
-                          <SelectDragIndicatorWrapper>
-                            <SelectDragIndicator />
-                          </SelectDragIndicatorWrapper>
+                  render={({ field }) => {
+                    const formattedSelectedValue = field.value
+                      ? field.value
+                          .split("_")
+                          .map(
+                            (word) =>
+                              word.charAt(0).toUpperCase() + word.slice(1),
+                          )
+                          .join(" ")
+                      : "Select option";
 
-                          {/* Default selection */}
-                          <SelectItem label="No selection" value="" />
+                    return (
+                      <Select
+                        selectedValue={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger>
+                          <SelectInput
+                            placeholder="Select option"
+                            className="flex-1"
+                            value={formattedSelectedValue}
+                          />
+                          <SelectIcon className="mr-3" as={ChevronDownIcon} />
+                        </SelectTrigger>
+                        <SelectPortal>
+                          <SelectBackdrop />
+                          <SelectContent>
+                            <SelectDragIndicatorWrapper>
+                              <SelectDragIndicator />
+                            </SelectDragIndicatorWrapper>
 
-                          {image_labels.length > 0 && !isLoading ? (
-                            image_labels.map((label) => {
-                              const formattedLabel = label
-                                .split("_")
-                                .map(
-                                  (word) =>
-                                    word.charAt(0).toUpperCase() +
-                                    word.slice(1),
-                                )
-                                .join(" ");
+                            {/* Default selection */}
+                            <SelectItem label="No selection" value="" />
 
-                              return (
-                                <SelectItem
-                                  key={label}
-                                  label={formattedLabel}
-                                  value={label}
-                                />
-                              );
-                            })
-                          ) : (
-                            <SelectItem
-                              label={"No Options"}
-                              value={"No Options"}
-                              disabled
-                            />
-                          )}
-                        </SelectContent>
-                      </SelectPortal>
-                    </Select>
-                  )}
+                            {image_labels.length > 0 && !isLoading ? (
+                              image_labels.map((label) => {
+                                const formattedLabel = label
+                                  .split("_")
+                                  .map(
+                                    (word) =>
+                                      word.charAt(0).toUpperCase() +
+                                      word.slice(1),
+                                  )
+                                  .join(" ");
+
+                                return (
+                                  <SelectItem
+                                    key={label}
+                                    label={formattedLabel}
+                                    value={label}
+                                  />
+                                );
+                              })
+                            ) : (
+                              <SelectItem
+                                label={"No Options"}
+                                value={"No Options"}
+                                disabled
+                              />
+                            )}
+                          </SelectContent>
+                        </SelectPortal>
+                      </Select>
+                    );
+                  }}
                 />
               </FormControl>
               <Divider />
