@@ -81,8 +81,8 @@ export default function FilterMementoSheet({
     defaultValues,
   });
 
-  const { image_labels, refetch, isLoading } = useImageLabels({
-    queryOptions: { refetchOnMount: false },
+  const { image_labels, isLoading } = useImageLabels({
+    queryOptions: { refetchOnMount: true },
   });
 
   const startDate = watch("start_date");
