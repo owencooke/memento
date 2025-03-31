@@ -1,12 +1,14 @@
 import { Tabs } from "expo-router";
 import { HapticTab } from "@/src/components/navigation/HapticTab";
-import { IconSymbol } from "@/src/components/ui/IconSymbol";
 import TabBarBackground from "@/src/components/ui/TabBarBackground";
 import Header from "@/src/components/navigation/Header";
 import { useColors } from "@/src/hooks/useColors";
+import { BookHeart, FolderHeart } from "lucide-react-native";
 
 export default function TabLayout() {
   const { getColor } = useColors();
+
+  const primaryColor = getColor("primary-500");
 
   return (
     <Tabs
@@ -22,8 +24,8 @@ export default function TabLayout() {
         name="mementos"
         options={{
           title: "Mementos",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="house.fill" color={color} />
+          tabBarIcon: ({ color, size }) => (
+            <BookHeart size={size} color={color || primaryColor} />
           ),
         }}
       />
@@ -31,8 +33,8 @@ export default function TabLayout() {
         name="collections"
         options={{
           title: "Collections",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="paperplane.fill" color={color} />
+          tabBarIcon: ({ color, size }) => (
+            <FolderHeart size={size} color={color || primaryColor} />
           ),
         }}
       />
