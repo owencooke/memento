@@ -27,34 +27,37 @@ export default function SignIn() {
   }
 
   return (
-    <View className="m-auto w-full h-2/5 justify-between px-5">
-      <View className="flex flex-1 justify-start items-center">
-        <Image
-          size="xl"
-          resizeMode="contain"
-          source={require("@/src/assets/images/logo.png")}
-          alt="Memento Logo"
-        />
-        <Heading className="mt-4" size="4xl">
-          Memento
-        </Heading>
-      </View>
-      <View className="mt-6 px-8">
-        <Button
-          size="lg"
-          action="secondary"
-          onPress={signIn}
-          className="bg-background-0 flex items-center justify-center rounded-lg border"
-        >
+    <View className="w-full h-full bg-primary-50">
+      <View className="m-auto w-full h-2/5 justify-between px-5">
+        <View className="flex flex-1 justify-start items-center">
           <Image
-            source={require("@/src/assets/images/google-logo.png")}
-            alt="Google Logo"
-            className="w-10 h-10"
+            // size="2xl"
+            className="h-1/2 aspect-square"
+            resizeMode="contain"
+            source={require("@/src/assets/images/logo.png")}
+            alt="Memento Logo"
           />
-          <ButtonText className="text-typography-800">
-            Sign in with Google
-          </ButtonText>
-        </Button>
+          <Heading className="mt-4 text-primary-500" size="4xl">
+            Memento
+          </Heading>
+        </View>
+        <View className="mt-6 px-8">
+          <Button
+            size="lg"
+            action="secondary"
+            onPress={signIn}
+            className="bg-background-0 flex items-center justify-center rounded-lg border"
+          >
+            <Image
+              source={require("@/src/assets/images/google-logo.png")}
+              alt="Google Logo"
+              className="w-10 h-10"
+            />
+            <ButtonText className="text-typography-800">
+              Sign in with Google
+            </ButtonText>
+          </Button>
+        </View>
       </View>
     </View>
   );

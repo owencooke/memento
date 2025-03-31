@@ -20,7 +20,7 @@ export default {
     android: {
       adaptiveIcon: {
         foregroundImage: "./src/assets/images/logo.png",
-        backgroundColor: "#ffffff",
+        backgroundColor: "#dceefe",
       },
       package: "com.memento.app",
       config: {
@@ -42,7 +42,7 @@ export default {
           image: "./src/assets/images/logo.png",
           imageWidth: 200,
           resizeMode: "contain",
-          backgroundColor: "#ffffff",
+          backgroundColor: "#dceefe",
         },
       ],
     ],
