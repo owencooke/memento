@@ -91,83 +91,83 @@ export default function Collections() {
 
   return (
     <Box className="flex-1 bg-background-100">
-      {collections && collections.length > 0 ? (
-        showMapView ? (
-          <MapView style={styles.mapView} initialRegion={initialMapRegion}>
-            {collections
-              .filter((collection) => collection.coordinates)
-              .map((collection) => (
-                <Marker
-                  key={collection.id}
-                  coordinate={{
-                    latitude: collection.coordinates?.lat!,
-                    longitude: collection.coordinates?.long!,
-                  }}
-                  title={collection.title}
-                  description={collection.caption || undefined}
-                  onCalloutPress={() => handleViewCollection(collection.id)}
-                >
-                  {Platform.OS === "android" ? (
-                    //NOTE: Android does not support rendering custom views with size larger than 40x40px.
-                    //   So we render just the thumbnail image as a marker, instead of complex card.
-                    <Image
-                      className="max-w-10 max-h-10"
-                      resizeMode="cover"
-                      source={{
-                        uri: collection.thumbnailUri,
-                      }}
-                      alt="Thumbnail for Collection"
-                    />
-                  ) : (
-                    <Pressable
-                      onPress={() => handleViewCollection(collection.id)}
-                    >
-                      <CollectionCard {...collection} variant="marker" />
-                    </Pressable>
-                  )}
-                </Marker>
-              ))}
-          </MapView>
-        ) : (
-          <FlatList
-            numColumns={2}
-            columnWrapperStyle={{ gap: 12 }}
-            contentContainerStyle={{
-              gap: 12,
-              paddingHorizontal: 24,
-              paddingVertical: 24,
-            }}
-            showsVerticalScrollIndicator={false}
-            data={gridData}
-            keyExtractor={(item, index) =>
-              "spacer" in item ? `spacer-${index}` : String(item.id)
-            }
-            renderItem={({ item }) =>
-              "spacer" in item ? (
-                <Box className="flex-1" />
-              ) : (
-                <Pressable
-                  className="flex-1"
-                  onPress={() => handleViewCollection(item.id)}
-                >
-                  <CollectionCard {...item} />
-                </Pressable>
-              )
-            }
-            refreshControl={
-              <RefreshControl
-                refreshing={refreshing}
-                onRefresh={handleRefresh}
-                colors={[refreshColor]}
-                tintColor={refreshColor}
-              />
-            }
-          />
-        )
+      {showMapView ? (
+        <MapView style={styles.mapView} initialRegion={initialMapRegion}>
+          {collections
+            .filter((collection) => collection.coordinates)
+            .map((collection) => (
+              <Marker
+                key={collection.id}
+                coordinate={{
+                  latitude: collection.coordinates?.lat!,
+                  longitude: collection.coordinates?.long!,
+                }}
+                title={collection.title}
+                description={collection.caption || undefined}
+                onCalloutPress={() => handleViewCollection(collection.id)}
+              >
+                {Platform.OS === "android" ? (
+                  //NOTE: Android does not support rendering custom views with size larger than 40x40px.
+                  //   So we render just the thumbnail image as a marker, instead of complex card.
+                  <Image
+                    className="max-w-10 max-h-10"
+                    resizeMode="cover"
+                    source={{
+                      uri: collection.thumbnailUri,
+                    }}
+                    alt="Thumbnail for Collection"
+                  />
+                ) : (
+                  <Pressable
+                    onPress={() => handleViewCollection(collection.id)}
+                  >
+                    <CollectionCard {...collection} variant="marker" />
+                  </Pressable>
+                )}
+              </Marker>
+            ))}
+        </MapView>
       ) : (
-        <Box className="flex-1 items-center justify-center">
-          <Text>No collections yet!</Text>
-        </Box>
+        <FlatList
+          numColumns={2}
+          columnWrapperStyle={{ gap: 12 }}
+          contentContainerStyle={{
+            gap: 12,
+            paddingHorizontal: 24,
+            paddingVertical: 24,
+            flexGrow: 1,
+          }}
+          showsVerticalScrollIndicator={false}
+          data={gridData}
+          keyExtractor={(item, index) =>
+            "spacer" in item ? `spacer-${index}` : String(item.id)
+          }
+          renderItem={({ item }) =>
+            "spacer" in item ? (
+              <Box className="flex-1" />
+            ) : (
+              <Pressable
+                className="flex-1"
+                onPress={() => handleViewCollection(item.id)}
+              >
+                <CollectionCard {...item} />
+              </Pressable>
+            )
+          }
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              colors={[refreshColor]}
+              tintColor={refreshColor}
+            />
+          }
+          ListEmptyComponent={
+            <Box className="flex-1 items-center justify-center">
+              <Text>No collections yet!</Text>
+            </Box>
+          }
+        />
       )}
       {!showMapView && (
         <Fab size="lg" onPress={handleAddCollection}>
