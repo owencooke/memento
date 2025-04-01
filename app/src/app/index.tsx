@@ -17,28 +17,31 @@ import Animated, {
 } from "react-native-reanimated";
 import { Text } from "../components/ui/text";
 import { MementoLogo } from "../components/MementoLogo";
+import { useEffect } from "react";
 
 export default function SignIn() {
   const { session, isLoading, signIn, isNewUser } = useSession();
 
-  // Fade-in animations
   const progress = useSharedValue(0);
-  progress.value = withSequence(
-    withTiming(1, { duration: 800 }), // Logo appears
-    withDelay(200, withTiming(2, { duration: 600 })), // Title appears
-    withDelay(300, withTiming(3, { duration: 500 })), // Login button appears
-  );
-
-  // Bounce animation for logo
   const bounce = useSharedValue(0);
-  bounce.value = withRepeat(
-    withSequence(
-      withTiming(-10, { duration: 600, easing: Easing.inOut(Easing.ease) }),
-      withTiming(0, { duration: 600, easing: Easing.inOut(Easing.ease) }),
-    ),
-    -1,
-    true,
-  );
+
+  useEffect(() => {
+    // Fade-in animations
+    progress.value = withSequence(
+      withTiming(1, { duration: 800 }), // Logo appears
+      withDelay(200, withTiming(2, { duration: 600 })), // Title appears
+      withDelay(300, withTiming(3, { duration: 500 })), // Login button appears
+    );
+    // Bounce animation for logo
+    bounce.value = withRepeat(
+      withSequence(
+        withTiming(-10, { duration: 600, easing: Easing.inOut(Easing.ease) }),
+        withTiming(0, { duration: 600, easing: Easing.inOut(Easing.ease) }),
+      ),
+      -1,
+      true,
+    );
+  }, [bounce, progress]);
 
   // Animated styles
   const logoStyle = useAnimatedStyle(() => ({

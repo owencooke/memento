@@ -8,6 +8,7 @@ import { Platform } from "react-native";
 import { getDateFromISO } from "./date";
 
 export async function scheduleAllNotifications(birthdayString: string) {
+  clearAllScheduledNotifications();
   scheduleBirthdayNotification(birthdayString);
   scheduleChristmasNotification();
   scheduleValentinesNotification();
@@ -57,6 +58,7 @@ async function scheduleAnnualNotification(
   day: number,
 ) {
   const now = new Date();
+  const minutes = now.getMinutes() + 1;
   const isToday = now.getMonth() + 1 === month && now.getDate() === day;
   console.log(`Scheduling: ${title} for: ${month}/${day}`);
 
@@ -67,8 +69,8 @@ async function scheduleAnnualNotification(
         : Notifications.SchedulableTriggerInputTypes.YEARLY,
     month,
     day,
-    hour: now.getHours(),
-    minute: now.getMinutes() + 1,
+    hour: minutes >= 60 ? (now.getHours() + 1) % 24 : now.getHours(),
+    minute: minutes % 60,
     repeats: true,
   };
 
