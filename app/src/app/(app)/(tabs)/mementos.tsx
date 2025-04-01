@@ -63,7 +63,7 @@ export default function Mementos() {
 
   const handleAddMemento = () => {
     closeCreateOptions();
-    router.push("/(app)/(screens)/memento/create");
+    router.push("/(app)/(screens)/memento/create/single");
   };
 
   const handleBulkCreate = () => {
