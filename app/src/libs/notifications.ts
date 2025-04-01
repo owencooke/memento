@@ -8,7 +8,7 @@ import { Platform } from "react-native";
 import { getDateFromISO } from "./date";
 
 export async function scheduleAllNotifications(birthdayString: string) {
-  clearAllScheduledNotifications();
+  await clearAllScheduledNotifications();
   scheduleBirthdayNotification(birthdayString);
   scheduleChristmasNotification();
   scheduleValentinesNotification();

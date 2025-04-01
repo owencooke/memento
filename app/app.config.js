@@ -19,7 +19,7 @@ export default {
     },
     android: {
       adaptiveIcon: {
-        foregroundImage: "./src/assets/images/logo.png",
+        foregroundImage: "./src/assets/images/logo-android.png",
         backgroundColor: "#dceefe",
       },
       package: "com.memento.app",
@@ -39,7 +39,7 @@ export default {
       [
         "expo-splash-screen",
         {
-          image: "./src/assets/images/logo.png",
+          image: "./src/assets/images/logo-android.png",
           imageWidth: 200,
           resizeMode: "contain",
           backgroundColor: "#dceefe",
