@@ -188,15 +188,9 @@ export default function FilterMementoSheet({
                   name="image_label"
                   control={control}
                   render={({ field }) => {
-                    const formattedSelectedValue = field.value
-                      ? field.value
-                          .split("_")
-                          .map(
-                            (word) =>
-                              word.charAt(0).toUpperCase() + word.slice(1),
-                          )
-                          .join(" ")
-                      : "Select option";
+                    const selectedLabel =
+                      image_labels.find((label) => label.value === field.value)
+                        ?.label ?? "Select option";
 
                     return (
                       <Select
@@ -207,7 +201,7 @@ export default function FilterMementoSheet({
                           <SelectInput
                             placeholder="Select option"
                             className="flex-1 align-middle p-0 pl-2 m-0 h-full text-normal"
-                            value={formattedSelectedValue}
+                            value={selectedLabel}
                           />
                           <SelectIcon className="mr-3" as={ChevronDownIcon} />
                         </SelectTrigger>
@@ -222,21 +216,12 @@ export default function FilterMementoSheet({
                             <SelectItem label="No selection" value="" />
 
                             {image_labels.length > 0 && !isLoading ? (
-                              image_labels.map((label) => {
-                                const formattedLabel = label
-                                  .split("_")
-                                  .map(
-                                    (word) =>
-                                      word.charAt(0).toUpperCase() +
-                                      word.slice(1),
-                                  )
-                                  .join(" ");
-
+                              image_labels.map(({ value, label }) => {
                                 return (
                                   <SelectItem
-                                    key={label}
-                                    label={formattedLabel}
-                                    value={label}
+                                    key={value}
+                                    label={label}
+                                    value={value}
                                   />
                                 );
                               })
