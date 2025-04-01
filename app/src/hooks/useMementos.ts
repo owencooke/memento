@@ -58,7 +58,7 @@ export const useMementos = ({
       max_lat: filters.bbox?.northeast.lat ?? undefined,
       max_long: filters.bbox?.northeast.lng ?? undefined,
       text: searchText?.trim() || undefined,
-      image_labels: filters.image_label ?? undefined,
+      image_label: filters.image_label ?? undefined,
     },
     600,
   );
