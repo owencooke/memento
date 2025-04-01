@@ -164,9 +164,9 @@ export default function Collections() {
             />
           }
           ListEmptyComponent={
-            <Box className="flex-1 items-center justify-center">
-              <MementoLogo size="xl" variant="sad" />
-              <Text size="lg">You haven't created any collections yet!</Text>
+            <Box className="flex-1 items-center justify-center gap-2">
+              <MementoLogo size="lg" variant="sad" />
+              <Text size="lg">No collections yet. Start your first one!</Text>
             </Box>
           }
         />

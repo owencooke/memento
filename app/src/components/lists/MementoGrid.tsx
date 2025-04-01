@@ -61,7 +61,7 @@ export default function MementoGrid<ItemT extends MementoWithImages>({
       }
       ListEmptyComponent={
         <View className="flex-1 items-center justify-center">
-          <MementoLogo size="xl" variant="sad" />
+          <MementoLogo size="lg" variant="sad" />
           <Text size="lg">{emptyMessage}</Text>
         </View>
       }
