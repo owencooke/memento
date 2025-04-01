@@ -1,6 +1,6 @@
 """
 @description Supabase DB queries for Keepsakes/Mementos.
-@requirements FR-17, FR-19, FR-26, FR-27, FR30, FR33
+@requirements FR-16, FR-17, FR-19, FR-26, FR-27, FR30, FR33
 """
 
 from pydantic import UUID4
@@ -28,7 +28,7 @@ def get_mementos(
     """Gets all the mementos belonging to a user."""
     query = (
         supabase.table("memento")
-        .select("*, images:image(*)")
+        .select("*, images:image!inner(*)")
         .eq("user_id", str(user_id))
     )
 
@@ -39,6 +39,8 @@ def get_mementos(
             query.lte("date", filter_query.end_date.isoformat())
         if filter_query.text:
             query.text_search("memento_searchable_content", filter_query.text)
+        if filter_query.image_label:
+            query.eq("images.image_label", filter_query.image_label)
 
         # Bounding box filtering using the RPC function
         if all(
@@ -80,3 +82,25 @@ def update_memento(id: int, updated_memento: UpdateMemento) -> Memento:
         .execute()
     )
     return Memento(**response.data[0])
+
+
+def get_image_labels(user_id: UUID4) -> list[str]:
+    """Gets all image labels from associated images of users mementos"""
+    response = (
+        supabase.table("memento")
+        .select("user_id, images:image(image_label)")
+        .eq("user_id", str(user_id))
+        .neq("image.image_label", None)
+        .neq("image.image_label", "")
+        .execute()
+    )
+    labels = list(
+        {
+            image["image_label"]
+            for memento in response.data
+            for image in memento["images"]
+        },
+    )
+    labels.sort()
+
+    return labels
