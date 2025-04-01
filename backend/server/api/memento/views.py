@@ -16,6 +16,7 @@ from pydantic import UUID4
 
 from server.api.memento.models import (
     CreateMementoSuccessResponse,
+    ImageLabelResponse,
     MementoFilterParams,
     NewImageMetadata,
     NewMemento,
@@ -226,6 +227,13 @@ async def update_memento_and_images(
 @router.get("/image_labels")
 def get_users_image_labels(
     user_id: UUID4 = Depends(get_user_id),
-) -> list[str]:
+) -> list[ImageLabelResponse]:
     """Gets each unique image label from images associated with user's mementos"""
-    return get_image_labels(user_id)
+
+    def format_label(snake_case: str) -> str:
+        return " ".join(word.capitalize() for word in snake_case.split("_"))
+
+    labels = get_image_labels(user_id)
+    return [
+        ImageLabelResponse(value=label, label=format_label(label)) for label in labels
+    ]

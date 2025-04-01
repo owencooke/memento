@@ -36,6 +36,13 @@ class UpdateMemento(CoordinatesInsert, BaseWithCoordinates, MementoUpdate):  # t
     """
 
 
+class ImageLabelResponse(BaseModel):
+    """Value and formatted label"""
+
+    value: str
+    label: str
+
+
 class MementoFilterParams(BaseModel):
     """Filter parameters for Memento"""
 
