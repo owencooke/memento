@@ -120,6 +120,14 @@ export type Image = {
     memento_ids?: Array<Memento> | null;
 };
 
+/**
+ * Value and formatted label
+ */
+export type ImageLabelResponse = {
+    value: string;
+    label: string;
+};
+
 export type ImageWithUrl = {
     id: number;
     memento_id: number;
@@ -327,10 +335,7 @@ export type GetUsersMementosApiUserUserIdMementoGetData = {
         max_lat?: number | null;
         max_long?: number | null;
         text?: string | null;
-        /**
-         * Comma-separated image labels
-         */
-        image_labels?: string | null;
+        image_label?: string | null;
     };
     url: '/api/user/{user_id}/memento/';
 };
@@ -427,7 +432,7 @@ export type GetUsersImageLabelsApiUserUserIdMementoImageLabelsGetResponses = {
     /**
      * Successful Response
      */
-    200: Array<string>;
+    200: Array<ImageLabelResponse>;
 };
 
 export type GetUsersImageLabelsApiUserUserIdMementoImageLabelsGetResponse = GetUsersImageLabelsApiUserUserIdMementoImageLabelsGetResponses[keyof GetUsersImageLabelsApiUserUserIdMementoImageLabelsGetResponses];
