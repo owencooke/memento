@@ -120,6 +120,14 @@ export type Image = {
     memento_ids?: Array<Memento> | null;
 };
 
+/**
+ * Value and formatted label
+ */
+export type ImageLabelResponse = {
+    value: string;
+    label: string;
+};
+
 export type ImageWithUrl = {
     id: number;
     memento_id: number;
@@ -327,6 +335,7 @@ export type GetUsersMementosApiUserUserIdMementoGetData = {
         max_lat?: number | null;
         max_long?: number | null;
         text?: string | null;
+        image_label?: string | null;
     };
     url: '/api/user/{user_id}/memento/';
 };
@@ -400,6 +409,33 @@ export type UpdateMementoAndImagesApiUserUserIdMementoIdPutResponses = {
      */
     200: unknown;
 };
+
+export type GetUsersImageLabelsApiUserUserIdMementoImageLabelsGetData = {
+    body?: never;
+    path: {
+        user_id: string;
+    };
+    query?: never;
+    url: '/api/user/{user_id}/memento/image_labels';
+};
+
+export type GetUsersImageLabelsApiUserUserIdMementoImageLabelsGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetUsersImageLabelsApiUserUserIdMementoImageLabelsGetError = GetUsersImageLabelsApiUserUserIdMementoImageLabelsGetErrors[keyof GetUsersImageLabelsApiUserUserIdMementoImageLabelsGetErrors];
+
+export type GetUsersImageLabelsApiUserUserIdMementoImageLabelsGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: Array<ImageLabelResponse>;
+};
+
+export type GetUsersImageLabelsApiUserUserIdMementoImageLabelsGetResponse = GetUsersImageLabelsApiUserUserIdMementoImageLabelsGetResponses[keyof GetUsersImageLabelsApiUserUserIdMementoImageLabelsGetResponses];
 
 export type GetUsersCollectionsApiUserUserIdCollectionGetData = {
     body?: never;
