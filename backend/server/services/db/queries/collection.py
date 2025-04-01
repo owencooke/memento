@@ -42,6 +42,29 @@ def get_collections(
     return [CollectionWithMementos(**collection) for collection in response.data]
 
 
+def get_has_mementos(collection_id: int) -> list[int]:
+    """Gets the mementos associated with a collection"""
+    response = (
+        supabase.table("has_memento")
+        .select("memento_id")
+        .eq("collection_id", collection_id)
+        .execute()
+    )
+    return [item["memento_id"] for item in response.data]
+
+
+def db_delete_has_memento(collection_id: int, memento_id: int) -> HasMemento:
+    """Deletes a memento association from the DB"""
+    response = (
+        supabase.table("has_memento")
+        .delete()
+        .eq("collection_id", collection_id)
+        .eq("memento_id", memento_id)
+        .execute()
+    )
+    return HasMemento(**response.data[0])
+
+
 def create_collection(new_collection: NewCollection, user_id: UUID4) -> Collection:
     """Creates a new collection for a user."""
     response = (

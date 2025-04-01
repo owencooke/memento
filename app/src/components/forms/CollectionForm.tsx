@@ -12,13 +12,16 @@ import { Heading } from "@/src/components/ui/heading";
 import { Input, InputField } from "@/src/components/ui/input";
 import { Textarea, TextareaInput } from "@/src/components/ui/textarea";
 import { Button, ButtonSpinner, ButtonText } from "@/src/components/ui/button";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { AlertCircleIcon } from "@/src/components/ui/icon";
 import LocationInput, {
   GeoLocation,
 } from "@/src/components/inputs/LocationInput";
 import { FlatList } from "react-native";
 import DatePickerInput from "@/src/components/inputs/DatePickerInput";
+import { router, useLocalSearchParams } from "expo-router";
+import { useMementos } from "@/src/hooks/useMementos";
+import MementoGrid from "../lists/MementoGrid";
 
 /**
  * Form values for the CreateCollection screen
@@ -45,12 +48,13 @@ export default function CollectionForm({
   isSubmitting,
   onSubmit,
 }: CollectionFormProps) {
-  const defaultValues: CollectionFormData = {
-    title: "",
-    caption: "",
-    date: null,
-    location: { text: "" },
-  };
+  // Get local search params for selected mementos from select_mementos page
+  const { ids: idsString } = useLocalSearchParams<{ ids: string }>();
+  const selectedMementoIds = !idsString
+    ? []
+    : Array.isArray(idsString)
+      ? idsString.map(Number)
+      : idsString.split(",").map(Number);
 
   const {
     control,
@@ -59,16 +63,20 @@ export default function CollectionForm({
     setValue,
     formState: { errors },
   } = useForm<CollectionFormData>({
-    defaultValues: initialValues || defaultValues,
+    defaultValues: initialValues || {
+      title: "",
+      caption: "",
+      date: null,
+      location: { text: "" },
+    },
   });
 
-  // Prevent re-rendering location input when Geolocation changes
+  const { mementos } = useMementos({
+    queryOptions: { refetchOnMount: false },
+  });
+
+  // Updates the location input when GeoLocation changes
   const locationValue = watch("location");
-  /**
-   * Updates the location input when GeoLocation changes
-   *
-   * @param {GeoLocation} location - new location value
-   */
   const handleLocationChange = useCallback(
     (location: GeoLocation) => {
       const hasChanged =
@@ -82,6 +90,12 @@ export default function CollectionForm({
     },
     [locationValue, setValue],
   );
+
+  const handleAddMementosPress = () => {
+    router.push(
+      `/(app)/(screens)/collection/select_mementos?ids=${selectedMementoIds}`,
+    );
+  };
 
   return (
     <FlatList
@@ -173,6 +187,29 @@ export default function CollectionForm({
                 />
               )}
             />
+          </FormControl>
+          <FormControl size={"lg"}>
+            <FormControlLabel>
+              <FormControlLabelText>Mementos</FormControlLabelText>
+            </FormControlLabel>
+            {selectedMementoIds.length > 0 && (
+              <View className="flex-1 py-4">
+                <MementoGrid
+                  numColumns={3}
+                  mementos={mementos?.filter((memento) =>
+                    selectedMementoIds.includes(memento.id),
+                  )}
+                />
+              </View>
+            )}
+            <Button
+              className="mt-auto"
+              action="secondary"
+              size={"lg"}
+              onPress={handleAddMementosPress}
+            >
+              <ButtonText>Select Mementos</ButtonText>
+            </Button>
           </FormControl>
           <Button
             className="mt-auto"

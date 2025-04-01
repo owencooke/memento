@@ -74,34 +74,32 @@ export default function BulkCreateMemento() {
   // Updated groups when photos change
   useEffect(() => {
     setMementoGroups((prevGroups) => {
-      let lastGroupId = prevGroups.length - 1;
-      const prevPhotos = prevGroups.flatMap((group) => group.photos);
-      return photos.map((newPhoto) => {
-        const matchingGroupedPhoto = prevPhotos.find(
-          (p) => p.assetId === newPhoto.assetId,
-        );
-        if (!matchingGroupedPhoto) {
-          // New photo -> assigned to new group
-          lastGroupId += 1;
-          return {
-            ...defaultMementoFormValues.memento,
-            groupId: lastGroupId,
-            photos: [{ ...newPhoto, group: lastGroupId }],
-          };
-        }
-        // Get previous group and update the specific photo (i.e. bg removed)
-        const prevGroup = prevGroups.find(
-          (group) => matchingGroupedPhoto.group === group.groupId,
-        )!;
-        return {
-          ...prevGroup,
-          photos: prevGroup.photos.map((oldPhoto) =>
-            oldPhoto.group === matchingGroupedPhoto.group
-              ? { ...newPhoto, group: oldPhoto.group }
-              : oldPhoto,
-          ),
-        };
+      let remainingPhotos = [...photos];
+      const newGroups = prevGroups.map((group) => {
+        // Update photos for specific group
+        const updatedPhotos = group.photos.map((oldPhoto) => {
+          const matchingNewPhotoIndex = remainingPhotos.findIndex(
+            (newPhoto) => newPhoto.assetId === oldPhoto.assetId,
+          );
+          if (matchingNewPhotoIndex !== -1) {
+            const newPhoto = remainingPhotos[matchingNewPhotoIndex];
+            remainingPhotos.splice(matchingNewPhotoIndex, 1);
+            return { ...newPhoto, group: oldPhoto.group };
+          }
+          return oldPhoto;
+        });
+        // Update group with updated photos
+        return { ...group, photos: updatedPhotos };
       });
+      // For new photos, add each to a new group
+      remainingPhotos.forEach((newPhoto) => {
+        newGroups.push({
+          ...defaultMementoFormValues.memento,
+          groupId: newGroups.length,
+          photos: [{ ...newPhoto, group: newGroups.length }],
+        });
+      });
+      return newGroups;
     });
   }, [photos]);
 

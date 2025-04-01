@@ -1,9 +1,8 @@
-import MementoCard from "@/src/components/cards/MementoCard";
 import { Fab, FabIcon } from "@/src/components/ui/fab";
 import { AddIcon } from "@/src/components/ui/icon";
 import { router } from "expo-router";
-import { View, Text, FlatList, Pressable, RefreshControl } from "react-native";
-import { useMemo, useState } from "react";
+import { View, RefreshControl } from "react-native";
+import { useState } from "react";
 import { useColors } from "@/src/hooks/useColors";
 import {
   Input,
@@ -31,6 +30,8 @@ import { Grid2x2Plus } from "lucide-react-native";
 import { useMementos } from "@/src/hooks/useMementos";
 import { toISODateString } from "@/src/libs/date";
 import { Badge, BadgeText } from "@/src/components/ui/badge";
+import MementoGrid from "@/src/components/lists/MementoGrid";
+import { MementoWithImages } from "@/src/api-client/generated";
 
 export default function Mementos() {
   const [showActionsheet, setShowActionsheet] = useState(false);
@@ -49,15 +50,6 @@ export default function Mementos() {
     setSearchText,
   } = useMementos();
 
-  // For odd number of mementos, add a spacer for last grid element
-  const gridData = useMemo(
-    () =>
-      mementos?.length && mementos.length % 2
-        ? [...mementos, { spacer: true }]
-        : mementos,
-    [mementos],
-  );
-
   const closeCreateOptions = () => setShowCreateOptions(false);
 
   const handleRefresh = async () => {
@@ -66,8 +58,8 @@ export default function Mementos() {
     setRefreshing(false);
   };
 
-  const handleViewMemento = (id: number) =>
-    router.push(`/(app)/(screens)/memento/${id}`);
+  const handleViewMemento = (memento: MementoWithImages) =>
+    router.push(`/(app)/(screens)/memento/${memento.id}`);
 
   const handleAddMemento = () => {
     closeCreateOptions();
@@ -120,24 +112,9 @@ export default function Mementos() {
           )}
         </Button>
       </View>
-      <FlatList
-        columnWrapperStyle={{ gap: 12 }}
-        contentContainerStyle={{ gap: 12, flexGrow: 1 }}
-        numColumns={2}
-        showsVerticalScrollIndicator={false}
-        data={gridData}
-        renderItem={({ item }) =>
-          "spacer" in item ? (
-            <View className="flex-1" />
-          ) : (
-            <Pressable
-              className="flex-1"
-              onPress={() => handleViewMemento(item.id)}
-            >
-              <MementoCard {...item} />
-            </Pressable>
-          )
-        }
+      <MementoGrid
+        mementos={mementos}
+        onMementoPress={handleViewMemento}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -145,11 +122,6 @@ export default function Mementos() {
             colors={[refreshColor]}
             tintColor={refreshColor}
           />
-        }
-        ListEmptyComponent={
-          <View className="flex-1 items-center justify-center">
-            <Text>No mementos yet!</Text>
-          </View>
         }
       />
       <Fab

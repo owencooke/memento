@@ -1,8 +1,9 @@
 """
 @description API routes for Image Processing
-@requirements FR-10
+@requirements FR-8, FR-10, FR-11
 """
 
+import pytesseract
 from fastapi import APIRouter, HTTPException, Response, UploadFile
 
 from server.services.process_image.background import (
@@ -13,6 +14,7 @@ from server.services.process_image.converters import (
     pil_to_png_bytes,
     upload_file_to_pil,
 )
+from server.services.process_image.image_class import predict_class
 
 router = APIRouter()
 
@@ -27,3 +29,25 @@ async def remove_image_background(image_file: UploadFile) -> Response:
         return Response(content=output_bytes, media_type="image/png")
     except BackgroundRemovalError as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
+
+
+@router.post("/extract-text")
+async def extract_text(image_file: UploadFile) -> str:
+    """Uses OCR library to extract text from image"""
+    try:
+        input_image = await upload_file_to_pil(image_file)
+
+        return pytesseract.image_to_string(input_image)
+
+    except Exception as e:
+        return str(e)
+
+
+@router.post("/classify")
+async def classify_image(image_file: UploadFile) -> str:
+    """Test route for using Tensorflow/Keras to classify image"""
+    try:
+        input_image = await upload_file_to_pil(image_file)
+        return predict_class(input_image)
+    except Exception as e:
+        return str(e)
