@@ -1,6 +1,5 @@
 import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Image } from "@/src/components/ui/image";
 import { useSession } from "@/src/context/AuthContext";
 import {
   Avatar,
@@ -19,6 +18,7 @@ import {
 import { useTheme } from "../../context/ThemeContext";
 import { Text } from "../ui/text";
 import { router } from "expo-router";
+import { MementoLogo } from "../MementoLogo";
 
 interface HeaderProps {
   title?: string;
@@ -42,13 +42,7 @@ const Header: React.FC<HeaderProps> = ({ title, mode = "avatar" }) => {
             <ButtonIcon className="w-8 h-8" as={ChevronLeftIcon} />
           </Button>
         )}
-        <Image
-          size="sm"
-          source={require("@/src/assets/images/logo.png")}
-          alt="Memento Logo"
-          className="mr-2"
-          resizeMode="contain"
-        />
+        <MementoLogo size="sm" className="mr-2" />
         {title && mode === "avatar" && (
           <Text size="xl" className="font-semibold">
             {title}

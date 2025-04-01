@@ -21,9 +21,9 @@ import { router } from "expo-router";
 import { toISODateString } from "@/src/libs/date";
 import { ArrowRightIcon } from "@/src/components/ui/icon";
 import { View } from "react-native";
-import { Image } from "@/src/components/ui/image";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Notifications from "expo-notifications";
+import { MementoLogo } from "@/src/components/MementoLogo";
 
 interface NewUserInfoForm {
   birthday: Date;
@@ -61,13 +61,8 @@ export default function NewUserForm() {
   return (
     <SafeAreaView className="flex-1 p-6 justify-center" edges={["bottom"]}>
       <View className="flex items-center gap-2 mb-4">
-        <Image
-          size="xl"
-          resizeMode="contain"
-          source={require("@/src/assets/images/logo.png")}
-          alt="Memento Logo"
-        />
-        <Heading className="block" size="2xl">
+        <MementoLogo size="xl" />
+        <Heading className="block text-primary-500" size="2xl">
           Welcome to Memento 👋
         </Heading>
       </View>

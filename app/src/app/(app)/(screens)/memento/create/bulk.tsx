@@ -103,12 +103,6 @@ export default function BulkCreateMemento() {
     });
   }, [photos]);
 
-  console.log({
-    mementoGroups: mementoGroups.flatMap((group) =>
-      group.photos.map((p) => p.assetId),
-    ),
-  });
-
   // Update memento groups when user drags/reorders a photo
   const handlePhotosReordered = useCallback(
     (updatedPhotos: PhotoWithGroup[]) => {

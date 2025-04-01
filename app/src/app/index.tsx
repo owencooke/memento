@@ -16,6 +16,7 @@ import Animated, {
   Easing,
 } from "react-native-reanimated";
 import { Text } from "../components/ui/text";
+import { MementoLogo } from "../components/MementoLogo";
 
 export default function SignIn() {
   const { session, isLoading, signIn, isNewUser } = useSession();
@@ -75,12 +76,7 @@ export default function SignIn() {
       <View className="m-auto w-full h-2/5 justify-between px-5">
         <View className="flex flex-1 justify-start items-center">
           <Animated.View style={logoStyle} className="flex-1">
-            <Image
-              className="h-full aspect-square"
-              resizeMode="contain"
-              source={require("@/src/assets/images/logo.png")}
-              alt="Memento Logo"
-            />
+            <MementoLogo className="h-full aspect-square" />
           </Animated.View>
           <Animated.View
             style={titleStyle}
