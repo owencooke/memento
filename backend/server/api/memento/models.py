@@ -2,7 +2,6 @@ import datetime
 import re
 from typing import Any, Optional
 
-from fastapi import Query
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 from server.services.db.models.gis import BaseWithCoordinates, CoordinatesInsert
