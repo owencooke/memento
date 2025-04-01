@@ -1,19 +1,23 @@
 import React from "react";
 import { Image, ImageProps } from "@/src/components/ui/image";
 
-export type LogoProps = Omit<ImageProps, "source" | "alt">;
+export type MementoLogoProps = Omit<ImageProps, "source" | "alt"> & {
+  variant?: "default" | "sad";
+};
 
-/**
- * Logo component for displaying the Memento logo consistently across the app
- */
 export const MementoLogo = ({
+  variant = "default",
   className = "",
   resizeMode = "contain",
   ...props
-}: LogoProps) => {
+}: MementoLogoProps) => {
   return (
     <Image
-      source={require("@/src/assets/images/logo.png")}
+      source={
+        variant === "sad"
+          ? require("@/src/assets/images/logo-sad.png")
+          : require("@/src/assets/images/logo.png")
+      }
       alt="Memento Logo"
       className={`${className}`}
       resizeMode={resizeMode}

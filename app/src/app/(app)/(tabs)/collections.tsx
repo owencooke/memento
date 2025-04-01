@@ -10,7 +10,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useColors } from "@/src/hooks/useColors";
 import { useSession } from "@/src/context/AuthContext";
 import { getUsersCollectionsApiUserUserIdCollectionGetOptions } from "@/src/api-client/generated/@tanstack/react-query.gen";
-import { Box } from "@/src/components/ui/box";
 import { Fab, FabIcon, FabLabel } from "@/src/components/ui/fab";
 import { AddIcon } from "@/src/components/ui/icon";
 import { FlatList, Platform, Pressable, RefreshControl } from "react-native";
@@ -21,6 +20,8 @@ import { StyleSheet } from "react-native";
 import { useMementos } from "@/src/hooks/useMementos";
 import { Image } from "@/src/components/ui/image";
 import { LayoutGridIcon, MapIcon } from "lucide-react-native";
+import { Box } from "@/src/components/ui/box";
+import { MementoLogo } from "@/src/components/MementoLogo";
 
 export default function Collections() {
   const { session } = useSession();
@@ -164,7 +165,8 @@ export default function Collections() {
           }
           ListEmptyComponent={
             <Box className="flex-1 items-center justify-center">
-              <Text>No collections yet!</Text>
+              <MementoLogo size="xl" variant="sad" />
+              <Text size="lg">You haven't created any collections yet!</Text>
             </Box>
           }
         />
