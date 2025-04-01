@@ -17,6 +17,7 @@ import { AuthProvider, useSession } from "@/src/context/AuthContext";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { CameraProvider } from "../context/PhotoContext";
+import { useFonts } from "expo-font";
 
 export const queryClient = new QueryClient();
 
@@ -26,14 +27,17 @@ SplashScreen.preventAutoHideAsync();
 function RootContent() {
   const { isLoading } = useSession();
   const { theme } = useTheme();
+  const [fontsLoaded] = useFonts({
+    title: require("@/src/assets/fonts/Quicksand-Regular.ttf"),
+  });
 
   useEffect(() => {
-    if (!isLoading) {
+    if (!isLoading && fontsLoaded) {
       SplashScreen.hideAsync();
     }
-  }, [isLoading]);
+  }, [isLoading, fontsLoaded]);
 
-  if (isLoading) {
+  if (isLoading && !fontsLoaded) {
     return null;
   }
 

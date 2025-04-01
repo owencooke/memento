@@ -1,19 +1,22 @@
 """
 @description CRUD API routes for Keepsakes/Mementos.
-@requirements FR-12, FR-13, FR-14, FR-15, FR-17, FR-19, FR-20, FR-21, FR-26, FR-27,\
-        FR-28, FR-30, FR31, FR-32, FR-33
+@requirements FR-8, FR-11, FR-12, FR-13, FR-14, FR-15, FR-16, FR-17, FR-19, \
+        FR-20, FR-21, FR-26, FR-27, FR-28, FR-30, FR31, FR-32, FR-33
 """
 
 import json
 from typing import Annotated, Optional
 
-from fastapi import APIRouter, Depends, Form, UploadFile
+import pytesseract
+from fastapi import APIRouter, BackgroundTasks, Depends, Form, UploadFile
 from fastapi.responses import JSONResponse
 from loguru import logger
+from PIL import Image
 from pydantic import UUID4
 
 from server.api.memento.models import (
     CreateMementoSuccessResponse,
+    ImageLabelResponse,
     MementoFilterParams,
     NewImageMetadata,
     NewMemento,
@@ -25,13 +28,16 @@ from server.services.db.queries.image import (
     create_image_metadata,
     delete_image_metadata,
     get_images_for_memento,
-    update_image_order,
+    update_image,
 )
 from server.services.db.queries.memento import (
     create_memento,
+    get_image_labels,
     get_mementos,
     update_memento,
 )
+from server.services.process_image.converters import upload_file_to_pil
+from server.services.process_image.image_class import predict_class
 from server.services.storage.image import (
     delete_images,
     get_bulk_image_urls,
@@ -44,7 +50,7 @@ router = APIRouter()
 @router.get("/")
 def get_users_mementos(
     user_id: UUID4 = Depends(get_user_id),
-    filter_query: MementoFilterParams = Depends(),
+    filter_query: MementoFilterParams = Depends(MementoFilterParams),
 ) -> list[MementoWithImages]:
     """Gets all the mementos belonging to a user."""
     mementos = get_mementos(user_id, filter_query)
@@ -63,8 +69,35 @@ def get_users_mementos(
     return mementos
 
 
+# Helper function for image processing for creating/editing a memento
+def process_images_in_background(
+    images: list[tuple[Image.Image, str]],
+    memento_id: int,
+) -> None:
+    """Handles image processing in the background."""
+    for image, filename in images:  # Accessing each tuple's Image and filename
+        try:
+            # Extract text from the image
+            extracted_text = pytesseract.image_to_string(image)
+
+            # Classify label
+            predicted_class = predict_class(image)
+
+            update_image(
+                memento_id,
+                filename,
+                {"detected_text": extracted_text, "image_label": predicted_class},
+            )
+            logger.info(f"Adding detected text: {extracted_text}")
+            logger.info(f"Adding predicted class: {predicted_class}")
+
+        except Exception as e:
+            logger.error(f"Failed to process image {filename}: {e}")
+
+
 @router.post("/")
 async def create_new_memento(
+    background_tasks: BackgroundTasks,
     memento_str: Annotated[str, Form()],
     image_metadata_str: Annotated[str, Form()],
     images: list[UploadFile],
@@ -88,19 +121,28 @@ async def create_new_memento(
     # Create new memento in DB
     new_memento = create_memento(memento, user_id)
 
+    pil_images = []
     for i in range(len(images)):
         # Upload image to object storage
         path = await upload_image(images[i])
 
         # Create new image metadata records in DB
         image_metadata[i].filename = path
+
         create_image_metadata(image_metadata[i], new_memento.id)
+
+        new_image = await upload_file_to_pil(images[i])
+        pil_images.append((new_image, path))
+
+    background_tasks.add_task(process_images_in_background, pil_images, new_memento.id)
+    logger.info("Running image processing in the background...")
 
     return CreateMementoSuccessResponse(new_memento_id=new_memento.id)
 
 
 @router.put("/{id}")
 async def update_memento_and_images(
+    background_tasks: BackgroundTasks,
     id: int,
     memento_str: Annotated[str, Form()],
     image_metadata_str: Annotated[str, Form()],
@@ -135,7 +177,11 @@ async def update_memento_and_images(
         )
         if image_kept:
             # User kept old image; update DB record in case images re-ordered
-            update_image_order(metadata.id, image_kept.order_index)
+            update_image(
+                id,
+                image_kept.filename,
+                {"order_index": image_kept.order_index},
+            )
             logger.info(f"Updated image metadata for file: {image_kept.filename}")
         else:
             # User removed the old image; delete from DB/storage
@@ -148,6 +194,7 @@ async def update_memento_and_images(
 
     # New images
     if images:
+        pil_images = []
         for image in images:
             # Upload image file to storage
             path = await upload_image(image)
@@ -157,9 +204,36 @@ async def update_memento_and_images(
                 new for new in image_metadata if new.filename == image.filename
             )
             new_metadata.filename = path
+
+            # Create image metadata in DB
             create_image_metadata(new_metadata, updated_memento.id)
-            logger.info(f"Created image metadata record for {image.filename}")
+            logger.info(f"Created image metadata record for {metadata.filename}")
+
+            new_image = await upload_file_to_pil(image)
+            pil_images.append((new_image, path))
+
+        background_tasks.add_task(
+            process_images_in_background,
+            pil_images,
+            updated_memento.id,
+        )
+        logger.info("Running image processing in the background...")
 
     return JSONResponse(
         content={"message": f"Successfully updated Memento[{updated_memento.id}]"},
     )
+
+
+@router.get("/image_labels")
+def get_users_image_labels(
+    user_id: UUID4 = Depends(get_user_id),
+) -> list[ImageLabelResponse]:
+    """Gets each unique image label from images associated with user's mementos"""
+
+    def format_label(snake_case: str) -> str:
+        return " ".join(word.capitalize() for word in snake_case.split("_"))
+
+    labels = get_image_labels(user_id)
+    return [
+        ImageLabelResponse(value=label, label=format_label(label)) for label in labels
+    ]

@@ -21,7 +21,7 @@ export const createPhotoObject = async (photo: Photo): Promise<Photo> => {
     uri,
     mimeType,
     fileName: photo.fileName ?? `${uniqueFilename}.jpg`,
-    assetId: photo.assetId ?? uniqueFilename,
+    assetId: uniqueFilename,
   };
 };
 

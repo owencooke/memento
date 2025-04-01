@@ -6,7 +6,7 @@ export default {
     slug: "memento",
     version: "1.0.0",
     orientation: "portrait",
-    icon: "./src/assets/images/icon.png",
+    icon: "./src/assets/images/logo.png",
     scheme: "memento",
     userInterfaceStyle: "automatic",
     newArchEnabled: true,
@@ -19,8 +19,8 @@ export default {
     },
     android: {
       adaptiveIcon: {
-        foregroundImage: "./src/assets/images/adaptive-icon.png",
-        backgroundColor: "#ffffff",
+        foregroundImage: "./src/assets/images/logo-android.png",
+        backgroundColor: "#dceefe",
       },
       package: "com.memento.app",
       config: {
@@ -39,10 +39,10 @@ export default {
       [
         "expo-splash-screen",
         {
-          image: "./src/assets/images/splash-icon.png",
+          image: "./src/assets/images/logo-android.png",
           imageWidth: 200,
           resizeMode: "contain",
-          backgroundColor: "#ffffff",
+          backgroundColor: "#dceefe",
         },
       ],
     ],
