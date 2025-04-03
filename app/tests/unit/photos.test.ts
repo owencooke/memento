@@ -9,71 +9,31 @@ import {
 } from "@/src/libs/photos";
 import mime from "mime";
 
-// Mock external dependencies
-jest.mock("expo-image-manipulator", () => ({
-  manipulateAsync: jest.fn(),
-  SaveFormat: {
-    JPEG: "jpeg",
-  },
-}));
-
-jest.mock("expo-file-system", () => ({
-  getInfoAsync: jest.fn(),
-}));
-
-jest.mock("expo-image-picker", () => ({
-  launchImageLibraryAsync: jest.fn(),
-}));
-
-jest.mock("mime", () => ({
-  getType: jest.fn(),
-}));
-
-jest.mock("lodash", () => ({
-  uniqueId: jest.fn((prefix) => `${prefix}123456`),
-}));
-
-// Mock implementations for File and FileReader for convertBlobToBase64Uri tests
-const mockFileReader = {
-  onload: null as (() => void) | null,
-  result: "",
-  readAsDataURL: function (blob: Blob) {
-    // Simulate async operation
-    setTimeout(() => {
-      this.result = `data:${blob.type};base64,mockBase64Data`;
-      if (this.onload) this.onload();
-    }, 0);
-  },
+// Setup common test data
+const mockPhoto: Photo = {
+  uri: "file://test/photo.jpg",
+  mimeType: "image/jpeg",
+  fileName: "photo.jpg",
+  assetId: "asset123",
 };
 
-// @ts-ignore - create a minimal viable mock for the global
-global.FileReader = jest.fn(() => mockFileReader) as any;
+const mockLargeFileInfo = {
+  exists: true,
+  size: 1024 * 1024, // 1MB
+};
+
+const mockSmallFileInfo = {
+  exists: true,
+  size: 100 * 1024, // 100KB
+};
+
+const mockCompressedImage = {
+  uri: "file://test/compressed-photo.jpg",
+  width: 800,
+  height: 600,
+};
 
 describe("Photo utilities", () => {
-  // Setup common test data
-  const mockPhoto: Photo = {
-    uri: "file://test/photo.jpg",
-    mimeType: "image/jpeg",
-    fileName: "photo.jpg",
-    assetId: "asset123",
-  };
-
-  const mockLargeFileInfo = {
-    exists: true,
-    size: 1024 * 1024, // 1MB
-  };
-
-  const mockSmallFileInfo = {
-    exists: true,
-    size: 100 * 1024, // 100KB
-  };
-
-  const mockCompressedImage = {
-    uri: "file://test/compressed-photo.jpg",
-    width: 800,
-    height: 600,
-  };
-
   beforeEach(() => {
     jest.clearAllMocks();
   });
