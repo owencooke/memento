@@ -88,26 +88,28 @@ async def update_collection_and_mementos(
         raise HTTPException(status_code=400, detail="Update collection failed")
 
     memento_ids_current = get_has_mementos(id)
+    mementos_to_add = [m_id for m_id in mementos if m_id not in memento_ids_current]
+    mementos_to_remove = [m_id for m_id in memento_ids_current if m_id not in mementos]
 
     # Add mementos to collection
-    for memento_id in mementos:
-        if memento_id not in memento_ids_current:
-            has_memento = HasMementoInsert(
-                collection_id=id,
-                memento_id=memento_id,
+    for memento_id in mementos_to_add:
+        has_memento = HasMementoInsert(
+            collection_id=id,
+            memento_id=memento_id,
+        )
+        if not associate_memento(has_memento):
+            raise HTTPException(
+                status_code=400,
+                detail="Associate Memento to Collection Failed.",
             )
-            if not associate_memento(has_memento):
-                raise HTTPException(
-                    status_code=400,
-                    detail="Associate Memento to Collection Failed.",
-                )
 
     # Remove deleted mementos from collection
-    for memento_id in memento_ids_current:
-        if memento_id not in mementos:
-            removed_memento = db_delete_has_memento(id, memento_id)
-            if not removed_memento:
-                raise HTTPException(status_code=400, detail="Delete collection failed")
+    for memento_id in mementos_to_remove:
+        if not db_delete_has_memento(id, memento_id):
+            raise HTTPException(
+                status_code=400,
+                detail=f"Failed to remove mementos {memento_id}",
+            )
 
     return updated_collection
 
