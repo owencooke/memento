@@ -97,15 +97,15 @@ export const VALENTINES_CONTENT = {
 
 // Helper functions for testing/debuggng notifications
 
-async function testImmediateNotification() {
-  await Notifications.scheduleNotificationAsync({
-    content: { title: "Test Notification", body: "This is a testing message!" },
-    trigger: null,
-  });
-}
+// async function testImmediateNotification() {
+//   await Notifications.scheduleNotificationAsync({
+//     content: { title: "Test Notification", body: "This is a testing message!" },
+//     trigger: null,
+//   });
+// }
 
-async function logScheduledNotifications() {
-  const scheduledNotifications =
-    await Notifications.getAllScheduledNotificationsAsync();
-  console.log(JSON.stringify(scheduledNotifications, undefined, 2));
-}
+// async function logScheduledNotifications() {
+//   const scheduledNotifications =
+//     await Notifications.getAllScheduledNotificationsAsync();
+//   console.log(JSON.stringify(scheduledNotifications, undefined, 2));
+// }
