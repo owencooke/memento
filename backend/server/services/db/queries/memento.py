@@ -6,7 +6,7 @@
 from pydantic import UUID4
 
 from server.api.memento.models import MementoFilterParams, NewMemento, UpdateMemento
-from server.services.db.config import supabase
+from server.services import db
 from server.services.db.models.joins import MementoWithImages
 from server.services.db.models.schema_public_latest import Memento
 
@@ -14,7 +14,7 @@ from server.services.db.models.schema_public_latest import Memento
 def create_memento(new_memento: NewMemento, user_id: UUID4) -> Memento:
     """Creates a new memento for a user."""
     response = (
-        supabase.table("memento")
+        db.supabase.table("memento")
         .insert({**new_memento.model_dump(mode="json"), "user_id": str(user_id)})
         .execute()
     )
@@ -27,7 +27,7 @@ def get_mementos(
 ) -> list[MementoWithImages]:
     """Gets all the mementos belonging to a user."""
     query = (
-        supabase.table("memento")
+        db.supabase.table("memento")
         .select("*, images:image!inner(*)")
         .eq("user_id", str(user_id))
     )
@@ -51,7 +51,7 @@ def get_mementos(
                 filter_query.max_long,
             ],
         ):
-            bbox_response = supabase.rpc(
+            bbox_response = db.supabase.rpc(
                 "mementos_in_bounds",
                 {
                     "min_lat": filter_query.min_lat,
@@ -76,7 +76,7 @@ def get_mementos(
 def update_memento(id: int, updated_memento: UpdateMemento) -> Memento:
     """Updates an existing memento record."""
     response = (
-        supabase.table("memento")
+        db.supabase.table("memento")
         .update({**updated_memento.model_dump(mode="json", exclude={"user_id"})})
         .eq("id", id)
         .execute()
@@ -86,14 +86,14 @@ def update_memento(id: int, updated_memento: UpdateMemento) -> Memento:
 
 def db_delete_memento(id: int) -> Memento:
     """Deletes a memento from the DB"""
-    response = supabase.table("memento").delete().eq("id", id).execute()
+    response = db.supabase.table("memento").delete().eq("id", id).execute()
     return Memento(**response.data[0])
 
 
 def get_image_labels(user_id: UUID4) -> list[str]:
     """Gets all image labels from associated images of users mementos"""
     response = (
-        supabase.table("memento")
+        db.supabase.table("memento")
         .select("user_id, images:image(image_label)")
         .eq("user_id", str(user_id))
         .neq("image.image_label", None)

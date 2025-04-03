@@ -41,8 +41,8 @@ export default function DeleteModal({
             Delete {type[0].toUpperCase() + type.slice(1)}
           </Heading>
           <Text size="sm" className="text-typography-500 text-center">
-            Are you sure you want to delete this {type}? This action cannot
-            be undone.
+            Are you sure you want to delete this {type}? This action cannot be
+            undone.
           </Text>
         </ModalBody>
         <ModalFooter className="w-full">
