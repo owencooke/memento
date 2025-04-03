@@ -47,7 +47,7 @@ export type Collection = {
     location?: string | null;
     title: string;
     user_id: string;
-    ids?: Array<HasMemento> | null;
+    has_mementos?: Array<HasMemento> | null;
 };
 
 export type CollectionWithMementos = {
@@ -90,8 +90,8 @@ export type HttpValidationError = {
 export type HasMemento = {
     collection_id: number;
     memento_id: number;
-    collection_ids?: Array<Collection> | null;
-    memento_ids?: Array<Memento> | null;
+    collection?: Collection | null;
+    memento?: Memento | null;
 };
 
 /**
@@ -115,9 +115,9 @@ export type Image = {
     detected_text?: string | null;
     filename: string;
     image_label?: string | null;
-    mime_type?: string | null;
+    mime_type: string;
     order_index: number;
-    memento_ids?: Array<Memento> | null;
+    memento?: Memento | null;
 };
 
 /**
@@ -136,7 +136,7 @@ export type ImageWithUrl = {
     detected_text?: string | null;
     filename: string;
     image_label?: string | null;
-    mime_type?: string | null;
+    mime_type: string;
     order_index: number;
     url?: string;
 };
@@ -153,7 +153,8 @@ export type Memento = {
     date?: string | null;
     location?: string | null;
     user_id: string;
-    ids?: Array<Image> | null;
+    has_mementos?: Array<HasMemento> | null;
+    images?: Array<Image> | null;
 };
 
 export type MementoWithImages = {
@@ -427,6 +428,33 @@ export type CreateNewMementoApiUserUserIdMementoPostResponses = {
 };
 
 export type CreateNewMementoApiUserUserIdMementoPostResponse = CreateNewMementoApiUserUserIdMementoPostResponses[keyof CreateNewMementoApiUserUserIdMementoPostResponses];
+
+export type DeleteMementoApiUserUserIdMementoIdDeleteData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/api/user/{user_id}/memento/{id}';
+};
+
+export type DeleteMementoApiUserUserIdMementoIdDeleteErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type DeleteMementoApiUserUserIdMementoIdDeleteError = DeleteMementoApiUserUserIdMementoIdDeleteErrors[keyof DeleteMementoApiUserUserIdMementoIdDeleteErrors];
+
+export type DeleteMementoApiUserUserIdMementoIdDeleteResponses = {
+    /**
+     * Successful Response
+     */
+    200: Memento;
+};
+
+export type DeleteMementoApiUserUserIdMementoIdDeleteResponse = DeleteMementoApiUserUserIdMementoIdDeleteResponses[keyof DeleteMementoApiUserUserIdMementoIdDeleteResponses];
 
 export type UpdateMementoAndImagesApiUserUserIdMementoIdPutData = {
     body: BodyUpdateMementoAndImagesApiUserUserIdMementoIdPut;

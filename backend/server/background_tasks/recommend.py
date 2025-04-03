@@ -5,7 +5,7 @@ from pydantic import UUID4
 from server.api.websocket.manager import websocket_manager
 from server.api.websocket.models import WebSocketMessage, WSMessageType
 from server.services.cluster_memento.kmeans import cluster_mementos
-from server.services.db.queries.memento import get_mementos, get_mementos_for_clustering
+from server.services.db.queries.memento import get_mementos_for_clustering
 
 
 async def recommend_collection(user_id: UUID4) -> None:

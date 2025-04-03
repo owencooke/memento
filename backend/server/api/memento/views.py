@@ -1,14 +1,14 @@
 """
 @description CRUD API routes for Keepsakes/Mementos.
 @requirements FR-8, FR-11, FR-12, FR-13, FR-14, FR-15, FR-16, FR-17, FR-19, \
-        FR-20, FR-21, FR-26, FR-27, FR-28, FR-30, FR31, FR-32, FR-33
+        FR-20, FR-21, FR-26, FR-27, FR-28, FR-30, FR31, FR-32, FR-33, FR-34
 """
 
 import json
 from typing import Annotated, Optional
 
 import pytesseract
-from fastapi import APIRouter, BackgroundTasks, Depends, Form, UploadFile
+from fastapi import APIRouter, BackgroundTasks, Depends, Form, HTTPException, UploadFile
 from fastapi.responses import JSONResponse
 from loguru import logger
 from PIL import Image
@@ -24,6 +24,7 @@ from server.api.memento.models import (
 )
 from server.api.path import get_user_id
 from server.services.db.models.joins import MementoWithImages
+from server.services.db.models.schema_public_latest import Memento
 from server.services.db.queries.image import (
     create_image_metadata,
     delete_image_metadata,
@@ -32,6 +33,7 @@ from server.services.db.queries.image import (
 )
 from server.services.db.queries.memento import (
     create_memento,
+    db_delete_memento,
     get_image_labels,
     get_mementos,
     update_memento,
@@ -72,7 +74,6 @@ def get_users_mementos(
 # Helper function for image processing for creating/editing a memento
 def process_images_in_background(
     images: list[tuple[Image.Image, str]],
-    memento_id: int,
 ) -> None:
     """Handles image processing in the background."""
     for image, filename in images:  # Accessing each tuple's Image and filename
@@ -84,7 +85,6 @@ def process_images_in_background(
             predicted_class = predict_class(image)
 
             update_image(
-                memento_id,
                 filename,
                 {"detected_text": extracted_text, "image_label": predicted_class},
             )
@@ -134,7 +134,7 @@ async def create_new_memento(
         new_image = await upload_file_to_pil(images[i])
         pil_images.append((new_image, path))
 
-    background_tasks.add_task(process_images_in_background, pil_images, new_memento.id)
+    background_tasks.add_task(process_images_in_background, pil_images)
     logger.info("Running image processing in the background...")
 
     return CreateMementoSuccessResponse(new_memento_id=new_memento.id)
@@ -178,7 +178,6 @@ async def update_memento_and_images(
         if image_kept:
             # User kept old image; update DB record in case images re-ordered
             update_image(
-                id,
                 image_kept.filename,
                 {"order_index": image_kept.order_index},
             )
@@ -212,16 +211,25 @@ async def update_memento_and_images(
             new_image = await upload_file_to_pil(image)
             pil_images.append((new_image, path))
 
-        background_tasks.add_task(
-            process_images_in_background,
-            pil_images,
-            updated_memento.id,
-        )
+        background_tasks.add_task(process_images_in_background, pil_images)
         logger.info("Running image processing in the background...")
 
     return JSONResponse(
         content={"message": f"Successfully updated Memento[{updated_memento.id}]"},
     )
+
+
+@router.delete("/{id}")
+async def delete_memento(
+    id: int,
+) -> Memento:
+    """Delete a memento"""
+    deleted_memento = db_delete_memento(id)
+
+    if not deleted_memento:
+        raise HTTPException(status_code=400, detail="Delete collection failed")
+
+    return deleted_memento
 
 
 @router.get("/image_labels")

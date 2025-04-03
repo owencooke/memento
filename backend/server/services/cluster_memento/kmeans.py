@@ -10,22 +10,13 @@ from server.api.memento.models import MementoWithCoordinates
 
 
 def cluster_mementos(
-    mementos: List[MementoWithCoordinates], n_recommendations: int = 5
+    mementos: List[MementoWithCoordinates],
+    n_recommendations: int = 5,
 ) -> List[int]:
-    """
-    Cluster Mementos based on geographical coordinates and return recommended IDs.
-
-    Args:
-        mementos: List of Memento dictionaries, each containing 'id' and 'coordinates' fields
-                  where coordinates has 'lat' and 'lng' keys
-        n_recommendations: Number of Mementos to recommend
-
-    Returns:
-        List of Memento IDs recommended as a collection
-    """
+    """Cluster Mementos based on geographical coordinates and return recommended IDs."""
     # Extract coordinates and IDs
     coordinates = np.array(
-        [[memento.coordinates.lat, memento.coordinates.long] for memento in mementos]
+        [[memento.coordinates.lat, memento.coordinates.long] for memento in mementos],
     )
     ids = [memento.id for memento in mementos]
 
@@ -75,13 +66,12 @@ def cluster_mementos(
     # Get indices of mementos in the densest cluster
     cluster_indices = np.where(cluster_labels == densest_cluster)[0]
 
-    # If the densest cluster has more elements than needed, select those closest to center
     if len(cluster_indices) > n_recommendations:
         cluster_center = kmeans.cluster_centers_[densest_cluster]
 
         # Calculate distances to center for all points in cluster
         distances = np.sqrt(
-            np.sum((scaled_coordinates[cluster_indices] - cluster_center) ** 2, axis=1)
+            np.sum((scaled_coordinates[cluster_indices] - cluster_center) ** 2, axis=1),
         )
 
         # Get indices of closest points
