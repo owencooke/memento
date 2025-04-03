@@ -17,3 +17,20 @@ jest.mock("@/src/libs/supabase", () => {
     },
   };
 });
+
+jest.mock("expo-notifications", () => ({
+  scheduleNotificationAsync: jest.fn().mockResolvedValue(undefined),
+  cancelAllScheduledNotificationsAsync: jest.fn().mockResolvedValue(undefined),
+  getAllScheduledNotificationsAsync: jest.fn().mockResolvedValue([]),
+  SchedulableTriggerInputTypes: {
+    CALENDAR: "calendar",
+    YEARLY: "yearly",
+    TIME_INTERVAL: "timeInterval",
+  },
+}));
+
+jest.mock("react-native", () => ({
+  Platform: {
+    OS: "android", // Default to Android for tests
+  },
+}));
