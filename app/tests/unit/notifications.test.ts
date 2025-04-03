@@ -6,6 +6,7 @@ import {
   XMAS_CONTENT,
 } from "@/src/libs/notifications";
 import * as Notifications from "expo-notifications";
+import { Platform } from "react-native";
 import { mockCurrentDate } from "./mocks/date";
 
 // Mock dependencies
@@ -104,6 +105,48 @@ describe("Notification functions", () => {
           seconds: 15,
         },
       });
+    });
+
+    it("should handle multiple edge cases: iOS, time overflow, and special days", async () => {
+      Platform.OS = "ios";
+      mockCurrentDate(11, 25, 2025, 23, 59); // December 25 (Christmas) at 23:59
+
+      // 3. Test birthday on Christmas (two special days coinciding)
+      const christmasBirthday = new Date(1990, 11, 25);
+      (getDateFromISO as jest.Mock).mockReturnValue(christmasBirthday);
+
+      await scheduleAllNotifications("1990-12-25");
+
+      // Verify results - both Christmas and Birthday should be immediate
+      const birthdayCall = findNotificationByTitle("Birthday");
+      const christmasCall = findNotificationByTitle("Holidays");
+      const valentinesCall = findNotificationByTitle("Valentine's");
+
+      // Birthday is today (Christmas) - should be immediate
+      expect(birthdayCall[0].trigger).toEqual({
+        type: "timeInterval",
+        seconds: 15,
+      });
+
+      // Christmas is today - should be immediate
+      expect(christmasCall[0].trigger).toEqual({
+        type: "timeInterval",
+        seconds: 15,
+      });
+
+      // Valentine's is not today - should be scheduled with iOS calendar type
+      // and have correct hour/minute with overflow handled
+      expect(valentinesCall[0].trigger).toEqual({
+        type: "calendar", // iOS uses calendar type
+        month: 2,
+        day: 14,
+        hour: 0, // Should handle overflow from 23+1
+        minute: 0, // Should handle overflow from 59+1
+        repeats: true,
+      });
+
+      // Reset Platform for other tests
+      Platform.OS = "android";
     });
   });
 });
