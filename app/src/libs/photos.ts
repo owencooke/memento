@@ -28,6 +28,10 @@ export const createPhotoObject = async (photo: Photo): Promise<Photo> => {
 
 /**
  * Get photo(s) from the device's built-in libraary
+ *
+ * Legacy mode is necessary to extract location metadata from images.
+ * User must select through "More Options" > "Browse" instead of default screen
+ * https://github.com/expo/expo/issues/24652#issuecomment-2669183057
  */
 export const getPhotosFromLibrary = async (): Promise<Photo[]> => {
   const result = await ImagePicker.launchImageLibraryAsync({
@@ -35,6 +39,7 @@ export const getPhotosFromLibrary = async (): Promise<Photo[]> => {
     quality: 1,
     exif: true,
     allowsMultipleSelection: true,
+    legacy: true,
   });
 
   if (result.canceled) return [];

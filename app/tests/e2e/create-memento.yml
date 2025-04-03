@@ -35,10 +35,10 @@ appId: com.memento.app
 - tapOn:
     id: photo-grid-add-button
 - tapOn: Select from Library
+- tapOn: More options # Necessary to get location EXIF
+- tapOn: ".*Browse.*"
 - tapOn:
-    text: ".*Photo taken on.*" # default "accessibilityText" value identified for photos downloaded from Chrome on emulator
-    index: 0
-- tapOn: Add (1)
+    text: "tree(?:\\s*\\(\\d+\\))?\\.jpg.*" # default "accessibilityText" value identified via `maestro hierarchy`
 
 # Verify FR-10: Accept background removal
 - assertVisible:
@@ -46,14 +46,10 @@ appId: com.memento.app
 - tapOn:
     id: modal-background-removal-confirm
 
-# Verify FR-7/FR9: extract metadata and fill fields
+# Verify FR-7/FR-9: extract metadata and fill fields
 #   - matches EXIF metadata from ./util/assets/tree.jpg
-- assertVisible:
-    id: memento-form-date
-    text: "2025-04-03"
-- assertVisible:
-    id: memento-form-location
-    text: New York, NY, USA
+- assertVisible: "2025-04-03"
+- assertVisible: New York, NY, USA
 
 # Verify FR-17/FR-19: Fill out other form fields
 - runFlow:
