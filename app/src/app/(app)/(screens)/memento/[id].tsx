@@ -1,7 +1,7 @@
 /**
  * @description Screen for viewing an individual keepsake/memento.
  *    Also supports sharing a memento's images to another platform.
- * @requirements FR-26, FR-27, FR-28, FR-54
+ * @requirements FR-26, FR-27, FR-28, FR-34, FR-54
  */
 import ImageMetadataCard from "@/src/components/cards/ImageMetadataCard";
 import { ButtonIcon, Button } from "@/src/components/ui/button";
@@ -24,17 +24,28 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { shareAsync, isAvailableAsync } from "expo-sharing";
 import * as FileSystem from "expo-file-system";
 import { mimeTypeToExtension } from "@/src/libs/string";
+import { useMutation } from "@tanstack/react-query";
+import { deleteMementoApiUserUserIdMementoIdDeleteMutation, getUsersMementosApiUserUserIdMementoGetQueryKey } from "@/src/api-client/generated/@tanstack/react-query.gen";
+import { useSession } from "@/src/context/AuthContext";
+import { queryClient } from "@/src/app/_layout";
+import DeleteModal from "@/src/components/modals/DeleteModal";
 
 const buttonClasses = "flex-1";
 const iconClasses = "w-6 h-6";
 
 export default function ViewMemento() {
+  const { session } = useSession();
+  const user_id = String(session?.user.id);
   // Get memento
   const { id } = useLocalSearchParams<{ id: string }>();
   const { mementos } = useMementos({
     queryOptions: { refetchOnMount: false },
   });
   const memento = mementos?.find((m) => m.id === Number(id));
+
+  const deleteMutation = useMutation(
+    deleteMementoApiUserUserIdMementoIdDeleteMutation(),
+  );
 
   // State
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -49,6 +60,37 @@ export default function ViewMemento() {
 
   const handleEditMemento = () =>
     router.push(`/(app)/(screens)/memento/edit/${memento?.id}`);
+
+  // Delete memento
+  const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
+
+  const handleDeletePress = () => {
+    setDeleteModalVisible(true);
+  };
+  const handleConfirmDelete = () => {
+    onDelete(Number(id));
+  };
+
+  const onDelete = async (id: number) => {
+    const path = { user_id, id };
+
+    await deleteMutation.mutateAsync(
+      { path },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({
+            queryKey: getUsersMementosApiUserUserIdMementoGetQueryKey({
+              path: { user_id: user_id },
+            }),
+          });
+          setDeleteModalVisible(false);
+          router.dismissTo("/(app)/(tabs)/mementos");
+        },
+        onError: (error: any) =>
+          console.error("Failed to delete memento", error),
+      },
+    );
+  };
 
   const handleShareImage = async () => {
     try {
@@ -173,10 +215,17 @@ export default function ViewMemento() {
         >
           <ButtonIcon as={EditIcon} className={iconClasses} />
         </Button>
-        {/* TODO: open Delete confirmation modal */}
-        <Button size="xl" className={buttonClasses}>
+        <Button size="xl" className={buttonClasses} onPress={handleDeletePress}>
           <ButtonIcon as={TrashIcon} className={iconClasses} />
         </Button>
+
+        {/* Delete Collection Modal */}
+        <DeleteModal
+          visible={isDeleteModalVisible}
+          type="memento"
+          onClose={() => setDeleteModalVisible(false)}
+          onConfirm={handleConfirmDelete}
+        />
       </View>
     </SafeAreaView>
   );
