@@ -27,14 +27,31 @@ appId: com.memento.app
     text: ${maestro.copiedText}
 
 # Edit the memento fields
-# TODO: edit images? thumbnail?
 
-# Verify FR-30/FR-33:
+# Verify FR-31: remove all images and replace with a new
+- repeat:
+    while:
+      visible:
+        id: interactive-photo-card
+    commands:
+      - tapOn:
+          id: interactive-photo-card-delete
+- tapOn:
+    id: photo-grid-add-button
+- tapOn: Take a Photo
+- tapOn:
+    id: camera-capture-button
+- assertVisible:
+    id: interactive-photo-card
+- tapOn:
+    id: modal-background-removal-decline
+
+# Verify FR-30/FR-33: edit form fields
 - runFlow:
     file: ./util/memento-form.yml
     env:
       CAPTION: Edited caption
-      LOCATION_PARTIAL: Edit
+      LOCATION_PARTIAL: Edith
       LOCATION_FULL: Edithvale VIC, Australia
 - tapOn: Save Changes
 

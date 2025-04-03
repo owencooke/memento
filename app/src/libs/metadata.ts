@@ -7,7 +7,10 @@ import { GeoLocation } from "../components/inputs/LocationInput";
 import { Photo } from "@/src/libs/photos";
 import { getDateFromISO, toISODateString } from "./date";
 
-type Metadata = Pick<MementoWithImages | ImageWithUrl, "date" | "coordinates">;
+type Metadata = Pick<
+  ImageWithUrl,
+  "date" | "filename" | "coordinates" | "mime_type"
+>;
 
 /**
  * Extracts relevant metadata from either a photo or memento.
@@ -17,7 +20,7 @@ export const getRelevantMetadata = (
   item: Photo | MementoWithImages,
 ): Metadata => {
   if ("exif" in item) {
-    const { exif } = item;
+    const { exif, fileName, mimeType } = item;
 
     // Date
     let date =
@@ -37,7 +40,12 @@ export const getRelevantMetadata = (
       };
     }
 
-    return { date, coordinates };
+    return {
+      date,
+      coordinates,
+      mime_type: mimeType ?? "image/png",
+      filename: fileName ?? "",
+    };
   }
 
   // Memento Metadata
@@ -45,6 +53,8 @@ export const getRelevantMetadata = (
   return {
     date: item.date ?? null,
     coordinates: item.coordinates ?? null,
+    mime_type: "image/png",
+    filename: "",
   };
 };
 

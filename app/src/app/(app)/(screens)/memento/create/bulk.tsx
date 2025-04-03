@@ -172,7 +172,6 @@ export default function BulkCreateMemento() {
       );
       setCreatedMementoIds(responses.map((r) => r.new_memento_id));
     } catch (error: any) {
-      // TODO: add error toast or indicator?
       console.error(
         "Failed to bulk create mementos:",
         JSON.stringify(error?.detail, undefined, 2),
