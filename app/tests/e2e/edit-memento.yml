@@ -1,6 +1,6 @@
 appId: com.memento.app
 ---
-# - runFlow: ./util/launch.yml
+- runFlow: ./util/launch.yml
 
 # Navigate to Edit Memento page
 - tapOn:
