@@ -63,7 +63,7 @@ export default function Mementos() {
 
   const handleAddMemento = () => {
     closeCreateOptions();
-    router.push("/(app)/(screens)/memento/create");
+    router.push("/(app)/(screens)/memento/create/single");
   };
 
   const handleBulkCreate = () => {
@@ -72,11 +72,12 @@ export default function Mementos() {
   };
 
   const handleApplyFilters = (data: FilterMementoFormData) => {
-    const { start_date, end_date, location } = data;
+    const { start_date, end_date, location, image_label } = data;
     setFilters({
       start_date: start_date ? toISODateString(start_date) : null,
       end_date: end_date ? toISODateString(end_date) : null,
       bbox: location.bbox ?? null,
+      image_label: image_label ?? null,
     });
     setShowActionsheet(false);
   };

@@ -40,6 +40,13 @@ class UpdateMemento(CoordinatesInsert, BaseWithCoordinates, MementoUpdate):  # t
     """
 
 
+class ImageLabelResponse(BaseModel):
+    """Value and formatted label"""
+
+    value: str
+    label: str
+
+
 class MementoFilterParams(BaseModel):
     """Filter parameters for Memento"""
 
@@ -52,6 +59,10 @@ class MementoFilterParams(BaseModel):
     text: Optional[str] = Field(
         default=None,
         description="Text to search in memento caption and detected text",
+    )
+    image_label: Optional[str] = Field(
+        default=None,
+        description="Filter mementos by associated image labels",
     )
 
     @field_validator("text")
