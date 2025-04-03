@@ -13,7 +13,8 @@ async def recommend_collection(user_id: UUID4) -> None:
     # TODO: replace with actual algorithm call
     await asyncio.sleep(5)
     mementos = get_mementos_for_clustering(user_id)
-    clustered_memento_ids = cluster_mementos(mementos, n_recommendations=2)
+    clustered_memento_ids = cluster_mementos(mementos, min_cluster_size=3)
+    clustered_memento_ids = []
 
     # TODO: check DB to see if recommendation was already given
 
