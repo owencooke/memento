@@ -2,6 +2,7 @@ import * as ImageManipulator from "expo-image-manipulator";
 import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
 import { uniqueId } from "lodash";
+import mime from "mime";
 
 export type Photo = Omit<
   ImagePicker.ImagePickerAsset,
@@ -19,7 +20,7 @@ export const createPhotoObject = async (photo: Photo): Promise<Photo> => {
   return {
     ...photo,
     uri,
-    mimeType,
+    mimeType: mimeType ?? mime.getType(uri) ?? "jpg",
     fileName: photo.fileName ?? `${uniqueFilename}.jpg`,
     assetId: uniqueFilename,
   };

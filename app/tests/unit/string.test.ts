@@ -1,7 +1,6 @@
 import {
   toTitleCase,
   removeUnderscores,
-  mimeTypeToExtension,
   fileNameSafeString,
 } from "@/src/libs/string";
 
@@ -39,20 +38,6 @@ describe("removeUnderscores", () => {
 
   test("handles empty strings", () => {
     expect(removeUnderscores("")).toBe("");
-  });
-});
-
-describe("mimeTypeToExtension", () => {
-  test("extracts extension from common MIME types", () => {
-    expect(mimeTypeToExtension("image/jpeg")).toBe("jpeg");
-    expect(mimeTypeToExtension("image/png")).toBe("png");
-    expect(mimeTypeToExtension("application/pdf")).toBe("pdf");
-    expect(mimeTypeToExtension("text/html")).toBe("html");
-  });
-
-  test("defaults to png for invalid MIME types", () => {
-    expect(mimeTypeToExtension("invalid")).toBe("png");
-    expect(mimeTypeToExtension("")).toBe("png");
   });
 });
 
