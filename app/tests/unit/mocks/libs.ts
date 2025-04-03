@@ -1,3 +1,8 @@
+import { Platform } from "react-native";
+
+// Mock default device platform
+Platform.OS = "android";
+
 jest.mock("@react-native-async-storage/async-storage", () =>
   require("@react-native-async-storage/async-storage/jest/async-storage-mock"),
 );
@@ -29,12 +34,6 @@ jest.mock("expo-notifications", () => ({
   },
 }));
 
-jest.mock("react-native", () => ({
-  Platform: {
-    OS: "android", // Default to Android for tests
-  },
-}));
-
 jest.mock("expo-image-manipulator", () => ({
   manipulateAsync: jest.fn(),
   SaveFormat: {
@@ -58,8 +57,7 @@ jest.mock("lodash", () => ({
   uniqueId: jest.fn((prefix) => `${prefix}123456`),
 }));
 
-// Mock implementations for File and FileReader for convertBlobToBase64Uri tests
-const mockFileReader = {
+global.FileReader = jest.fn(() => ({
   onload: null as (() => void) | null,
   result: "",
   readAsDataURL: function (blob: Blob) {
@@ -69,7 +67,4 @@ const mockFileReader = {
       if (this.onload) this.onload();
     }, 0);
   },
-};
-
-// @ts-ignore - create a minimal viable mock for the global
-global.FileReader = jest.fn(() => mockFileReader) as any;
+})) as any;
