@@ -79,6 +79,11 @@ export default function CollectionForm({
     },
   });
 
+  // Set mementoIds in the form when they change
+  useEffect(() => {
+    setValue("mementoIds", selectedMementoIds);
+  }, [selectedMementoIds, setValue]);
+
   // Prevent re-rendering location input when Geolocation changes
   const { mementos } = useMementos({
     queryOptions: { refetchOnMount: false },
@@ -91,25 +96,22 @@ export default function CollectionForm({
     location: GeoLocation | null;
   }>({ date: null, location: null });
 
-  // When selected mementos are changed aggregates metadata and shows modal
+  // When selected mementos are changed, aggregates metadata and shows modal
   useEffect(() => {
-    const selectedMementos = mementos?.filter((memento) =>
-      selectedMementoIds.includes(memento.id),
-    );
-    setDerivedMetadata({ date: null, location: null });
-    if (
-      selectedMementos &&
-      selectedMementos.length > 0 &&
-      freshlySelected === "true"
-    ) {
-      aggregateMetadata(selectedMementos).then(({ date, location }) => {
-        if (date || location) {
-          setDerivedMetadata({ date, location });
-          setShowModal(true);
-        }
-      });
+    if (selectedMementoIds.length > 0 && freshlySelected === "true") {
+      const selectedMementos = mementos?.filter((memento) =>
+        selectedMementoIds.includes(memento.id),
+      );
+
+      if (selectedMementos?.length > 0) {
+        aggregateMetadata(selectedMementos).then(({ date, location }) => {
+          if (date || location) {
+            setDerivedMetadata({ date, location });
+            setShowModal(true);
+          }
+        });
+      }
     }
-    setValue("mementoIds", selectedMementoIds);
   }, [selectedMementoIds, mementos, setValue, freshlySelected]);
 
   // Updates the location input when GeoLocation changes
@@ -232,7 +234,7 @@ export default function CollectionForm({
                 render={({ field }) => (
                   <DatePickerInput
                     value={field.value}
-                    onChange={(date) => field.onChange(date)}
+                    onChange={field.onChange}
                   />
                 )}
               />
