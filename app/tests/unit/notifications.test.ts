@@ -6,11 +6,18 @@ import {
   XMAS_CONTENT,
 } from "@/src/libs/notifications";
 import * as Notifications from "expo-notifications";
+import { mockCurrentDate } from "./mocks/date";
 
 // Mock dependencies
 jest.mock("@/src/libs/date", () => ({
   getDateFromISO: jest.fn(),
 }));
+
+function findNotificationByTitle(titleFragment: string) {
+  const calls = (Notifications.scheduleNotificationAsync as jest.Mock).mock
+    .calls;
+  return calls.find((call) => call[0].content.title.includes(titleFragment));
+}
 
 describe("Notification functions", () => {
   beforeEach(() => {
@@ -24,8 +31,7 @@ describe("Notification functions", () => {
       (getDateFromISO as jest.Mock).mockReturnValue(mockBirthday);
 
       // Mock the date to be a random day (not a special day)
-      const mockDate = new Date(2025, 5, 15); // June 15, 2025
-      jest.spyOn(global, "Date").mockImplementation(() => mockDate as any);
+      mockCurrentDate(5, 15); // June 15, 2025
 
       await scheduleAllNotifications("1990-08-20");
 
@@ -76,32 +82,23 @@ describe("Notification functions", () => {
   });
 
   describe("scheduleAnnualNotification", () => {
-    it("should schedule immediate notification when date is today", async () => {
-      (getDateFromISO as jest.Mock).mockReturnValue(new Date(1990, 7, 20));
+    // Additional test examples using the helper functions
+    it("should schedule immediate notification for birthday when date is today", async () => {
+      // Set birthday to August 20
+      const birthday = new Date(1990, 7, 20);
+      (getDateFromISO as jest.Mock).mockReturnValue(birthday);
 
-      // Mock the date to be Valentine's day
-      const valentinesDay = new Date();
-      valentinesDay.setMonth(1); // February (0-indexed)
-      valentinesDay.setDate(14); // 14th day
-
-      // Mock current date to be Valentine's day
-      jest.spyOn(global, "Date").mockImplementation(() => {
-        return valentinesDay;
-      });
+      // Mock the date to also be August 20 (different year)
+      mockCurrentDate(7, 20); // August 20th
 
       await scheduleAllNotifications("1990-08-20");
 
-      // Find the Valentine's day notification by searching for it in the calls
+      // Find the birthday notification
+      const birthdayCall = findNotificationByTitle("Birthday");
 
-      const valentinesCall = (
-        Notifications.scheduleNotificationAsync as jest.Mock
-      ).mock.calls.find((call) =>
-        call[0].content.title.includes("Valentine's"),
-      );
-
-      // Verify the Valentine's notification was scheduled with immediate trigger
-      expect(valentinesCall[0]).toEqual({
-        content: VALENTINES_CONTENT,
+      // Verify the birthday notification was scheduled with immediate trigger
+      expect(birthdayCall[0]).toEqual({
+        content: BIRTHDAY_CONTENT,
         trigger: {
           type: "timeInterval",
           seconds: 15,

@@ -842,3 +842,196 @@ describe("Notification functions", () => {
   });
 });
 ```
+
+## Prompt
+
+### User Input
+
+the mock day for valentines isnt setting day correctly. can you fix it and make a helper that we can use in other tests
+
+### LLM Output
+
+I'll create a helper function to properly mock dates for the notification tests, making it reusable for all your tests:
+
+```typescript
+import { getDateFromISO } from "@/src/libs/date";
+import {
+  BIRTHDAY_CONTENT,
+  scheduleAllNotifications,
+  VALENTINES_CONTENT,
+  XMAS_CONTENT,
+} from "@/src/libs/notifications";
+import * as Notifications from "expo-notifications";
+
+// Mock dependencies
+jest.mock("@/src/libs/date", () => ({
+  getDateFromISO: jest.fn(),
+}));
+
+/**
+ * Helper function to mock the current date for testing notification scheduling
+ * @param year - Year to set (optional, defaults to 2025)
+ * @param month - Month to set (0-indexed, January = 0, December = 11)
+ * @param day - Day of month to set
+ * @param hours - Hours to set (optional, defaults to 10)
+ * @param minutes - Minutes to set (optional, defaults to 30)
+ */
+function mockCurrentDate(
+  month: number,
+  day: number,
+  year = 2025,
+  hours = 10,
+  minutes = 30,
+) {
+  const mockDate = new Date(year, month, day, hours, minutes);
+  jest.spyOn(global, "Date").mockImplementation(() => mockDate as any);
+  return mockDate;
+}
+
+/**
+ * Helper function to find a notification call by title content
+ * @param titleFragment - Part of the title text to search for
+ * @returns The matching notification call or undefined if not found
+ */
+function findNotificationByTitle(titleFragment: string) {
+  const calls = (Notifications.scheduleNotificationAsync as jest.Mock).mock
+    .calls;
+  return calls.find((call) => call[0].content.title.includes(titleFragment));
+}
+
+describe("Notification functions", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  describe("scheduleAllNotifications", () => {
+    it("should cancel all notifications and schedule birthday, Christmas, and Valentine's notifications", async () => {
+      // Setup mock for getDateFromISO - make sure birthday is NOT today
+      const mockBirthday = new Date(1990, 7, 20); // August 20 (different from current date)
+      (getDateFromISO as jest.Mock).mockReturnValue(mockBirthday);
+
+      // Mock the date to be a random day (not a special day)
+      mockCurrentDate(5, 15); // June 15, 2025
+
+      await scheduleAllNotifications("1990-08-20");
+
+      expect(
+        Notifications.cancelAllScheduledNotificationsAsync,
+      ).toHaveBeenCalledTimes(1);
+      expect(Notifications.scheduleNotificationAsync).toHaveBeenCalledTimes(3);
+
+      // Verify birthday notification was scheduled with yearly type for Android
+      expect(Notifications.scheduleNotificationAsync).toHaveBeenCalledWith({
+        content: BIRTHDAY_CONTENT,
+        trigger: {
+          type: "yearly",
+          month: 8, // August
+          day: 20,
+          hour: expect.any(Number),
+          minute: expect.any(Number),
+          repeats: true,
+        },
+      });
+
+      // Verify Christmas notification was scheduled
+      expect(Notifications.scheduleNotificationAsync).toHaveBeenCalledWith({
+        content: XMAS_CONTENT,
+        trigger: {
+          type: "yearly",
+          month: 12,
+          day: 25,
+          hour: expect.any(Number),
+          minute: expect.any(Number),
+          repeats: true,
+        },
+      });
+
+      // Verify Valentine's notification was scheduled
+      expect(Notifications.scheduleNotificationAsync).toHaveBeenCalledWith({
+        content: VALENTINES_CONTENT,
+        trigger: {
+          type: "yearly",
+          month: 2,
+          day: 14,
+          hour: expect.any(Number),
+          minute: expect.any(Number),
+          repeats: true,
+        },
+      });
+    });
+  });
+
+  describe("scheduleAnnualNotification", () => {
+    it("should schedule immediate notification when date is today", async () => {
+      // Make sure birthday is not today
+      (getDateFromISO as jest.Mock).mockReturnValue(new Date(1990, 7, 20));
+
+      // Mock the date to be Valentine's day (February 14)
+      mockCurrentDate(1, 14); // February 14th (0-indexed month)
+
+      await scheduleAllNotifications("1990-08-20");
+
+      // Find the Valentine's day notification by searching for it in the calls
+      const valentinesCall = findNotificationByTitle("Valentine's");
+
+      // Verify the Valentine's notification was scheduled with immediate trigger
+      expect(valentinesCall[0]).toEqual({
+        content: VALENTINES_CONTENT,
+        trigger: {
+          type: "timeInterval",
+          seconds: 15,
+        },
+      });
+    });
+
+    // Additional test examples using the helper functions
+    it("should schedule immediate notification for birthday when date is today", async () => {
+      // Set birthday to August 20
+      const birthday = new Date(1990, 7, 20);
+      (getDateFromISO as jest.Mock).mockReturnValue(birthday);
+
+      // Mock the date to also be August 20 (different year)
+      mockCurrentDate(7, 20); // August 20th
+
+      await scheduleAllNotifications("1990-08-20");
+
+      // Find the birthday notification
+      const birthdayCall = findNotificationByTitle("Birthday");
+
+      // Verify the birthday notification was scheduled with immediate trigger
+      expect(birthdayCall[0]).toEqual({
+        content: BIRTHDAY_CONTENT,
+        trigger: {
+          type: "timeInterval",
+          seconds: 15,
+        },
+      });
+    });
+  });
+
+  // Example of testing edge cases with the helper functions
+  describe("Edge cases", () => {
+    it("should handle Christmas day correctly", async () => {
+      // Set birthday to not be Christmas
+      (getDateFromISO as jest.Mock).mockReturnValue(new Date(1990, 7, 20));
+
+      // Mock the date to be Christmas
+      mockCurrentDate(11, 25); // December 25th
+
+      await scheduleAllNotifications("1990-08-20");
+
+      // Find the Christmas notification
+      const christmasCall = findNotificationByTitle("Holidays");
+
+      // Verify Christmas notification is immediate
+      expect(christmasCall[0]).toEqual({
+        content: XMAS_CONTENT,
+        trigger: {
+          type: "timeInterval",
+          seconds: 15,
+        },
+      });
+    });
+  });
+});
+```
