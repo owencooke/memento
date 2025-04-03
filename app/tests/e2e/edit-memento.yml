@@ -28,6 +28,8 @@ appId: com.memento.app
 
 # Edit the memento fields
 # TODO: edit images? thumbnail?
+
+# Verify FR-30/FR-33:
 - runFlow:
     file: ./util/memento-form.yml
     env:
