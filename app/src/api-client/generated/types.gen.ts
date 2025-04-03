@@ -418,6 +418,33 @@ export type CreateNewMementoApiUserUserIdMementoPostResponses = {
 
 export type CreateNewMementoApiUserUserIdMementoPostResponse = CreateNewMementoApiUserUserIdMementoPostResponses[keyof CreateNewMementoApiUserUserIdMementoPostResponses];
 
+export type DeleteMementoApiUserUserIdMementoIdDeleteData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/api/user/{user_id}/memento/{id}';
+};
+
+export type DeleteMementoApiUserUserIdMementoIdDeleteErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type DeleteMementoApiUserUserIdMementoIdDeleteError = DeleteMementoApiUserUserIdMementoIdDeleteErrors[keyof DeleteMementoApiUserUserIdMementoIdDeleteErrors];
+
+export type DeleteMementoApiUserUserIdMementoIdDeleteResponses = {
+    /**
+     * Successful Response
+     */
+    200: Memento;
+};
+
+export type DeleteMementoApiUserUserIdMementoIdDeleteResponse = DeleteMementoApiUserUserIdMementoIdDeleteResponses[keyof DeleteMementoApiUserUserIdMementoIdDeleteResponses];
+
 export type UpdateMementoAndImagesApiUserUserIdMementoIdPutData = {
     body: BodyUpdateMementoAndImagesApiUserUserIdMementoIdPut;
     path: {
