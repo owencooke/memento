@@ -1,7 +1,7 @@
 """
 @description CRUD API routes for Keepsakes/Mementos.
-@requirements FR-8, FR-11, FR-12, FR-13, FR-14, FR-15, FR-17, FR-19, FR-20, FR-21,\
-      FR-26, FR-27, FR-28, FR-30, FR31, FR-32, FR-33, FR-34
+@requirements FR-8, FR-11, FR-12, FR-13, FR-14, FR-15, FR-16, FR-17, FR-19, \
+        FR-20, FR-21, FR-26, FR-27, FR-28, FR-30, FR31, FR-32, FR-33, FR-34
 """
 
 import json
@@ -16,6 +16,7 @@ from pydantic import UUID4
 
 from server.api.memento.models import (
     CreateMementoSuccessResponse,
+    ImageLabelResponse,
     MementoFilterParams,
     NewImageMetadata,
     NewMemento,
@@ -33,6 +34,7 @@ from server.services.db.queries.image import (
 from server.services.db.queries.memento import (
     create_memento,
     db_delete_memento,
+    get_image_labels,
     get_mementos,
     update_memento,
 )
@@ -50,7 +52,7 @@ router = APIRouter()
 @router.get("/")
 def get_users_mementos(
     user_id: UUID4 = Depends(get_user_id),
-    filter_query: MementoFilterParams = Depends(),
+    filter_query: MementoFilterParams = Depends(MementoFilterParams),
 ) -> list[MementoWithImages]:
     """Gets all the mementos belonging to a user."""
     mementos = get_mementos(user_id, filter_query)
@@ -235,3 +237,18 @@ async def delete_memento(
         raise HTTPException(status_code=400, detail="Delete collection failed")
 
     return deleted_memento
+
+
+@router.get("/image_labels")
+def get_users_image_labels(
+    user_id: UUID4 = Depends(get_user_id),
+) -> list[ImageLabelResponse]:
+    """Gets each unique image label from images associated with user's mementos"""
+
+    def format_label(snake_case: str) -> str:
+        return " ".join(word.capitalize() for word in snake_case.split("_"))
+
+    labels = get_image_labels(user_id)
+    return [
+        ImageLabelResponse(value=label, label=format_label(label)) for label in labels
+    ]

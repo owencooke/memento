@@ -50,6 +50,7 @@ def get_has_mementos(collection_id: int) -> list[int]:
         .eq("collection_id", collection_id)
         .execute()
     )
+
     return [item["memento_id"] for item in response.data]
 
 

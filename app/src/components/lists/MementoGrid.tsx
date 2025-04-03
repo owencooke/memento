@@ -3,6 +3,7 @@ import { FlatList, FlatListProps, Pressable, View } from "react-native";
 import { MementoWithImages } from "@/src/api-client/generated";
 import MementoCard from "@/src/components/cards/MementoCard";
 import { Text } from "@/src/components/ui/text";
+import { MementoLogo } from "../MementoLogo";
 
 interface MementoGridProps<ItemT extends MementoWithImages>
   extends Omit<
@@ -18,7 +19,7 @@ interface MementoGridProps<ItemT extends MementoWithImages>
 export default function MementoGrid<ItemT extends MementoWithImages>({
   mementos,
   onMementoPress = () => {},
-  emptyMessage = "No mementos yet!",
+  emptyMessage = "You haven't created any mementos yet!",
   numColumns = 2,
   ...restProps
 }: MementoGridProps<ItemT>) {
@@ -60,7 +61,8 @@ export default function MementoGrid<ItemT extends MementoWithImages>({
       }
       ListEmptyComponent={
         <View className="flex-1 items-center justify-center">
-          <Text>{emptyMessage}</Text>
+          <MementoLogo size="lg" variant="sad" />
+          <Text size="lg">{emptyMessage}</Text>
         </View>
       }
       {...restProps}

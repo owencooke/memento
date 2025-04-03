@@ -120,6 +120,14 @@ export type Image = {
     memento_ids?: Array<Memento> | null;
 };
 
+/**
+ * Value and formatted label
+ */
+export type ImageLabelResponse = {
+    value: string;
+    label: string;
+};
+
 export type ImageWithUrl = {
     id: number;
     memento_id: number;
@@ -191,7 +199,15 @@ export type UpdateCollection = {
  */
 export type UserInfo = {
     id: string;
-    birthday?: string | null;
+    birthday: string;
+};
+
+/**
+ * UserInfo Insert Schema.
+ */
+export type UserInfoInsert = {
+    id?: string | null;
+    birthday: string;
 };
 
 export type ValidationError = {
@@ -240,6 +256,31 @@ export type UserInfoApiUserIdGetResponses = {
 };
 
 export type UserInfoApiUserIdGetResponse = UserInfoApiUserIdGetResponses[keyof UserInfoApiUserIdGetResponses];
+
+export type PostUserInfoApiUserPostData = {
+    body: UserInfoInsert;
+    path?: never;
+    query?: never;
+    url: '/api/user/';
+};
+
+export type PostUserInfoApiUserPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type PostUserInfoApiUserPostError = PostUserInfoApiUserPostErrors[keyof PostUserInfoApiUserPostErrors];
+
+export type PostUserInfoApiUserPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: UserInfo;
+};
+
+export type PostUserInfoApiUserPostResponse = PostUserInfoApiUserPostResponses[keyof PostUserInfoApiUserPostResponses];
 
 export type RemoveImageBackgroundApiImageRemoveBackgroundPostData = {
     body: BodyRemoveImageBackgroundApiImageRemoveBackgroundPost;
@@ -327,6 +368,7 @@ export type GetUsersMementosApiUserUserIdMementoGetData = {
         max_lat?: number | null;
         max_long?: number | null;
         text?: string | null;
+        image_label?: string | null;
     };
     url: '/api/user/{user_id}/memento/';
 };
@@ -427,6 +469,33 @@ export type UpdateMementoAndImagesApiUserUserIdMementoIdPutResponses = {
      */
     200: unknown;
 };
+
+export type GetUsersImageLabelsApiUserUserIdMementoImageLabelsGetData = {
+    body?: never;
+    path: {
+        user_id: string;
+    };
+    query?: never;
+    url: '/api/user/{user_id}/memento/image_labels';
+};
+
+export type GetUsersImageLabelsApiUserUserIdMementoImageLabelsGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetUsersImageLabelsApiUserUserIdMementoImageLabelsGetError = GetUsersImageLabelsApiUserUserIdMementoImageLabelsGetErrors[keyof GetUsersImageLabelsApiUserUserIdMementoImageLabelsGetErrors];
+
+export type GetUsersImageLabelsApiUserUserIdMementoImageLabelsGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: Array<ImageLabelResponse>;
+};
+
+export type GetUsersImageLabelsApiUserUserIdMementoImageLabelsGetResponse = GetUsersImageLabelsApiUserUserIdMementoImageLabelsGetResponses[keyof GetUsersImageLabelsApiUserUserIdMementoImageLabelsGetResponses];
 
 export type GetUsersCollectionsApiUserUserIdCollectionGetData = {
     body?: never;

@@ -12,7 +12,7 @@ import { Heading } from "@/src/components/ui/heading";
 import { Input, InputField } from "@/src/components/ui/input";
 import { Textarea, TextareaInput } from "@/src/components/ui/textarea";
 import { Button, ButtonSpinner, ButtonText } from "@/src/components/ui/button";
-import { useCallback } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AlertCircleIcon } from "@/src/components/ui/icon";
 import LocationInput, {
   GeoLocation,
@@ -20,6 +20,8 @@ import LocationInput, {
 import { FlatList } from "react-native";
 import DatePickerInput from "@/src/components/inputs/DatePickerInput";
 import { router, useLocalSearchParams } from "expo-router";
+import { aggregateMetadata } from "@/src/libs/metadata";
+import AutofillFieldsModal from "../modals/AutofillFieldsModal";
 import { useMementos } from "@/src/hooks/useMementos";
 import MementoGrid from "../lists/MementoGrid";
 
@@ -31,6 +33,7 @@ export interface CollectionFormData {
   date: Date | null;
   location: GeoLocation;
   caption: string;
+  mementoIds: number[];
 }
 
 export interface CollectionFormProps {
@@ -48,13 +51,17 @@ export default function CollectionForm({
   isSubmitting,
   onSubmit,
 }: CollectionFormProps) {
-  // Get local search params for selected mementos from select_mementos page
-  const { ids: idsString } = useLocalSearchParams<{ ids: string }>();
-  const selectedMementoIds = !idsString
-    ? []
-    : Array.isArray(idsString)
+  // Get local search params for selected mementos from select_mementos page and freshly selected if passed from select_mementos page
+  const { ids: idsString, freshlySelected } = useLocalSearchParams<{
+    ids: string;
+    freshlySelected: string;
+  }>();
+  const selectedMementoIds = useMemo(() => {
+    if (!idsString) return [];
+    return Array.isArray(idsString)
       ? idsString.map(Number)
       : idsString.split(",").map(Number);
+  }, [idsString]);
 
   const {
     control,
@@ -68,12 +75,44 @@ export default function CollectionForm({
       caption: "",
       date: null,
       location: { text: "" },
+      mementoIds: [],
     },
   });
 
+  // Set mementoIds in the form when they change
+  useEffect(() => {
+    setValue("mementoIds", selectedMementoIds);
+  }, [selectedMementoIds, setValue]);
+
+  // Prevent re-rendering location input when Geolocation changes
   const { mementos } = useMementos({
     queryOptions: { refetchOnMount: false },
   });
+
+  // State management for derived metadata modal
+  const [showModal, setShowModal] = useState(false);
+  const [derivedMetadata, setDerivedMetadata] = useState<{
+    date: Date | null;
+    location: GeoLocation | null;
+  }>({ date: null, location: null });
+
+  // When selected mementos are changed, aggregates metadata and shows modal
+  useEffect(() => {
+    if (selectedMementoIds.length > 0 && freshlySelected === "true") {
+      const selectedMementos = mementos?.filter((memento) =>
+        selectedMementoIds.includes(memento.id),
+      );
+
+      if (selectedMementos?.length > 0) {
+        aggregateMetadata(selectedMementos).then(({ date, location }) => {
+          if (date || location) {
+            setDerivedMetadata({ date, location });
+            setShowModal(true);
+          }
+        });
+      }
+    }
+  }, [selectedMementoIds, mementos, setValue, freshlySelected]);
 
   // Updates the location input when GeoLocation changes
   const locationValue = watch("location");
@@ -97,134 +136,171 @@ export default function CollectionForm({
     );
   };
 
+  const handleAccept = ({
+    location,
+    date,
+  }: {
+    location: boolean;
+    date: boolean;
+  }) => {
+    if (location && derivedMetadata.location) {
+      setValue("location", derivedMetadata.location);
+    }
+    if (date && derivedMetadata.date) {
+      setValue("date", derivedMetadata.date);
+    }
+    setShowModal(false);
+  };
+
   return (
-    <FlatList
-      data={[]}
-      renderItem={() => <></>}
-      contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 20 }}
-      showsVerticalScrollIndicator={false}
-      keyboardShouldPersistTaps="handled"
-      ListHeaderComponent={
-        <View className="flex justify-center gap-6 pb-32">
-          <Heading className="block" size="2xl">
-            {title}
-          </Heading>
-          <FormControl size={"lg"} isInvalid={!!errors?.title}>
-            <FormControlLabel>
-              <FormControlLabelText>Title</FormControlLabelText>
-            </FormControlLabel>
-            <Controller
-              name="title"
-              control={control}
-              render={({ field }) => (
-                <Input className="bg-background-0">
-                  <InputField
-                    onChangeText={field.onChange}
-                    value={field.value}
-                    placeholder="Collection Title"
-                  />
-                </Input>
-              )}
-              rules={{
-                validate: {
-                  required: (value) => {
-                    return (value && value.length > 0) || "Title is required";
+    <>
+      {showModal && derivedMetadata && (
+        <AutofillFieldsModal
+          location={derivedMetadata.location?.text || null}
+          date={derivedMetadata.date || null}
+          accept={handleAccept}
+          reject={() => {
+            setShowModal(false);
+          }}
+        />
+      )}
+      <FlatList
+        data={[]}
+        renderItem={() => <></>}
+        contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 20 }}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        ListHeaderComponent={
+          <View className="flex justify-center gap-6 pb-32">
+            <Heading className="block" size="2xl">
+              {title}
+            </Heading>
+            <FormControl size={"lg"} isInvalid={!!errors?.title}>
+              <FormControlLabel>
+                <FormControlLabelText>Title</FormControlLabelText>
+              </FormControlLabel>
+              <Controller
+                name="title"
+                control={control}
+                render={({ field }) => (
+                  <Input className="bg-background-0">
+                    <InputField
+                      onChangeText={field.onChange}
+                      value={field.value}
+                      placeholder="Collection Title"
+                    />
+                  </Input>
+                )}
+                rules={{
+                  validate: {
+                    required: (value) => {
+                      return (value && value.length > 0) || "Title is required";
+                    },
                   },
-                },
-              }}
-            />
-            <FormControlError className="mt-4">
-              <FormControlErrorIcon as={AlertCircleIcon} />
-              <FormControlErrorText className="flex-1">
-                {errors?.title?.message}
-              </FormControlErrorText>
-            </FormControlError>
-          </FormControl>
-          <FormControl size={"lg"}>
-            <FormControlLabel>
-              <FormControlLabelText>Caption</FormControlLabelText>
-            </FormControlLabel>
-            <Controller
-              name="caption"
-              control={control}
-              render={({ field }) => (
-                <Textarea className="bg-background-0" size="md">
-                  <TextareaInput
-                    onChangeText={field.onChange}
-                    value={field.value ?? ""}
-                    placeholder="Add a caption"
+                }}
+              />
+              <FormControlError className="mt-4">
+                <FormControlErrorIcon as={AlertCircleIcon} />
+                <FormControlErrorText className="flex-1">
+                  {errors?.title?.message}
+                </FormControlErrorText>
+              </FormControlError>
+            </FormControl>
+            <FormControl size={"lg"}>
+              <FormControlLabel>
+                <FormControlLabelText>Caption</FormControlLabelText>
+              </FormControlLabel>
+              <Controller
+                name="caption"
+                control={control}
+                render={({ field }) => (
+                  <Textarea className="bg-background-0" size="md">
+                    <TextareaInput
+                      onChangeText={field.onChange}
+                      value={field.value ?? ""}
+                      placeholder="Add a caption"
+                    />
+                  </Textarea>
+                )}
+              />
+            </FormControl>
+            <FormControl size={"lg"}>
+              <FormControlLabel>
+                <FormControlLabelText>Date</FormControlLabelText>
+              </FormControlLabel>
+              <Controller
+                name="date"
+                control={control}
+                render={({ field }) => (
+                  <DatePickerInput
+                    value={field.value}
+                    onChange={field.onChange}
                   />
-                </Textarea>
-              )}
-            />
-          </FormControl>
-          <FormControl size={"lg"}>
-            <FormControlLabel>
-              <FormControlLabelText>Date</FormControlLabelText>
-            </FormControlLabel>
-            <Controller
-              name="date"
-              control={control}
-              render={({ field }) => (
-                <DatePickerInput
-                  value={field.value}
-                  onChange={(date) => field.onChange(date)}
-                />
-              )}
-            />
-          </FormControl>
-          <FormControl size={"lg"}>
-            <FormControlLabel>
-              <FormControlLabelText>Location</FormControlLabelText>
-            </FormControlLabel>
-            <Controller
-              name="location"
-              control={control}
-              render={({ field }) => (
-                <LocationInput
-                  onChange={handleLocationChange}
-                  value={field.value}
-                />
-              )}
-            />
-          </FormControl>
-          <FormControl size={"lg"}>
-            <FormControlLabel>
-              <FormControlLabelText>Mementos</FormControlLabelText>
-            </FormControlLabel>
-            {selectedMementoIds.length > 0 && (
-              <View className="flex-1 py-4">
-                <MementoGrid
-                  numColumns={3}
-                  mementos={mementos?.filter((memento) =>
-                    selectedMementoIds.includes(memento.id),
-                  )}
-                />
-              </View>
-            )}
+                )}
+              />
+            </FormControl>
+            <FormControl size={"lg"}>
+              <FormControlLabel>
+                <FormControlLabelText>Location</FormControlLabelText>
+              </FormControlLabel>
+              <Controller
+                name="location"
+                control={control}
+                render={({ field }) => (
+                  <LocationInput
+                    onChange={handleLocationChange}
+                    value={field.value}
+                  />
+                )}
+              />
+            </FormControl>
+            <FormControl size={"lg"}>
+              <FormControlLabel>
+                <FormControlLabelText>Mementos</FormControlLabelText>
+              </FormControlLabel>
+              <Controller
+                control={control}
+                name="mementoIds"
+                defaultValue={selectedMementoIds}
+                render={({ field: { value } }) => (
+                  <>
+                    {value.length > 0 && (
+                      <View className="flex-1 py-4">
+                        <MementoGrid
+                          numColumns={3}
+                          mementos={mementos?.filter((memento) =>
+                            value.includes(memento.id),
+                          )}
+                        />
+                      </View>
+                    )}
+                    <Button
+                      className="mt-auto"
+                      action="secondary"
+                      size={"lg"}
+                      onPress={handleAddMementosPress}
+                    >
+                      <ButtonText>Select Mementos</ButtonText>
+                    </Button>
+                  </>
+                )}
+              />
+            </FormControl>
             <Button
               className="mt-auto"
-              action="secondary"
               size={"lg"}
-              onPress={handleAddMementosPress}
+              onPress={handleSubmit(onSubmit)}
+              disabled={isSubmitting}
             >
-              <ButtonText>Select Mementos</ButtonText>
+              {isSubmitting ? (
+                <ButtonSpinner />
+              ) : (
+                <ButtonText>{submitButtonText}</ButtonText>
+              )}
             </Button>
-          </FormControl>
-          <Button
-            className="mt-auto"
-            size={"lg"}
-            onPress={handleSubmit(onSubmit)}
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? (
-              <ButtonSpinner />
-            ) : (
-              <ButtonText>{submitButtonText}</ButtonText>
-            )}
-          </Button>
-        </View>
-      }
-    />
+          </View>
+        }
+      />
+    </>
   );
 }

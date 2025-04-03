@@ -18,16 +18,30 @@ import DatePickerInput from "@/src/components/inputs/DatePickerInput";
 import { useForm, Controller } from "react-hook-form";
 import { Box } from "../ui/box";
 import { Button, ButtonGroup, ButtonText } from "../ui/button";
-import { AlertCircleIcon } from "../ui/icon";
+import { AlertCircleIcon, ChevronDownIcon } from "../ui/icon";
 import { Heading } from "../ui/heading";
 import LocationInput, { GeoLocation } from "./LocationInput";
 import { useCallback } from "react";
 import { Divider } from "../ui/divider";
+import {
+  Select,
+  SelectBackdrop,
+  SelectContent,
+  SelectDragIndicator,
+  SelectDragIndicatorWrapper,
+  SelectIcon,
+  SelectInput,
+  SelectItem,
+  SelectPortal,
+  SelectTrigger,
+} from "../ui/select";
+import { useImageLabels } from "@/src/hooks/useImageLables";
 
 export interface FilterMementoFormData {
   start_date: Date | null;
   end_date: Date | null;
   location: GeoLocation;
+  image_label: string | null;
 }
 
 interface FilterMementoSheetProps {
@@ -54,6 +68,7 @@ export default function FilterMementoSheet({
     start_date: null,
     end_date: null,
     location: { text: "" },
+    image_label: null,
   };
   const {
     control,
@@ -64,6 +79,10 @@ export default function FilterMementoSheet({
     formState: { errors },
   } = useForm<FilterMementoFormData>({
     defaultValues,
+  });
+
+  const { image_labels, isLoading } = useImageLabels({
+    queryOptions: { refetchOnMount: true },
   });
 
   const startDate = watch("start_date");
@@ -159,6 +178,65 @@ export default function FilterMementoSheet({
                       queryType="(regions)"
                     />
                   )}
+                />
+              </FormControl>
+              <FormControl size={"lg"}>
+                <FormControlLabel>
+                  <FormControlLabelText>Image Labels</FormControlLabelText>
+                </FormControlLabel>
+                <Controller
+                  name="image_label"
+                  control={control}
+                  render={({ field }) => {
+                    const selectedLabel =
+                      image_labels.find((label) => label.value === field.value)
+                        ?.label ?? "Select option";
+
+                    return (
+                      <Select
+                        selectedValue={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger>
+                          <SelectInput
+                            placeholder="Select option"
+                            className="flex-1 align-middle p-0 pl-2 m-0 h-full text-normal"
+                            value={selectedLabel}
+                          />
+                          <SelectIcon className="mr-3" as={ChevronDownIcon} />
+                        </SelectTrigger>
+                        <SelectPortal>
+                          <SelectBackdrop />
+                          <SelectContent>
+                            <SelectDragIndicatorWrapper>
+                              <SelectDragIndicator />
+                            </SelectDragIndicatorWrapper>
+
+                            {/* Default selection */}
+                            <SelectItem label="No selection" value="" />
+
+                            {image_labels.length > 0 && !isLoading ? (
+                              image_labels.map(({ value, label }) => {
+                                return (
+                                  <SelectItem
+                                    key={value}
+                                    label={label}
+                                    value={value}
+                                  />
+                                );
+                              })
+                            ) : (
+                              <SelectItem
+                                label={"No Options"}
+                                value={"No Options"}
+                                disabled
+                              />
+                            )}
+                          </SelectContent>
+                        </SelectPortal>
+                      </Select>
+                    );
+                  }}
                 />
               </FormControl>
               <Divider />
