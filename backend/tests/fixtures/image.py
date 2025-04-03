@@ -11,6 +11,7 @@ def image_data() -> dict:
         "filename": "image",
         "order_index": 0,
         "memento_id": 1,
+        "mime_type": "image/jpeg",
     }
 
 

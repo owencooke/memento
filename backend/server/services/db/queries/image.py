@@ -34,13 +34,9 @@ def delete_image_metadata(id: int) -> bool:
     return len(response.data) == 1
 
 
-def update_image(memento_id: int, filename: str, updates: Dict[str, str | int]) -> bool:
+def update_image(filename: str, updates: Dict[str, str | int]) -> bool:
     """Updates the detected text of an image"""
     response = (
-        db.supabase.table("image")
-        .update(updates)
-        .eq("memento_id", memento_id)
-        .eq("filename", filename)
-        .execute()
+        db.supabase.table("image").update(updates).eq("filename", filename).execute()
     )
     return len(response.data) == 1

@@ -74,7 +74,6 @@ def get_users_mementos(
 # Helper function for image processing for creating/editing a memento
 def process_images_in_background(
     images: list[tuple[Image.Image, str]],
-    memento_id: int,
 ) -> None:
     """Handles image processing in the background."""
     for image, filename in images:  # Accessing each tuple's Image and filename
@@ -86,7 +85,6 @@ def process_images_in_background(
             predicted_class = predict_class(image)
 
             update_image(
-                memento_id,
                 filename,
                 {"detected_text": extracted_text, "image_label": predicted_class},
             )
@@ -136,7 +134,7 @@ async def create_new_memento(
         new_image = await upload_file_to_pil(images[i])
         pil_images.append((new_image, path))
 
-    background_tasks.add_task(process_images_in_background, pil_images, new_memento.id)
+    background_tasks.add_task(process_images_in_background, pil_images)
     logger.info("Running image processing in the background...")
 
     return CreateMementoSuccessResponse(new_memento_id=new_memento.id)
@@ -180,7 +178,6 @@ async def update_memento_and_images(
         if image_kept:
             # User kept old image; update DB record in case images re-ordered
             update_image(
-                id,
                 image_kept.filename,
                 {"order_index": image_kept.order_index},
             )
@@ -214,11 +211,7 @@ async def update_memento_and_images(
             new_image = await upload_file_to_pil(image)
             pil_images.append((new_image, path))
 
-        background_tasks.add_task(
-            process_images_in_background,
-            pil_images,
-            updated_memento.id,
-        )
+        background_tasks.add_task(process_images_in_background, pil_images)
         logger.info("Running image processing in the background...")
 
     return JSONResponse(

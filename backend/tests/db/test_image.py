@@ -4,7 +4,7 @@ from server.services.db.queries.image import (
     create_image_metadata,
     delete_image_metadata,
     get_images_for_memento,
-    update_image_order,
+    update_image,
 )
 from tests.fixtures.supabase import MockSupabase
 
@@ -80,7 +80,7 @@ def test_delete_image_metadata(
     assert result is True
 
 
-def test_update_image_order(
+def test_update_image(
     mock_supabase: MockSupabase,
     expected_image_data: dict,
 ) -> None:
@@ -88,17 +88,22 @@ def test_update_image_order(
     mock_supabase_client, mock_query_response, _ = mock_supabase
 
     # Given
-    image_id = 1
-    new_order_index = 2
+    filename = expected_image_data["filename"]
+    updated_fields = {
+        "order_index": 2,
+        "image_label": "cat",
+        "detected_text": "blah blah",
+    }
     mock_query_response.data = [expected_image_data]
 
     # When
-    result = update_image_order(image_id, new_order_index)
+    result = update_image(filename, updated_fields)
 
     # Then
     mock_supabase_client.table.assert_called_once_with("image")
-    mock_supabase_client.table().update.assert_called_once_with(
-        {"order_index": new_order_index},
+    mock_supabase_client.table().update.assert_called_once_with(updated_fields)
+    mock_supabase_client.table().update().eq.assert_called_once_with(
+        "filename",
+        filename,
     )
-    mock_supabase_client.table().update().eq.assert_called_once_with("id", image_id)
     assert result is True
