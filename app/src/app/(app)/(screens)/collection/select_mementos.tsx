@@ -2,6 +2,9 @@
  * @description Screen for selecting mementos to add to a collection
  *
  * @requirements FR-41
+ *
+ * @component
+ * @returns {JSX.Element} Rendered SelectMementos screen.
  */
 import { router, useLocalSearchParams } from "expo-router";
 import { View } from "react-native";
@@ -10,9 +13,9 @@ import { Button, ButtonText } from "@/src/components/ui/button";
 import { MementoWithImages } from "@/src/api-client/generated";
 import { useMementos } from "@/src/hooks/useMementos";
 import { Heading } from "@/src/components/ui/heading";
-import { Text } from "@/src/components/ui/text";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MementoGrid from "@/src/components/lists/MementoGrid";
+import { Text } from "@/src/components/ui/text";
 
 export default function SelectMementos() {
   // Get local search params for pre-selected mementos IDs
@@ -55,12 +58,11 @@ export default function SelectMementos() {
       return newState;
     });
   };
-
   // Submit selected mementos
   const handleMementosSelected = () => {
     const idsString = Object.keys(selectedIds).toString();
     router.back();
-    router.setParams({ ids: idsString });
+    router.setParams({ ids: idsString, freshlySelected: "true" });
   };
 
   return (

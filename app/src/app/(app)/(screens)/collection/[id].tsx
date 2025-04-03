@@ -18,9 +18,9 @@ import { Box } from "@/src/components/ui/box";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FlatList, Pressable } from "react-native";
 import MementoCard from "@/src/components/cards/MementoCard";
-import DeleteCollectionModal from "@/src/components/modals/DeleteModal";
 import { queryClient } from "@/src/app/_layout";
 import { useMementos } from "@/src/hooks/useMementos";
+import DeleteModal from "@/src/components/modals/DeleteModal";
 
 const buttonClasses = "flex-1";
 const iconClasses = "w-6 h-6";
@@ -184,8 +184,9 @@ export default function ViewCollection() {
       </Box>
 
       {/* Delete Collection Modal */}
-      <DeleteCollectionModal
+      <DeleteModal
         visible={isDeleteModalVisible}
+        type="collection"
         onClose={() => setDeleteModalVisible(false)}
         onConfirm={handleConfirmDelete}
       />
