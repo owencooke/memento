@@ -8,7 +8,6 @@ appId: com.memento.app
 - tapOn: Create multiple mementos
 
 # Select photos from device library
-# NOTE: requires at least 2 photos to have been added to device library
 - tapOn: Add photos from library
 - tapOn:
     text: ".*Photo taken on.*" # default "accessibilityText" value identified for photos downloaded from Chrome on emulator
