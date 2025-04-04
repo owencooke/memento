@@ -23,8 +23,9 @@ def get_mementos_for_clustering(user_id: UUID4) -> list[MementoWithCoordinates]:
 
 
 def create_rejected_collection(
-    user_id: UUID4, recommendation: RejectedRecommendationsInsert,
-) -> RejectedRecommendationsInsert:
+    user_id: UUID4,
+    recommendation: RejectedRecommendationsInsert,
+) -> RejectedRecommendations:
     """Adds a rejected collection to the db"""
     response = (
         db.supabase.table("rejected_recommendations")
