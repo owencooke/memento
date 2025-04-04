@@ -7,7 +7,7 @@ import {
 } from "@/src/libs/notifications";
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
-import { mockCurrentDate } from "./mocks/date";
+import { mockCurrentDate } from "./mocks/date.mock";
 
 // Mock dependencies
 jest.mock("@/src/libs/date", () => ({

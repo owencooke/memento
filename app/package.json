@@ -21,7 +21,7 @@
       "node_modules/(?!@gluestack-ui)/"
     ],
     "setupFiles": [
-      "./tests/unit/mocks/libs.ts"
+      "./tests/unit/mocks/libs.mock.ts"
     ],
     "collectCoverage": true,
     "coverageDirectory": "coverage",

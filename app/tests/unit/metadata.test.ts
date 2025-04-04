@@ -1,7 +1,12 @@
 import { getRelevantMetadata, aggregateMetadata } from "@/src/libs/metadata";
 import { getDateFromISO, toISODateString } from "@/src/libs/date";
 import { Photo } from "@/src/libs/photos";
-import { MementoWithImages } from "@/src/api-client/generated";
+import {
+  createMockPhoto,
+  createMockMemento,
+  locationClusters,
+  mockGeocodingResponse,
+} from "./mocks/metadata.mock";
 
 // Mock fetch for the reverse geocoding
 global.fetch = jest.fn();
@@ -21,11 +26,7 @@ describe("Metadata Utilities", () => {
     describe("Photo metadata extraction", () => {
       it("extracts EXIF metadata from a photo with complete information", () => {
         // Given
-        const photo: Photo = {
-          uri: "file://test/image.jpg",
-          fileName: "image.jpg",
-          mimeType: "image/jpeg",
-          assetId: "asset123",
+        const photo = createMockPhoto({
           exif: {
             DateTimeOriginal: "2023:01:15 14:30:00",
             GPSLatitude: 37.7749,
@@ -33,7 +34,7 @@ describe("Metadata Utilities", () => {
             GPSLongitude: 122.4194,
             GPSLongitudeRef: "W",
           },
-        };
+        });
 
         // When
         const metadata = getRelevantMetadata(photo);
@@ -53,11 +54,7 @@ describe("Metadata Utilities", () => {
 
       it("handles photos with southern hemisphere coordinates", () => {
         // Given
-        const photo: Photo = {
-          uri: "file://test/image.jpg",
-          fileName: "image.jpg",
-          mimeType: "image/jpeg",
-          assetId: "asset123",
+        const photo = createMockPhoto({
           exif: {
             DateTimeOriginal: "2023:01:15 14:30:00",
             GPSLatitude: 33.9249,
@@ -65,7 +62,7 @@ describe("Metadata Utilities", () => {
             GPSLongitude: 18.4241,
             GPSLongitudeRef: "E", // Eastern hemisphere
           },
-        };
+        });
 
         // When
         const metadata = getRelevantMetadata(photo);
@@ -79,11 +76,7 @@ describe("Metadata Utilities", () => {
 
       it("handles photos with missing EXIF date using fallbacks", () => {
         // Given
-        const photo: Photo = {
-          uri: "file://test/image.jpg",
-          fileName: "image.jpg",
-          mimeType: "image/jpeg",
-          assetId: "asset123",
+        const photo = createMockPhoto({
           exif: {
             // No DateTimeOriginal
             DateTimeDigitized: "2023:01:15 14:30:00",
@@ -92,7 +85,7 @@ describe("Metadata Utilities", () => {
             GPSLongitude: 122.4194,
             GPSLongitudeRef: "W",
           },
-        };
+        });
 
         // When
         const metadata = getRelevantMetadata(photo);
@@ -104,11 +97,7 @@ describe("Metadata Utilities", () => {
 
       it("handles photos with DateTime as last fallback", () => {
         // Given
-        const photo: Photo = {
-          uri: "file://test/image.jpg",
-          fileName: "image.jpg",
-          mimeType: "image/jpeg",
-          assetId: "asset123",
+        const photo = createMockPhoto({
           exif: {
             // No DateTimeOriginal or DateTimeDigitized
             DateTime: "2023:01:15 14:30:00",
@@ -117,7 +106,7 @@ describe("Metadata Utilities", () => {
             GPSLongitude: 122.4194,
             GPSLongitudeRef: "W",
           },
-        };
+        });
 
         // When
         const metadata = getRelevantMetadata(photo);
@@ -129,16 +118,12 @@ describe("Metadata Utilities", () => {
 
       it("handles photos with missing GPS coordinates", () => {
         // Given
-        const photo: Photo = {
-          uri: "file://test/image.jpg",
-          fileName: "image.jpg",
-          mimeType: "image/jpeg",
-          assetId: "asset123",
+        const photo = createMockPhoto({
           exif: {
             DateTimeOriginal: "2023:01:15 14:30:00",
             // No GPS data
           },
-        };
+        });
 
         // When
         const metadata = getRelevantMetadata(photo);
@@ -150,14 +135,12 @@ describe("Metadata Utilities", () => {
 
       it("handles photos with missing fileName", () => {
         // Given
-        const photo: Photo = {
-          uri: "file://test/image.jpg",
-          mimeType: "image/jpeg",
-          assetId: "asset123",
+        const photo = createMockPhoto({
+          fileName: undefined,
           exif: {
             DateTimeOriginal: "2023:01:15 14:30:00",
           },
-        };
+        });
 
         // When
         const metadata = getRelevantMetadata(photo);
@@ -168,14 +151,12 @@ describe("Metadata Utilities", () => {
 
       it("handles photos with missing mimeType", () => {
         // Given
-        const photo: Photo = {
-          uri: "file://test/image.jpg",
-          fileName: "image.jpg",
-          assetId: "asset123",
+        const photo = createMockPhoto({
+          mimeType: undefined,
           exif: {
             DateTimeOriginal: "2023:01:15 14:30:00",
           },
-        };
+        });
 
         // When
         const metadata = getRelevantMetadata(photo);
@@ -185,14 +166,8 @@ describe("Metadata Utilities", () => {
       });
 
       it("handles photos with no EXIF data", () => {
-        // Given
-        const photo: Photo = {
-          uri: "file://test/image.jpg",
-          fileName: "image.jpg",
-          mimeType: "image/jpeg",
-          assetId: "asset123",
-          exif: {},
-        };
+        // Given - default photo has empty exif
+        const photo = createMockPhoto();
 
         // When
         const metadata = getRelevantMetadata(photo);
@@ -206,14 +181,9 @@ describe("Metadata Utilities", () => {
     describe("Memento metadata extraction", () => {
       it("extracts metadata from a memento with complete information", () => {
         // Given
-        const memento: MementoWithImages = {
-          id: 1,
-          caption: "Test Memento",
-          date: "2023-01-15",
+        const memento = createMockMemento({
           coordinates: { lat: 37.7749, long: 122.4194 },
-          user_id: "",
-          images: [],
-        };
+        });
 
         // When
         const metadata = getRelevantMetadata(memento);
@@ -229,14 +199,10 @@ describe("Metadata Utilities", () => {
 
       it("handles mementos with missing date and coordinates", () => {
         // Given
-        const memento: MementoWithImages = {
-          id: 1,
-          caption: "Test Memento",
+        const memento = createMockMemento({
           date: null,
           coordinates: null,
-          user_id: "",
-          images: [],
-        };
+        });
 
         // When
         const metadata = getRelevantMetadata(memento);
@@ -256,11 +222,7 @@ describe("Metadata Utilities", () => {
     it("aggregates metadata from multiple photos with common date", async () => {
       // Given
       const photos: Photo[] = [
-        {
-          uri: "file://test/image1.jpg",
-          fileName: "image1.jpg",
-          mimeType: "image/jpeg",
-          assetId: "asset1",
+        createMockPhoto({
           exif: {
             DateTimeOriginal: "2023:01:15 14:30:00",
             GPSLatitude: 37.7749,
@@ -268,11 +230,9 @@ describe("Metadata Utilities", () => {
             GPSLongitude: 122.4194,
             GPSLongitudeRef: "W",
           },
-        },
-        {
-          uri: "file://test/image2.jpg",
+        }),
+        createMockPhoto({
           fileName: "image2.jpg",
-          mimeType: "image/jpeg",
           assetId: "asset2",
           exif: {
             DateTimeOriginal: "2023:01:15 15:00:00", // Same date, different time
@@ -281,16 +241,11 @@ describe("Metadata Utilities", () => {
             GPSLongitude: 122.4199,
             GPSLongitudeRef: "W",
           },
-        },
+        }),
       ];
 
       // Mock functions for geocoding
-      (global.fetch as jest.Mock).mockResolvedValue({
-        json: jest.fn().mockResolvedValue({
-          status: "OK",
-          results: [{ formatted_address: "San Francisco, CA, USA" }],
-        }),
-      });
+      mockGeocodingResponse.success();
 
       // When
       const result = await aggregateMetadata(photos);
@@ -317,6 +272,7 @@ describe("Metadata Utilities", () => {
         .mockReturnValueOnce("2023-01-15")
         .mockReturnValueOnce("2023-01-16");
 
+      // This is a simple enough setup that we can just use inline objects
       const photos: Photo[] = [
         {
           uri: "file://test/image1.jpg",
@@ -356,21 +312,15 @@ describe("Metadata Utilities", () => {
 
     it("handles photos with no location data", async () => {
       // Given
-      const photos: Photo[] = [
-        {
-          uri: "file://test/image1.jpg",
-          fileName: "image1.jpg",
-          mimeType: "image/jpeg",
-          assetId: "asset1",
-          exif: {
-            DateTimeOriginal: "2023:01:15 14:30:00",
-            // No GPS data
-          },
+      const photo = createMockPhoto({
+        exif: {
+          DateTimeOriginal: "2023:01:15 14:30:00",
+          // No GPS data
         },
-      ];
+      });
 
       // When
-      const result = await aggregateMetadata(photos);
+      const result = await aggregateMetadata([photo]);
 
       // Then
       expect(result.location).toBeNull();
@@ -378,35 +328,24 @@ describe("Metadata Utilities", () => {
 
     it("handles geocoding API errors", async () => {
       // Given
-      const photos: Photo[] = [
-        {
-          uri: "file://test/image1.jpg",
-          fileName: "image1.jpg",
-          mimeType: "image/jpeg",
-          assetId: "asset1",
-          exif: {
-            DateTimeOriginal: "2023:01:15 14:30:00",
-            GPSLatitude: 37.7749,
-            GPSLatitudeRef: "N",
-            GPSLongitude: 122.4194,
-            GPSLongitudeRef: "W",
-          },
+      const photo = createMockPhoto({
+        exif: {
+          DateTimeOriginal: "2023:01:15 14:30:00",
+          GPSLatitude: 37.7749,
+          GPSLatitudeRef: "N",
+          GPSLongitude: 122.4194,
+          GPSLongitudeRef: "W",
         },
-      ];
+      });
 
       // Mock geocoding error
-      (global.fetch as jest.Mock).mockResolvedValue({
-        json: jest.fn().mockResolvedValue({
-          status: "ZERO_RESULTS",
-          results: [],
-        }),
-      });
+      mockGeocodingResponse.error();
 
       // Spy on console.error
       const consoleSpy = jest.spyOn(console, "error").mockImplementation();
 
       // When
-      const result = await aggregateMetadata(photos);
+      const result = await aggregateMetadata([photo]);
 
       // Then
       expect(result.location).toEqual({
@@ -420,30 +359,24 @@ describe("Metadata Utilities", () => {
 
     it("handles fetch errors during geocoding", async () => {
       // Given
-      const photos: Photo[] = [
-        {
-          uri: "file://test/image1.jpg",
-          fileName: "image1.jpg",
-          mimeType: "image/jpeg",
-          assetId: "asset1",
-          exif: {
-            DateTimeOriginal: "2023:01:15 14:30:00",
-            GPSLatitude: 37.7749,
-            GPSLatitudeRef: "N",
-            GPSLongitude: 122.4194,
-            GPSLongitudeRef: "W",
-          },
+      const photo = createMockPhoto({
+        exif: {
+          DateTimeOriginal: "2023:01:15 14:30:00",
+          GPSLatitude: 37.7749,
+          GPSLatitudeRef: "N",
+          GPSLongitude: 122.4194,
+          GPSLongitudeRef: "W",
         },
-      ];
+      });
 
       // Mock fetch error
-      (global.fetch as jest.Mock).mockRejectedValue(new Error("Network error"));
+      mockGeocodingResponse.networkError();
 
       // Spy on console.error
       const consoleSpy = jest.spyOn(console, "error").mockImplementation();
 
       // When
-      const result = await aggregateMetadata(photos);
+      const result = await aggregateMetadata([photo]);
 
       // Then
       expect(result.location).toEqual({
@@ -456,84 +389,14 @@ describe("Metadata Utilities", () => {
     });
 
     it("handles multiple location clusters by finding the largest", async () => {
-      // Given
-      const photos: Photo[] = [
-        // San Francisco cluster (3 photos)
-        {
-          uri: "file://test/sf1.jpg",
-          fileName: "sf1.jpg",
-          mimeType: "image/jpeg",
-          assetId: "asset1",
-          exif: {
-            DateTimeOriginal: "2023:01:15 14:30:00",
-            GPSLatitude: 37.775,
-            GPSLatitudeRef: "N",
-            GPSLongitude: 122.419,
-            GPSLongitudeRef: "W",
-          },
-        },
-        {
-          uri: "file://test/sf2.jpg",
-          fileName: "sf2.jpg",
-          mimeType: "image/jpeg",
-          assetId: "asset2",
-          exif: {
-            DateTimeOriginal: "2023:01:15 15:00:00",
-            GPSLatitude: 37.774,
-            GPSLatitudeRef: "N",
-            GPSLongitude: 122.42,
-            GPSLongitudeRef: "W",
-          },
-        },
-        {
-          uri: "file://test/sf3.jpg",
-          fileName: "sf3.jpg",
-          mimeType: "image/jpeg",
-          assetId: "asset3",
-          exif: {
-            DateTimeOriginal: "2023:01:15 16:00:00",
-            GPSLatitude: 37.776,
-            GPSLatitudeRef: "N",
-            GPSLongitude: 122.418,
-            GPSLongitudeRef: "W",
-          },
-        },
-        // New York cluster (2 photos - smaller cluster)
-        {
-          uri: "file://test/ny1.jpg",
-          fileName: "ny1.jpg",
-          mimeType: "image/jpeg",
-          assetId: "asset4",
-          exif: {
-            DateTimeOriginal: "2023:01:20 10:00:00",
-            GPSLatitude: 40.713,
-            GPSLatitudeRef: "N",
-            GPSLongitude: 74.006,
-            GPSLongitudeRef: "W",
-          },
-        },
-        {
-          uri: "file://test/ny2.jpg",
-          fileName: "ny2.jpg",
-          mimeType: "image/jpeg",
-          assetId: "asset5",
-          exif: {
-            DateTimeOriginal: "2023:01:20 11:00:00",
-            GPSLatitude: 40.714,
-            GPSLatitudeRef: "N",
-            GPSLongitude: 74.005,
-            GPSLongitudeRef: "W",
-          },
-        },
+      // Given - Use our pre-defined location clusters
+      const photos = [
+        ...locationClusters.sanFrancisco,
+        ...locationClusters.newYork,
       ];
 
       // Mock geocoding response for San Francisco (the largest cluster)
-      (global.fetch as jest.Mock).mockResolvedValue({
-        json: jest.fn().mockResolvedValue({
-          status: "OK",
-          results: [{ formatted_address: "San Francisco, CA, USA" }],
-        }),
-      });
+      mockGeocodingResponse.success();
 
       // When
       const result = await aggregateMetadata(photos);
@@ -554,32 +417,21 @@ describe("Metadata Utilities", () => {
 
     it("handles photos with no date information", async () => {
       // Given
-      const photos: Photo[] = [
-        {
-          uri: "file://test/image1.jpg",
-          fileName: "image1.jpg",
-          mimeType: "image/jpeg",
-          assetId: "asset1",
-          exif: {
-            // No date information
-            GPSLatitude: 37.7749,
-            GPSLatitudeRef: "N",
-            GPSLongitude: 122.4194,
-            GPSLongitudeRef: "W",
-          },
+      const photo = createMockPhoto({
+        exif: {
+          // No date information
+          GPSLatitude: 37.7749,
+          GPSLatitudeRef: "N",
+          GPSLongitude: 122.4194,
+          GPSLongitudeRef: "W",
         },
-      ];
-
-      // Mock geocoding
-      (global.fetch as jest.Mock).mockResolvedValue({
-        json: jest.fn().mockResolvedValue({
-          status: "OK",
-          results: [{ formatted_address: "San Francisco, CA, USA" }],
-        }),
       });
 
+      // Mock geocoding
+      mockGeocodingResponse.success();
+
       // When
-      const result = await aggregateMetadata(photos);
+      const result = await aggregateMetadata([photo]);
 
       // Then
       expect(result.date).toBeNull();

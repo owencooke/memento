@@ -154,6 +154,7 @@ describe("Photo utilities", () => {
         quality: 1,
         exif: true,
         allowsMultipleSelection: true,
+        legacy: true,
       });
     });
 
