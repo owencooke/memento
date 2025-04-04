@@ -29,7 +29,7 @@ def create_rejected_collection(
     response = (
         db.supabase.table("rejected_recommendations")
         .insert({**recommendation.model_dump(mode="json"), "user_id": str(user_id)})
-        .execute
+        .execute()
     )
     return RejectedRecommendations(**response.data[0])
 
