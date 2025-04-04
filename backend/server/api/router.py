@@ -1,6 +1,6 @@
 from fastapi.routing import APIRouter
 
-from server.api import collection, image, memento, monitoring, testing, user
+from server.api import collection, image, memento, monitoring, testing, user, websocket
 
 # Nested routers that require user id access
 user_id_router = APIRouter(prefix="/user/{user_id}")
@@ -9,6 +9,11 @@ user_id_router.include_router(
     collection.router,
     prefix="/collection",
     tags=["collection"],
+)
+user_id_router.include_router(
+    websocket.router,
+    prefix="/ws",
+    tags=["ws"],
 )
 
 

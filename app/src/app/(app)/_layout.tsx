@@ -8,6 +8,7 @@ import { useSession } from "@/src/context/AuthContext";
 import { Center } from "@/src/components/ui/center";
 import { Spinner } from "@/src/components/ui/spinner";
 import Header from "@/src/components/navigation/Header";
+import { useWebSocket } from "@/src/hooks/useWebSocket";
 import * as Notifications from "expo-notifications";
 import { useEffect } from "react";
 import { userInfoApiUserIdGet } from "@/src/api-client/generated";
@@ -24,6 +25,7 @@ Notifications.setNotificationHandler({
 export default function AppLayout() {
   const { session, isLoading } = useSession();
 
+  useWebSocket();
   useEffect(() => {
     const scheduleNotifcations = async () => {
       const { data: userInfo } = await userInfoApiUserIdGet({

@@ -3,16 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from server.api.router import api_router
 from server.config.log import configure_logging
+from server.config.openapi import add_openapi_models
 
 
 def get_app() -> FastAPI:
-    """
-    Get FastAPI application.
-
-    This is the main constructor of an application.
-
-    :return: application.
-    """
+    """Initializes the FastAPI application."""
     configure_logging()
     app = FastAPI(
         title="Memento Backend",
@@ -26,7 +21,11 @@ def get_app() -> FastAPI:
         allow_headers=["*"],  # Allow all headers
     )
 
-    # Main router for the API.
+    # Main API router (includes all nested routes)
     app.include_router(router=api_router, prefix="/api")
+
+    # Override app's openapi generation method to include additional models
+    openapi_schema = app.openapi()
+    app.openapi = lambda: add_openapi_models(openapi_schema)  # type: ignore
 
     return app

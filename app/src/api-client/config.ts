@@ -9,10 +9,13 @@ const getBaseUrl = () => {
   // Use machine's host IP as host for backend
   const host = process.env.EXPO_PUBLIC_API_HOST ?? "127.0.0.1";
   const port = process.env.EXPO_PUBLIC_API_PORT ?? "8000";
-  return `http://${host}:${port}/`;
+  return `http://${host}:${port}`;
 };
 
 export const createClientConfig: CreateClientConfig = (config) => ({
   ...config,
   baseUrl: getBaseUrl(),
 });
+
+export const getWsUrl = (userId: string) =>
+  `${getBaseUrl()}/api/user/${userId}/ws/`;

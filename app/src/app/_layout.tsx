@@ -17,6 +17,7 @@ import { AuthProvider, useSession } from "@/src/context/AuthContext";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { CameraProvider } from "../context/PhotoContext";
+import useNotificationObserver from "../hooks/useNotificationObserver";
 import { useFonts } from "expo-font";
 
 export const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ SplashScreen.preventAutoHideAsync();
 function RootContent() {
   const { isLoading } = useSession();
   const { theme } = useTheme();
+  useNotificationObserver();
   const [fontsLoaded] = useFonts({
     title: require("@/src/assets/fonts/Quicksand-Regular.ttf"),
   });
