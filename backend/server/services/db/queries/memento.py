@@ -7,7 +7,6 @@ from pydantic import UUID4
 
 from server.api.memento.models import (
     MementoFilterParams,
-    MementoWithCoordinates,
     NewMemento,
     UpdateMemento,
 )
