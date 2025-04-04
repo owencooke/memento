@@ -7,55 +7,20 @@ import { GeoLocation } from "../components/inputs/LocationInput";
 import { Photo } from "@/src/libs/photos";
 import { getDateFromISO, toISODateString } from "./date";
 
-type SelectedPhotoMetadata = Pick<
+type Metadata = Pick<
   ImageWithUrl,
   "date" | "filename" | "coordinates" | "mime_type"
 >;
 
-type Metadata = Pick<MementoWithImages | ImageWithUrl, "date" | "coordinates">;
-
-/**
- * Extracts "relevant" properties from EXIF metadata of an image for our application.
- */
-export const getRelevantImageMetadata = (
-  photo: Photo,
-): SelectedPhotoMetadata => {
-  const { exif, fileName, mimeType } = photo;
-
-  // Date
-  let date =
-    exif?.DateTimeOriginal || exif?.DateTimeDigitized || exif?.DateTime;
-  date = date ? toISODateString(date) : null;
-
-  // Coordinates
-  let coordinates = null;
-  if (exif && "GPSLatitude" in exif) {
-    coordinates = {
-      lat: (exif.GPSLatitudeRef === "S" ? -1 : 1) * exif.GPSLatitude,
-      long: (exif.GPSLongitudeRef === "W" ? -1 : 1) * exif.GPSLongitude,
-    };
-  }
-
-  return {
-    date,
-    filename: fileName ?? "",
-    coordinates,
-    mime_type: mimeType ?? "image/png",
-  };
-};
-
-const isPhoto = (item: Photo | MementoWithImages): item is Photo => {
-  return "exif" in item;
-};
-
 /**
  * Extracts relevant metadata from either a photo or memento.
+ * If it's a photo, extracts the EXIF metadata associated with image.
  */
 export const getRelevantMetadata = (
   item: Photo | MementoWithImages,
 ): Metadata => {
-  if (isPhoto(item)) {
-    const { exif } = item;
+  if ("exif" in item) {
+    const { exif, fileName, mimeType } = item;
 
     // Date
     let date =
@@ -66,18 +31,30 @@ export const getRelevantMetadata = (
     let coordinates = null;
     if (exif && "GPSLatitude" in exif) {
       coordinates = {
-        lat: (exif.GPSLatitudeRef === "S" ? -1 : 1) * exif.GPSLatitude,
-        long: (exif.GPSLongitudeRef === "W" ? -1 : 1) * exif.GPSLongitude,
+        lat:
+          (exif.GPSLatitudeRef === "S" && exif.GPSLatitude > 0 ? -1 : 1) *
+          exif.GPSLatitude,
+        long:
+          (exif.GPSLongitudeRef === "W" && exif.GPSLongitude > 0 ? -1 : 1) *
+          exif.GPSLongitude,
       };
     }
 
-    return { date, coordinates };
+    return {
+      date,
+      coordinates,
+      mime_type: mimeType ?? "image/png",
+      filename: fileName ?? "",
+    };
   }
 
   // Memento Metadata
+  item = item as MementoWithImages;
   return {
     date: item.date ?? null,
     coordinates: item.coordinates ?? null,
+    mime_type: "image/png",
+    filename: "",
   };
 };
 

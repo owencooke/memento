@@ -22,29 +22,18 @@ export async function scheduleAllNotifications(birthdayString: string) {
 async function scheduleBirthdayNotification(birthdayString: string) {
   const date = getDateFromISO(birthdayString);
   await scheduleAnnualNotification(
-    "Happy Birthday! 🎂",
-    "Make your day unforgettable — save your birthday cards and memories in Memento!",
+    BIRTHDAY_CONTENT,
     date.getMonth() + 1,
     date.getDate(),
   );
 }
 
 async function scheduleChristmasNotification() {
-  await scheduleAnnualNotification(
-    "Happy Holidays! 🎄",
-    "Capture the magic of your holiday memories in some new mementos!",
-    12,
-    25,
-  );
+  await scheduleAnnualNotification(XMAS_CONTENT, 12, 25);
 }
 
 async function scheduleValentinesNotification() {
-  await scheduleAnnualNotification(
-    "Happy Valentine's Day! 💘",
-    "Keep love alive by saving your Valentine's cards and gifts in Memento!",
-    2,
-    14,
-  );
+  await scheduleAnnualNotification(VALENTINES_CONTENT, 2, 14);
 }
 
 /**
@@ -52,15 +41,14 @@ async function scheduleValentinesNotification() {
  * If current day matches, (ex: birthday) notification should appear in 15 seconds.
  */
 async function scheduleAnnualNotification(
-  title: string,
-  body: string,
+  content: { title: string; body: string },
   month: number,
   day: number,
 ) {
   const now = new Date();
   const minutes = now.getMinutes() + 1;
   const isToday = now.getMonth() + 1 === month && now.getDate() === day;
-  console.log(`Scheduling: ${title} for: ${month}/${day}`);
+  console.log(`Scheduling: ${content.title} for: ${month}/${day}`);
 
   const trigger: Notifications.NotificationTriggerInput = {
     type:
@@ -75,7 +63,7 @@ async function scheduleAnnualNotification(
   };
 
   await Notifications.scheduleNotificationAsync({
-    content: { title, body },
+    content,
     trigger: !isToday
       ? trigger
       : {
@@ -90,13 +78,30 @@ async function clearAllScheduledNotifications() {
   console.log("All scheduled notifications have been cleared.");
 }
 
-// Helper functions for testing/debugging notifications
+// Notification contents
+
+export const BIRTHDAY_CONTENT = {
+  title: "Happy Birthday! 🎂",
+  body: "Make your day unforgettable — save your birthday cards and memories in Memento!",
+};
+
+export const XMAS_CONTENT = {
+  title: "Happy Holidays! 🎄",
+  body: "Capture the magic of your holiday memories in some new mementos!",
+};
+
+export const VALENTINES_CONTENT = {
+  title: "Happy Valentine's Day! 💘",
+  body: "Keep love alive by saving your Valentine's cards and gifts in Memento!",
+};
+
+// Helper functions for testing/debuggng notifications
 
 // async function testImmediateNotification() {
 //   await Notifications.scheduleNotificationAsync({
 //     content: { title: "Test Notification", body: "This is a testing message!" },
 //     trigger: null,
-//   });i
+//   });
 // }
 
 // async function logScheduledNotifications() {

@@ -8,7 +8,6 @@ appId: com.memento.app
 - tapOn: Create multiple mementos
 
 # Select photos from device library
-# NOTE: requires at least 2 photos to have been added to device library
 - tapOn: Add photos from library
 - tapOn:
     text: ".*Photo taken on.*" # default "accessibilityText" value identified for photos downloaded from Chrome on emulator
@@ -18,6 +17,7 @@ appId: com.memento.app
     index: 1
 - tapOn: Add (2)
 
+# Verify FR-22: group images into keepsakes
 - assertVisible: "Memento #1"
 - assertVisible: "Memento #2"
 - assertVisible:
@@ -35,7 +35,7 @@ appId: com.memento.app
 - tapOn:
     id: modal-background-removal-decline
 
-# Fill out each group's details
+# Verify FR-23: Fill out each group's details
 - tapOn: "Memento #1"
 - runFlow:
     file: ./util/memento-form.yml
@@ -59,7 +59,7 @@ appId: com.memento.app
 # Submit the form
 - tapOn: Create 2 Mementos
 
-# Accept option to add the mementos to a new collection
+# Verify FR-24: Accept option to add the mementos to a new collection
 - tapOn: Collection title
 - inputText: Bulk Created Collection
 - hideKeyboard

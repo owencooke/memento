@@ -90,12 +90,13 @@ This should generate new TypeScript clients/types inside the `/src/app/api-clien
 
 ## Unit Testing
 
-Powered by [Jest](https://jestjs.io/).
+White-box unit testing, powered by [Jest](https://jestjs.io/). To run:
 
 ```bash
- # pnpm i
  pnpm test
 ```
+
+This will run all the test suites for the TypeScript logic/functions (non-UI components) defined under `/app/src/libs`. The test results will be printed to the terminal. Additionally, an HTML code coverage report is generated and can be viewed by opening `/app/coverage/index.html` in your browser.
 
 ## E2E Testing
 

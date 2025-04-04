@@ -8,11 +8,11 @@ appId: com.memento.app
 
 # Verify memento fields and image are visible
 - assertVisible:
-    id: view-memento-carousel-image
+    id: view-memento-carousel-image # FR-28
 - assertVisible:
-    id: view-memento-caption
+    id: view-memento-caption # FR-26
 - assertVisible:
-    id: view-memento-date
+    id: view-memento-date # FR-27
 - assertVisible:
     id: view-memento-location
 
