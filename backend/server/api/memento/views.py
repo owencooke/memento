@@ -23,6 +23,7 @@ from server.api.memento.models import (
     UpdateMemento,
 )
 from server.api.path import get_user_id
+from server.background_tasks.recommend import recommend_collection
 from server.services.db.models.joins import MementoWithImages
 from server.services.db.models.schema_public_latest import Memento
 from server.services.db.queries.image import (
@@ -136,6 +137,9 @@ async def create_new_memento(
 
     background_tasks.add_task(process_images_in_background, pil_images)
     logger.info("Running image processing in the background...")
+
+    background_tasks.add_task(recommend_collection, user_id)
+    logger.info("Running collection recommendation in the background...")
 
     return CreateMementoSuccessResponse(new_memento_id=new_memento.id)
 
