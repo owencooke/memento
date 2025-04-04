@@ -13,6 +13,7 @@ def cluster_mementos(
     min_cluster_size: int = 5,
     min_samples: Optional[int] = None,
     allow_single_cluster: bool = True,
+    prediction_data: bool = True,
 ) -> dict[int, List[int]]:
     """Cluster Mementos based on geographical coordinates and return recommended IDs."""
 
@@ -33,6 +34,7 @@ def cluster_mementos(
         min_cluster_size=min_cluster_size,
         min_samples=min_samples,
         allow_single_cluster=allow_single_cluster,
+        prediction_data=prediction_data,
     )
     cluster_labels = clusterer.fit_predict(scaled_coordinates)
 
@@ -40,7 +42,7 @@ def cluster_mementos(
 
     clusters: dict[int, List[int]] = {}
     for i, label in enumerate(cluster_labels):
-        if label not in clusters:
+        if label not in clusters and label != -1:
             clusters[label] = []
         clusters[label].append(ids[i])
 

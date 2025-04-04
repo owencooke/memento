@@ -4,7 +4,7 @@ from pydantic import UUID4
 
 from server.api.websocket.manager import websocket_manager
 from server.api.websocket.models import WebSocketMessage, WSMessageType
-from server.services.cluster_memento.kmeans import cluster_mementos
+from server.services.cluster_memento.hdbscan import cluster_mementos
 from server.services.db.queries.memento import get_mementos_for_clustering
 
 
@@ -13,8 +13,8 @@ async def recommend_collection(user_id: UUID4) -> None:
     # TODO: replace with actual algorithm call
     await asyncio.sleep(5)
     mementos = get_mementos_for_clustering(user_id)
+    rejected_recommendations = get_rejected_recommendations(user_id)
     clustered_memento_ids = cluster_mementos(mementos, min_cluster_size=3)
-    clustered_memento_ids = []
 
     # TODO: check DB to see if recommendation was already given
 
