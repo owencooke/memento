@@ -72,7 +72,7 @@ const handleRecommendedCollection = (mementoIds: number[]) => {
       title: "A new collection, just for you! 🗂️",
       body: "We've curated a special set of memories. Tap to check them out!",
       data: {
-        url: `/(app)/(screens)/collection/create?ids=${mementoIds}`,
+        url: `/(app)/(screens)/collection/create?ids=${mementoIds}&freshlySelected=true`,
       },
     },
     trigger: null,
