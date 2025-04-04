@@ -1,12 +1,14 @@
 from collections import defaultdict
-from typing import List, Optional
+from typing import List, Optional, cast
 
 import numpy as np
 from hdbscan import HDBSCAN
 from loguru import logger
+from numpy.typing import NDArray
 from sklearn.preprocessing import StandardScaler
 
 from server.api.memento.models import MementoWithCoordinates
+from server.services.db.models.gis import Coordinates
 
 
 def cluster_mementos(
@@ -24,9 +26,18 @@ def cluster_mementos(
         logger.warning("Less mementos than minimum cluster size!")
         return {-1: ids}
 
-    coordinates = np.array(
-        [[memento.coordinates.lat, memento.coordinates.long] for memento in mementos],
-    )
+        # The mementos in passed into this function should always have
+        # not None coordinates. Mypy requires either define another model or cast field.
+        coordinates: NDArray[np.float64] = np.array(
+            [
+                [
+                    cast(Coordinates, memento.coordinates).lat,
+                    cast(Coordinates, memento.coordinates).long,
+                ]
+                for memento in mementos
+            ],
+            dtype=np.float64,
+        )
     scaler = StandardScaler()
     scaled_coordinates = scaler.fit_transform(coordinates)
 
