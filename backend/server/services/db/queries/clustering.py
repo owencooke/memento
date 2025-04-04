@@ -36,11 +36,14 @@ def create_rejected_collection(
 
 def is_collection_rejected(user_id: UUID4, memento_ids: list[int]) -> bool:
     """Checks if a set of memento_ids have been rejected before"""
+    # cs expects PostgreSQL array format
+    pg_array = "{" + ",".join(map(str, memento_ids)) + "}"
+
     response = (
         db.supabase.table("rejected_recommendations")
         .select("id")
         .filter("user_id", "eq", str(user_id))
-        .filter("memento_ids", "cs", memento_ids)
+        .filter("memento_ids", "cs", pg_array)
         .execute()
     )
     return len(response.data) > 0
