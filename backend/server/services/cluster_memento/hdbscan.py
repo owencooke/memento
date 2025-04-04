@@ -1,3 +1,4 @@
+from collections import defaultdict
 from typing import List, Optional
 
 import numpy as np
@@ -28,7 +29,6 @@ def cluster_mementos(
     )
     scaler = StandardScaler()
     scaled_coordinates = scaler.fit_transform(coordinates)
-    logger.info(f"Scaled Coordinates: {scaled_coordinates}")
 
     clusterer = HDBSCAN(
         min_cluster_size=min_cluster_size,
@@ -38,14 +38,14 @@ def cluster_mementos(
     )
     cluster_labels = clusterer.fit_predict(scaled_coordinates)
 
-    logger.info(f"Cluster Labels: {cluster_labels}")
-
-    clusters: dict[int, List[int]] = {}
+    clusters = defaultdict(list)
     for i, label in enumerate(cluster_labels):
-        if label not in clusters and label != -1:
-            clusters[label] = []
-        clusters[label].append(ids[i])
+        if label == -1:
+            continue
+        clusters[int(label)].append(ids[i])
 
-    logger.info(f"Clusters: {clusters}")
+    logger.debug(f"Scaled Coordinates: {scaled_coordinates}")
+    logger.debug(f"Cluster Labels: {cluster_labels}")
+    logger.debug(f"Clusters: {clusters}")
 
-    return clusters
+    return dict(clusters)
