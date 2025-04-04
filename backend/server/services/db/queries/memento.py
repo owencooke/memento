@@ -89,18 +89,6 @@ def update_memento(id: int, updated_memento: UpdateMemento) -> Memento:
     return Memento(**response.data[0])
 
 
-def get_mementos_for_clustering(user_id: UUID4) -> list[MementoWithCoordinates]:
-    """Retrieves mementos with a non-null coordinates field"""
-    query = (
-        db.supabase.table("memento")
-        .select("user_id, id, coordinates")
-        .eq("user_id", str(user_id))
-        .neq("coordinates", None)
-    )
-    response = query.execute()
-    return [MementoWithCoordinates(**item) for item in response.data]
-
-
 def db_delete_memento(id: int) -> Memento:
     """Deletes a memento from the DB"""
     response = db.supabase.table("memento").delete().eq("id", id).execute()
