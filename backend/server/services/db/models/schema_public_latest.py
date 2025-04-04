@@ -99,11 +99,11 @@ class RejectedRecommendationsBaseSchema(CustomModel):
     """RejectedRecommendations Base Schema."""
 
     # Primary Keys
-    id: UUID4
-    user_id: UUID4
+    id: int
 
     # Columns
     memento_ids: list
+    user_id: UUID4
 
 
 class UserInfoBaseSchema(CustomModel):
@@ -221,11 +221,10 @@ class RejectedRecommendationsInsert(CustomModelInsert):
     """RejectedRecommendations Insert Schema."""
 
     # Primary Keys
-    id: UUID4 | None = Field(default=None)  # has default value
-    user_id: UUID4
 
     # Required fields
     memento_ids: list
+    user_id: UUID4
 
 
 class UserInfoInsert(CustomModelInsert):
@@ -338,11 +337,10 @@ class RejectedRecommendationsUpdate(CustomModelUpdate):
     """RejectedRecommendations Update Schema."""
 
     # Primary Keys
-    id: UUID4 | None = Field(default=None)
-    user_id: UUID4 | None = Field(default=None)
 
     # Optional fields
     memento_ids: list | None = Field(default=None)
+    user_id: UUID4 | None = Field(default=None)
 
 
 class UserInfoUpdate(CustomModelUpdate):
