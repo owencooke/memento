@@ -6,7 +6,9 @@ from pydantic import UUID4
 from server.api.websocket.manager import websocket_manager
 from server.api.websocket.models import WebSocketMessage, WSMessageType
 from server.services.cluster_memento.hdbscan import cluster_mementos
+from server.services.db.models.schema_public_latest import RejectedRecommendationsInsert
 from server.services.db.queries.clustering import (
+    create_rejected_collection,
     get_mementos_for_clustering,
     is_collection_rejected,
 )
@@ -40,3 +42,13 @@ async def recommend_collection(user_id: UUID4) -> None:
             body=selected_recommendation,
         ),
     )
+
+    rejected_collection = create_rejected_collection(
+        user_id,
+        RejectedRecommendationsInsert(
+            user_id=user_id,
+            memento_ids=selected_recommendation,
+        ),
+    )
+
+    logger.info(f"Rejected Collection: {rejected_collection}")
