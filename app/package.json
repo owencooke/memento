@@ -9,7 +9,7 @@
     "android:prod": "expo run:android --variant release",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "test": "jest",
+    "test": "jest --coverage",
     "test:e2e": "maestro test tests/e2e/*",
     "lint": "expo lint",
     "sync-api": "sh scripts/sync-api.sh && openapi-ts",
@@ -21,7 +21,12 @@
       "node_modules/(?!@gluestack-ui)/"
     ],
     "setupFiles": [
-      "./tests/unit/mocks/libs.ts"
+      "./tests/unit/mocks/libs.mock.ts"
+    ],
+    "collectCoverage": true,
+    "coverageDirectory": "coverage",
+    "coverageReporters": [
+      "html"
     ]
   },
   "dependencies": {
@@ -81,6 +86,7 @@
     "expo-web-browser": "~14.0.2",
     "lodash": "^4.17.21",
     "lucide-react-native": "^0.482.0",
+    "mime": "^4.0.6",
     "nativewind": "^4.1.23",
     "react": "18.3.1",
     "react-dom": "18.3.1",

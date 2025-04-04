@@ -208,6 +208,7 @@ export const CameraProvider: React.FC<React.PropsWithChildren> = ({
           {/* Rectangle reference overlay */}
           <View className="absolute inset-0 justify-center items-center z-50">
             <RectangleVerticalIcon
+              testID="camera-reference-overlay"
               size={height * 0.7}
               strokeWidth={0.1}
               color="#DADADA"

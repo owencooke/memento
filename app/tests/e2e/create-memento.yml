@@ -8,12 +8,18 @@ appId: com.memento.app
 - tapOn: Create a single memento
 - assertVisible: Create Memento
 
-# Take a photo
+# Open camera
 - assertNotVisible:
     id: interactive-photo-card
 - tapOn:
     id: photo-grid-add-button
 - tapOn: Take a Photo
+
+# Verify FR-5: reference square overlay visible
+- assertVisible:
+    id: camera-reference-overlay
+
+# Verify FR-4/FR-20: Take a photo with device camera
 - tapOn:
     id: camera-capture-button
 - assertVisible:
@@ -25,23 +31,27 @@ appId: com.memento.app
 - tapOn:
     id: modal-background-removal-decline
 
-# Select photos from device library
-# NOTE: requires at least 1 photo to have been added to device library
+# Verify FR-6/FR-20: Select photos from device library
 - tapOn:
     id: photo-grid-add-button
 - tapOn: Select from Library
+- tapOn: More options # Necessary to get location EXIF
+- tapOn: ".*Browse.*"
 - tapOn:
-    text: ".*Photo taken on.*" # default "accessibilityText" value identified for photos downloaded from Chrome on emulator
-    index: 0
-- tapOn: Add (1)
+    text: "tree(?:\\s*\\(\\d+\\))?\\.jpg.*" # default "accessibilityText" value identified via `maestro hierarchy`
 
-# Accept background removal
+# Verify FR-10: Accept background removal
 - assertVisible:
     id: modal-background-removal
 - tapOn:
     id: modal-background-removal-confirm
 
-# Fill out other form fields
+# Verify FR-7/FR-9: extract metadata and fill fields
+#   - matches EXIF metadata from ./util/assets/tree.jpg
+- assertVisible: "2025-04-03"
+- assertVisible: New York, NY, USA
+
+# Verify FR-17/FR-19: Fill out other form fields
 - runFlow:
     file: ./util/memento-form.yml
     env:

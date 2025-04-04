@@ -1,7 +1,7 @@
 import { GeoLocation } from "../components/inputs/LocationInput";
 import { Photo } from "@/src/libs/photos";
 import { toISODateString } from "../libs/date";
-import { getRelevantImageMetadata } from "../libs/metadata";
+import { getRelevantMetadata } from "../libs/metadata";
 
 export interface MementoFormData {
   memento: { date: Date | null; location: GeoLocation; caption: string };
@@ -24,7 +24,7 @@ export const prepareMementoPayload = (form: MementoFormData) => {
       coordinates: lat && long ? { lat, long } : null,
     },
     image_metadata_str: form.photos.map((photo, idx) => ({
-      ...getRelevantImageMetadata(photo),
+      ...getRelevantMetadata(photo),
       order_index: idx,
     })),
   };

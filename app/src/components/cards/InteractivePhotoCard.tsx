@@ -35,6 +35,7 @@ export default function InteractivePhotoCard({
         )}
         {onDelete && (
           <Button
+            testID="interactive-photo-card-delete"
             onPress={onDelete}
             className="absolute p-2 rounded-full top-0 right-0"
             size="sm"

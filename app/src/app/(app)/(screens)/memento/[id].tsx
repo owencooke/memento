@@ -23,7 +23,7 @@ import PagerView, {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { shareAsync, isAvailableAsync } from "expo-sharing";
 import * as FileSystem from "expo-file-system";
-import { mimeTypeToExtension } from "@/src/libs/string";
+import mime from "mime";
 import { useMutation } from "@tanstack/react-query";
 import {
   deleteMementoApiUserUserIdMementoIdDeleteMutation,
@@ -100,7 +100,7 @@ export default function ViewMemento() {
       const image = memento?.images[currentImageIndex];
       if (image?.url) {
         // Download the image content to a temp file
-        const localUri = `${FileSystem.cacheDirectory}Memento.${mimeTypeToExtension(image.mime_type)}`;
+        const localUri = `${FileSystem.cacheDirectory}Memento.${mime.getExtension(image.mime_type)}`;
         await FileSystem.downloadAsync(image.url, localUri);
 
         // Share the downloaded content

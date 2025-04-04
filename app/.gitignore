@@ -5,6 +5,7 @@
 *.env
 *.env.bak
 package-lock.json
+coverage
 
 # build folders
 android/
