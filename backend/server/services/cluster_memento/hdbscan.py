@@ -1,3 +1,8 @@
+"""
+@description Clusters mementos based on geographical location
+@requirements FR-38
+"""
+
 from collections import defaultdict
 from typing import List, Optional, cast
 

@@ -1,3 +1,9 @@
+"""
+@description Background task for recommending collection based on results of
+    HDBSCAN clustering algorithm, sends recommendation via websocket.
+@requirements FR-38, FR-39, FR-40
+"""
+
 from random import choice
 
 from loguru import logger
