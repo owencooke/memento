@@ -95,6 +95,17 @@ class MementosWithImagesBaseSchema(CustomModel):
     user_id: UUID4 | None = Field(default=None)
 
 
+class RejectedRecommendationsBaseSchema(CustomModel):
+    """RejectedRecommendations Base Schema."""
+
+    # Primary Keys
+    id: UUID4
+    user_id: UUID4
+
+    # Columns
+    memento_ids: list
+
+
 class UserInfoBaseSchema(CustomModel):
     """UserInfo Base Schema."""
 
@@ -206,6 +217,17 @@ class MementosWithImagesInsert(CustomModelInsert):
     user_id: UUID4 | None = Field(default=None)
 
 
+class RejectedRecommendationsInsert(CustomModelInsert):
+    """RejectedRecommendations Insert Schema."""
+
+    # Primary Keys
+    id: UUID4 | None = Field(default=None)  # has default value
+    user_id: UUID4
+
+    # Required fields
+    memento_ids: list
+
+
 class UserInfoInsert(CustomModelInsert):
     """UserInfo Insert Schema."""
 
@@ -312,6 +334,17 @@ class MementosWithImagesUpdate(CustomModelUpdate):
     user_id: UUID4 | None = Field(default=None)
 
 
+class RejectedRecommendationsUpdate(CustomModelUpdate):
+    """RejectedRecommendations Update Schema."""
+
+    # Primary Keys
+    id: UUID4 | None = Field(default=None)
+    user_id: UUID4 | None = Field(default=None)
+
+    # Optional fields
+    memento_ids: list | None = Field(default=None)
+
+
 class UserInfoUpdate(CustomModelUpdate):
     """UserInfo Update Schema."""
 
@@ -371,6 +404,14 @@ class MementosWithImages(MementosWithImagesBaseSchema):
     """MementosWithImages Schema for Pydantic.
 
     Inherits from MementosWithImagesBaseSchema. Add any customization here.
+    """
+
+
+
+class RejectedRecommendations(RejectedRecommendationsBaseSchema):
+    """RejectedRecommendations Schema for Pydantic.
+
+    Inherits from RejectedRecommendationsBaseSchema. Add any customization here.
     """
 
 
