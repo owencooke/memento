@@ -86,7 +86,7 @@ class MementoFilterParams(BaseModel):
     def check_date_order(cls, data: Any) -> Any:
         """Checks that end date is gte start_date"""
         if (
-            isinstance(data, dict)
+            isinstance(data, MementoFilterParams)
             and data["end_date"]
             and data["start_date"]
             and data["end_date"] < data["start_date"]
