@@ -210,11 +210,9 @@ def test_get_mementos_image_label_filter(
     result = get_mementos(user_id, filter_params)
 
     # Then
+    calls = [call("user_id", str(user_id)), call("images.image_label", "beach")]
     mock_supabase_client.table.assert_called_once_with("memento")
-    mock_supabase_client.table().select().eq.assert_called_with("user_id", str(user_id))
-    mock_supabase_client.table().select().eq().eq.assert_called_once_with(
-        "images.image_label", "beach"
-    )
+    mock_supabase_client.table().select().eq.assert_has_calls(calls)
 
     assert len(result) == 1
     assert "Beach" in result[0].caption
