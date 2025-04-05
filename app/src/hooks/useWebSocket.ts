@@ -3,6 +3,14 @@
  *    system recommended collections. When a recommendation received, a in-app notification
  *    is sent to the user, which when tapped, navigates them to the "Create Collection" screen
  *    with the recommended mementos from the algorithm (which they can accept or reject).
+ *
+ * Note that in a production app, this would not be necessary, as it would be
+ *  simpler to have the server send a remote push notification. We made the
+ *  design decision to stick with local/in-app notifications, as they were
+ *  compatible with Expo Go and required much less configuration steps to setup.
+ *
+ * Reference: https://docs.expo.dev/push-notifications/what-you-need-to-know/
+ *
  * @requirements FR-39, FR-40
  */
 

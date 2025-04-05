@@ -1,3 +1,17 @@
+"""
+@description WebSocket connection route, used so that the server can send
+    recommended collections back to the client.
+
+    Note that in a production app, this would not be necessary, as it would be
+    simpler to have the server send a remote push notification. We made the
+    design decision to stick with local/in-app notifications, as they were
+    compatible with Expo Go and required much less configuration steps to setup.
+
+    Reference: https://docs.expo.dev/push-notifications/what-you-need-to-know/
+
+@requirements FR-39
+"""
+
 import uuid
 
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
