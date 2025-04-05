@@ -1,3 +1,11 @@
+/**
+ * @description Hook for establishing WebSocket connection to server for receiving
+ *    system recommended collections. When a recommendation received, a in-app notification
+ *    is sent to the user, which when tapped, navigates them to the "Create Collection" screen
+ *    with the recommended mementos from the algorithm (which they can accept or reject).
+ * @requirements FR-39, FR-40
+ */
+
 import { useCallback, useEffect, useRef } from "react";
 import { useSession } from "../context/AuthContext";
 import { getWsUrl } from "../api-client/config";
@@ -9,14 +17,7 @@ export const useWebSocket = () => {
   const { session } = useSession();
   const wsRef = useRef<WebSocket | null>(null);
 
-  const processMessage = (message: WebSocketMessage) => {
-    if (message.type === "recommendation") {
-      handleRecommendedCollection(message.body as number[]);
-    } else {
-      console.log("WS received undefined message type:", message);
-    }
-  };
-
+  // Connect a WebSocket to server and manage lifecycle callbacks
   const connect = useCallback(() => {
     const userId = String(session?.user.id);
     if (!userId || wsRef.current) return;
@@ -26,7 +27,7 @@ export const useWebSocket = () => {
     console.log("WS opened");
 
     ws.onmessage = (event) =>
-      processMessage(JSON.parse(event.data) as WebSocketMessage);
+      handleMessageType(JSON.parse(event.data) as WebSocketMessage);
 
     ws.onclose = () => {
       console.log("WS closed");
@@ -45,9 +46,9 @@ export const useWebSocket = () => {
     // Connect on mount
     connect();
 
+    // Connect when app reopened
     const handleAppStateChange = (state: string) => {
       if (state === "active" && !wsRef.current) {
-        // Connect when app reopened
         connect();
       }
     };
@@ -62,6 +63,16 @@ export const useWebSocket = () => {
   }, [connect]);
 };
 
+// Maps a generic message from server to a specific client action based on message type
+const handleMessageType = (message: WebSocketMessage) => {
+  if (message.type === "recommendation") {
+    handleRecommendedCollection(message.body as number[]);
+  } else {
+    console.log("WS received undefined message type:", message);
+  }
+};
+
+// Sends user an in-app notification with deep link to recommended collection/mementos
 const handleRecommendedCollection = (mementoIds: number[]) => {
   console.log(
     "Sending in-app notification for recommended collection:",
