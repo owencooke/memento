@@ -8,6 +8,7 @@ from server.services.db.models.schema_public_latest import (
     Collection,
     HasMemento,
     HasMementoInsert,
+    HasMementoUpdate,
 )
 from server.services.db.queries.collection import (
     associate_memento,
@@ -15,8 +16,10 @@ from server.services.db.queries.collection import (
     db_delete_collection,
     db_delete_has_memento,
     get_collection,
+    get_collection_image_filenames,
     get_collections,
     get_has_mementos,
+    update_associate_memento,
     update_collection,
 )
 
@@ -264,3 +267,105 @@ def test_associate_memento_failure(
 
     mock_supabase_client.table.assert_called_once_with("has_memento")
     mock_supabase_client.table().insert.assert_called_once()
+
+
+def test_update_associate_memento(
+    mock_supabase: MockSupabase,
+    has_memento_data: dict,
+) -> None:
+    """Test updating a memento association with a collection."""
+    mock_supabase_client, mock_query_response, _ = mock_supabase
+
+    # Given
+    # Create updated has_memento data
+    updated_has_memento_data = dict(has_memento_data)
+    # ID is needed for updating
+    updated_has_memento_data["id"] = 1
+
+    mock_has_memento = HasMementoUpdate(**updated_has_memento_data)
+    mock_query_response.data = [updated_has_memento_data]
+
+    # When
+    result = update_associate_memento(mock_has_memento)
+
+    # Then
+    mock_supabase_client.table.assert_called_once_with("has_memento")
+    mock_supabase_client.table().update.assert_called_once()
+    mock_supabase_client.table().update().eq.assert_called_once_with("id", id)
+    assert isinstance(result, HasMemento)
+    assert result.collection_id == updated_has_memento_data["collection_id"]
+    assert result.memento_id == updated_has_memento_data["memento_id"]
+
+
+def test_get_collection_image_filenames(
+    mock_supabase: MockSupabase,
+    collection_data: dict,
+) -> None:
+    """Test getting image filenames for mementos in a collection."""
+    mock_supabase_client, mock_query_response, _ = mock_supabase
+
+    # Given
+    collection_id = collection_data["id"]
+
+    # Mock response data structure for nested image filenames
+    mock_response_data = [
+        {
+            "memento": {
+                "images": [{"filename": "image1.jpg"}, {"filename": "image2.jpg"}]
+            }
+        },
+        {"memento": {"images": [{"filename": "image3.jpg"}]}},
+    ]
+
+    mock_query_response.data = mock_response_data
+
+    # Mock the from_ method and chain
+    mock_supabase_client.from_.return_value = mock_supabase_client
+    mock_supabase_client.select.return_value = mock_supabase_client
+    mock_supabase_client.eq.return_value = mock_supabase_client
+    mock_supabase_client.execute.return_value = mock_query_response
+
+    # When
+    result = get_collection_image_filenames(collection_id)
+
+    # Then
+    mock_supabase_client.from_.assert_called_once_with("has_memento")
+    mock_supabase_client.select.assert_called_once_with(
+        "memento:memento_id(images:image(filename))"
+    )
+    mock_supabase_client.eq.assert_called_once_with("collection_id", collection_id)
+
+    assert len(result) == 3
+    assert result == ["image1.jpg", "image2.jpg", "image3.jpg"]
+
+
+def test_get_collection_image_filenames_empty(
+    mock_supabase: MockSupabase,
+    collection_data: dict,
+) -> None:
+    """Test getting image filenames when there are no images in the collection."""
+    mock_supabase_client, mock_query_response, _ = mock_supabase
+
+    # Given
+    collection_id = collection_data["id"]
+
+    # Empty response
+    mock_query_response.data = []
+
+    # Mock the from_ method and chain
+    mock_supabase_client.from_.return_value = mock_supabase_client
+    mock_supabase_client.select.return_value = mock_supabase_client
+    mock_supabase_client.eq.return_value = mock_supabase_client
+    mock_supabase_client.execute.return_value = mock_query_response
+
+    # When
+    result = get_collection_image_filenames(collection_id)
+
+    # Then
+    mock_supabase_client.from_.assert_called_once_with("has_memento")
+    mock_supabase_client.select.assert_called_once_with(
+        "memento:memento_id(images:image(filename))"
+    )
+    mock_supabase_client.eq.assert_called_once_with("collection_id", collection_id)
+
+    assert result == []
