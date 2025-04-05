@@ -49,6 +49,7 @@ async def recommend_collection(user_id: UUID4) -> None:
         ),
     )
 
+    # Store recommendation to prevent repeated suggestions
     rejected_collection = create_rejected_collection(
         user_id,
         RejectedRecommendationsInsert(
@@ -56,5 +57,4 @@ async def recommend_collection(user_id: UUID4) -> None:
             memento_ids=selected_recommendation,
         ),
     )
-
-    logger.info(f"Rejected Collection: {rejected_collection}")
+    logger.info(f"Added already used recommendation: {rejected_collection}")

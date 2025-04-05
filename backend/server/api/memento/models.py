@@ -16,7 +16,7 @@ from server.services.db.models.schema_public_latest import (
 
 
 class MementoWithCoordinates(BaseWithCoordinates, Memento):  # type: ignore[misc]
-    """Memento with coordiantes"""
+    """Memento with coordinates"""
 
 
 class NewMemento(CoordinatesInsert, BaseWithCoordinates, MementoInsert):  # type: ignore[misc]
