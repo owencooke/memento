@@ -407,7 +407,9 @@ export type CreateNewMementoApiUserUserIdMementoPostData = {
     path: {
         user_id: string;
     };
-    query?: never;
+    query?: {
+        run_recommend?: boolean;
+    };
     url: '/api/user/{user_id}/memento/';
 };
 
@@ -640,6 +642,33 @@ export type GenerateCollageApiUserUserIdCollectionIdCollageGetResponses = {
      */
     200: unknown;
 };
+
+export type TestRecommendCollectionApiTestingRecommendCollectionUserIdPostData = {
+    body?: never;
+    path: {
+        user_id: string;
+    };
+    query?: never;
+    url: '/api/testing/recommend-collection/{user_id}';
+};
+
+export type TestRecommendCollectionApiTestingRecommendCollectionUserIdPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type TestRecommendCollectionApiTestingRecommendCollectionUserIdPostError = TestRecommendCollectionApiTestingRecommendCollectionUserIdPostErrors[keyof TestRecommendCollectionApiTestingRecommendCollectionUserIdPostErrors];
+
+export type TestRecommendCollectionApiTestingRecommendCollectionUserIdPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: string;
+};
+
+export type TestRecommendCollectionApiTestingRecommendCollectionUserIdPostResponse = TestRecommendCollectionApiTestingRecommendCollectionUserIdPostResponses[keyof TestRecommendCollectionApiTestingRecommendCollectionUserIdPostResponses];
 
 export type TestCollageApiTestingCollageGetData = {
     body?: never;

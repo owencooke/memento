@@ -77,13 +77,18 @@ async def create_new_memento(
     image_metadata_str: Annotated[str, Form()],
     images: list[UploadFile],
     user_id: UUID4 = Depends(get_user_id),
+    run_recommend: bool = True,
 ) -> CreateMementoSuccessResponse:
     """Post route for creating a new memento.
 
     Three main steps:
         1. Creates a memento DB record
-        2. Uploads associated images to object storage,
-        3. Stores a metadata DB record for each image.
+        2. Uploads associated images to object storage
+        3. Stores a metadata DB record for each image
+
+    Also kicks off background tasks for:
+        1. Image processing
+        2. Collection recommendation
 
     Uses multipart/form-data to upload JSON/binary payloads simultaneously.
     """
@@ -112,8 +117,9 @@ async def create_new_memento(
     background_tasks.add_task(process_images_in_background, pil_images)
     logger.info("Running image processing in the background...")
 
-    background_tasks.add_task(recommend_collection, user_id)
-    logger.info("Running collection recommendation in the background...")
+    if run_recommend:  # query param, defaults to True
+        background_tasks.add_task(recommend_collection, user_id)
+        logger.info("Running collection recommendation in the background...")
 
     return CreateMementoSuccessResponse(new_memento_id=new_memento.id)
 

@@ -160,11 +160,12 @@ export default function BulkCreateMemento() {
   const handleSubmit = async () => {
     try {
       const responses = await Promise.all(
-        mementoGroups.map(async (group) => {
+        mementoGroups.map(async (group, idx) => {
           const { groupId, photos, ...memento } = group;
           const body: any = prepareMementoPayload({ memento, photos });
           return createMutation.mutateAsync({
             body,
+            query: { run_recommend: idx === mementoGroups.length - 1 },
             path: { user_id: String(session?.user.id) },
             bodySerializer: formDataBodySerializer.bodySerializer,
           });
