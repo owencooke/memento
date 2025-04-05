@@ -31,18 +31,18 @@ def cluster_mementos(
         logger.warning("Less mementos than minimum cluster size!")
         return {-1: ids}
 
-        # The mementos in passed into this function should always have
-        # not None coordinates. Mypy requires either define another model or cast field.
-        coordinates: NDArray[np.float64] = np.array(
+    # The mementos in passed into this function should always have
+    # not None coordinates. Mypy requires either define another model or cast field.
+    coordinates: NDArray[np.float64] = np.array(
+        [
             [
-                [
-                    cast(Coordinates, memento.coordinates).lat,
-                    cast(Coordinates, memento.coordinates).long,
-                ]
-                for memento in mementos
-            ],
-            dtype=np.float64,
-        )
+                cast(Coordinates, memento.coordinates).lat,
+                cast(Coordinates, memento.coordinates).long,
+            ]
+            for memento in mementos
+        ],
+        dtype=np.float64,
+    )
     scaler = StandardScaler()
     scaled_coordinates = scaler.fit_transform(coordinates)
 
