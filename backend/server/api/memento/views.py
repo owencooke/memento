@@ -7,11 +7,9 @@
 import json
 from typing import Annotated, Optional
 
-import pytesseract
 from fastapi import APIRouter, BackgroundTasks, Depends, Form, HTTPException, UploadFile
 from fastapi.responses import JSONResponse
 from loguru import logger
-from PIL import Image
 from pydantic import UUID4
 
 from server.api.memento.models import (
@@ -23,6 +21,7 @@ from server.api.memento.models import (
     UpdateMemento,
 )
 from server.api.path import get_user_id
+from server.background_tasks.process_image import process_images_in_background
 from server.background_tasks.recommend import recommend_collection
 from server.services.db.models.joins import MementoWithImages
 from server.services.db.models.schema_public_latest import Memento
@@ -40,7 +39,6 @@ from server.services.db.queries.memento import (
     update_memento,
 )
 from server.services.process_image.converters import upload_file_to_pil
-from server.services.process_image.image_class import predict_class
 from server.services.storage.image import (
     delete_images,
     get_bulk_image_urls,
@@ -70,30 +68,6 @@ def get_users_mementos(
         memento.images.sort(key=lambda image: image.order_index)
 
     return mementos
-
-
-# Helper function for image processing for creating/editing a memento
-def process_images_in_background(
-    images: list[tuple[Image.Image, str]],
-) -> None:
-    """Handles image processing in the background."""
-    for image, filename in images:  # Accessing each tuple's Image and filename
-        try:
-            # Extract text from the image
-            extracted_text = pytesseract.image_to_string(image)
-
-            # Classify label
-            predicted_class = predict_class(image)
-
-            update_image(
-                filename,
-                {"detected_text": extracted_text, "image_label": predicted_class},
-            )
-            logger.info(f"Adding detected text: {extracted_text}")
-            logger.info(f"Adding predicted class: {predicted_class}")
-
-        except Exception as e:
-            logger.error(f"Failed to process image {filename}: {e}")
 
 
 @router.post("/")
