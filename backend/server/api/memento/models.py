@@ -100,8 +100,8 @@ class MementoFilterParams(BaseModel):
     def all_bounds_values(cls, data: Any) -> Any:
         """Ensure all bounding box values are provided if any are set"""
         bbox_fields = ["min_lat", "min_long", "max_lat", "max_long"]
-        bbox_values = [data.get(field) for field in bbox_fields]
-        if any(bbox_values) and not all(bbox_values):
+        values_present = [data.get(field) is not None for field in bbox_fields]
+        if any(values_present) and not all(values_present):
             raise ValueError(
                 "All bounding box coordinates \
                         (min_lat, min_long, max_lat, max_long) must be provided",
