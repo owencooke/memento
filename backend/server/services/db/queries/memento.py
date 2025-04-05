@@ -5,7 +5,11 @@
 
 from pydantic import UUID4
 
-from server.api.memento.models import MementoFilterParams, NewMemento, UpdateMemento
+from server.api.memento.models import (
+    MementoFilterParams,
+    NewMemento,
+    UpdateMemento,
+)
 from server.services import db
 from server.services.db.models.joins import MementoWithImages
 from server.services.db.models.schema_public_latest import Memento
@@ -23,7 +27,7 @@ def create_memento(new_memento: NewMemento, user_id: UUID4) -> Memento:
 
 def get_mementos(
     user_id: UUID4,
-    filter_query: MementoFilterParams | None,
+    filter_query: MementoFilterParams | None = None,
 ) -> list[MementoWithImages]:
     """Gets all the mementos belonging to a user."""
     query = (
