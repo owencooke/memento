@@ -1,8 +1,5 @@
 from unittest.mock import call
 
-from pydantic import UUID4
-from tests.fixtures.supabase import MockSupabase
-
 from server.api.collection.models import NewCollection, UpdateCollection
 from server.services.db.models.schema_public_latest import (
     Collection,
@@ -22,6 +19,7 @@ from server.services.db.queries.collection import (
     update_associate_memento,
     update_collection,
 )
+from tests.fixtures.supabase import MockSupabase
 
 
 def test_create_collection(
@@ -132,10 +130,11 @@ def test_get_collections(
     # Then
     mock_supabase_client.table.assert_called_once_with("collection")
     mock_supabase_client.table().select.assert_called_once_with(
-        "*, mementos:has_memento(*)"
+        "*, mementos:has_memento(*)",
     )
     mock_supabase_client.table().select().eq.assert_called_once_with(
-        "user_id", str(user_id)
+        "user_id",
+        str(user_id),
     )
     assert len(result) == 2
     assert result[0].id == collections_with_mementos_data[0]["id"]
@@ -165,7 +164,8 @@ def test_get_has_mementos(
     mock_supabase_client.table.assert_called_once_with("has_memento")
     mock_supabase_client.table().select.assert_called_once_with("memento_id")
     mock_supabase_client.table().select().eq.assert_called_once_with(
-        "collection_id", collection_id
+        "collection_id",
+        collection_id,
     )
     assert len(result) == 3
     assert result == [1, 2, 3]
@@ -218,7 +218,8 @@ def test_db_delete_collection(
     mock_supabase_client.table.assert_called_once_with("collection")
     mock_supabase_client.table().delete.assert_called_once()
     mock_supabase_client.table().delete().eq.assert_called_once_with(
-        "id", collection_id
+        "id",
+        collection_id,
     )
     assert isinstance(result, Collection)
     assert result.id == collection_id
@@ -261,7 +262,7 @@ def test_associate_memento_failure(
     # When/Then
     try:
         associate_memento(mock_has_memento)
-        assert False, "Expected ValueError but no exception was raised"
+        raise AssertionError("Expected ValueError but no exception was raised")
     except ValueError as e:
         assert str(e) == "Failed to associate memento with collection"
 
@@ -311,8 +312,8 @@ def test_get_collection_image_filenames(
     mock_response_data = [
         {
             "memento": {
-                "images": [{"filename": "image1.jpg"}, {"filename": "image2.jpg"}]
-            }
+                "images": [{"filename": "image1.jpg"}, {"filename": "image2.jpg"}],
+            },
         },
         {"memento": {"images": [{"filename": "image3.jpg"}]}},
     ]
@@ -331,7 +332,7 @@ def test_get_collection_image_filenames(
     # Then
     mock_supabase_client.from_.assert_called_once_with("has_memento")
     mock_supabase_client.select.assert_called_once_with(
-        "memento:memento_id(images:image(filename))"
+        "memento:memento_id(images:image(filename))",
     )
     mock_supabase_client.eq.assert_called_once_with("collection_id", collection_id)
 
@@ -364,7 +365,7 @@ def test_get_collection_image_filenames_empty(
     # Then
     mock_supabase_client.from_.assert_called_once_with("has_memento")
     mock_supabase_client.select.assert_called_once_with(
-        "memento:memento_id(images:image(filename))"
+        "memento:memento_id(images:image(filename))",
     )
     mock_supabase_client.eq.assert_called_once_with("collection_id", collection_id)
 

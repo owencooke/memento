@@ -57,7 +57,7 @@ def memento_with_images_data() -> dict:
                 "detected_text": "Sample text",
                 "image_label": "mountain_view",
                 "url": "https://example.com/image1.jpg",
-            }
+            },
         ],
     }
 
@@ -73,7 +73,8 @@ def multiple_mementos_with_images_data() -> list[dict]:
             "id": 1,
             "caption": "Mountain Trip",
             "location": "Colorado",
-            "coordinates": "0101000020E61000009BA9108FC4CBFFBF9D8026C2865B4940",  # approx 42N, -71E
+            # approx 42N, -71E
+            "coordinates": "0101000020E61000009BA9108FC4CBFFBF9D8026C2865B4940",
             "date": base_date.isoformat(),
             "user_id": user_id,
             "images": [
@@ -88,14 +89,15 @@ def multiple_mementos_with_images_data() -> list[dict]:
                     "detected_text": "Rocky mountains hiking trail",
                     "image_label": "mountain_view",
                     "url": "https://example.com/mountains.jpg",
-                }
+                },
             ],
         },
         {
             "id": 2,
             "caption": "Beach Day",
             "location": "Miami",
-            "coordinates": "0101000020E6100000A01A2FDD24B055C05C8FC2F528DC3D40",  # approx 30N, -85E
+            # approx 30N, -85E
+            "coordinates": "0101000020E6100000A01A2FDD24B055C05C8FC2F528DC3D40",
             "date": (base_date + timedelta(days=30)).isoformat(),
             "user_id": user_id,
             "images": [
@@ -129,7 +131,8 @@ def multiple_mementos_with_images_data() -> list[dict]:
             "id": 3,
             "caption": "City Tour",
             "location": "New York",
-            "coordinates": "0101000020E61000003333333333B354C066666666664E4240",  # approx 45N, -83E
+            # approx 45N, -83E
+            "coordinates": "0101000020E61000003333333333B354C066666666664E4240",
             "date": (base_date + timedelta(days=60)).isoformat(),
             "user_id": user_id,
             "images": [
@@ -144,7 +147,7 @@ def multiple_mementos_with_images_data() -> list[dict]:
                     "detected_text": "Manhattan skyline",
                     "image_label": "cityscape",
                     "url": "https://example.com/city.jpg",
-                }
+                },
             ],
         },
     ]

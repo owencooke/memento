@@ -2,8 +2,6 @@ import uuid
 from datetime import date
 from unittest.mock import MagicMock, call
 
-from tests.fixtures.supabase import MockSupabase
-
 from server.api.memento.models import MementoFilterParams, NewMemento, UpdateMemento
 from server.services.db.models.joins import MementoWithImages
 from server.services.db.models.schema_public_latest import Memento
@@ -14,6 +12,7 @@ from server.services.db.queries.memento import (
     get_mementos,
     update_memento,
 )
+from tests.fixtures.supabase import MockSupabase
 
 
 def test_create_memento(
@@ -144,13 +143,16 @@ def test_get_mementos_date_filter(
     # Then
     mock_supabase_client.table.assert_called_once_with("memento")
     mock_supabase_client.table().select().eq.assert_called_once_with(
-        "user_id", str(user_id)
+        "user_id",
+        str(user_id),
     )
     mock_supabase_client.table().select().eq().gte.assert_called_once_with(
-        "date", start_date.isoformat()
+        "date",
+        start_date.isoformat(),
     )
     mock_supabase_client.table().select().eq().gte().lte.assert_called_once_with(
-        "date", end_date.isoformat()
+        "date",
+        end_date.isoformat(),
     )
 
     assert len(result) == 2
@@ -168,7 +170,7 @@ def test_get_mementos_text_search(
     # Given
     user_id = uuid.UUID(multiple_mementos_with_images_data[0]["user_id"])
     mock_query_response.data = [
-        multiple_mementos_with_images_data[0]
+        multiple_mementos_with_images_data[0],
     ]  # Only the mountain memento
 
     # Create filter with text search
@@ -180,10 +182,12 @@ def test_get_mementos_text_search(
     # Then
     mock_supabase_client.table.assert_called_once_with("memento")
     mock_supabase_client.table().select().eq.assert_called_once_with(
-        "user_id", str(user_id)
+        "user_id",
+        str(user_id),
     )
     mock_supabase_client.table().select().eq().text_search.assert_called_once_with(
-        "memento_searchable_content", "mountain:* & hiking:*"
+        "memento_searchable_content",
+        "mountain:* & hiking:*",
     )
 
     assert len(result) == 1
@@ -200,7 +204,7 @@ def test_get_mementos_image_label_filter(
     # Given
     user_id = uuid.UUID(multiple_mementos_with_images_data[0]["user_id"])
     mock_query_response.data = [
-        multiple_mementos_with_images_data[1]
+        multiple_mementos_with_images_data[1],
     ]  # Only the beach memento
 
     # Create filter with image label
@@ -243,7 +247,10 @@ def test_get_mementos_bounding_box_filter_with_results(
 
     # Create filter with bounding box coordinates
     filter_params = MementoFilterParams(
-        min_lat=40.0, min_long=-90.0, max_lat=50.0, max_long=-70.0
+        min_lat=40.0,
+        min_long=-90.0,
+        max_lat=50.0,
+        max_long=-70.0,
     )
 
     # When
@@ -288,7 +295,10 @@ def test_get_mementos_bounding_box_filter_empty_results(
 
     # Create filter with bounding box coordinates (far away from any data)
     filter_params = MementoFilterParams(
-        min_lat=0.0, min_long=0.0, max_lat=10.0, max_long=10.0
+        min_lat=0.0,
+        min_long=0.0,
+        max_lat=10.0,
+        max_long=10.0,
     )
 
     # When
@@ -340,7 +350,8 @@ def test_get_mementos_combined_filters(
     mock_supabase_client.table().select().eq().gte().lte.assert_called_once()
     mock_supabase_client.table().select().eq().gte().lte().text_search.assert_called_once()
     mock_supabase_client.table().select().eq().gte().lte().text_search().in_.assert_called_once_with(
-        "id", [1, 2]
+        "id",
+        [1, 2],
     )
 
     assert len(result) == 1
@@ -376,10 +387,11 @@ def test_get_image_labels(
     calls = [call("image.image_label", None), call("image.image_label", "")]
     mock_supabase_client.table.assert_called_once_with("memento")
     mock_supabase_client.table().select.assert_called_once_with(
-        "user_id, images:image(image_label)"
+        "user_id, images:image(image_label)",
     )
     mock_supabase_client.table().select().eq.assert_called_once_with(
-        "user_id", str(user_id)
+        "user_id",
+        str(user_id),
     )
     mock_supabase_client.table().select().eq().neq.assert_has_calls(calls)
 
