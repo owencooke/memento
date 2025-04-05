@@ -105,6 +105,7 @@ def get_image_labels(user_id: UUID4) -> list[str]:
             image["image_label"]
             for memento in response.data
             for image in memento["images"]
+            if image["image_label"]
         },
     )
     labels.sort()
