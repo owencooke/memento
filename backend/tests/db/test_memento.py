@@ -283,7 +283,7 @@ def test_get_mementos_bounding_box_filter_empty_results(
     multiple_mementos_with_images_data: list[dict],
 ) -> None:
     """Test getting mementos with bounding box filter that returns no results."""
-    mock_supabase_client, mock_query_response, _ = mock_supabase
+    mock_supabase_client, _, _ = mock_supabase
 
     # Given
     user_id = uuid.UUID(multiple_mementos_with_images_data[0]["user_id"])
@@ -292,11 +292,12 @@ def test_get_mementos_bounding_box_filter_empty_results(
     rpc_response = MagicMock()
     rpc_response.data = []  # No IDs in bounds
     mock_supabase_client.rpc().execute.return_value = rpc_response
+    mock_supabase_client.rpc.reset_mock()
 
     # Create filter with bounding box coordinates (far away from any data)
     filter_params = MementoFilterParams(
-        min_lat=0.0,
-        min_long=0.0,
+        min_lat=1.0,
+        min_long=1.0,
         max_lat=10.0,
         max_long=10.0,
     )
