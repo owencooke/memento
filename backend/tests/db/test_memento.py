@@ -250,15 +250,20 @@ def test_get_mementos_bounding_box_filter_with_results(
     result = get_mementos(user_id, filter_params)
 
     # Then
-    mock_supabase_client.rpc.assert_called_once_with(
-        "mementos_in_bounds",
-        {
-            "min_lat": 40.0,
-            "min_long": -90.0,
-            "max_lat": 50.0,
-            "max_long": -70.0,
-        },
-    )
+    calls = [
+        call(),
+        call(
+            "mementos_in_bounds",
+            {
+                "min_lat": 40.0,
+                "min_long": -90.0,
+                "max_lat": 50.0,
+                "max_long": -70.0,
+            },
+        ),
+        call().execute(),
+    ]
+    mock_supabase_client.rpc.assert_has_calls(calls)
     mock_supabase_client.table().select().eq().in_.assert_called_once_with("id", [1, 3])
 
     assert len(result) == 2
