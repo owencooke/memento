@@ -5,3 +5,4 @@ from tests.fixtures.file import *
 from tests.fixtures.image import *
 from tests.fixtures.memento import *
 from tests.fixtures.supabase import *
+from tests.fixtures.user import *
