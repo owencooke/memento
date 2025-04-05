@@ -82,6 +82,7 @@ filterwarnings = [
     "error",
     "ignore::DeprecationWarning",
     "ignore:.*unclosed.*:ResourceWarning",
+    "ignore:'force_all_finite' was renamed to 'ensure_all_finite':FutureWarning:sklearn"
 ]
 env = [
     "SERVER_ENVIRONMENT=pytest",
