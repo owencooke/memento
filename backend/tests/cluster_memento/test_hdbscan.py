@@ -1,9 +1,7 @@
 import uuid
-import warnings
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import numpy as np
-import pytest
 
 from server.api.memento.models import MementoWithCoordinates
 from server.services.cluster_memento.hdbscan import cluster_mementos
@@ -21,7 +19,7 @@ def test_cluster_mementos_success(
     # Should have at least one cluster
     assert len(result) > 0
     # All clusters should have at least min_cluster_size elements
-    for cluster_id, memento_ids in result.items():
+    for _, memento_ids in result.items():
         assert len(memento_ids) >= 2
 
 
@@ -51,7 +49,8 @@ def test_cluster_mementos_not_enough_mementos() -> None:
 
 @patch("server.services.cluster_memento.hdbscan.HDBSCAN")
 def test_cluster_mementos_parameters(
-    mock_hdbscan, sample_mementos: list[MementoWithCoordinates]
+    mock_hdbscan: MagicMock,
+    sample_mementos: list[MementoWithCoordinates],
 ) -> None:
     """Test that HDBSCAN is initialized with the correct parameters."""
     # Setup mock
@@ -80,7 +79,7 @@ def test_cluster_mementos_parameters(
     assert 1 in result
     assert result[0] == [1, 2, 3]
     assert result[1] == [4, 5]
-    # Memento 6 with ID 6 should not be in any cluster because it's labeled as noise (-1)
+    # Memento 6 with ID 6 should not be in any cluster because it's labeled as noise
     assert 6 not in [id for cluster in result.values() for id in cluster]
 
 
@@ -90,7 +89,10 @@ def test_cluster_mementos_with_custom_params(
     """Test clustering with custom parameters."""
     # When
     result = cluster_mementos(
-        sample_mementos, min_cluster_size=3, min_samples=1, allow_single_cluster=True
+        sample_mementos,
+        min_cluster_size=3,
+        min_samples=1,
+        allow_single_cluster=True,
     )
 
     # Then
@@ -104,7 +106,8 @@ def test_cluster_mementos_no_clusters_found(
     """Test behavior when no clusters are found (all points are noise)."""
     # Use very high min_cluster_size to force all points to be noise
     result = cluster_mementos(
-        sample_mementos, min_cluster_size=len(sample_mementos) + 1
+        sample_mementos,
+        min_cluster_size=len(sample_mementos) + 1,
     )
 
     # Then
@@ -114,7 +117,10 @@ def test_cluster_mementos_no_clusters_found(
 
 
 @patch("server.services.cluster_memento.hdbscan.logger")
-def test_cluster_mementos_logging(mock_logger, sample_mementos) -> None:
+def test_cluster_mementos_logging(
+    mock_logger: MagicMock,
+    sample_mementos: list[MementoWithCoordinates],
+) -> None:
     """Test that logging happens as expected."""
     # When
     cluster_mementos(sample_mementos)

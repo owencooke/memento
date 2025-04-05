@@ -1,5 +1,4 @@
 import uuid
-import warnings
 
 import pytest
 

@@ -1,8 +1,5 @@
 from uuid import UUID
 
-import pytest
-from tests.fixtures.supabase import MockSupabase
-
 from server.api.memento.models import MementoWithCoordinates
 from server.services.db.models.schema_public_latest import (
     RejectedRecommendations,
@@ -13,6 +10,7 @@ from server.services.db.queries.clustering import (
     get_mementos_for_clustering,
     is_collection_rejected,
 )
+from tests.fixtures.supabase import MockSupabase
 
 
 def test_get_mementos_for_clustering(mock_supabase: MockSupabase) -> None:
@@ -41,13 +39,15 @@ def test_get_mementos_for_clustering(mock_supabase: MockSupabase) -> None:
     # Then
     mock_supabase_client.table.assert_called_once_with("memento")
     mock_supabase_client.table().select.assert_called_once_with(
-        "user_id, id, coordinates"
+        "user_id, id, coordinates",
     )
     mock_supabase_client.table().select().eq.assert_called_once_with(
-        "user_id", str(user_id)
+        "user_id",
+        str(user_id),
     )
     mock_supabase_client.table().select().eq().neq.assert_called_once_with(
-        "coordinates", None
+        "coordinates",
+        None,
     )
 
     assert len(result) == 2
@@ -69,7 +69,8 @@ def test_create_rejected_collection(mock_supabase: MockSupabase) -> None:
     memento_ids = [1, 2, 3]
 
     rejected_recommendation = RejectedRecommendationsInsert(
-        memento_ids=memento_ids, user_id=user_id
+        memento_ids=memento_ids,
+        user_id=user_id,
     )
 
     expected_response = {

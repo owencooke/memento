@@ -1,10 +1,9 @@
 from datetime import date
 from uuid import UUID
 
-from tests.fixtures.supabase import MockSupabase
-
 from server.services.db.models.schema_public_latest import UserInfo, UserInfoInsert
 from server.services.db.queries.user import create_user_info, get_user_info
+from tests.fixtures.supabase import MockSupabase
 
 
 def test_get_user_info(mock_supabase: MockSupabase) -> None:
