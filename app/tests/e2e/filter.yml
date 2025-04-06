@@ -1,0 +1,101 @@
+appId: com.memento.app
+---
+- runFlow: ./util/launch.yml
+
+# Required Setup
+# Mementos:
+#   Memento 1:
+#     - caption: Hello caption surfer
+#     - date: nil
+#     - location: nil
+#     - detected text: nil
+#     - image label: envelope
+#   Memento 2:
+#     - caption: nil
+#     - date: nil
+#     - location: Calgary, AB, Canada
+#     - detected text: Hello detected text surfer
+#     - image label: nil
+#   Memento 3:
+#     - caption: nil
+#     - date: 04-01-2025
+#     - location: Edmonton, AB, Canada
+#     - detected text: nil
+#     - image label: nil
+#   Memento 4:
+#     - caption: nil
+#     - date: 04-03-2025
+#     - location: Sherwood Park, AB, Canada
+#     - detected text: nil
+#     - image label: nil
+#   Memento 5:
+#     - caption: nil
+#     - date: 04-05-2025
+#     - location: Toronto, ON, Canada
+#     - detected text: nil
+#     - image label: nil
+
+# Verify FR-12
+# FIXME: STICKY DATEPICKER ;(
+# - runFlow:
+#     file: ./filter/filter-date.yml
+#     env:
+#       START: 1
+#       END: 3
+# - assertVisible: "2025-04-01"
+# - assertVisible: "2025-04-03"
+# - assertNotVisible: "2025-04-05"
+# - runFlow:
+#     file: ./filter/clear-filters.yml
+
+# Verify FR-12
+- runFlow:
+    file: ./filter/filter-location.yml
+    env:
+      LOCATION_PARTIAL: "Alber"
+      LOCATION_FULL: "Alberta, Canada"
+- assertVisible: "Edmonton"
+- assertVisible: "Calgary"
+- assertVisible: "Sherwood Park"
+- assertNotVisible: "Toronto"
+- runFlow:
+    file: ./filter/clear-filters.yml
+
+# Verify FR-16
+- runFlow:
+    file: ./filter/filter-image-label.yml
+    env:
+      LABEL: "Envelope"
+- assertVisible: "Hello caption surfer"
+- assertNotVisible: "Hello detected text surfer"
+- runFlow:
+    file: ./filter/clear-filters.yml
+
+# Verify FR-15
+- runFlow:
+    file: ./filter/filter-search.yml
+    env:
+      TEXT: "caption"
+- assertVisible: "Hello caption surfer"
+- assertNotVisible: "Hello detected text surfer"
+- runFlow:
+    file: ./filter/clear-filters.yml
+
+# Verify FR-14
+- runFlow:
+    file: ./filter/filter-search.yml
+    env:
+      TEXT: "detect"
+- assertVisible: "Hello detected text surfer"
+- assertNotVisible: "Hello caption surfer"
+- runFlow:
+    file: ./filter/clear-filters.yml
+
+- runFlow:
+    file: ./filter/filter-search.yml
+    env:
+      TEXT: "hello"
+- assertVisible: "Hello caption surfer"
+- assertVisible: "Hello detected text surfer"
+- runFlow:
+    file: ./filter/clear-filters.yml
