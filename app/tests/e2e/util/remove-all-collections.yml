@@ -1,11 +1,11 @@
+---
 appId: com.memento.app
 ---
-- runFlow: ./util/launch.yml
+- runFlow: launch.yml
 
 # Navigate to View Collection page
 - tapOn:
     id: tab-collections
-- tapOn:
 
 # Remove mementos while mementos on screen
 - repeat:

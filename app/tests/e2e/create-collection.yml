@@ -1,6 +1,16 @@
+---
 appId: com.memento.app
 ---
 - runFlow: ./util/launch.yml
+- runFlow: ./util/remove-all-mementos.yml
+- runFlow: ./util/remove-all-collections.yml
+
+- runFlow:
+    file: ./util/create-test-memento.yml
+    env:
+      CAPTION: "Test Memento for Collection"
+      LOCATION_PARTIAL: "Edmon"
+      LOCATION_FULL: "Edmonton, AB, Canada"
 
 # Navigate to Create Collection page
 - tapOn:
@@ -27,11 +37,11 @@ appId: com.memento.app
 - scrollUntilVisible:
     element:
       id: submit-selected-mementos-button
-    direction: DOWN # DOWN|UP|LEFT|RIGHT (optional, default: DOWN)
-    timeout: 50000 # (optional, default: 20000) ms
-    speed: 40 # 0-100 (optional, default: 40) Scroll speed. Higher values scroll faster.
-    visibilityPercentage: 100 # 0-100 (optional, default: 100) Percentage of element visible in viewport
-    centerElement: false # true|false (optional, default: false)
+    direction: DOWN
+    timeout: 50000
+    speed: 40
+    visibilityPercentage: 100
+    centerElement: false
 - tapOn:
     id: submit-selected-mementos-button
 

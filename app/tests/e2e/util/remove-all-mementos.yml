@@ -1,6 +1,7 @@
+---
 appId: com.memento.app
 ---
-- runFlow: ./util/launch.yml
+- runFlow: launch.yml
 
 # Remove mementos while mementos on screen
 - repeat:
