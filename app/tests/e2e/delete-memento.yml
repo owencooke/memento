@@ -1,6 +1,9 @@
 appId: com.memento.app
 ---
-# - runFlow: ./util/launch.yml
+
+# !!! Need to have at least one memento
+
+- runFlow: ./util/launch.yml
 
 # Wait for a memento card to appear
 - assertVisible:
@@ -20,7 +23,7 @@ appId: com.memento.app
 - tapOn:
     id: delete-modal-confirm
 
-# Check that the deleted memento doesn't appear on the mementos page
+# Verify FR-34: Check that the deleted memento doesn't appear on the mementos page
 - assertNotVisible:
     id: memento-card-caption
     index: 0

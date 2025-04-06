@@ -117,6 +117,7 @@ export default function Collections() {
                       uri: collection.thumbnailUri,
                     }}
                     alt="Thumbnail for Collection"
+                    testID="collection-card"
                   />
                 ) : (
                   <Pressable

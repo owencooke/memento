@@ -1,6 +1,9 @@
 appId: com.memento.app
 ---
-# - runFlow: ./util/launch.yml
+
+# !!! Need to have at least one collection
+
+- runFlow: ./util/launch.yml
 
 # Navigate to the Map View
 - tapOn:
@@ -9,11 +12,11 @@ appId: com.memento.app
 # Wait for a collection to appear
 - assertVisible:
     id: collection-card
-    
+
 - tapOn:
     id: view-map-button
 
-# Verify collection card is on the map
+# Verify FR-51: Collection card is on the map
 - assertVisible:
     id: collection-card
 

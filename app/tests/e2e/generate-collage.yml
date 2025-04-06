@@ -1,6 +1,9 @@
 appId: com.memento.app
 ---
-# - runFlow: ./util/launch.yml
+
+# !!! Need to have at least one collection
+
+- runFlow: ./util/launch.yml
 
 # Navigate to collage generation page of a collection
 - tapOn:
@@ -17,7 +20,7 @@ appId: com.memento.app
 - tapOn:
     id: collage-button
 
-# Verify successful collage generation)
+# Verify FR-53 and FR-55: successful collage generation
 - assertVisible:
     id: collage-image
 - assertVisible:
