@@ -8,4 +8,5 @@ from tests.fixtures.image import *
 from tests.fixtures.image_class import *
 from tests.fixtures.memento import *
 from tests.fixtures.supabase import *
+from tests.fixtures.text_manager import *
 from tests.fixtures.user import *
