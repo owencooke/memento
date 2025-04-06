@@ -1,0 +1,96 @@
+---
+appId: com.memento.app
+---
+- runFlow: ./util/launch.yml
+
+# Required Setup
+# Mementos:
+#   Memento 1:
+#     - caption: nil
+#     - date: 04-01-2025
+#     - location: Edmonton, AB, Canada
+#   Memento 2:
+#     - caption: nil
+#     - date: 04-05-2025
+#     - location: Sherwood Park, AB, Canada
+# Collections:
+#   Collection 1:
+#     - caption: Collection made by Maestro
+#     - date: 04-01-2025
+#     - location: Calgary, AB, Canada
+#     - Mementos:
+#       - Memento 1
+
+# Navigate to Edit Collection page
+- tapOn:
+    id: tab-collections
+- tapOn:
+    id: collection-card
+    index: 0
+- assertVisible: Collection made by Maestro
+- tapOn:
+    id: view-collection-edit-button
+
+# Check that cancelling doesn't save changes/edits
+- copyTextFrom:
+    id: collection-form-caption
+- tapOn:
+    id: collection-form-caption
+- inputText: garbage text
+- hideKeyboard
+- tapOn:
+    id: header-back-button
+- assertVisible:
+    id: view-collection-caption
+    text: ${maestro.copiedText}
+- tapOn:
+    id: view-collection-edit-button
+- assertVisible:
+    id: collection-form-caption
+    text: ${maestro.copiedText}
+
+# Verify FR-42 TODO
+- tapOn:
+    id: collection-form-select-mementos-button
+- assertVisible:
+    id: selected-memento-card-fab
+- tapOn:
+    id: memento-card
+    index: 0
+- assertNotVisible:
+    id: selected-memento-card-fab
+- tapOn:
+    id: memento-card
+    index: 1
+- assertVisible:
+    id: selected-memento-card-fab
+- tapOn:
+    id: submit-selected-mementos-button
+
+- assertVisible:
+    id: accept-derived-metadata-button
+- tapOn:
+    id: accept-derived-metadata-button
+
+# Verify FR-43, FR-44, FR-45
+- runFlow:
+    file: ./util/collection-form.yml
+    env:
+      TITLE: Collection Edited by Maestro
+      CAPTION: Caption Edited by Maestro
+      LOCATION_PARTIAL: Edmon
+      LOCATION_FULL: Edmonton, AB, Canada
+- tapOn: Save Changes
+
+# Verify changes updated on view page
+- assertVisible:
+    id: view-collection-title
+    text: Collection Edited by Maestro
+
+- assertVisible:
+    id: view-collection-caption
+    text: Caption Edited by Maestro
+
+- assertVisible:
+    id: view-collection-location
+    text: Edmonton, AB, Canada
