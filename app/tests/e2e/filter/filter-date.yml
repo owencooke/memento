@@ -1,0 +1,21 @@
+appId: com.memento.app
+---
+- assertVisible: Mementos
+- tapOn:
+    id: mementos-filter-button
+- assertVisible: Filter Mementos
+
+# set start date
+- tapOn:
+    id: filter-sheet-start-date
+- tapOn: ${START}
+- tapOn: OK
+
+# set end date
+- tapOn:
+    id: filter-sheet-end-date
+- tapOn: ${END}
+- tapOn: OK
+
+- tapOn:
+    id: filter-sheet-submit-button
