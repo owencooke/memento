@@ -1,0 +1,21 @@
+appId: com.memento.app
+---
+- runFlow: ./util/launch.yml
+
+# Navigate to View Collection page
+- tapOn:
+    id: tab-collections
+- tapOn:
+
+# Remove mementos while mementos on screen
+- repeat:
+    while:
+      visible:
+        id: collection-card
+    commands:
+      - tapOn:
+          id: collection-card
+      - tapOn:
+          id: view-collection-delete-button
+      - tapOn:
+          id: delete-modal-confirm

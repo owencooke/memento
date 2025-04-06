@@ -1,0 +1,16 @@
+appId: com.memento.app
+---
+- runFlow: ./util/launch.yml
+
+# Remove mementos while mementos on screen
+- repeat:
+    while:
+      visible:
+        id: memento-card
+    commands:
+      - tapOn:
+          id: memento-card
+      - tapOn:
+          id: view-memento-delete-button
+      - tapOn:
+          id: delete-modal-confirm

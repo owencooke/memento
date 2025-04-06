@@ -218,7 +218,12 @@ export default function ViewMemento() {
         >
           <ButtonIcon as={EditIcon} className={iconClasses} />
         </Button>
-        <Button size="xl" className={buttonClasses} onPress={handleDeletePress}>
+        <Button
+          testID="view-memento-delete-button"
+          size="xl"
+          className={buttonClasses}
+          onPress={handleDeletePress}
+        >
           <ButtonIcon as={TrashIcon} className={iconClasses} />
         </Button>
 
