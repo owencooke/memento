@@ -1,0 +1,56 @@
+appId: com.memento.app
+---
+- runFlow: ./util/launch.yml
+
+# Navigate to Create Collection page
+- tapOn:
+    id: tab-collections
+- tapOn:
+    id: fab-create-collection
+- assertVisible: Create Collection
+
+# Select Mementos
+- assertNotVisible:
+    id: memento-card
+- tapOn:
+    id: collection-form-select-mementos-button
+- assertVisible: Select Mementos
+- assertVisible:
+    id: memento-card
+#
+# # Verify FR-41
+- tapOn:
+    id: memento-card
+- assertVisible:
+    id: selected-memento-card-fab
+
+- scrollUntilVisible:
+    element:
+      id: submit-selected-mementos-button
+    direction: DOWN # DOWN|UP|LEFT|RIGHT (optional, default: DOWN)
+    timeout: 50000 # (optional, default: 20000) ms
+    speed: 40 # 0-100 (optional, default: 40) Scroll speed. Higher values scroll faster.
+    visibilityPercentage: 100 # 0-100 (optional, default: 100) Percentage of element visible in viewport
+    centerElement: false # true|false (optional, default: false)
+- tapOn:
+    id: submit-selected-mementos-button
+
+# # Verify FR-7/FR-9: extract metadata and fill fields
+# - assertVisible: Edmonton, AB, Canada
+- tapOn:
+    id: accept-derived-metadata-button
+
+# Verify FR-37: Fill out other form fields
+- runFlow:
+    file: ./util/collection-form.yml
+    env:
+      TITLE: "Collection made by Maestro"
+      CAPTION: "Collection made by Maestro"
+      LOCATION_PARTIAL: "Edmon"
+      LOCATION_FULL: "Edmonton, AB, Canada"
+
+# Verify new memento added to grid view
+- assertVisible: Collections
+- assertVisible: Collection made by Maestro
+- assertVisible: ^\d{4}-\d{2}-01$
+- assertVisible: Edmonton

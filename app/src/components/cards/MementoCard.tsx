@@ -67,6 +67,7 @@ export default function MementoCard({
       )}
       {selected && (
         <Fab
+          testID="selected-memento-card-fab"
           size="lg"
           className="w-10 h-10 absolute top-2 right-2 bg-tertiary-500 pointer-events-none"
         >

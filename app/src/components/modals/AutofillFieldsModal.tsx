@@ -81,6 +81,7 @@ export default function AutofillFieldsModal({
             <ButtonText>Decline</ButtonText>
           </Button>
           <Button
+            testID="accept-derived-metadata-button"
             action="primary"
             onPress={() => accept({ location: useLocation, date: useDate })}
           >

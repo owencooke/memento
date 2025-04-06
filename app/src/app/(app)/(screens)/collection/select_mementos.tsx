@@ -85,7 +85,12 @@ export default function SelectMementos() {
           </View>
         }
         ListFooterComponent={
-          <Button className="mt-4" size={"lg"} onPress={handleMementosSelected}>
+          <Button
+            testID="submit-selected-mementos-button"
+            className="mt-4"
+            size={"lg"}
+            onPress={handleMementosSelected}
+          >
             <ButtonText>
               {selectedCount > 0
                 ? `Select Mementos (${selectedCount})`
