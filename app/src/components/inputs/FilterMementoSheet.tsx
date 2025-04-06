@@ -127,6 +127,7 @@ export default function FilterMementoSheet({
                   control={control}
                   render={({ field }) => (
                     <DatePickerInput
+                      testID="filter-sheet-start-date"
                       value={field.value}
                       onChange={(date) => field.onChange(date)}
                     />
@@ -143,6 +144,7 @@ export default function FilterMementoSheet({
                   control={control}
                   render={({ field }) => (
                     <DatePickerInput
+                      testID="filter-sheet-end-date"
                       value={field.value}
                       onChange={(date) => field.onChange(date)}
                     />
@@ -173,6 +175,7 @@ export default function FilterMementoSheet({
                   control={control}
                   render={({ field }) => (
                     <LocationInput
+                      testID="filter-sheet-location"
                       value={field.value}
                       onChange={handleLocationChange}
                       queryType="(regions)"
@@ -199,6 +202,7 @@ export default function FilterMementoSheet({
                       >
                         <SelectTrigger>
                           <SelectInput
+                            testID="filter-sheet-image-label"
                             placeholder="Select option"
                             className="flex-1 align-middle p-0 pl-2 m-0 h-full text-normal"
                             value={selectedLabel}
@@ -242,6 +246,7 @@ export default function FilterMementoSheet({
               <Divider />
               <ButtonGroup>
                 <Button
+                  testID="filter-sheet-clear-button"
                   size={"lg"}
                   onPress={() => {
                     reset();
@@ -253,7 +258,11 @@ export default function FilterMementoSheet({
                 >
                   <ButtonText className="text-error-500">Clear All</ButtonText>
                 </Button>
-                <Button size={"lg"} onPress={handleSubmit(onSubmit)}>
+                <Button
+                  testID="filter-sheet-submit-button"
+                  size={"lg"}
+                  onPress={handleSubmit(onSubmit)}
+                >
                   <ButtonText>Apply Filters</ButtonText>
                 </Button>
               </ButtonGroup>
