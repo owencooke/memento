@@ -51,6 +51,7 @@ export default function MementoCard({
               size="md"
               italic
               className="text-center line-clamp-2 font-light flex-1"
+              testID="memento-card-caption"
             >
               {caption}
             </Text>

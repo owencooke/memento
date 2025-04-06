@@ -1,0 +1,24 @@
+appId: com.memento.app
+---
+# - runFlow: ./util/launch.yml
+
+# Navigate to collage generation page of a collection
+- tapOn:
+    id: collections-tab
+
+# Wait for a collection to appear
+- assertVisible:
+    id: collection-card
+
+# Generate collage
+- tapOn:
+    id: collection-card
+    index: 0
+- tapOn:
+    id: collage-button
+
+# Verify successful collage generation)
+- assertVisible:
+    id: collage-image
+- assertVisible:
+    id: export-collage-button

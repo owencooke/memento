@@ -1,0 +1,33 @@
+appId: com.memento.app
+---
+# - runFlow: ./util/launch.yml
+
+# Navigate to the Map View
+- tapOn:
+    id: collections-tab
+
+# Wait for a collection to appear
+- assertVisible:
+    id: collection-card
+    
+- tapOn:
+    id: view-map-button
+
+# Verify collection card is on the map
+- assertVisible:
+    id: collection-card
+
+- tapOn:
+    id: collection-card
+
+# Verify collection fields
+- assertVisible:
+    id: view-collection-title
+- assertVisible:
+    id: view-collection-caption
+- assertVisible:
+    id: view-collection-location
+- assertVisible:
+    id: view-collection-date
+- assertVisible:
+    id: memento-card

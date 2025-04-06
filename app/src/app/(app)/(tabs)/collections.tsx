@@ -181,6 +181,7 @@ export default function Collections() {
         placement="bottom left"
         size="lg"
         onPress={handleToggleMapView}
+        testID="view-map-button"
       >
         <FabIcon
           className="text-typography-800 data-[hover=true]:text-typography-800 data-[active=true]:text-typography-800"

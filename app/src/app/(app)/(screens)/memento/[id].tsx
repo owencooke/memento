@@ -196,7 +196,12 @@ export default function ViewMemento() {
       </View>
       {/* Options bar (info, edit, delete, share) */}
       <View className="flex flex-row justify-between items-center bg-primary-500">
-        <Button size="xl" className={buttonClasses} onPress={handleShareImage}>
+        <Button 
+          size="xl" 
+          className={buttonClasses} 
+          onPress={handleShareImage}
+          testID="share-memento-button"
+        >
           <ButtonIcon as={ShareIcon} className={iconClasses} />
         </Button>
         <Button
@@ -218,7 +223,12 @@ export default function ViewMemento() {
         >
           <ButtonIcon as={EditIcon} className={iconClasses} />
         </Button>
-        <Button size="xl" className={buttonClasses} onPress={handleDeletePress}>
+        <Button 
+          size="xl" 
+          className={buttonClasses} 
+          onPress={handleDeletePress}
+          testID="view-memento-delete-button"
+        >
           <ButtonIcon as={TrashIcon} className={iconClasses} />
         </Button>
 

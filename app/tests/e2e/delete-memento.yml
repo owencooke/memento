@@ -1,0 +1,27 @@
+appId: com.memento.app
+---
+# - runFlow: ./util/launch.yml
+
+# Wait for a memento card to appear
+- assertVisible:
+    id: memento-card-caption
+
+# Copy the caption of the first memento card
+- copyTextFrom:
+    id: memento-card-caption
+    index: 0
+
+# Navigate to delete modal and confirm deletion
+- tapOn:
+    id: memento-card
+    index: 0
+- tapOn:
+    id: view-memento-delete-button
+- tapOn:
+    id: delete-modal-confirm
+
+# Check that the deleted memento doesn't appear on the mementos page
+- assertNotVisible:
+    id: memento-card-caption
+    index: 0
+    text: ${maestro.copiedText}

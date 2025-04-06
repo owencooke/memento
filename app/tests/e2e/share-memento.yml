@@ -1,0 +1,19 @@
+appId: com.memento.app
+---
+# - runFlow: ./util/launch.yml
+
+# Wait for a memento card to appear
+- assertVisible:
+    id: memento-card
+
+# Navigate to View Memento page
+- tapOn:
+    id: memento-card
+    index: 0
+
+# Wait for the Share Memento button
+- assertVisible:
+    id: share-memento-button
+
+- tapOn:
+    id: share-memento-button
