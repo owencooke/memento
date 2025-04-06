@@ -2,15 +2,13 @@
 appId: com.memento.app
 ---
 - runFlow: ./util/launch.yml
-- runFlow: ./util/remove-all-mementos.yml
-- runFlow: ./util/remove-all-collections.yml
 
-- runFlow:
-    file: ./util/create-test-memento.yml
-    env:
-      CAPTION: "Test Memento for Collection"
-      LOCATION_PARTIAL: "Edmon"
-      LOCATION_FULL: "Edmonton, AB, Canada"
+# Required Setup
+# Mementos:
+#   Memento 1:
+#     - caption: nil
+#     - date: 04-01-2025
+#     - location: Edmonton, AB, Canada
 
 # Navigate to Create Collection page
 - tapOn:
@@ -46,7 +44,7 @@ appId: com.memento.app
     id: submit-selected-mementos-button
 
 # # Verify FR-7/FR-9: extract metadata and fill fields
-# - assertVisible: Edmonton, AB, Canada
+- assertVisible: Edmonton, AB, Canada
 - tapOn:
     id: accept-derived-metadata-button
 
@@ -56,8 +54,8 @@ appId: com.memento.app
     env:
       TITLE: "Collection made by Maestro"
       CAPTION: "Collection made by Maestro"
-      LOCATION_PARTIAL: "Edmon"
-      LOCATION_FULL: "Edmonton, AB, Canada"
+      LOCATION_PARTIAL: "Calg"
+      LOCATION_FULL: "Calg, AB, Canada"
 
 # Verify new memento added to grid view
 - assertVisible: Collections
