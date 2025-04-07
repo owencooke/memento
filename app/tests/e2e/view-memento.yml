@@ -1,5 +1,6 @@
 appId: com.memento.app
 ---
+# !!! Need to have at least one memento
 - runFlow: ./util/launch.yml
 
 # Navigate to View Memento page

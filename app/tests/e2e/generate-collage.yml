@@ -1,7 +1,8 @@
 appId: com.memento.app
 ---
-
-# !!! Need to have at least one collection
+# !!!
+#   - Need to have at least one collection
+#   - Will fail if a collage already generated for collection (reload app to fix)
 
 - runFlow: ./util/launch.yml
 
@@ -20,8 +21,11 @@ appId: com.memento.app
 - tapOn:
     id: collage-button
 
-# Verify FR-53 and FR-55: successful collage generation
+# Verify FR-53: successful collage generation
 - assertVisible:
     id: collage-image
-- assertVisible:
+
+# Verify FR-55: can share the generated collage
+- tapOn:
     id: export-collage-button
+- runFlow: ./util/assert-share.yml
