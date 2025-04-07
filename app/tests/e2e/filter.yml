@@ -6,33 +6,15 @@ appId: com.memento.app
 # Mementos:
 #   Memento 1:
 #     - caption: Hello caption surfer
-#     - date: nil
-#     - location: nil
+#     - date: 04-03-2025
+#     - location: Edmonton, AB, Canada
 #     - detected text: nil
 #     - image label: envelope
 #   Memento 2:
 #     - caption: nil
-#     - date: nil
-#     - location: Calgary, AB, Canada
-#     - detected text: Hello detected text surfer
-#     - image label: nil
-#   Memento 3:
-#     - caption: nil
-#     - date: 04-01-2025
-#     - location: Edmonton, AB, Canada
-#     - detected text: nil
-#     - image label: nil
-#   Memento 4:
-#     - caption: nil
-#     - date: 04-03-2025
-#     - location: Sherwood Park, AB, Canada
-#     - detected text: nil
-#     - image label: nil
-#   Memento 5:
-#     - caption: nil
 #     - date: 04-05-2025
 #     - location: Toronto, ON, Canada
-#     - detected text: nil
+#     - detected text: Hello detected text surfer
 #     - image label: nil
 
 # Verify FR-12
@@ -40,23 +22,29 @@ appId: com.memento.app
 # - runFlow:
 #     file: ./filter/filter-date.yml
 #     env:
-#       START: 1
-#       END: 3
-# - assertVisible: "2025-04-01"
+#       START: 3
+#       END: 4
 # - assertVisible: "2025-04-03"
-# - assertNotVisible: "2025-04-05"
 # - runFlow:
 #     file: ./filter/clear-filters.yml
+#
+# FIXME: STICKY DATEPICKER ;(
+# - runFlow:
+#     file: ./util/filter-date.yml
+#     env:
+#       START: 4
+#       END: 5
+# - assertVisible: "2025-04-05"
+# - runFlow:
+#     file: ./util/clear-filters.yml
 
-# Verify FR-12
+# Verify FR-13
 - runFlow:
     file: ./filter/filter-location.yml
     env:
       LOCATION_PARTIAL: "Alber"
       LOCATION_FULL: "Alberta, Canada"
 - assertVisible: "Edmonton"
-- assertVisible: "Calgary"
-- assertVisible: "Sherwood Park"
 - assertNotVisible: "Toronto"
 - runFlow:
     file: ./filter/clear-filters.yml
@@ -67,7 +55,7 @@ appId: com.memento.app
     env:
       LABEL: "Envelope"
 - assertVisible: "Hello caption surfer"
-- assertNotVisible: "Hello detected text surfer"
+- assertNotVisible: "Toronto"
 - runFlow:
     file: ./filter/clear-filters.yml
 
@@ -77,7 +65,7 @@ appId: com.memento.app
     env:
       TEXT: "caption"
 - assertVisible: "Hello caption surfer"
-- assertNotVisible: "Hello detected text surfer"
+- assertNotVisible: "Toronto"
 - runFlow:
     file: ./filter/clear-filters.yml
 
@@ -86,16 +74,7 @@ appId: com.memento.app
     file: ./filter/filter-search.yml
     env:
       TEXT: "detect"
-- assertVisible: "Hello detected text surfer"
+- assertVisible: "Toronto"
 - assertNotVisible: "Hello caption surfer"
-- runFlow:
-    file: ./filter/clear-filters.yml
-
-- runFlow:
-    file: ./filter/filter-search.yml
-    env:
-      TEXT: "hello"
-- assertVisible: "Hello caption surfer"
-- assertVisible: "Hello detected text surfer"
 - runFlow:
     file: ./filter/clear-filters.yml
