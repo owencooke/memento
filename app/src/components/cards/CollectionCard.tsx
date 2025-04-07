@@ -51,6 +51,7 @@ export default function CollectionCard({
             />
           </View>
           <Text
+            testID="collection-card-title"
             size={isMarker ? "sm" : "lg"}
             className="font-bold text-center mt-1"
           >
