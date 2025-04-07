@@ -1,22 +1,15 @@
-import binascii
-import datetime
-from typing import Any, Dict
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
-import numpy as np
 import pytest
 from PIL import ImageDraw, ImageFont
 
-from server.config.settings import ROOT_DIR
-from server.config.types import RGB, RGBA, Font, IntPair
-from server.services.db.models.schema_public_latest import Collection
+from server.config.types import Font
 
 
 @pytest.fixture
 def pil_font() -> Font:
     """Create a mock PIL Font object."""
-    font = MagicMock(spec=ImageFont.FreeTypeFont)
-    return font
+    return MagicMock(spec=ImageFont.FreeTypeFont)
 
 
 @pytest.fixture

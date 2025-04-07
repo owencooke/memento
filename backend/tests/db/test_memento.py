@@ -2,8 +2,6 @@ import uuid
 from datetime import date
 from unittest.mock import MagicMock, call
 
-from tests.fixtures.supabase import MockSupabase
-
 from server.api.memento.models import MementoFilterParams, NewMemento, UpdateMemento
 from server.services.db.models.joins import MementoWithImages
 from server.services.db.models.schema_public_latest import Memento
@@ -14,6 +12,7 @@ from server.services.db.queries.memento import (
     get_mementos,
     update_memento,
 )
+from tests.fixtures.supabase import MockSupabase
 
 
 def test_create_memento(
@@ -216,7 +215,7 @@ def test_get_mementos_image_label_filter(
 
     memento_query_response = MagicMock()
     memento_query_response.data = [
-        multiple_mementos_with_images_data[1]
+        multiple_mementos_with_images_data[1],
     ]  # Only the beach memento
 
     # Set up a side effect to return different responses
