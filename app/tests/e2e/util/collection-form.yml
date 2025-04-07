@@ -30,6 +30,12 @@ tags:
     direction: DOWN
 - tapOn: ${LOCATION_FULL}
 
+# Remove title (for edit collection flow)
+- tapOn:
+    id: collection-form-title
+- eraseText
+- hideKeyboard
+
 # Submit the form
 - tapOn:
     id: collection-form-submit-button
@@ -40,7 +46,6 @@ tags:
 # Set the title
 - tapOn:
     id: collection-form-title
-- eraseText
 - inputText: ${TITLE}
 - hideKeyboard
 
