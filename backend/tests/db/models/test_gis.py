@@ -116,6 +116,12 @@ class TestBaseWithCoordinates:
         model = BaseWithCoordinates(coordinates=[1, 2, 3])  # Invalid format
         assert model.coordinates is None
 
+    def test_init_with_invalid_postgis_binary(self):
+        """Test that an invalid PostGIS binary string returns None"""
+        invalid_hex = "invalid_hex"
+        model = BaseWithCoordinates(coordinates=invalid_hex)
+        assert model.coordinates is None
+
 
 class TestCoordinatesInsert:
     """Test suite for CoordinatesInsert class."""
