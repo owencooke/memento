@@ -45,7 +45,7 @@ appId: com.memento.app
 - tapOn:
     id: submit-selected-mementos-button
 
-# # Verify FR-7/FR-9: extract metadata and fill fields
+# # Verify FR-47 - FR-50: extract metadata and fill fields
 - tapOn:
     id: accept-derived-metadata-button
 - assertVisible: "Edmonton, AB, Canada"
