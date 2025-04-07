@@ -30,13 +30,13 @@ appId: com.memento.app
 #
 # FIXME: STICKY DATEPICKER ;(
 # - runFlow:
-#     file: ./util/filter-date.yml
+#     file: ./filter/filter-date.yml
 #     env:
 #       START: 4
 #       END: 5
 # - assertVisible: "2025-04-05"
 # - runFlow:
-#     file: ./util/clear-filters.yml
+#     file: ./filter/clear-filters.yml
 
 # Verify FR-13
 - runFlow:
