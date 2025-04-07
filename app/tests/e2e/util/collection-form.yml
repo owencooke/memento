@@ -1,0 +1,49 @@
+appId: com.memento.app
+tags:
+  - util
+---
+# Modularized flow for filling out the Collection form fields
+# (title, caption, date, location)
+
+# Set the caption
+- tapOn:
+    id: collection-form-caption
+- eraseText
+- inputText: ${CAPTION}
+- hideKeyboard
+
+# Set the date
+- tapOn:
+    id: collection-form-date
+- tapOn: 1
+- tapOn: OK
+# - assertVisible: ^\d{4}-\d{2}-01$ # FIXME: Sticky Datepicker is back
+
+# Set the location
+- tapOn:
+    id: collection-form-location
+- eraseText
+- inputText: ${LOCATION_PARTIAL}
+- hideKeyboard
+- scrollUntilVisible:
+    element: ${LOCATION_FULL}
+    direction: DOWN
+- tapOn: ${LOCATION_FULL}
+
+# Submit the form
+- tapOn:
+    id: collection-form-submit-button
+
+# Verify FR-36
+- assertVisible: Title is required
+
+# Set the title
+- tapOn:
+    id: collection-form-title
+- eraseText
+- inputText: ${TITLE}
+- hideKeyboard
+
+# Submit the form
+- tapOn:
+    id: collection-form-submit-button

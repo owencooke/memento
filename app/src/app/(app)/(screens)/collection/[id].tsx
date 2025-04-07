@@ -120,17 +120,35 @@ export default function ViewCollection() {
               collection.date) && (
               <>
                 <Box className="flex">
-                  <Text size="3xl" bold className="">
+                  <Text
+                    testID="view-collection-title"
+                    size="3xl"
+                    bold
+                    className=""
+                  >
                     {collection.title}
                   </Text>
-                  <Text size="xl" italic className="font-light">
+                  <Text
+                    testID="view-collection-caption"
+                    size="xl"
+                    italic
+                    className="font-light"
+                  >
                     {collection.caption}
                   </Text>
                   <Box className="flex-row justify-between items-center gap-x-4 font-medium">
-                    <Text size="lg" className="font-light">
+                    <Text
+                      testID="view-collection-location"
+                      size="lg"
+                      className="font-light"
+                    >
                       {collection.location}
                     </Text>
-                    <Text size="lg" className="text-right font-light">
+                    <Text
+                      testID="view-collection-date"
+                      size="lg"
+                      className="text-right font-light"
+                    >
                       {collection.date}
                     </Text>
                   </Box>
@@ -172,13 +190,19 @@ export default function ViewCollection() {
           <ButtonIcon as={ShareIcon} className={iconClasses} />
         </Button>
         <Button
+          testID="view-collection-edit-button"
           size="xl"
           className={buttonClasses}
           onPress={handleEditCollection}
         >
           <ButtonIcon as={EditIcon} className={iconClasses} />
         </Button>
-        <Button size="xl" className={buttonClasses} onPress={handleDeletePress}>
+        <Button
+          testID="view-collection-delete-button"
+          size="xl"
+          className={buttonClasses}
+          onPress={handleDeletePress}
+        >
           <ButtonIcon as={TrashIcon} className={iconClasses} />
         </Button>
       </Box>

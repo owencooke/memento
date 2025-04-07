@@ -90,6 +90,7 @@ export default function Mementos() {
             <InputIcon as={SearchIcon} />
           </InputSlot>
           <InputField
+            testID="mementos-search-bar"
             placeholder="Search..."
             value={searchText}
             onChangeText={setSearchText}
@@ -97,6 +98,7 @@ export default function Mementos() {
         </Input>
 
         <Button
+          testID="mementos-filter-button"
           size="md"
           variant="link"
           className="rounded-full p-3.5 relative"
