@@ -1,14 +1,18 @@
-# Modularized flow for filling out the Collection form fields (title, caption, date, location)
-
 appId: com.memento.app
 tags:
   - util
 ---
+# Modularized flow for filling out the Collection form fields
+# (title, caption, date, location)
+
 # Set the caption
 - tapOn:
     id: collection-form-caption
 - eraseText
-- inputText: ${CAPTION}
+- runFlow:
+    file: "input-text.yml"
+    env:
+      INPUT_TEXT: "${CAPTION}"
 - hideKeyboard
 
 # Set the date
@@ -22,7 +26,10 @@ tags:
 - tapOn:
     id: collection-form-location
 - eraseText
-- inputText: ${LOCATION_PARTIAL}
+- runFlow:
+    file: "input-text.yml"
+    env:
+      INPUT_TEXT: "${LOCATION_PARTIAL}"
 - hideKeyboard
 - scrollUntilVisible:
     element: ${LOCATION_FULL}
@@ -40,7 +47,10 @@ tags:
 - tapOn:
     id: collection-form-title
 - eraseText
-- inputText: ${TITLE}
+- runFlow:
+    file: "input-text.yml"
+    env:
+      INPUT_TEXT: "${TITLE}"
 - hideKeyboard
 
 # Submit the form
