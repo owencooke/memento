@@ -172,7 +172,11 @@ export default function Collections() {
         />
       )}
       {!showMapView && (
-        <Fab size="lg" onPress={handleAddCollection}>
+        <Fab
+          testID="fab-create-collection"
+          size="lg"
+          onPress={handleAddCollection}
+        >
           <FabIcon as={AddIcon} />
         </Fab>
       )}

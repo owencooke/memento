@@ -55,7 +55,12 @@ export default function DeleteModal({
           >
             <ButtonText>Cancel</ButtonText>
           </Button>
-          <Button onPress={onConfirm} size="sm" className="flex-grow">
+          <Button
+            testID="delete-modal-confirm"
+            onPress={onConfirm}
+            size="sm"
+            className="flex-grow"
+          >
             <ButtonText>Delete</ButtonText>
           </Button>
         </ModalFooter>

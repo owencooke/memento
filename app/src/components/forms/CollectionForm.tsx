@@ -185,6 +185,7 @@ export default function CollectionForm({
                 render={({ field }) => (
                   <Input className="bg-background-0">
                     <InputField
+                      testID="collection-form-title"
                       onChangeText={field.onChange}
                       value={field.value}
                       placeholder="Collection Title"
@@ -216,6 +217,7 @@ export default function CollectionForm({
                 render={({ field }) => (
                   <Textarea className="bg-background-0" size="md">
                     <TextareaInput
+                      testID="collection-form-caption"
                       onChangeText={field.onChange}
                       value={field.value ?? ""}
                       placeholder="Add a caption"
@@ -233,6 +235,7 @@ export default function CollectionForm({
                 control={control}
                 render={({ field }) => (
                   <DatePickerInput
+                    testID="collection-form-date"
                     value={field.value}
                     onChange={field.onChange}
                   />
@@ -248,6 +251,7 @@ export default function CollectionForm({
                 control={control}
                 render={({ field }) => (
                   <LocationInput
+                    testID="collection-form-location"
                     onChange={handleLocationChange}
                     value={field.value}
                   />
@@ -275,6 +279,7 @@ export default function CollectionForm({
                       </View>
                     )}
                     <Button
+                      testID="collection-form-select-mementos-button"
                       className="mt-auto"
                       action="secondary"
                       size={"lg"}
@@ -287,6 +292,7 @@ export default function CollectionForm({
               />
             </FormControl>
             <Button
+              testID="collection-form-submit-button"
               className="mt-auto"
               size={"lg"}
               onPress={handleSubmit(onSubmit)}

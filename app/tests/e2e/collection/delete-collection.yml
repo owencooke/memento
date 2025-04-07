@@ -1,0 +1,27 @@
+---
+appId: com.memento.app
+---
+- runFlow: ./util/launch.yml
+
+# Collections:
+#   Collection 1:
+#     - caption: nil
+#     - date: nil
+#     - location: nil
+#     - Mementos:
+#       - nil
+
+# Verify FR-46
+- tapOn:
+    id: tab-collections
+- tapOn:
+    id: collection-card
+    index: 0
+- assertVisible:
+    id: view-collection-delete-button
+- tapOn:
+    id: view-collection-delete-button
+- tapOn:
+    id: delete-modal-confirm
+- assertNotVisible:
+    id: collection-card

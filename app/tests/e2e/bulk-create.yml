@@ -10,7 +10,9 @@ appId: com.memento.app
 # Select photos from device library
 - tapOn: Add photos from library
 - tapOn:
-    text: ".*Photo taken on.*" # default "accessibilityText" value identified for photos downloaded from Chrome on emulator
+    # default "accessibilityText" value identified for photos downloaded
+    # from Chrome on emulator
+    text: ".*Photo taken on.*"
     index: 0
 - tapOn:
     text: ".*Photo taken on.*"
@@ -61,11 +63,17 @@ appId: com.memento.app
 
 # Verify FR-24: Accept option to add the mementos to a new collection
 - tapOn: Collection title
-- inputText: Bulk Created Collection
+- runFlow:
+    file: "./util/input-text.yml"
+    env:
+      INPUT_TEXT: "Bulk Created Collection"
 - hideKeyboard
 
 - tapOn: Add a caption
-- inputText: Maestro created this collection via bulk create
+- runFlow:
+    file: "./util/input-text.yml"
+    env:
+      INPUT_TEXT: "Maestro created this collection via bulk create"
 - hideKeyboard
 
 - tapOn: Create Collection

@@ -1,0 +1,8 @@
+appId: com.memento.app
+---
+- assertVisible: Mementos
+- tapOn:
+    id: mementos-search-bar
+- eraseText
+- inputText: ${TEXT}
+- hideKeyboard

@@ -13,7 +13,10 @@ appId: com.memento.app
     id: memento-form-caption
 - tapOn:
     id: memento-form-caption
-- inputText: garbage text
+- runFlow:
+    file: "./util/input-text.yml"
+    env:
+      INPUT_TEXT: "garbage text"
 - hideKeyboard
 - tapOn:
     id: header-back-button

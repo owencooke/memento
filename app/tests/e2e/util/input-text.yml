@@ -1,0 +1,20 @@
+# https://github.com/mobile-dev-inc/Maestro/issues/2382#issuecomment-2750423163
+# Maestro input text skipping characters when app stutters
+
+# Required env:
+#   INPUT_TEXT
+appId: com.memento.app
+tags:
+  - util
+---
+- evalScript: ${output.counter = 0}
+- repeat:
+    optional: true
+    while:
+      true: ${output.counter < INPUT_TEXT.length}
+    commands:
+      - runFlow:
+          file: "input-text.yml"
+          env:
+            INPUT_TEXT: "${INPUT_TEXT.charAt(output.counter)}"
+      - evalScript: ${output.counter = output.counter + 1}
