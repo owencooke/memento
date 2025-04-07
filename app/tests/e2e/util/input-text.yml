@@ -3,9 +3,7 @@
 
 # Required env:
 #   INPUT_TEXT
-appId: com.memento.app
-tags:
-  - util
+appId: ${APP_ID}
 ---
 - evalScript: ${output.counter = 0}
 - repeat:
@@ -13,8 +11,5 @@ tags:
     while:
       true: ${output.counter < INPUT_TEXT.length}
     commands:
-      - runFlow:
-          file: "input-text.yml"
-          env:
-            INPUT_TEXT: "${INPUT_TEXT.charAt(output.counter)}"
+      - inputText: ${INPUT_TEXT.charAt(output.counter)}
       - evalScript: ${output.counter = output.counter + 1}

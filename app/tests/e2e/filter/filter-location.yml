@@ -8,7 +8,10 @@ appId: com.memento.app
 # set location
 - tapOn:
     id: filter-sheet-location
-- inputText: ${LOCATION_PARTIAL}
+  runFlow:
+    file: "../util/input-text.yml"
+    env:
+      INPUT_TEXT: ${LOCATION_PARTIAL}
 - hideKeyboard
 - scrollUntilVisible:
     element: ${LOCATION_FULL}
