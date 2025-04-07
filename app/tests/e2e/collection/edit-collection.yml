@@ -1,7 +1,7 @@
 ---
 appId: com.memento.app
 ---
-- runFlow: ./util/launch.yml
+- runFlow: ../util/launch.yml
 
 # Required Setup
 # Mementos:
@@ -12,7 +12,7 @@ appId: com.memento.app
 #   Memento 2:
 #     - caption: nil
 #     - date: 04-05-2025
-#     - location: Sherwood Park, AB, Canada
+#     - location: Toronto, ON, Canada
 # Collections:
 #   Collection 1:
 #     - caption: Collection made by Maestro
@@ -26,7 +26,7 @@ appId: com.memento.app
     id: tab-collections
 - tapOn:
     id: collection-card
-    index: 0
+    containsChild: Calgary
 - assertVisible: Collection made by Maestro
 - tapOn:
     id: view-collection-edit-button
@@ -56,31 +56,30 @@ appId: com.memento.app
     id: selected-memento-card-fab
 - tapOn:
     id: memento-card
-    index: 0
+    containsChild: Edmonton
 - assertNotVisible:
     id: selected-memento-card-fab
 - tapOn:
     id: memento-card
-    index: 1
+    containsChild: Toronto
 - assertVisible:
     id: selected-memento-card-fab
 - tapOn:
     id: submit-selected-mementos-button
 
-- assertVisible:
-    id: accept-derived-metadata-button
 - tapOn:
     id: accept-derived-metadata-button
+- assertVisible: "Toronto, ON, Canada"
+- assertVisible: "2025-04-05"
 
 # Verify FR-43, FR-44, FR-45
 - runFlow:
-    file: ./util/collection-form.yml
+    file: ../util/collection-form.yml
     env:
       TITLE: Collection Edited by Maestro
       CAPTION: Caption Edited by Maestro
-      LOCATION_PARTIAL: Edmon
-      LOCATION_FULL: Edmonton, AB, Canada
-- tapOn: Save Changes
+      LOCATION_PARTIAL: Calg
+      LOCATION_FULL: Calgary, AB, Canada
 
 # Verify changes updated on view page
 - assertVisible:
