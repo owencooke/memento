@@ -29,7 +29,7 @@ def cluster_mementos(
     ids = [memento.id for memento in mementos]
     if len(mementos) < min_cluster_size:
         logger.warning("Less mementos than minimum cluster size!")
-        return {-1: ids}
+        return {}
 
     # The mementos in passed into this function should always have
     # not None coordinates. Mypy requires either define another model or cast field.
