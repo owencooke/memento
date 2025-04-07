@@ -63,17 +63,11 @@ appId: com.memento.app
 
 # Verify FR-24: Accept option to add the mementos to a new collection
 - tapOn: Collection title
-- runFlow:
-    file: "./util/input-text.yml"
-    env:
-      INPUT_TEXT: "Bulk Created Collection"
+- inputText: Bulk Created Collection
 - hideKeyboard
 
 - tapOn: Add a caption
-- runFlow:
-    file: "./util/input-text.yml"
-    env:
-      INPUT_TEXT: "Maestro created this collection via bulk create"
+- inputText: Maestro created this collection via bulk create
 - hideKeyboard
 
 - tapOn: Create Collection

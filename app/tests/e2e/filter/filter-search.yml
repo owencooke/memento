@@ -4,8 +4,5 @@ appId: com.memento.app
 - tapOn:
     id: mementos-search-bar
 - eraseText
-- runFlow:
-    file: "../util/input-text.yml"
-    env:
-      INPUT_TEXT: "${TEXT}"
+- inputText: ${TEXT}
 - hideKeyboard

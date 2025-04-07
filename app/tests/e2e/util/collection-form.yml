@@ -9,10 +9,7 @@ tags:
 - tapOn:
     id: collection-form-caption
 - eraseText
-- runFlow:
-    file: "input-text.yml"
-    env:
-      INPUT_TEXT: "${CAPTION}"
+- inputText: ${CAPTION}
 - hideKeyboard
 
 # Set the date
@@ -26,10 +23,7 @@ tags:
 - tapOn:
     id: collection-form-location
 - eraseText
-- runFlow:
-    file: "input-text.yml"
-    env:
-      INPUT_TEXT: "${LOCATION_PARTIAL}"
+- inputText: ${LOCATION_PARTIAL}
 - hideKeyboard
 - scrollUntilVisible:
     element: ${LOCATION_FULL}
@@ -47,10 +41,7 @@ tags:
 - tapOn:
     id: collection-form-title
 - eraseText
-- runFlow:
-    file: "input-text.yml"
-    env:
-      INPUT_TEXT: "${TITLE}"
+- inputText: ${TITLE}
 - hideKeyboard
 
 # Submit the form

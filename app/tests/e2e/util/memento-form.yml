@@ -9,10 +9,7 @@ tags:
 - tapOn:
     id: memento-form-caption
 - eraseText
-- runFlow:
-    file: "input-text.yml"
-    env:
-      INPUT_TEXT: "${CAPTION}"
+- inputText: ${CAPTION}
 - hideKeyboard
 
 # Set the date
@@ -27,10 +24,7 @@ tags:
 - tapOn:
     id: memento-form-location
 - eraseText
-- runFlow:
-    file: "input-text.yml"
-    env:
-      INPUT_TEXT: "${LOCATION_PARTIAL}"
+- inputText: ${LOCATION_PARTIAL}
 - hideKeyboard
 - scrollUntilVisible:
     element: ${LOCATION_FULL}
