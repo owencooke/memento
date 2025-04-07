@@ -32,7 +32,7 @@ def get_mementos(
     """Gets all the mementos belonging to a user."""
     query = (
         db.supabase.table("memento")
-        .select("*, images:image!inner(*)")
+        .select("*, images:image(*)")
         .eq("user_id", str(user_id))
     )
 

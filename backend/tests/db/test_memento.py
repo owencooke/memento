@@ -2,6 +2,8 @@ import uuid
 from datetime import date
 from unittest.mock import MagicMock, call
 
+from tests.fixtures.supabase import MockSupabase
+
 from server.api.memento.models import MementoFilterParams, NewMemento, UpdateMemento
 from server.services.db.models.joins import MementoWithImages
 from server.services.db.models.schema_public_latest import Memento
@@ -12,7 +14,6 @@ from server.services.db.queries.memento import (
     get_mementos,
     update_memento,
 )
-from tests.fixtures.supabase import MockSupabase
 
 
 def test_create_memento(
@@ -105,7 +106,7 @@ def test_get_mementos_no_filter(
     # Then
     mock_supabase_client.table.assert_called_once_with("memento")
     mock_supabase_client.table().select.assert_called_once_with(
-        "*, images:image!inner(*)",
+        "*, images:image(*)",
     )
     mock_supabase_client.table().select().eq.assert_called_once_with(
         "user_id",
@@ -199,13 +200,31 @@ def test_get_mementos_image_label_filter(
     multiple_mementos_with_images_data: list[dict],
 ) -> None:
     """Test getting mementos with image label filter."""
-    mock_supabase_client, mock_query_response, _ = mock_supabase
+    mock_supabase_client, mock_db_response, _ = mock_supabase
 
     # Given
     user_id = uuid.UUID(multiple_mementos_with_images_data[0]["user_id"])
-    mock_query_response.data = [
-        multiple_mementos_with_images_data[1],
+    beach_memento_id = multiple_mementos_with_images_data[1]["id"]
+
+    # We need to handle two separate queries:
+    # 1. First query to get memento_ids from the image table
+    # 2. Second query to get the actual mementos
+
+    # Set up mocks for a sequence of responses
+    image_query_response = MagicMock()
+    image_query_response.data = [{"memento_id": beach_memento_id}]
+
+    memento_query_response = MagicMock()
+    memento_query_response.data = [
+        multiple_mementos_with_images_data[1]
     ]  # Only the beach memento
+
+    # Set up a side effect to return different responses
+    execute_side_effects = [image_query_response, memento_query_response]
+
+    # Create a patched version of the fixture's chain builder
+    original_chain_builder = mock_supabase_client.table.return_value
+    original_chain_builder.execute.side_effect = execute_side_effects
 
     # Create filter with image label
     filter_params = MementoFilterParams(image_label="beach")
@@ -214,10 +233,10 @@ def test_get_mementos_image_label_filter(
     result = get_mementos(user_id, filter_params)
 
     # Then
-    calls = [call("user_id", str(user_id)), call("images.image_label", "beach")]
-    mock_supabase_client.table.assert_called_once_with("memento")
-    mock_supabase_client.table().select().eq.assert_has_calls(calls)
+    expected_table_calls = [call("memento"), call("image")]
+    assert mock_supabase_client.table.call_args_list == expected_table_calls
 
+    # Check result
     assert len(result) == 1
     assert "Beach" in result[0].caption
     assert len(result[0].images) == 2
