@@ -8,16 +8,15 @@ appId: com.memento.app
 - tapOn: Create multiple mementos
 
 # Select photos from device library
+# !!! OS specific behaviour, tailored to lab phone
 - tapOn: Add photos from library
 - tapOn:
-    # default "accessibilityText" value identified for photos downloaded
-    # from Chrome on emulator
     text: ".*Photo taken on.*"
     index: 0
 - tapOn:
     text: ".*Photo taken on.*"
     index: 1
-- tapOn: Add (2)
+- tapOn: Done
 
 # Verify FR-22: group images into keepsakes
 - assertVisible: "Memento #1"
