@@ -25,7 +25,7 @@ async def recommend_collection(user_id: UUID4) -> None:
     mementos = get_mementos_for_clustering(user_id)
     clustered_memento_ids = cluster_mementos(mementos, min_cluster_size=3)
 
-    logger.debug(f"Clustered memento ids: {clustered_memento_ids}")
+    logger.info(f"Clustered memento ids: {clustered_memento_ids}")
 
     # Check DB for previously rejected collections
     valid_recommendations = [
@@ -33,7 +33,7 @@ async def recommend_collection(user_id: UUID4) -> None:
         for memento_ids in clustered_memento_ids.values()
         if not is_collection_rejected(user_id, memento_ids)
     ]
-    logger.debug(f"Valid recommendation: {valid_recommendations}")
+    logger.info(f"Valid recommendation: {valid_recommendations}")
 
     # No valid recommendations
     if not valid_recommendations:

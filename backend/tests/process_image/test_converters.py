@@ -91,7 +91,7 @@ async def test_pil_to_png_bytes_with_resize(mock_pil_image: MagicMock) -> None:
     # Then
     assert mock_bytesio.call_count == 1
     assert mock_buffer.tell.call_count == 2
-    assert mock_logger.debug.call_count == 2
+    assert mock_logger.info.call_count == 2
     mock_pil_image.resize.assert_called_once()
     assert mock_pil_image.save.call_count == 1
     assert resized_image.save.call_count == 1
