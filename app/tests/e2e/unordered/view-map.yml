@@ -5,11 +5,11 @@ appId: com.memento.app
 #   - Tapping the marker's callout bubble uses relative screen position, since there was no
 #       accessiblilityText to access (so verifying FR-52 may be flaky depending on device)
 
-- runFlow: ./util/launch.yml
+- runFlow: ../util/launch.yml
 
 # Navigate to Collections tab
 - tapOn:
-    id: collections-tab
+    id: tab-collections
 
 # Copy the caption of the first collection card
 - copyTextFrom:
