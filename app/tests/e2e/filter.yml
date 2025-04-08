@@ -1,0 +1,80 @@
+appId: com.memento.app
+---
+- runFlow: ./util/launch.yml
+
+# Required Setup
+# Mementos:
+#   Memento 1:
+#     - caption: Hello caption surfer
+#     - date: 04-03-2025
+#     - location: Edmonton, AB, Canada
+#     - detected text: nil
+#     - image label: envelope
+#   Memento 2:
+#     - caption: nil
+#     - date: 04-05-2025
+#     - location: Toronto, ON, Canada
+#     - detected text: Hello detected text surfer
+#     - image label: nil
+
+# Verify FR-12
+# FIXME: STICKY DATEPICKER ;(
+# - runFlow:
+#     file: ./filter/filter-date.yml
+#     env:
+#       START: 3
+#       END: 4
+# - assertVisible: "2025-04-03"
+# - runFlow:
+#     file: ./filter/clear-filters.yml
+#
+# FIXME: STICKY DATEPICKER ;(
+# - runFlow:
+#     file: ./filter/filter-date.yml
+#     env:
+#       START: 4
+#       END: 5
+# - assertVisible: "2025-04-05"
+# - runFlow:
+#     file: ./filter/clear-filters.yml
+
+# Verify FR-13
+- runFlow:
+    file: ./filter/filter-location.yml
+    env:
+      LOCATION_PARTIAL: "Alber"
+      LOCATION_FULL: "Alberta, Canada"
+- assertVisible: "Edmonton"
+- assertNotVisible: "Toronto"
+- runFlow:
+    file: ./filter/clear-filters.yml
+
+# Verify FR-16
+- runFlow:
+    file: ./filter/filter-image-label.yml
+    env:
+      LABEL: "Envelope"
+- assertVisible: "Hello caption surfer"
+- assertNotVisible: "Toronto"
+- runFlow:
+    file: ./filter/clear-filters.yml
+
+# Verify FR-15
+- runFlow:
+    file: ./filter/filter-search.yml
+    env:
+      TEXT: "caption"
+- assertVisible: "Hello caption surfer"
+- assertNotVisible: "Toronto"
+- runFlow:
+    file: ./filter/clear-filters.yml
+
+# Verify FR-14
+- runFlow:
+    file: ./filter/filter-search.yml
+    env:
+      TEXT: "detect"
+- assertVisible: "Toronto"
+- assertNotVisible: "Hello caption surfer"
+- runFlow:
+    file: ./filter/clear-filters.yml

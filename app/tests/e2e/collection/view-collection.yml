@@ -1,0 +1,33 @@
+appId: com.memento.app
+---
+- runFlow: ../util/launch.yml
+
+# Collections:
+#   Collection 1:
+#     - caption: {TITLE}
+#     - date: {CAPTION}
+#     - location: {LOCATION}
+#     - Mementos:
+#       - Memento 1
+
+# Navigate to View Collection page
+- tapOn:
+    id: tab-collections
+- tapOn:
+    id: collection-card
+    index: 0
+
+# Verify FR-3
+- assertVisible:
+    id: memento-card
+- assertVisible:
+    id: view-collection-title
+    text: ${TITLE}
+- assertVisible:
+    id: view-collection-caption
+    text: ${CAPTION}
+- assertVisible:
+    id: view-collection-date
+- assertVisible:
+    id: view-collection-location
+    text: ${LOCATION}

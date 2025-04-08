@@ -10,7 +10,9 @@ appId: com.memento.app
 # Select photos from device library
 - tapOn: Add photos from library
 - tapOn:
-    text: ".*Photo taken on.*" # default "accessibilityText" value identified for photos downloaded from Chrome on emulator
+    # default "accessibilityText" value identified for photos downloaded
+    # from Chrome on emulator
+    text: ".*Photo taken on.*"
     index: 0
 - tapOn:
     text: ".*Photo taken on.*"

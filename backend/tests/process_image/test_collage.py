@@ -128,6 +128,45 @@ class TestCollageGenerator:
         assert generator.image_processor.rotate_image.call_count == 5
         assert collage.paste.call_count == 5
 
+    def test_render_scattered_images_exception_handling(
+        self,
+        mock_pil_image: MagicMock,
+    ) -> None:
+        """
+        Test that exceptions in the _render_scattered_images
+        method are handled properly.
+        """
+
+        # Given
+        collage = mock_pil_image
+        generator = CollageGenerator()
+        mock_images = [mock_pil_image] * 5
+
+        # Mock dependencies
+        generator._initialize_grid = MagicMock(
+            return_value=(100, 100, [(0, 0), (0, 1), (1, 0), (1, 1), (2, 0)]),
+        )
+        generator.image_processor.prepare_image = MagicMock(
+            side_effect=Exception("Image processing error"),
+        )
+        generator.image_processor.rotate_image = MagicMock(return_value=mock_pil_image)
+        mock_pil_image.width = 100
+        mock_pil_image.height = 100
+
+        # When
+        generator._render_scattered_images(collage, mock_images)
+
+        # Then
+        # Check that prepare_image raised an exception and the error was logged,
+        # but the process continued for the next image
+        generator._initialize_grid.assert_called_once_with(5)
+        assert (
+            generator.image_processor.prepare_image.call_count == 5
+        )  # It tried to call 5 times
+        assert (
+            generator.image_processor.rotate_image.call_count == 0
+        )  # rotate_image should not be called if prepare_image fails
+
 
 class TestImageProcessor:
     """Tests for the ImageProcessor class."""

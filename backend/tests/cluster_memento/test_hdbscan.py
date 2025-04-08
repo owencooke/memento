@@ -43,8 +43,7 @@ def test_cluster_mementos_not_enough_mementos() -> None:
     result = cluster_mementos(mementos, min_cluster_size=5)
 
     # Then
-    assert -1 in result
-    assert result[-1] == [1, 2]
+    assert result == {}
 
 
 @patch("server.services.cluster_memento.hdbscan.HDBSCAN")
@@ -111,9 +110,7 @@ def test_cluster_mementos_no_clusters_found(
     )
 
     # Then
-    # Should return an empty dictionary since no clusters were formed
-    memento_ids = [memento.id for memento in sample_mementos]
-    assert result == {-1: memento_ids}
+    assert result == {}
 
 
 @patch("server.services.cluster_memento.hdbscan.logger")

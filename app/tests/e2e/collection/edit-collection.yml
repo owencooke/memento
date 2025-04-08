@@ -1,0 +1,95 @@
+---
+appId: com.memento.app
+---
+- runFlow: ../util/launch.yml
+
+# Required Setup
+# Mementos:
+#   Memento 1:
+#     - caption: nil
+#     - date: 04-03-2025
+#     - location: Edmonton, AB, Canada
+#   Memento 2:
+#     - caption: nil
+#     - date: 04-05-2025
+#     - location: Toronto, ON, Canada
+# Collections:
+#   Collection 1:
+#     - caption: Collection made by Maestro
+#     - date: 04-01-2025
+#     - location: Calgary, AB, Canada
+#     - Mementos:
+#       - Memento 1
+
+# Navigate to Edit Collection page
+- tapOn:
+    id: tab-collections
+- tapOn:
+    id: collection-card
+    containsChild: Calgary
+- assertVisible: Collection made by Maestro
+- tapOn:
+    id: view-collection-edit-button
+
+# Check that cancelling doesn't save changes/edits
+- copyTextFrom:
+    id: collection-form-caption
+- tapOn:
+    id: collection-form-caption
+- inputText: garbage text
+- hideKeyboard
+- tapOn:
+    id: header-back-button
+- assertVisible:
+    id: view-collection-caption
+    text: ${maestro.copiedText}
+- tapOn:
+    id: view-collection-edit-button
+- assertVisible:
+    id: collection-form-caption
+    text: ${maestro.copiedText}
+
+# Verify FR-42 TODO
+- tapOn:
+    id: collection-form-select-mementos-button
+- assertVisible:
+    id: selected-memento-card-fab
+- tapOn:
+    id: memento-card
+    containsChild: Edmonton
+- assertNotVisible:
+    id: selected-memento-card-fab
+- tapOn:
+    id: memento-card
+    containsChild: Toronto
+- assertVisible:
+    id: selected-memento-card-fab
+- tapOn:
+    id: submit-selected-mementos-button
+
+- tapOn:
+    id: accept-derived-metadata-button
+- assertVisible: "Toronto, ON, Canada"
+- assertVisible: "2025-04-05"
+
+# Verify FR-43, FR-44, FR-45
+- runFlow:
+    file: ../util/collection-form.yml
+    env:
+      TITLE: ${NEW_TITLE}
+      CAPTION: ${NEW_CAPTION}
+      LOCATION_PARTIAL: ${NEW_LOCATION_PARTIAL}
+      LOCATION_FULL: ${NEW_LOCATION_FULL}
+
+# Verify changes updated on view page
+- assertVisible:
+    id: view-collection-title
+    text: ${NEW_TITLE}
+
+- assertVisible:
+    id: view-collection-caption
+    text: ${NEW_CAPTION}
+
+- assertVisible:
+    id: view-collection-location
+    text: ${NEW_LOCATION_FULL}
