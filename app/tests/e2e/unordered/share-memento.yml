@@ -2,7 +2,7 @@ appId: com.memento.app
 ---
 # !!! Need to have at least one memento
 
-- runFlow: ./util/launch.yml
+- runFlow: ../util/launch.yml
 
 # Wait for a memento card to appear
 - assertVisible:
@@ -16,6 +16,7 @@ appId: com.memento.app
 # Click share button
 - tapOn:
     id: share-memento-button
+    retryTapIfNoChange: false
 
 # Verify FR-54: Share to other apps sheet pops up
-- runFlow: ./util/assert-share.yml
+- runFlow: ../util/assert-share.yml

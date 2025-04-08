@@ -2,16 +2,6 @@ appId: com.memento.app
 tags:
   - util
 ---
-# Ensure test image(s) added to phone gallery at least once
-- runFlow:
-    when:
-      true: ${!output.testImageAdded}
-    commands:
-      - addMedia:
-          - "./assets/tree.jpg"
-          - "./assets/tree.jpg"
-      - evalScript: ${output.testImageAdded = true}
-
 # NOTE: by commenting this out:
 #   PRO: we can run the tests on EITHER Expo Go or a Dev Build
 #   CON: the app will no longer automatically launch if not open.

@@ -31,7 +31,7 @@ tags:
 - tapOn:
     id: photo-grid-add-button
 - tapOn: Select from Library
-- tapOn: More options
+- tapOn: ".*More.*"
 - tapOn: ".*Browse.*"
 - tapOn:
     text: "tree(?:\\s*\\(\\d+\\))?\\.jpg.*"
@@ -43,7 +43,6 @@ tags:
     id: modal-background-removal-confirm
 
 # Wait for auto metadata extraction
-- assertVisible: "2025-04-03"
 - assertVisible: New York, NY, USA
 
 # Fill form

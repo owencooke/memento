@@ -1,6 +1,7 @@
 appId: com.memento.app
 ---
-- runFlow: ./util/launch.yml
+- runFlow: ../util/launch.yml
+- runFlow: ../util/add-assets.yml
 
 # Navigate to Bulk Create page
 - tapOn:
@@ -39,7 +40,7 @@ appId: com.memento.app
 # Verify FR-23: Fill out each group's details
 - tapOn: "Memento #1"
 - runFlow:
-    file: ./util/memento-form.yml
+    file: ../util/memento-form.yml
     env:
       CAPTION: Group number one
       LOCATION_PARTIAL: San Fr
@@ -49,7 +50,7 @@ appId: com.memento.app
 
 - tapOn: "Memento #2"
 - runFlow:
-    file: ./util/memento-form.yml
+    file: ../util/memento-form.yml
     env:
       CAPTION: Group number two
       LOCATION_PARTIAL: Tor

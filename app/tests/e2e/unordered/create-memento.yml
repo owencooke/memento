@@ -1,9 +1,10 @@
 appId: com.memento.app
 ---
-- runFlow: ./util/launch.yml
+- runFlow: ../util/launch.yml
+- runFlow: ../util/add-assets.yml
 
 - runFlow:
-    file: ./util/create-test-memento.yml
+    file: ../util/create-test-memento.yml
     env:
       CAPTION: "Single made by Maestro"
       LOCATION_PARTIAL: "Edmon"
