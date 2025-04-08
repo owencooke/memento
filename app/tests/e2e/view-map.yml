@@ -1,0 +1,40 @@
+appId: com.memento.app
+---
+# !!!
+#   - Need to have at least one collection with location in Edmonton area (visible without moving map)
+#   - Tapping the marker's callout bubble uses relative screen position, since there was no
+#       accessiblilityText to access (so verifying FR-52 may be flaky depending on device)
+
+- runFlow: ./util/launch.yml
+
+# Navigate to Collections tab
+- tapOn:
+    id: collections-tab
+
+# Copy the caption of the first collection card
+- copyTextFrom:
+    id: collection-card-title
+    index: 0
+
+# Open map view
+- tapOn:
+    id: view-map-button
+- assertVisible: Google Map
+
+# Verify FR-51: Collection card is on the map
+- assertVisible: ".*${maestro.copiedText}.*" # card's accessbility text
+
+# Verify FR-52: tap on marker to view collection/fields
+- tapOn: ".*${maestro.copiedText}.*" # marker image
+- tapOn:
+    point: 50%, 47% # callout speech bubble
+- assertVisible:
+    id: view-collection-title
+- assertVisible:
+    id: view-collection-caption
+- assertVisible:
+    id: view-collection-location
+- assertVisible:
+    id: view-collection-date
+- assertVisible:
+    id: memento-card

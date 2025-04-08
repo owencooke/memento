@@ -120,17 +120,17 @@ export default function ViewCollection() {
               collection.date) && (
               <>
                 <Box className="flex">
-                  <Text size="3xl" bold className="">
+                  <Text size="3xl" bold className="" testID="view-collection-title">
                     {collection.title}
                   </Text>
-                  <Text size="xl" italic className="font-light">
+                  <Text size="xl" italic className="font-light" testID="view-collection-caption">
                     {collection.caption}
                   </Text>
                   <Box className="flex-row justify-between items-center gap-x-4 font-medium">
-                    <Text size="lg" className="font-light">
+                    <Text size="lg" className="font-light" testID="view-collection-location">
                       {collection.location}
                     </Text>
-                    <Text size="lg" className="text-right font-light">
+                    <Text size="lg" className="text-right font-light" testID="view-collection-date">
                       {collection.date}
                     </Text>
                   </Box>
@@ -168,6 +168,7 @@ export default function ViewCollection() {
           size="xl"
           className={buttonClasses}
           onPress={handleShareCollection}
+          testID="collage-button"
         >
           <ButtonIcon as={ShareIcon} className={iconClasses} />
         </Button>
