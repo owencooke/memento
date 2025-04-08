@@ -21,6 +21,7 @@ appId: com.memento.app
       CAPTION: "Collection made by Maestro"
       LOCATION_PARTIAL: "Calg"
       LOCATION_FULL: "Calgary, AB, Canada"
+      CITY: "Calgary"
 
 # Verify FR-13
 - runFlow:

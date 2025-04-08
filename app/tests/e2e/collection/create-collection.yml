@@ -55,14 +55,15 @@ appId: com.memento.app
 - runFlow:
     file: ../util/collection-form.yml
     env:
-      TITLE: "Collection made by Maestro"
-      CAPTION: "Collection made by Maestro"
-      LOCATION_PARTIAL: "Calg"
-      LOCATION_FULL: "Calgary, AB, Canada"
+      TITLE: ${TITLE}
+      CAPTION: ${CAPTION}
+      LOCATION_PARTIAL: ${LOCATION_PARTIAL}
+      LOCATION_FULL: ${LOCATION_FULL}
 
-# Verify new memento added to grid view
+# Verify new collection added to grid view
 - assertVisible: Collections
-- assertVisible: Collection made by Maestro
+- assertVisible: ${TITLE}
+- assertVisible: ${CAPTION}
 # FIXME: STICKY DATEPICKER
 # - assertVisible: ^\d{4}-\d{2}-01$
-- assertVisible: Calgary
+- assertVisible: ${CITY}
