@@ -1,7 +1,7 @@
 ---
 appId: com.memento.app
 ---
-- runFlow: ./util/launch.yml
+- runFlow: ../util/launch.yml
 
 # Collections:
 #   Collection 1:

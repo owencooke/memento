@@ -7,7 +7,7 @@ appId: com.memento.app
 # Mementos:
 #   Memento 1:
 #     - caption: nil
-#     - date: 04-01-2025
+#     - date: 04-03-2025
 #     - location: Edmonton, AB, Canada
 #   Memento 2:
 #     - caption: nil
@@ -76,20 +76,20 @@ appId: com.memento.app
 - runFlow:
     file: ../util/collection-form.yml
     env:
-      TITLE: Collection Edited by Maestro
-      CAPTION: Caption Edited by Maestro
-      LOCATION_PARTIAL: Calg
-      LOCATION_FULL: Calgary, AB, Canada
+      TITLE: ${NEW_TITLE}
+      CAPTION: ${NEW_CAPTION}
+      LOCATION_PARTIAL: ${NEW_LOCATION_PARTIAL}
+      LOCATION_FULL: ${NEW_LOCATION_FULL}
 
 # Verify changes updated on view page
 - assertVisible:
     id: view-collection-title
-    text: Collection Edited by Maestro
+    text: ${NEW_TITLE}
 
 - assertVisible:
     id: view-collection-caption
-    text: Caption Edited by Maestro
+    text: ${NEW_CAPTION}
 
 - assertVisible:
     id: view-collection-location
-    text: Edmonton, AB, Canada
+    text: ${NEW_LOCATION_FULL}
