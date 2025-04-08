@@ -35,6 +35,10 @@ tags:
     when:
       visible: Collections
     commands:
+      # Make sure map view closed
+      - tapOn:
+          text: Grid
+          optional: true
       - tapOn: Mementos
 # # Extend timeout (app can take a while to launch)
 # - extendedWaitUntil:

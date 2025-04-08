@@ -1,5 +1,6 @@
 appId: com.memento.app
 ---
+# !!! Need to have at least one memento
 - runFlow: ./util/launch.yml
 
 # Navigate to View Memento page
@@ -12,12 +13,15 @@ appId: com.memento.app
 - assertVisible:
     id: view-memento-caption # FR-26
 - assertVisible:
-    id: view-memento-date # FR-27
+    id: view-memento-date
 - assertVisible:
     id: view-memento-location
 
-# Show more image details
-# TODO: verify image class/detected text/date etc.
+# Verify FR-27: Show more image details / keepsake metadata
 - tapOn:
     id: view-memento-show-details
 - assertVisible: Image Details
+- assertVisible: Coordinates
+- assertVisible: Date
+- assertVisible: Detected Text
+- assertVisible: Image Label

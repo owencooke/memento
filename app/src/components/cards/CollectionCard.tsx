@@ -40,6 +40,7 @@ export default function CollectionCard({
         <View
           className={`relative flex flex-col rounded-xl shadow-hard-3 bg-background-0 
             ${isMarker ? "w-[80px] p-[6px]" : "flex-1 gap-1 p-3"}`}
+          testID="collection-card"
         >
           <View className="aspect-square flex-1">
             <Image
@@ -50,6 +51,7 @@ export default function CollectionCard({
             />
           </View>
           <Text
+            testID="collection-card-title"
             size={isMarker ? "sm" : "lg"}
             className="font-bold text-center mt-1"
           >

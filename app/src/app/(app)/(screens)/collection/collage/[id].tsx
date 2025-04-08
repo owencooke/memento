@@ -125,8 +125,14 @@ export default function ViewCollection() {
             className="flex-1 w-full"
             source={{ uri: collageImageUri }}
             alt="Collage"
+            testID="collage-image"
           />
-          <Button className="mt-auto" size="xl" onPress={handleShareCollage}>
+          <Button 
+            className="mt-auto" 
+            size="xl" 
+            onPress={handleShareCollage}
+            testID="export-collage-button"
+          >
             <ButtonIcon as={ShareIcon} />
             <ButtonText>Export Collage</ButtonText>
           </Button>
