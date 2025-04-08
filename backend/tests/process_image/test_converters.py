@@ -60,7 +60,7 @@ async def test_pil_to_png_bytes_no_resize(mock_pil_image: MagicMock) -> None:
         compress_level=6,
     )
     mock_buffer.tell.assert_called_once()
-    mock_logger.debug.assert_called_once()
+    mock_logger.info.assert_called_once()
     assert result == expected_bytes
 
 
