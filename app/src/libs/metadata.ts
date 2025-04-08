@@ -117,7 +117,7 @@ const reverseCityGeocode = async (
     }
     return { ...coords, text: results[0].formatted_address || "" };
   } catch (error) {
-    console.error(error);
+    console.log(error);
     return { ...coords, text: "" };
   }
 };

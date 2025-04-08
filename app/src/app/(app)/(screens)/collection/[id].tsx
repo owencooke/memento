@@ -103,7 +103,7 @@ export default function ViewCollection() {
           router.dismissTo("/(app)/(tabs)/collections");
         },
         onError: (error: any) =>
-          console.error("Failed to delete collection", error),
+          console.log("Failed to delete collection", error),
       },
     );
   };

@@ -94,7 +94,7 @@ export const CameraProvider: React.FC<React.PropsWithChildren> = ({
       const newPhoto = await createPhotoObject(capturedPicture);
       processPhotos([newPhoto]);
     } catch (error) {
-      console.error("Error taking picture:", error);
+      console.log("Error taking picture:", error);
       hideCamera();
     }
   };
@@ -145,7 +145,7 @@ export const CameraProvider: React.FC<React.PropsWithChildren> = ({
             ]);
           }
         } catch (error) {
-          console.error(`Failed to process photo ${photo.assetId}:`, error);
+          console.log(`Failed to process photo ${photo.assetId}:`, error);
         }
       });
     }

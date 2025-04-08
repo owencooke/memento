@@ -96,8 +96,7 @@ export default function EditMemento() {
           });
           handleRedirect();
         },
-        onError: (error: any) =>
-          console.error("Failed to update memento", error),
+        onError: (error: any) => console.log("Failed to update memento", error),
       },
     );
   };

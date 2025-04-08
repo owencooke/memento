@@ -46,7 +46,7 @@ export default function CreateMemento() {
           router.replace("/(app)/(tabs)/mementos");
         },
         onError: (error: any) =>
-          console.error("Failed to create new memento", error),
+          console.log("Failed to create new memento", error),
       },
     );
   };

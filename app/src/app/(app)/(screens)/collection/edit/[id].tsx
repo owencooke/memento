@@ -120,7 +120,7 @@ export default function EditCollection() {
           handleRedirect();
         },
         onError: (error: any) =>
-          console.error("Failed to update collection", error),
+          console.log("Failed to update collection", error),
       },
     );
   };

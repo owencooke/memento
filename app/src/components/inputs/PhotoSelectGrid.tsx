@@ -40,7 +40,7 @@ export default function PhotoSelectGrid({
 
   // When photos change, send updated state to parent component
   useEffect(() => {
-    onChange(photos).catch((e) => console.error(e));
+    onChange(photos).catch((e) => console.log(e));
   }, [onChange, photos]);
 
   // Include non-draggable add button at end of photo grid

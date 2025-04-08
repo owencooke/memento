@@ -89,8 +89,7 @@ export default function ViewMemento() {
           setDeleteModalVisible(false);
           router.dismissTo("/(app)/(tabs)/mementos");
         },
-        onError: (error: any) =>
-          console.error("Failed to delete memento", error),
+        onError: (error: any) => console.log("Failed to delete memento", error),
       },
     );
   };
@@ -114,7 +113,7 @@ export default function ViewMemento() {
         }
       }
     } catch (error) {
-      console.error("Error sharing image:", error);
+      console.log("Error sharing image:", error);
     }
   };
 

@@ -47,7 +47,7 @@ export const useWebSocket = () => {
       }
     };
 
-    ws.onerror = (error) => console.error("WS error:", error);
+    ws.onerror = (error) => console.log("WS error:", error);
   }, [session?.user.id]);
 
   useEffect(() => {

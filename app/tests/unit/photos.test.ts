@@ -272,8 +272,8 @@ describe("Photo utilities", () => {
         new Error("File access error"),
       );
 
-      // Spy on console.error
-      const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
+      // Spy on console.log
+      const consoleErrorSpy = jest.spyOn(console, "log").mockImplementation();
 
       // Call createPhotoObject
       const result = await createPhotoObject(mockPhoto);
@@ -288,7 +288,7 @@ describe("Photo utilities", () => {
       // Should still return a valid photo object
       expect(result).toHaveProperty("uri", mockPhoto.uri);
 
-      // Restore console.error
+      // Restore console.log
       consoleErrorSpy.mockRestore();
     });
   });
