@@ -9,11 +9,10 @@ appId: com.memento.app
 - tapOn:
     id: filter-sheet-location
 - inputText: ${LOCATION_PARTIAL}
-- hideKeyboard
-- scrollUntilVisible:
-    element: ${LOCATION_FULL}
-    direction: DOWN
-- tapOn: ${LOCATION_FULL}
+- tapOn:
+    text: ${LOCATION_FULL}
+    repeat: 5
+    delay: 1000
 
 - tapOn:
     id: filter-sheet-submit-button
