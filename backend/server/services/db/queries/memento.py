@@ -76,7 +76,7 @@ def get_mementos(
             image_query = (
                 db.supabase.table("image")
                 .select("memento_id")
-                .in_("image_label", filter_query.image_label)
+                .like("image_label", filter_query.image_label)
                 .execute()
             )
             labeled_memento_ids = [item["memento_id"] for item in image_query.data]
