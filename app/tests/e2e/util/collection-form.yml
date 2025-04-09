@@ -20,15 +20,23 @@ tags:
 # - assertVisible: ^\d{4}-\d{2}-01$ # FIXME: Sticky Datepicker is back
 
 # Set the location
+- scrollUntilVisible:
+    centerElement: true
+    direction: DOWN
+    element: Mementos
 - tapOn:
     id: collection-form-location
 - eraseText
 - inputText: ${LOCATION_PARTIAL}
-- hideKeyboard
-- scrollUntilVisible:
-    element: ${LOCATION_FULL}
-    direction: DOWN
-- tapOn: ${LOCATION_FULL}
+# - scrollUntilVisible:
+#     element: ${LOCATION_FULL}
+#     direction: DOWN
+- tapOn:
+    text: ${LOCATION_FULL}
+    repeat: 5
+    delay: 500
+    # optional: true
+# - hideKeyboard
 
 # Remove title (for edit collection flow)
 - tapOn:
