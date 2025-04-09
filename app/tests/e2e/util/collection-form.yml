@@ -39,6 +39,9 @@ tags:
 # - hideKeyboard
 
 # Remove title (for edit collection flow)
+- scrollUntilVisible:
+    direction: UP
+    element: Title
 - tapOn:
     id: collection-form-title
 - eraseText
