@@ -27,7 +27,7 @@ appId: com.memento.app
 # Verify FR-52: tap on marker to view collection/fields
 - tapOn: ".*${maestro.copiedText}.*" # marker image
 - tapOn:
-    point: 50%, 47% # callout speech bubble
+    point: 50%, 42% # callout speech bubble
 - assertVisible:
     id: view-collection-title
 - assertVisible:
