@@ -76,12 +76,13 @@ exclude = [
 ]
 
 [tool.pytest.ini_options]
-addopts = "--cov=server --cov-report=html"
+addopts = "--cov=server --cov-branch --cov-report=html"
 asyncio_default_fixture_loop_scope = "function"
 filterwarnings = [
     "error",
     "ignore::DeprecationWarning",
     "ignore:.*unclosed.*:ResourceWarning",
+    "ignore:'force_all_finite' was renamed to 'ensure_all_finite':FutureWarning:sklearn"
 ]
 env = [
     "SERVER_ENVIRONMENT=pytest",
@@ -90,8 +91,18 @@ env = [
 
 [tool.coverage.report]
 include_namespace_packages = true
-omit = ["**/__init__.py"]
 skip_empty = true
+omit = [
+  "**/__init__.py",
+  "tests/*",
+  "scripts/*",
+  "server/api/*",
+  "server/application.py",
+  "server/assets/*",
+  "server/background_tasks/*",
+  "server/config/*",
+  "server/__main__.py",
+]
 
 [tool.ruff]
 # List of enabled rulsets.

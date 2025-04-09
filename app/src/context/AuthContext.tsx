@@ -86,7 +86,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         }
       }
     } catch (error) {
-      console.error("Google Sign-In Error:", error);
+      console.log("Google Sign-In Error:", error);
     }
   };
 
@@ -170,7 +170,7 @@ const handleOAuthCallback = async (url: string): Promise<User | null> => {
 
     return data.user;
   } catch (error: any) {
-    console.error("Error processing OAuth callback:", error.message);
+    console.log("Error processing OAuth callback:", error.message);
     return null;
   }
 };

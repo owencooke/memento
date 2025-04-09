@@ -19,7 +19,8 @@ type Metadata = Pick<
 export const getRelevantMetadata = (
   item: Photo | MementoWithImages,
 ): Metadata => {
-  if ("exif" in item) {
+  if ("uri" in item && "fileName" in item) {
+    // Extract from a photo
     const { exif, fileName, mimeType } = item;
 
     // Date
@@ -110,14 +111,19 @@ const reverseCityGeocode = async (
   try {
     const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&key=${apiKey}&result_type=locality`;
     const { results, status } = await fetch(url).then((res) => res.json());
-    if (status !== "OK" || !results || results.length < 1) {
+    if (
+      status !== "OK" ||
+      !results ||
+      results.length < 1 ||
+      !results[0].formatted_address
+    ) {
       throw new Error(
         `Reverse geocoding failed. Status: ${status}, results: ${JSON.stringify(results)}`,
       );
     }
-    return { ...coords, text: results[0].formatted_address || "" };
+    return { ...coords, text: results[0].formatted_address };
   } catch (error) {
-    console.error(error);
+    console.log(error);
     return { ...coords, text: "" };
   }
 };

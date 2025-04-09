@@ -32,7 +32,7 @@ def get_mementos(
     """Gets all the mementos belonging to a user."""
     query = (
         db.supabase.table("memento")
-        .select("*, images:image!inner(*)")
+        .select("*, images:image(*)")
         .eq("user_id", str(user_id))
     )
 
@@ -43,8 +43,6 @@ def get_mementos(
             query.lte("date", filter_query.end_date.isoformat())
         if filter_query.text:
             query.text_search("memento_searchable_content", filter_query.text)
-        if filter_query.image_label:
-            query.eq("images.image_label", filter_query.image_label)
 
         # Bounding box filtering using the RPC function
         if all(
@@ -72,6 +70,18 @@ def get_mementos(
             else:
                 # If no mementos are in the bounding box, return an empty list early
                 return []
+
+        # Filter by mementos with associated images labels
+        if filter_query.image_label:
+            image_query = (
+                db.supabase.table("image")
+                .select("memento_id")
+                .like("image_label", filter_query.image_label)
+                .execute()
+            )
+            labeled_memento_ids = [item["memento_id"] for item in image_query.data]
+            if labeled_memento_ids:
+                query.in_("id", labeled_memento_ids)
 
     response = query.execute()
     return [MementoWithImages(**item) for item in response.data]
@@ -109,6 +119,7 @@ def get_image_labels(user_id: UUID4) -> list[str]:
             image["image_label"]
             for memento in response.data
             for image in memento["images"]
+            if image["image_label"]
         },
     )
     labels.sort()

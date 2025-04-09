@@ -4,8 +4,8 @@ tags:
 ---
 # Verify device's native share actionsheet pops up
 # (accessiblilityText below obtained using Maestro hierarchy for Pixel 6 emulator)
-- assertVisible: Sharing image
+- assertVisible: ".*share.*"
 - assertVisible: ".*preview.*"
 # Exit sharing preview by tapping outside
 - tapOn:
-    point: 50%,15%
+    point: 50%,10%

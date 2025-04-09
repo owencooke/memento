@@ -1,6 +1,6 @@
 appId: com.memento.app
 ---
-- runFlow: ./util/launch.yml
+- runFlow: ../util/launch.yml
 
 # Navigate to Edit Memento page
 - tapOn:
@@ -48,7 +48,7 @@ appId: com.memento.app
 
 # Verify FR-30/FR-33: edit form fields
 - runFlow:
-    file: ./util/memento-form.yml
+    file: ../util/memento-form.yml
     env:
       CAPTION: Edited caption
       LOCATION_PARTIAL: Edith

@@ -75,7 +75,7 @@ export default function CreateCollection() {
           router.replace("/(app)/(tabs)/collections");
         },
         onError: (error: any) =>
-          console.error("Failed to create new collection", error),
+          console.log("Failed to create new collection", error),
       },
     );
   };

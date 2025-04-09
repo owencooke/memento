@@ -1,6 +1,6 @@
 import { View } from "react-native";
 import { Image } from "@/src/components/ui/image";
-import { ImageWithUrl, MementoWithImages } from "@/src/api-client/generated";
+import { MementoWithImages } from "@/src/api-client/generated";
 import { Text } from "../ui/text";
 import { useMemo } from "react";
 import { Fab, FabIcon } from "../ui/fab";
@@ -21,7 +21,9 @@ export default function MementoCard({
 }: MementoCardProps) {
   // Get thumbnail
   const thumbnail = useMemo(
-    () => images.find((image) => image.order_index === 0) as ImageWithUrl,
+    () =>
+      images.find((image) => image.order_index === 0)?.url ||
+      "https://placehold.co/400x400.png",
     [images],
   );
 
@@ -38,7 +40,7 @@ export default function MementoCard({
     >
       <View className="aspect-square">
         <Image
-          source={{ uri: thumbnail.url }}
+          source={{ uri: thumbnail }}
           className="w-full h-full"
           alt=""
           resizeMode="cover"
@@ -68,6 +70,7 @@ export default function MementoCard({
       )}
       {selected && (
         <Fab
+          testID="selected-memento-card-fab"
           size="lg"
           className="w-10 h-10 absolute top-2 right-2 bg-tertiary-500 pointer-events-none"
         >

@@ -34,7 +34,11 @@ export default function TabLayout() {
         options={{
           title: "Collections",
           tabBarIcon: ({ color, size }) => (
-            <FolderHeart size={size} color={color || primaryColor} testID="collections-tab"/>
+            <FolderHeart
+              size={size}
+              color={color || primaryColor}
+              testID="tab-collections"
+            />
           ),
         }}
       />

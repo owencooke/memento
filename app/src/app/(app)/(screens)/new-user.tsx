@@ -53,7 +53,7 @@ export default function NewUserForm() {
           router.push("/(app)/(tabs)/mementos");
         },
         onError: (error: any) =>
-          console.error("Failed to create new user info", error),
+          console.log("Failed to create new user info", error),
       },
     );
   };

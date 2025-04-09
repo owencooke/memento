@@ -50,7 +50,7 @@ export default function ViewCollection() {
     if (collageImageBlob) {
       convertBlobToBase64Uri(collageImageBlob as Blob)
         .then(setCollageImageString)
-        .catch(console.error);
+        .catch(console.log);
     }
   }, [collageImageBlob]);
 
@@ -75,7 +75,7 @@ export default function ViewCollection() {
         }
       }
     } catch (error) {
-      console.error("Error sharing collage:", error);
+      console.log("Error sharing collage:", error);
     }
   };
 
@@ -127,9 +127,9 @@ export default function ViewCollection() {
             alt="Collage"
             testID="collage-image"
           />
-          <Button 
-            className="mt-auto" 
-            size="xl" 
+          <Button
+            className="mt-auto"
+            size="xl"
             onPress={handleShareCollage}
             testID="export-collage-button"
           >

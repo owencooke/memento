@@ -1,0 +1,61 @@
+appId: com.memento.app
+tags:
+  - util
+---
+- runFlow: launch.yml
+
+# Navigate to Create Memento page
+- tapOn:
+    id: fab-create-memento
+- tapOn: Create a single memento
+- assertVisible: Create Memento
+
+# Open camera
+- tapOn:
+    id: photo-grid-add-button
+- tapOn: Take a Photo
+- assertVisible:
+    id: camera-reference-overlay
+- tapOn:
+    id: camera-capture-button
+- assertVisible:
+    id: interactive-photo-card
+
+# Reject background removal
+- assertVisible:
+    id: modal-background-removal
+- tapOn:
+    id: modal-background-removal-decline
+
+# Upload from library
+- tapOn:
+    id: photo-grid-add-button
+- tapOn: Select from Library
+- tapOn: ".*More.*"
+- tapOn: ".*Browse.*"
+- tapOn:
+    text: "tree(?:\\s*\\(\\d+\\))?\\.jpg.*"
+
+# Accept background removal
+- assertVisible:
+    id: modal-background-removal
+- tapOn:
+    id: modal-background-removal-confirm
+
+# Wait for auto metadata extraction
+- assertVisible: New York, NY, USA
+
+# Fill form
+- runFlow:
+    file: memento-form.yml
+    env:
+      CAPTION: ${CAPTION}
+      LOCATION_PARTIAL: ${LOCATION_PARTIAL}
+      LOCATION_FULL: ${LOCATION_FULL}
+
+# Submit the form
+- tapOn:
+    id: memento-form-submit-button
+
+# Back on mementos screen
+- assertVisible: Mementos

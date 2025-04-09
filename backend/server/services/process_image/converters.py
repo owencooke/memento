@@ -29,7 +29,7 @@ async def pil_to_png_bytes(
 
         # Check size constraint in KB
         size_kb = buffer.tell() / 1024
-        logger.debug(f"Compressed image size: {size_kb}")
+        logger.info(f"Compressed image size: {size_kb}")
         if size_kb <= max_size_kb or (width < 200 and height < 200):
             break
 

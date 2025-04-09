@@ -1,0 +1,18 @@
+appId: com.memento.app
+---
+- assertVisible: Mementos
+- tapOn:
+    id: mementos-filter-button
+- assertVisible: Filter Mementos
+
+# set location
+- tapOn:
+    id: filter-sheet-location
+- inputText: ${LOCATION_PARTIAL}
+- tapOn:
+    text: ${LOCATION_FULL}
+    repeat: 5
+    delay: 1000
+
+- tapOn:
+    id: filter-sheet-submit-button

@@ -54,7 +54,7 @@ async def create_new_collection(
     user_id: UUID4 = Depends(get_user_id),
 ) -> Collection:
     """Create a collection."""
-    logger.debug(f"Creating a new collection {new_collection}")
+    logger.info(f"Creating a new collection {new_collection}")
 
     inserted_collection = create_collection(new_collection, user_id)
     if not inserted_collection:

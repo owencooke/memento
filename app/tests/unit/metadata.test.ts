@@ -341,8 +341,8 @@ describe("Metadata Utilities", () => {
       // Mock geocoding error
       mockGeocodingResponse.error();
 
-      // Spy on console.error
-      const consoleSpy = jest.spyOn(console, "error").mockImplementation();
+      // Spy on console.log
+      const consoleSpy = jest.spyOn(console, "log").mockImplementation();
 
       // When
       const result = await aggregateMetadata([photo]);
@@ -372,8 +372,8 @@ describe("Metadata Utilities", () => {
       // Mock fetch error
       mockGeocodingResponse.networkError();
 
-      // Spy on console.error
-      const consoleSpy = jest.spyOn(console, "error").mockImplementation();
+      // Spy on console.log
+      const consoleSpy = jest.spyOn(console, "log").mockImplementation();
 
       // When
       const result = await aggregateMetadata([photo]);

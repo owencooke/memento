@@ -1,0 +1,15 @@
+appId: com.memento.app
+---
+- runFlow: ../util/launch.yml
+- runFlow: ../util/add-assets.yml
+
+- runFlow:
+    file: ../util/create-test-memento.yml
+    env:
+      CAPTION: "Single made by Maestro"
+      LOCATION_PARTIAL: "Edmon"
+      LOCATION_FULL: "Edmonton, AB, Canada"
+
+- assertVisible: Single made by Maestro
+- assertVisible: ^\d{4}-\d{2}-01$
+- assertVisible: Edmonton

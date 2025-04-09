@@ -91,10 +91,10 @@ class MementoFilterParams(BaseModel):
     def check_date_order(cls, data: Any) -> Any:
         """Checks that end date is gte start_date"""
         if (
-            isinstance(data, dict)
-            and data["end_date"]
-            and data["start_date"]
-            and data["end_date"] < data["start_date"]
+            isinstance(data, MementoFilterParams)
+            and data.end_date
+            and data.start_date
+            and data.end_date < data.start_date
         ):
             raise ValueError("end date must be greater than or equal to start date")
 
@@ -105,8 +105,8 @@ class MementoFilterParams(BaseModel):
     def all_bounds_values(cls, data: Any) -> Any:
         """Ensure all bounding box values are provided if any are set"""
         bbox_fields = ["min_lat", "min_long", "max_lat", "max_long"]
-        bbox_values = [data.get(field) for field in bbox_fields]
-        if any(bbox_values) and not all(bbox_values):
+        values_present = [data.get(field) is not None for field in bbox_fields]
+        if any(values_present) and not all(values_present):
             raise ValueError(
                 "All bounding box coordinates \
                         (min_lat, min_long, max_lat, max_long) must be provided",

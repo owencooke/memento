@@ -1,0 +1,44 @@
+appId: com.memento.app
+---
+# Required Setup
+# Mementos:
+#   Memento 1:
+#     - caption: nil
+#     - date: 04-01-2025
+#     - location: Edmonton, AB, Canada
+#   Memento 2:
+#     - caption: nil
+#     - date: 04-05-2025
+#     - location: Toronto, ON, Canada
+
+# Verify FR-12
+- runFlow:
+    file: ./collection/create-collection.yml
+    env:
+      TITLE: "Collection made by Maestro"
+      CAPTION: "Collection made by Maestro"
+      LOCATION_PARTIAL: "Q"
+      LOCATION_FULL: "Québec, QC, Canada"
+      CITY: "Québec"
+
+# Verify FR-13
+- runFlow:
+    file: ./collection/edit-collection.yml
+    env:
+      NEW_TITLE: "Collection Edited by Maestro"
+      NEW_CAPTION: "Caption Edited by Maestro"
+      NEW_LOCATION_PARTIAL: "Q"
+      NEW_LOCATION_FULL: "Québec, QC, Canada"
+      CITY: "Québec"
+
+# Verify FR-16
+- runFlow:
+    file: ./collection/view-collection.yml
+    env:
+      TITLE: "Collection Edited by Maestro"
+      CAPTION: "Caption Edited by Maestro"
+      LOCATION: "Québec, QC, Canada"
+
+# Verify FR-15
+- runFlow:
+    file: ./collection/delete-collection.yml

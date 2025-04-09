@@ -1,0 +1,13 @@
+appId: com.memento.app
+tags:
+  - util
+---
+# Ensure test image(s) added to phone gallery at least once
+- runFlow:
+    when:
+      true: ${!output.testImageAdded}
+    commands:
+      - addMedia:
+          - "./assets/tree.jpg"
+          - "./assets/tree.jpg"
+      - evalScript: ${output.testImageAdded = true}

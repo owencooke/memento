@@ -37,16 +37,23 @@ const LocationInput = ({
   const { getColor } = useColors();
   const autocompleteRef = useRef<any>(null);
   const prevTextRef = useRef<string>("");
+  const programmaticChangeRef = useRef(false);
 
-  // Updates the autocomplete text when controlled value changes
   useEffect(() => {
     if (
       autocompleteRef.current &&
       value !== null &&
       value.text !== prevTextRef.current
     ) {
-      prevTextRef.current = value.text;
+      if (programmaticChangeRef.current) {
+        // If this change came from the user typing, don't call setAddressText
+        programmaticChangeRef.current = false;
+        return;
+      }
+
+      // Only set address text if the change came externally
       autocompleteRef.current.setAddressText(value.text);
+      prevTextRef.current = value.text;
     }
   }, [value]);
 
@@ -65,11 +72,16 @@ const LocationInput = ({
           const long = details?.geometry.location.lng;
           const text = data.description || "";
           const bbox = details?.geometry.viewport; // This is how the bounding box is accessed
+
+          programmaticChangeRef.current = true;
           prevTextRef.current = text;
 
           onChange({ text, lat, long, bbox });
         }}
         textInputProps={{
+          autoCorrect: false,
+          autoCapitalize: "none",
+          spellCheck: false,
           onChangeText: (text) => {
             if (text !== prevTextRef.current) {
               prevTextRef.current = text;

@@ -1,8 +1,9 @@
 import binascii
 from typing import Any, Dict, Optional
-from typing_extensions import Self
+
 from pydantic import BaseModel, Field, field_validator
 from shapely import wkb
+from typing_extensions import Self
 
 
 class Coordinates(BaseModel):

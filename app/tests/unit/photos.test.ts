@@ -272,8 +272,8 @@ describe("Photo utilities", () => {
         new Error("File access error"),
       );
 
-      // Spy on console.error
-      const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
+      // Spy on console.log
+      const consoleErrorSpy = jest.spyOn(console, "log").mockImplementation();
 
       // Call createPhotoObject
       const result = await createPhotoObject(mockPhoto);
@@ -288,8 +288,46 @@ describe("Photo utilities", () => {
       // Should still return a valid photo object
       expect(result).toHaveProperty("uri", mockPhoto.uri);
 
-      // Restore console.error
+      // Restore console.log
       consoleErrorSpy.mockRestore();
+    });
+  });
+  it("falls back to 'jpg' when both mimeType and mime.getType are null", async () => {
+    // Mock file size check to be small enough
+    (FileSystem.getInfoAsync as jest.Mock).mockResolvedValue(mockSmallFileInfo);
+
+    // Mock mime.getType to return null
+    (mime.getType as jest.Mock).mockReturnValue(null);
+
+    const photoWithoutMimeType: Photo = {
+      uri: "file://test/photo.unknown",
+      fileName: "photo.unknown",
+      assetId: "asset123",
+    };
+
+    const result = await createPhotoObject(photoWithoutMimeType);
+
+    expect(result.mimeType).toBe("jpg");
+    expect(mime.getType).toHaveBeenCalledWith(photoWithoutMimeType.uri);
+  });
+
+  it("returns zero file size for non-existent files", async () => {
+    // Mock file doesn't exist
+    (FileSystem.getInfoAsync as jest.Mock).mockResolvedValueOnce({
+      exists: false,
+    });
+
+    // Mock mime.getType and uniqueId
+    (mime.getType as jest.Mock).mockReturnValue("image/jpeg");
+
+    const result = await createPhotoObject(mockPhoto);
+
+    // No compression needed for zero size file
+    expect(ImageManipulator.manipulateAsync).not.toHaveBeenCalled();
+    expect(result).toEqual({
+      ...mockPhoto,
+      fileName: "photo.jpg",
+      assetId: "photo_123456",
     });
   });
 });

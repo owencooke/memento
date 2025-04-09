@@ -101,7 +101,7 @@ const getFileSize = async (uri: string): Promise<number> => {
     const info = await FileSystem.getInfoAsync(uri);
     return info.exists ? info.size : 0;
   } catch (error) {
-    console.error("Error getting file size:", error);
+    console.log("Error getting file size:", error);
     return 0;
   }
 };

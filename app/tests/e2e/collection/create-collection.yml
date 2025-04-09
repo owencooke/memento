@@ -1,0 +1,69 @@
+---
+appId: com.memento.app
+---
+- runFlow: ../util/launch.yml
+
+# Required Setup
+# Mementos:
+#   Memento 1:
+#     - caption: nil
+#     - date: 04-03-2025
+#     - location: Edmonton, AB, Canada
+
+# Navigate to Create Collection page
+- tapOn:
+    id: tab-collections
+- tapOn:
+    id: fab-create-collection
+- assertVisible: Create Collection
+
+# Select Mementos
+- assertNotVisible:
+    id: memento-card
+- tapOn:
+    id: collection-form-select-mementos-button
+- assertVisible: Select Mementos
+- assertVisible:
+    id: memento-card
+#
+# # Verify FR-41
+- tapOn:
+    id: memento-card
+    containsChild:
+      text: Edmonton
+- assertVisible:
+    id: selected-memento-card-fab
+
+- scrollUntilVisible:
+    element:
+      id: submit-selected-mementos-button
+    direction: DOWN
+    timeout: 50000
+    speed: 40
+    visibilityPercentage: 100
+    centerElement: false
+- tapOn:
+    id: submit-selected-mementos-button
+
+# # Verify FR-47 - FR-50: extract metadata and fill fields
+- tapOn:
+    id: accept-derived-metadata-button
+- assertVisible: "Edmonton, AB, Canada"
+- assertVisible: "2025-04-03"
+
+# Verify FR-37: Fill out other form fields
+- runFlow:
+    file: ../util/collection-form.yml
+    env:
+      TITLE: ${TITLE}
+      CAPTION: ${CAPTION}
+      LOCATION_PARTIAL: ${LOCATION_PARTIAL}
+      LOCATION_FULL: ${LOCATION_FULL}
+
+# Verify new collection added to grid view
+- assertVisible: Collections
+- assertVisible: ${TITLE}
+- assertVisible: ${CAPTION}
+# FIXME: STICKY DATEPICKER
+# - assertVisible: ^\d{4}-\d{2}-01$
+- assertVisible: ${CITY}
