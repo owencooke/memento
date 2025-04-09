@@ -42,8 +42,8 @@ appId: com.memento.app
 - runFlow:
     file: ./filter/filter-location.yml
     env:
-      LOCATION_PARTIAL: "Alber"
-      LOCATION_FULL: "Alberta, Canada"
+      LOCATION_PARTIAL: "Ed"
+      LOCATION_FULL: "Edmonton, AB, Canada"
 - assertVisible: "Edmonton"
 - assertNotVisible: "Toronto"
 - runFlow:
